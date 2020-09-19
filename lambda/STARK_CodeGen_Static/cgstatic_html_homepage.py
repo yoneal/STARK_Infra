@@ -18,7 +18,7 @@ def create(data):
 
             <link rel="stylesheet" href="css/bootstrap.min.css" />
             <link rel="stylesheet" href="css/bootstrap-vue.css" />
-            <link rel="stylesheet" href="css/STARK_POC.css" />
+            <link rel="stylesheet" href="css/STARK.css" />
 
             <script src="js/vue.js" defer></script>
             <script src="js/bootstrap-vue.min.js" defer></script>
