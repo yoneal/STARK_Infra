@@ -82,7 +82,9 @@ def create(data):
             else:
                 data['pk'] = payload.get('{pk_varname}')
                 data['orig_pk'] = payload.get('orig_{pk_varname}','')
-                data['sk'] = payload.get('sk', default_sk)"""
+                data['sk'] = payload.get('sk', '')
+                if data['sk'] == "":
+                    data['sk'] = default_sk"""
 
     for col, col_type in columns.items():
         col_varname = col.replace(" ", "_").lower()
