@@ -1,0 +1,56 @@
+.hidden: {
+    visibility: hidden
+}
+
+fieldset {
+    margin-top: 0px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid black;
+}
+
+fieldset.infra_api_gateway {
+    background-color: #479EFF;
+}
+
+fieldset.infra_lambda {
+    background-color: #DAF7A6;
+}
+
+fieldset.infra_ddb {
+    background-color: #FF5733;
+}
+
+fieldset.infra_sqs {
+    background-color: #FFC300;
+}
+
+fieldset.infra_s3 {
+    background-color: #9B59B6;
+}
+
+fieldset.infra_cf {
+    background-color: #61E5FF;
+}
+
+.cloud_resources_box {
+    height: 80vh;
+    overflow-y: scroll;
+    margin-bottom: 20px;
+    padding:10px;
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+}
+
+.module_card {
+    width: 375px;
+}
+
+.module_card:hover {
+    box-shadow: 0px 0px 5px orange;
+}
+
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+  background-color: #fff8bb;
+}

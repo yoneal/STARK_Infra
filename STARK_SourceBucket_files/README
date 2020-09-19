@@ -1,0 +1,4 @@
+STARK_SourceBucket:
+
+Files here are what the STARKSourceBucket S3 bucket should hold for the common static files (HTML/CSS/JS)
+
