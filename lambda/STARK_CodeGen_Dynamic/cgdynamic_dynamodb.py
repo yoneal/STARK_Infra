@@ -18,14 +18,21 @@ def create(data):
 
     default_sk     = entity + "|info"
  
- 
-    #Create the column list value we'll use in the code as a declaration
-    col_list = "pk, sk, "
+    #Create the column dict we'll use in the code as a declaration
+    col_dict = '{ "pk": pk, "sk": sk, '
     for col in columns:
         col_varname = col.replace(" ", "_").lower()
-        col_list += col_varname + ", "
-    col_list = col_list[:-2]
-    #FIXME - this is unwieldy for tables with a ton of columns. Make this a dictionary of {column_name: column_value}
+        col_dict += f'"{col_varname}": {col_varname}, '
+    col_dict = col_dict[:-2]
+    col_dict += ' }'
+
+    #Create the dict value retrieval code for the add/edit function body
+    dict_to_var_code = f"""pk = data.get('pk', '')
+        sk = data.get('sk', '')"""
+    for col in columns:
+        col_varname = col.replace(" ", "_").lower()
+        dict_to_var_code = f"""
+        {col_varname} = data.get('{col_varname}', '')"""
 
     #This is for our DDB update call
     update_expression = ""
@@ -61,6 +68,7 @@ def create(data):
             #Get specific request method
             method  = event.get('requestContext').get('http').get('method')
             payload = json.loads(event.get('body')).get('{entity_varname}',"")
+            data = {{}}
 
             if payload == "":
                 return {{
@@ -72,16 +80,14 @@ def create(data):
                     }}
                 }}
             else:
-                pk = payload.get('{pk_varname}')
-                orig_pk = payload.get('orig_{pk_varname}','')
-                sk = payload.get('sk', '')
-                if sk == "":
-                    sk = default_sk"""
+                data['pk'] = payload.get('{pk_varname}')
+                data['orig_pk'] = payload.get('orig_{pk_varname}','')
+                data['sk'] = payload.get('sk', default_sk)"""
 
     for col, col_type in columns.items():
         col_varname = col.replace(" ", "_").lower()
         source_code +=f"""
-                {col_varname} = payload.get('{col_varname}','')"""
+                data['{col_varname}'] = payload.get('{col_varname}','')"""
 
     source_code +=f"""
 
@@ -92,13 +98,13 @@ def create(data):
 
                 #We can't update DDB PK, so if PK is different, we need to do ADD + DELETE
                 if orig_pk == pk:
-                    response = edit({col_list})
+                    response = edit(data)
                 else:
-                    response = add({col_list})
+                    response = add(data)
                     response = delete(orig_pk, sk)
 
             elif method == "POST":
-                response = add({col_list})
+                response = add(data)
 
             else:
                 return {{
@@ -249,7 +255,8 @@ def create(data):
 
         return "OK"
 
-    def edit({col_list}):                
+    def edit(data):                
+        {dict_to_var_code}
 
         response = ddb.update_item(
             TableName=ddb_table,
@@ -291,7 +298,8 @@ def create(data):
 
         return "OK"
 
-    def add({col_list}):
+    def add(data):
+        {dict_to_var_code}
 
         item={{}}
         item['pk'] = {{'S' : pk}}
