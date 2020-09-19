@@ -26,8 +26,8 @@ Resources:
                         ApiId:
                             Ref: STARKParserApi
             Runtime: python3.8
-            Handler: STARK_parser_v0_3.lambda_handler
-            CodeUri: lambda/STARK_POC_parser
+            Handler: main.lambda_handler
+            CodeUri: lambda/STARK_Parser
             Policies:
                 - AmazonSSMReadOnlyAccess
                 - AWSLambdaFullAccess
@@ -38,8 +38,8 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Runtime: python3.8
-            Handler: lambda_function.lambda_handler
-            CodeUri: lambda/STARK_POC_CFwriter
+            Handler: main.lambda_handler
+            CodeUri: lambda/STARK_CFWriter
             Policies:
                 - AmazonS3FullAccess
                 - AmazonSSMFullAccess
@@ -59,8 +59,8 @@ Resources:
                         ApiId:
                             Ref: STARKParserApi
             Runtime: python3.8
-            Handler: STARK_POC_deploy.lambda_handler
-            CodeUri: lambda/STARK_POC_deploy
+            Handler: main.lambda_handler
+            CodeUri: lambda/STARK_Deploy
             Policies:
                 - AmazonSSMReadOnlyAccess
                 - AWSLambdaFullAccess
@@ -80,8 +80,8 @@ Resources:
                         ApiId:
                             Ref: STARKParserApi
             Runtime: python3.8
-            Handler: STARK_POC_deploy_check.lambda_handler
-            CodeUri: lambda/STARK_POC_deploy_check
+            Handler: main.lambda_handler
+            CodeUri: lambda/STARK_Deploy_Check
             Policies:
                 - AmazonSSMReadOnlyAccess
                 - AWSLambdaFullAccess
@@ -93,7 +93,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Runtime: python3.8
-            Handler: lambda_function.lambda_handler
+            Handler: main.lambda_handler
             CodeUri: lambda/STARK_CodeGen_Static
             Policies:
                 - AmazonS3FullAccess
@@ -107,7 +107,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Runtime: python3.8
-            Handler: lambda_function.lambda_handler
+            Handler: main.lambda_handler
             CodeUri: lambda/STARK_CodeGen_Dynamic
             Policies:
                 - AmazonS3FullAccess
@@ -121,8 +121,8 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Runtime: python3.8
-            Handler: lambda_function.lambda_handler
-            CodeUri: lambda/STARK_POC_STARKBucketPreloader
+            Handler: main.lambda_handler
+            CodeUri: lambda/STARK_WebsiteBucketPreloader
             Policies:
                 - AmazonS3FullAccess
                 - AmazonSSMReadOnlyAccess
@@ -130,56 +130,6 @@ Resources:
             Layers:
                 - arn:aws:lambda:ap-southeast-1:201649379729:layer:CF_CustomResourceHelper_layer:1
             Timeout: 60
-    STARKModulesFunc:
-        Type: AWS::Serverless::Function
-        Properties:
-            Events:
-                ModulesGetEvent:
-                    Type: HttpApi
-                    Properties:
-                        Path: /modules
-                        Method: GET
-                        ApiId:
-                            Ref: STARKParserApi
-            Runtime: python3.8
-            Handler: lambda_function.lambda_handler
-            CodeUri: lambda/STARK_POC_moduleslist
-    STARKCustomerFunc:
-        Type: AWS::Serverless::Function
-        Properties:
-            Events:
-                CustomerGetEvent:
-                    Type: HttpApi
-                    Properties:
-                        Path: /customer
-                        Method: GET
-                        ApiId:
-                            Ref: STARKParserApi
-                CustomerPostEvent:
-                    Type: HttpApi
-                    Properties:
-                        Path: /customer
-                        Method: POST
-                        ApiId:
-                            Ref: STARKParserApi
-                CustomerPutEvent:
-                    Type: HttpApi
-                    Properties:
-                        Path: /customer
-                        Method: PUT
-                        ApiId:
-                            Ref: STARKParserApi
-                CustomerDeleteEvent:
-                    Type: HttpApi
-                    Properties:
-                        Path: /customer
-                        Method: DELETE
-                        ApiId:
-                            Ref: STARKParserApi
-            Runtime: python3.8
-            Handler: lambda_function.lambda_handler
-            CodeUri: lambda/STARK_POC_customer
-            Role: arn:aws:iam::201649379729:role/WayneStark_test_lambda_role_1
     ParameterStoreApiID:
         Type: AWS::SSM::Parameter
         Properties:
