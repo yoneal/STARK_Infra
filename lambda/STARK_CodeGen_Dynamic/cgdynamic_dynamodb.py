@@ -9,7 +9,7 @@ def create(data):
   
     pk             = data["PK"]
     entity         = data["Entity"]
-    model          = data["Columns"]
+    columns        = data["Columns"]
     ddb_table_name = data["DynamoDB Name"]
 
     #Convert human-friendly names to variable-friendly names
@@ -17,14 +17,11 @@ def create(data):
     pk_varname     = entity.replace(" ", "_").lower()
 
     default_sk     = entity + "|info"
-
-    #FIXME "model" here is actually just the columns, not the entire model; 
-    #   we're stuck with older variable naming that pre-dates our current structure
-    #   Fix when able
+ 
  
     #Create the column list value we'll use in the code as a declaration
     col_list = "pk, sk, "
-    for col in model:
+    for col in columns:
         col_varname = col.replace(" ", "_").lower()
         col_list += col_varname + ", "
     col_list = col_list[:-2]
@@ -32,7 +29,7 @@ def create(data):
 
     #This is for our DDB update call
     update_expression = ""
-    for col in model:
+    for col in columns:
         col_varname = col.replace(" ", "_").lower()
         update_expression += f"""#{col_varname} = :{col_varname}, """
     update_expression = update_expression[:-2]
@@ -81,7 +78,7 @@ def create(data):
                 if sk == "":
                     sk = default_sk"""
 
-    for col, col_type in model.items():
+    for col, col_type in columns.items():
         col_varname = col.replace(" ", "_").lower()
         source_code +=f"""
                 {col_varname} = payload.get('{col_varname}','')"""
@@ -169,7 +166,7 @@ def create(data):
             item = {{'{pk_varname}': record['pk']['S'],
                     'sk': record['sk']['S'],"""
 
-    for col, col_type in model.items():
+    for col, col_type in columns.items():
         #FIXME: [Dupe 0] This transformation is a stub, and it should be done earlier. Only final processed data should be here
         #   The parser should have done the work for us. It's possible that both the original and transformed types need to be
         #   retained, for different purposes. The original type has metadata value that may affect other codegen decisions, aside
@@ -218,7 +215,7 @@ def create(data):
             item = {{'{pk_varname}': record['pk']['S'],
                     'sk': record['sk']['S'],"""
 
-    for col, col_type in model.items():
+    for col, col_type in columns.items():
         #FIXME: [Dupe 0] This transformation is a stub, and it should be done earlier. Only final processed data should be here
         #   The parser should have done the work for us. It's possible that both the original and transformed types need to be
         #   retained, for different purposes. The original type has metadata value that may affect other codegen decisions, aside
@@ -263,7 +260,7 @@ def create(data):
             UpdateExpression="SET {update_expression}",
             ExpressionAttributeNames={{"""
 
-    for col in model:
+    for col in columns:
         col_varname = col.replace(" ", "_").lower()
         source_code +=f"""
                 '#{col_varname}' : '{col_varname}',"""  
@@ -272,7 +269,7 @@ def create(data):
             }},
             ExpressionAttributeValues={{"""
 
-    for col, col_type in model.items():
+    for col, col_type in columns.items():
         #FIXME: [Dupe 2] This transformation is a stub, and it should be done earlier. Only final processed data should be here
         #   The parser should have done the work for us. It's possible that both the original and transformed types need to be
         #   retained, for different purposes. The original type has metadata value that may affect other codegen decisions, aside
@@ -300,7 +297,7 @@ def create(data):
         item['pk'] = {{'S' : pk}}
         item['sk'] = {{'S' : sk}}"""
 
-    for col, col_type in model.items():
+    for col, col_type in columns.items():
         #FIXME: [Dupe 3] This transformation is a stub, and it should be done earlier. Only final processed data should be here
         #   The parser should have done the work for us. It's possible that both the original and transformed types need to be
         #   retained, for different purposes. The original type has metadata value that may affect other codegen decisions, aside
