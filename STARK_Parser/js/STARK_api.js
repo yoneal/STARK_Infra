@@ -31,10 +31,8 @@ Document:
         - Title: string
         - Revision: string
         - Description: string`,
-            provisioned_resources: 'STARK Parser is idle',
         },
         api_key: '',
-        cloud_resources: '',
         deploy_visibility: 'hidden',
         model_readonly: false,
         loading_message: '',
@@ -49,11 +47,6 @@ Document:
             root.success_message = ''
             root.loading_message = "STARK is parsing your YAML model..."
             root.spinner_show();
-
-            // This function and relevant parameters should be decoupled from Vue!
-            this.cloud_resources = ""
-            this.form.provisioned_resources = "STARK Parser initiated... please wait..."
-
 
             let data = {
                 data_model: this.form.data_model
@@ -88,13 +81,10 @@ Document:
                 console.log(data)
                 if (data == "Code:NoProjectName") {
                     console.log("Error Code")
-                    root.form.provisioned_resources = "Please enter a Project Name first for \"__STARK_project_name__:\""
                     root.success_message = "Please enter a project name in the \"__STARK_project_name__\" attribute below"
 
                 }else {
                     console.log("Success")
-                    root.form.provisioned_resources = ""
-                    root.cloud_resources = data;
                     console.log("DONE!");
 
                     root.success_message = "Nice! Your YAML looks valid according to the STARK Parser.<br>Click \"Deploy\" to launch your serverless system!"
@@ -106,7 +96,6 @@ Document:
             .catch(function(error) {
                 root.loading_message = ""
                 root.spinner_hide();
-                root.form.provisioned_resources = "Sorry, your YAML is invalid. Make sure it conforms to STARK syntax, then try again. "
                 root.success_message = "Sorry, your YAML is invalid. Make sure it conforms to STARK syntax, then try again. "
             });
         },

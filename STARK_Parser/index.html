@@ -27,17 +27,7 @@
         </h2>
         </div>
     </div>
-<!--
-    <div class="d-flex justify-content-left" id="loading-spinner" :style="{visibility: visibility}">
-        <div class="p-2">
-            {{ loading_message }}
-            <br>
-        </div>
-        <div class="spinner-border" role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
-    </div>        
--->
+
     <div class="row">
         <div class="col-sm-12 col-lg-6">
             Status:
@@ -70,7 +60,6 @@
                   v-model="form.data_model"
                   :readonly=model_readonly
                 ></b-form-textarea>
-                <!--<b-form-input v-model="api_key" placeholder="API Key: JV gave you one, paste it here"></b-form-input>-->
                 <b-button id="btn_generate" variant="primary" class="mt-2" v-on:click="send_to_STARK()">Generate</b-button>
                 <b-button id="btn_deploy" variant="success" class="mt-2" v-on:click="deploy_STARK()" :style="{visibility: deploy_visibility}">Deploy</b-button>
             </b-form-group>
@@ -88,38 +77,6 @@
             </b-tooltip>
 
         </div>
-
-    <!--
-        <div class="col-sm" :style="{display: ui_visibility}">
-            <p class="mt-2 mb-2">Resources to Provision:</p>
-
-            <div class="cloud_resources_box">
-
-                <div class="container" v-html="form.provisioned_resources">
-                    {{ form.provisioned_resources }}
-                </div>
-
-                <div id="cloud-resources">
-                    <template v-for="resource in cloud_resources" id="cloud-resources-template">
-                        <div class="infra">
-                        <h3> {{ resource.name }} </h3>
-                        <fieldset :class="resource.class">
-                            <div v-for="section in resource.sections">
-                            <h4>{{ section.title }}</h4>
-                            <ul>
-                                <li v-for="item in section.items">{{ item }}</li>
-                            </ul>
-                            </div>
-                        </fieldset>
-                        </div>
-                    </template>
-                </div>
-
-            </div>
-        </div>
-    -->
-
-
 
     </div>
 
