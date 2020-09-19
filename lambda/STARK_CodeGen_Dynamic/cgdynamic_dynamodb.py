@@ -92,16 +92,17 @@ def create(data):
     source_code +=f"""
 
             if method == "DELETE":
-                response = delete(pk, sk)
+                response = delete(data)
 
             elif method == "PUT":
 
                 #We can't update DDB PK, so if PK is different, we need to do ADD + DELETE
-                if orig_pk == pk:
+                if data['orig_pk'] == data['pk']:
                     response = edit(data)
                 else:
-                    response = add(data)
-                    response = delete(orig_pk, sk)
+                    response   = add(data)
+                    data['pk'] = data['orig_pk']
+                    response   = delete(data)
 
             elif method == "POST":
                 response = add(data)
@@ -244,7 +245,10 @@ def create(data):
 
         return items
 
-    def delete(pk, sk):
+    def delete(data):
+        pk = data.get('pk','')
+        sk = data.get('sk','')
+
         response = ddb.delete_item(
             TableName=ddb_table,
             Key={{
