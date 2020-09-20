@@ -28,6 +28,8 @@ Item:
             min: 5
             max: 50
             wrap: no-wrap
+        - Weight (kg):
+            type: dec-spinner
         - Category: string
         - Description: string
 Document:
