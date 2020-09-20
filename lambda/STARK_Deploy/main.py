@@ -51,7 +51,7 @@ def lambda_handler(event, context):
     except ClientError as error:
         payload = {
             'status': 'CloudFormation Execution Failed',
-            'message': "Sorry, STARK failed to deploy due to an internal error. It's not you, it's us! {" + str(error) + "}",
+            'message': "Sorry, STARK failed to deploy due to an internal error. It's not you, it's us! {" + error.response['Error']['Code'] + "}",
             'retry': False
         }        
 
