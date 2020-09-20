@@ -25,7 +25,7 @@ def lambda_handler(event, context):
 
     project_varname = (data_model.get('__STARK_project_name__')).replace(" ", "")
     
-    CF_url = f'https://waynestark-stark-prototype-codegenbucket.s3-ap-southeast-1.amazonaws.com/STARK_{project_varname}.yaml'
+    CF_url = f'https://waynestark-stark-prototype-codegenbucket.s3-ap-southeast-1.amazonaws.com/STARK_SAM_{project_varname}.yaml'
 
     response = client.create_stack(
         StackName=project_varname,
