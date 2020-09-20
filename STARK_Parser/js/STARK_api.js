@@ -139,7 +139,18 @@ Document:
                 //  While it is looping, each communication also contains `status` and `message` aside from `retry`.
                 //  We should display `status` and `message` to the user.
                 root.msg_counter += 1;
-                root.deploy_check();
+
+                if(data['retry'] == true) {
+                    root.deploy_check();
+                }
+                else {
+                    //Failed:
+                    //This means CF Stack execution failed outright.
+                    console.log("CF Stack fail: ");
+                    root.loading_message = ""
+                    root.spinner_hide();
+                    root.success_message = data['message'];
+                }
 
             })
             .catch(function(error) {

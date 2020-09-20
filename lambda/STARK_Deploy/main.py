@@ -26,27 +26,36 @@ def lambda_handler(event, context):
     project_varname = (data_model.get('__STARK_project_name__')).replace(" ", "_").lower()
     CF_stack_name   = (data_model.get('__STARK_project_name__')).replace(" ", "").lower()
 
-
-
     CF_url = f'https://waynestark-stark-prototype-codegenbucket.s3-ap-southeast-1.amazonaws.com/STARK_SAM_{project_varname}.yaml'
 
-    response = client.create_stack(
-        StackName=CF_stack_name,
-        TemplateURL=CF_url,
-        TimeoutInMinutes=10,
-        Capabilities=[
-            'CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND',
-        ],
-        RoleARN='arn:aws:iam::201649379729:role/STARK_POC_Deploy_CloudFormationServiceRole',
-        OnFailure='DELETE',
-        EnableTerminationProtection=False
-    )
+    try:
+        response = client.create_stack(
+            StackName=CF_stack_name,
+            TemplateURL=CF_url,
+            TimeoutInMinutes=10,
+            Capabilities=[
+                'CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND',
+            ],
+            RoleARN='arn:aws:iam::201649379729:role/STARK_POC_Deploy_CloudFormationServiceRole',
+            OnFailure='DELETE',
+            EnableTerminationProtection=False
+        )
 
-    payload = {
-        'status': 'CloudFormation Execution Started',
-        'message': "Look at you, testing out next-gen serverless tech! Don't worry, it's coming!",
-        'retry': True
-    }
+        payload = {
+            'status': 'CloudFormation Execution Started',
+            'message': "Look at you, testing out next-gen serverless tech! Don't worry, it's coming!",
+            'retry': True
+        }
+
+    except AssertionError as error:
+        payload = {
+            'status': 'CloudFormation Execution Failed',
+            'message': "Sorry, STARK failed to deploy due to an internal error. It's not you, it's us! {" + str(error) + "}",
+            'retry': False
+        }        
+
+
+
 
     return {
         "isBase64Encoded": False,
