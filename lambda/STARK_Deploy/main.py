@@ -23,15 +23,12 @@ def lambda_handler(event, context):
     jsonified_payload = json.loads(raw_data_model)
     data_model = yaml.safe_load(jsonified_payload["data_model"])
 
-    project_name = (data_model.get('__STARK_project_name__')).replace(" ", "")
-
+    project_varname = (data_model.get('__STARK_project_name__')).replace(" ", "")
     
-    #FIXME: Hard-coded for now. Should be based on project name and API key
-    CF_url = 'https://waynestark-common-archive.s3-ap-southeast-1.amazonaws.com/CFWriter_test.yaml'
-
+    CF_url = f'https://waynestark-stark-prototype-codegenbucket.s3-ap-southeast-1.amazonaws.com/STARK_{project_varname}.yaml'
 
     response = client.create_stack(
-        StackName=project_name,
+        StackName=project_varname,
         TemplateURL=CF_url,
         TimeoutInMinutes=10,
         Capabilities=[
@@ -45,9 +42,8 @@ def lambda_handler(event, context):
     payload = {
         'status': 'CloudFormation Execution Started',
         'message': "Look at you, testing out next-gen serverless tech! Don't worry, it's coming!",
-        'retry': True #FIXME: hard-coded for now, but for prod check response first. This will be false if create_stack() errors out.
+        'retry': True
     }
-
 
     return {
         "isBase64Encoded": False,

@@ -23,14 +23,14 @@ def lambda_handler(event, context):
     jsonified_payload = json.loads(raw_data_model)
     data_model = yaml.safe_load(jsonified_payload["data_model"])
 
-    project_name = (data_model.get('__STARK_project_name__')).replace(" ", "")
+    project_varname = (data_model.get('__STARK_project_name__')).replace(" ", "")
 
     
     print("Sleep for 10!")
     sleep(10)
 
     response = client.describe_stacks(
-        StackName=project_name
+        StackName=project_varname
     )
 
     stack_status = response['Stacks'][0]['StackStatus']
@@ -41,7 +41,7 @@ def lambda_handler(event, context):
     if stack_status == 'CREATE_COMPLETE':
 
         response = client.describe_stack_resource(
-            StackName=project_name,
+            StackName=project_varname,
             LogicalResourceId='STARKSystemBucket'
         )
 

@@ -40,12 +40,8 @@ def create_handler(event, context):
 
     #Get relevant info from cloud_resources
     ApiG_param_name = cloud_resources['CodeGen_Metadata']['STARK_CodeGen_ApiGatewayId_ParameterName']
+    models          = cloud_resources["DynamoDB"]["Models"]
     api_gateway_id  = ssm.get_parameter(Name=ApiG_param_name).get('Parameter', {}).get('Value')
-
-    #FIXME: Now that we're using the DynamoDB models, we don't actually need the Entities metatada... consider removing it
-    #entities = cloud_resources['CodeGen_Metadata']['Entities']
-    models   = cloud_resources["DynamoDB"]["Models"]
-
 
     #STARK Settings JS file for the project
     settings_data = { 'API Gateway ID': api_gateway_id, 'Entities': models }
