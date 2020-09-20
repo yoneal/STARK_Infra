@@ -32,7 +32,7 @@ def create(data):
     for col in columns:
         col_varname = col.replace(" ", "_").lower()
         dict_to_var_code += f"""
-        {col_varname} = data.get('{col_varname}', '')"""
+        {col_varname} = str(data.get('{col_varname}', ''))"""
 
     #This is for our DDB update call
     update_expression = ""
