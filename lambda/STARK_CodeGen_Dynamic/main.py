@@ -49,9 +49,6 @@ def create_handler(event, context):
     #FIXME: Now that we're using the DynamoDB models, we don't actually need the Entities metatada... consider removing it
     models   = cloud_resources["DynamoDB"]["Models"]
 
-
-    cleanup_tmp() #just to make we have a consistent starting point in /tmp, no matter the potential error state of the last execution
-
     ##########################################
     #Create our entity Lambdas (API endpoint backing)
     for entity in entities:
@@ -77,9 +74,6 @@ def create_handler(event, context):
             'Bucket': codegen_bucket_name,
             'Update Token': update_token
         })
-
-        #Step 5: cleanup /tmp
-        cleanup_tmp()
 
     ################################################
     #Create our Lambda for the /modules API endpoint
@@ -137,8 +131,3 @@ def deploy_lambda(data):
 
     return response
 
-def cleanup_tmp():
-    #FIXME: Actually implement this if still needed, otherwise remove
-    status = ""
-
-    return status

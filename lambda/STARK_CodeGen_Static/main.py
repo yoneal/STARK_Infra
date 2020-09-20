@@ -42,13 +42,13 @@ def create_handler(event, context):
     ApiG_param_name = cloud_resources['CodeGen_Metadata']['STARK_CodeGen_ApiGatewayId_ParameterName']
     api_gateway_id  = ssm.get_parameter(Name=ApiG_param_name).get('Parameter', {}).get('Value')
 
-    entities = cloud_resources['CodeGen_Metadata']['Entities']
     #FIXME: Now that we're using the DynamoDB models, we don't actually need the Entities metatada... consider removing it
+    #entities = cloud_resources['CodeGen_Metadata']['Entities']
     models   = cloud_resources["DynamoDB"]["Models"]
 
 
     #STARK Settings JS file for the project
-    settings_data = { 'API Gateway ID': api_gateway_id, 'Entities': entities }
+    settings_data = { 'API Gateway ID': api_gateway_id, 'Entities': models }
     deploy(cg_js_settings.create(settings_data), bucket_name=bucket_name, key=f"js/STARK_settings.js")
 
     #For each entity, we'll create a set of HTML and JS Files
