@@ -49,7 +49,7 @@ def create(data):
             if int(col_type.get('min', 0)) > spin_min:
                 spin_min = int(col_type.get('min'))
 
-            if int(col_type.get('max', 0)) > spin_max:
+            if int(col_type.get('max', 0)) < spin_max:
                 spin_max = int(col_type.get('max'))
 
             if col_type.get('wrap','') == "no-wrap":
