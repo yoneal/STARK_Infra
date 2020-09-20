@@ -146,7 +146,7 @@ Document:
                 else {
                     //Failed:
                     //This means CF Stack execution failed outright.
-                    console.log("CF Stack fail: ");
+                    console.log("CF Stack Failure returned by Lambda!");
                     root.loading_message = ""
                     root.spinner_hide();
                     root.success_message = data['message'];
@@ -154,7 +154,10 @@ Document:
 
             })
             .catch(function(error) {
-                
+                console.log("CF Stack Failure - 500 Error Code");
+                root.loading_message = ""
+                root.spinner_hide();
+                root.success_message = "Deploy failed: We encountered an internal error. It's not you, it's us!<br>";            
             });
         },
         deploy_check: function () {
