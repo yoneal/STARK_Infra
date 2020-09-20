@@ -32,6 +32,33 @@ def create(data):
         html_code+=f"""
                             </select>"""
 
+    elif isinstance(col_type, dict):
+        #These are the complex data types that need additional settings as part of their spec
+        #   All col_type dicts follow this format:
+        #       { "type": "columntype", "type-specific attrib1": "value", "type-specific attrib2": "value" }
+        #   Only the "type" index is fixed. All the other indexes may vary depending on the column type specified
+
+        #Spinbutton - useful as a user-friendly int chooser. 
+        #   Can also be transformed to a generic string chooser, as long as the internal value is mapped to integers
+        #       We should probably handle that as a different col type, though
+        if col_type["type"] == "int-spinner":
+            spin_min  = 0
+            spin_max  = 99
+            spin_wrap = "wrap"
+
+            if int(col_type.get('min', 0)) > spin_min:
+                spin_min = int(col_type.get('min'))
+
+            if int(col_type.get('max', 0)) > spin_max:
+                spin_max = int(col_type.get('max'))
+
+            if col_type.get('wrap','') == "no-wrap":
+                spin_wrap = ""
+
+            html_code=f"""<b-form-spinbutton class="mb-2" id="{col_varname}" v-model="{entity_varname}.{col_varname}" {spin_wrap} min="{spin_min}" max="{spin_max}">"""
+          
+
+
     else:
         html_code=f"""<input type="text" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}">"""
 

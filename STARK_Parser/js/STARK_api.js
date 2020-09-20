@@ -23,6 +23,11 @@ Item:
     pk: Product Code
     data:
         - Title: string
+        - Qty:
+            type: int-spinner
+            min: 5
+            max: 50
+            wrap: no-wrap
         - Category: string
         - Description: string
 Document:
