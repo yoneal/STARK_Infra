@@ -71,7 +71,7 @@ def lambda_handler(event, context):
         retry = False
         
     else:
-        result = 'FAILED'
+        result = ''
         retry = True
 
 

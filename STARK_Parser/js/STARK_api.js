@@ -157,7 +157,7 @@ Document:
                 console.log("CF Stack Failure - 500 Error Code");
                 root.loading_message = ""
                 root.spinner_hide();
-                root.success_message = "Deploy failed: STARK encountered an internal error. It's not you, it's us!<br>";            
+                root.success_message = "Deploy failed: STARK encountered an internal error. It's not you, it's us!<br>(You can try again or come back later to see if this error persists)";            
             });
         },
         deploy_check: function () {
@@ -210,7 +210,7 @@ Document:
                     root.msg_counter += 1;
                     root.deploy_check()
                 }
-                else {
+                else if (data['result'] == "SUCCESS") {
                     //Success:
                     //Data should contain the S3 bucket URL for website hosting that was created for us.
                     //We'll show a link to the user, for clicking and fun.
@@ -218,6 +218,14 @@ Document:
                     root.loading_message = ""
                     root.spinner_hide();
                     root.success_message = "Success! Here's your new system URL: <a href='" + data['url'] + "'>" + data['url'] + "</a>";
+                }
+                else if (data['result'] == "FAILED") {
+                    //This means CF Stack execution eventually failed.
+                    console.log("CF Stack Execution failure...");
+                    root.loading_message = ""
+                    root.spinner_hide();
+                    root.success_message = "Sorry, STARK failed to deploy due to an internal error. It's not you, it's us! {" +  data['status'] + "}";
+
                 }
             })
             .catch(function(error) {
