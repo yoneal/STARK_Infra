@@ -9,6 +9,7 @@ from time import sleep
 #Extra modules
 import yaml
 import boto3
+from botocore.exceptions import ClientError
 
 client = boto3.client('cloudformation')
 
@@ -47,7 +48,7 @@ def lambda_handler(event, context):
             'retry': True
         }
 
-    except AssertionError as error:
+    except ClientError as error:
         payload = {
             'status': 'CloudFormation Execution Failed',
             'message': "Sorry, STARK failed to deploy due to an internal error. It's not you, it's us! {" + str(error) + "}",

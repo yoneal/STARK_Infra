@@ -157,7 +157,7 @@ Document:
                 console.log("CF Stack Failure - 500 Error Code");
                 root.loading_message = ""
                 root.spinner_hide();
-                root.success_message = "Deploy failed: We encountered an internal error. It's not you, it's us!<br>";            
+                root.success_message = "Deploy failed: STARK encountered an internal error. It's not you, it's us!<br>";            
             });
         },
         deploy_check: function () {
