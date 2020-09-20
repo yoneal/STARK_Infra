@@ -176,20 +176,11 @@ def create(data):
                     'sk': record['sk']['S'],"""
 
     for col, col_type in columns.items():
-        #FIXME: [Dupe 0] This transformation is a stub, and it should be done earlier. Only final processed data should be here
-        #   The parser should have done the work for us. It's possible that both the original and transformed types need to be
-        #   retained, for different purposes. The original type has metadata value that may affect other codegen decisions, aside
-        #   from having a counterpart for DDB datatypes
         col_varname = col.replace(" ", "_").lower()
-        if col_type == 'string':
-            col_type = 'S'
-        elif col_type == "int":
-            col_type = 'N'
-        else:
-            col_type = 'S'
+        col_type_id = set_type(col_type)
 
         source_code +=f"""
-                    '{col_varname}': record['{col_varname}']['{col_type}'],"""
+                    '{col_varname}': record['{col_varname}']['{col_type_id}'],"""
 
 
     source_code +=f"""}}
@@ -225,20 +216,11 @@ def create(data):
                     'sk': record['sk']['S'],"""
 
     for col, col_type in columns.items():
-        #FIXME: [Dupe 0] This transformation is a stub, and it should be done earlier. Only final processed data should be here
-        #   The parser should have done the work for us. It's possible that both the original and transformed types need to be
-        #   retained, for different purposes. The original type has metadata value that may affect other codegen decisions, aside
-        #   from having a counterpart for DDB datatypes
         col_varname = col.replace(" ", "_").lower()
-        if col_type == 'string':
-            col_type = 'S'
-        elif col_type == "int":
-            col_type = 'N'
-        else:
-            col_type = 'S'
+        col_type_id = set_type(col_type)
 
         source_code +=f"""
-                    '{col_varname}': record['{col_varname}']['{col_type}'],"""
+                    '{col_varname}': record['{col_varname}']['{col_type_id}'],"""
 
 
     source_code += f"""}}
@@ -283,20 +265,11 @@ def create(data):
             ExpressionAttributeValues={{"""
 
     for col, col_type in columns.items():
-        #FIXME: [Dupe 2] This transformation is a stub, and it should be done earlier. Only final processed data should be here
-        #   The parser should have done the work for us. It's possible that both the original and transformed types need to be
-        #   retained, for different purposes. The original type has metadata value that may affect other codegen decisions, aside
-        #   from having a counterpart for DDB datatypes
         col_varname = col.replace(" ", "_").lower()
-        if col_type == 'string':
-            col_type = 'S'
-        elif col_type == "int":
-            col_type = 'N'
-        else:
-            col_type = 'S'
+        col_type_id = set_type(col_type)
 
         source_code +=f"""
-                ':{col_varname}' : {{'{col_type}' : {col_varname} }},"""  
+                ':{col_varname}' : {{'{col_type_id}' : {col_varname} }},"""  
 
     source_code += f"""
             }}
@@ -312,20 +285,11 @@ def create(data):
         item['sk'] = {{'S' : sk}}"""
 
     for col, col_type in columns.items():
-        #FIXME: [Dupe 3] This transformation is a stub, and it should be done earlier. Only final processed data should be here
-        #   The parser should have done the work for us. It's possible that both the original and transformed types need to be
-        #   retained, for different purposes. The original type has metadata value that may affect other codegen decisions, aside
-        #   from having a counterpart for DDB datatypes
         col_varname = col.replace(" ", "_").lower()
-        if col_type == 'string':
-            col_type = 'S'
-        elif col_type == "int":
-            col_type = 'N'
-        else:
-            col_type = 'S'
+        col_type_id = set_type(col_type)
 
         source_code +=f"""
-        item['{col_varname}'] = {{'{col_type}' : {col_varname}}}"""
+        item['{col_varname}'] = {{'{col_type_id}' : {col_varname}}}"""
 
     source_code += f"""
         response = ddb.put_item(
@@ -337,3 +301,18 @@ def create(data):
     """
 
     return textwrap.dedent(source_code)
+
+
+def set_type(col_type):
+    if col_type == 'string':
+        col_type_id = 'S'
+    elif col_type == "int":
+        col_type_id = 'N'
+    elif isinstance(col_type, dict):
+        #special/complex types
+        if col_type["type"] == "int-spinner" or col_type["type"] == "decimal-spinner":
+            col_type_id = 'N'
+    else:
+        col_type_id = 'S'
+
+    return col_type_id
