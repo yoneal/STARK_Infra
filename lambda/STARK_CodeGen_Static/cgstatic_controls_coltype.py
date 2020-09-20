@@ -47,7 +47,7 @@ def create(data):
             spin_min  = 0
 
             if col_type["type"] == "int-spinner":
-                spin_step = 0
+                spin_step = 1
                 spin_max  = 99
             else:
                 spin_step = 0.1
