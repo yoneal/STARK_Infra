@@ -29,10 +29,19 @@ def create(data):
     #Create the dict value retrieval code for the add/edit function body
     dict_to_var_code = f"""pk = data.get('pk', '')
         sk = data.get('sk', '')"""
-    for col in columns:
+    for col, col_type in columns.items():
         col_varname = col.replace(" ", "_").lower()
-        dict_to_var_code += f"""
+
+        col_type_id = set_type(col_type)
+
+        if col_type_id in ['S', 'N']: 
+            dict_to_var_code += f"""
         {col_varname} = str(data.get('{col_varname}', ''))"""
+
+        else:
+            dict_to_var_code += f"""
+        {col_varname} = data.get('{col_varname}', '')"""
+
 
     #This is for our DDB update call
     update_expression = ""
@@ -312,6 +321,9 @@ def set_type(col_type):
         #special/complex types
         if col_type["type"] == "int-spinner" or col_type["type"] == "decimal-spinner":
             col_type_id = 'N'
+        
+        if col_type["type"] == "tags":
+            col_type_id = 'SS'
     
     elif col_type == "int" or col_type == "number":
         col_type_id = 'N'

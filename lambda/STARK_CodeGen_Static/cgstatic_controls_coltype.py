@@ -76,7 +76,7 @@ def create(data):
             if int(col_type.get('limit', 0)) != 0:
                 tag_limit = int(col_type.get('limit', 0))
 
-            html_code=f"""<b-form-tags input-id="{col_varname}" v-model="{entity_varname}.{col_varname}" limit="{tag_limit}"" remove-on-delete></b-form-tags>"""
+            html_code=f"""<b-form-tags input-id="{col_varname}" v-model="{entity_varname}.{col_varname}" :limit="{tag_limit}" remove-on-delete></b-form-tags>"""
 
 
     else:
