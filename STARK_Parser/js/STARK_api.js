@@ -23,14 +23,16 @@ Item:
     pk: Product Code
     data:
         - Title: string
-        - Qty:
+        - In Stock:
             type: int-spinner
             min: 5
             max: 50
-            wrap: no-wrap
         - Weight in kg:
             type: decimal-spinner
-        - Category: string
+            wrap: no-wrap
+        - Categories:
+            type: tags
+            limit: 3
         - Description: string
 Document:
     pk: Document ID

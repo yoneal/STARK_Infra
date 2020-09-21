@@ -68,6 +68,15 @@ def create(data):
             html_code=f"""<b-form-spinbutton class="mb-2" id="{col_varname}" v-model="{entity_varname}.{col_varname}" {spin_wrap} min="{spin_min}" max="{spin_max}" step="{spin_step}">"""
 
 
+        #Tags input - really user-friendly UX for multiple values in a field (think of the "To:" fields in email)
+        #FIXME: This has more capabilities built-in, please add them here too (like validators and the other props)
+        if col_type["type"] == "tags":
+            tag_limit = 5
+
+            if int(col_type.get('limit', 0)) != 0:
+                tag_limit = int(col_type.get('limit', 0))
+
+        html_code=f"""<b-form-tags input-id="{col_varname}" v-model="{entity_varname}.{col_varname}" limit="{tag_limit}"" remove-on-delete></b-form-tags>"""
 
 
     else:

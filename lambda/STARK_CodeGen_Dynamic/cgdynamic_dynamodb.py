@@ -304,15 +304,16 @@ def create(data):
 
 
 def set_type(col_type):
-    if col_type == 'string':
-        col_type_id = 'S'
-    elif col_type == "int":
-        col_type_id = 'N'
-    elif isinstance(col_type, dict):
+
+    #Default is 'S'. Defined here so we don't need duplicate Else statements below
+    col_type_id = 'S'
+
+    if isinstance(col_type, dict):
         #special/complex types
         if col_type["type"] == "int-spinner" or col_type["type"] == "decimal-spinner":
             col_type_id = 'N'
-    else:
-        col_type_id = 'S'
+    
+    elif col_type == "int" or col_type == "number":
+        col_type_id = 'N'
 
     return col_type_id
