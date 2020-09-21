@@ -20,6 +20,9 @@ def create(data):
     if col_type == "date":
         html_code=f"""<b-form-datepicker id="{col_varname}" show-decade-nav v-model="{entity_varname}.{col_varname}" class="mb-2"></b-form-datepicker>"""
 
+    if col_type == "time":
+        html_code=f"""<b-form-timepicker id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2"></b-form-timepicker>"""
+
     elif col_type == "multi-line-string":
         html_code=f"""<textarea class="form-control" id="{col_varname}" v-model="{entity_varname}.{col_varname}" placeholder="" rows="4"></textarea>"""
 
@@ -77,6 +80,15 @@ def create(data):
                 tag_limit = int(col_type.get('limit', 0))
 
             html_code=f"""<b-form-tags input-id="{col_varname}" v-model="{entity_varname}.{col_varname}" :limit="{tag_limit}" remove-on-delete></b-form-tags>"""
+
+        #Rating - nice UI to give a 1-5 (or 1-N) feedback
+        if col_type["type"] == "rating":
+            rating_max = 5
+
+            if int(col_type.get('max', 0)) != 0:
+                rating_max = int(col_type.get('max', 0))
+
+            html_code=f"""<b-form-rating id="{col_varname}" v-model="{entity_varname}.{col_varname}" stars="{rating_max}" show-value></b-form-tags>"""
 
 
     else:

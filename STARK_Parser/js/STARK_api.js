@@ -33,6 +33,9 @@ Item:
         - Categories:
             type: tags
             limit: 3
+        - Rating:
+            type: rating
+            max: 10
         - Description: string
 Document:
     pk: Document ID
