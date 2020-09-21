@@ -37,6 +37,7 @@ Item:
             type: rating
             max: 10
         - Description: string
+        - Last Update: time
 Document:
     pk: Document ID
     data:
