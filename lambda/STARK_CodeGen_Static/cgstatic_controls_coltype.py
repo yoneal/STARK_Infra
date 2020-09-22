@@ -24,8 +24,15 @@ def create(data):
     elif col_type == "time":
         html_code=f"""<b-form-timepicker id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2"></b-form-timepicker>"""
 
-    elif col_type == "yes-no":
-        html_code=f"""<b-form-checkbox id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2" value="yes" unchecked-value="no">{{{{ {entity_varname}.{col_varname} }}}}</b-form-checkbox>"""
+    elif col_type == "yes-no" or col_type == "boolean":
+        if col_type == "yes-no":
+            checked   ="Yes"
+            unchecked ="No"
+        elif col_type == "boolean":
+            checked   ="True"
+            unchecked ="False"
+
+        html_code=f"""<b-form-checkbox id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2" value="{checked}" unchecked-value="{unchecked}">{{{{ {entity_varname}.{col_varname} }}}}</b-form-checkbox>"""
 
     elif col_type == "multi-line-string":
         html_code=f"""<textarea class="form-control" id="{col_varname}" v-model="{entity_varname}.{col_varname}" placeholder="" rows="4" max-rows="8"></textarea>"""
@@ -99,7 +106,7 @@ def create(data):
 
             values = col_type.get('values', [])
 
-            html_code=f"""<b-form-checkbox-group id="{col_varname}" v-model="{entity_varname}.{col_varname}" stars="{rating_max}" show-value>"""
+            html_code=f"""<b-form-checkbox-group id="{col_varname}" v-model="{entity_varname}.{col_varname}">"""
             
             for value in values:
                 html_code+=f"""<b-form-checkbox value="{value}">{value}</b-form-checkbox>"""
