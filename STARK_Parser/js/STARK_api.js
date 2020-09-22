@@ -9,16 +9,8 @@ Customer:
         - Customer Name: string
         - Gender: [ Male, Female, LGBTQ+ ]
         - Join Date: date
+        - Preferred Customer: yes-no
         - Remarks: multi-line-string
-Sales Agent:
-    pk: Employee ID
-    data:
-        - First Name: string
-        - Last Name: string
-        - Sex: [ "Yes", "No", "HR is calling" ]
-        - Hiring Date: string
-        - Salary: string
-        - TIN: string
 Item:
     pk: Product Code
     data:
@@ -36,8 +28,20 @@ Item:
         - Rating:
             type: rating
             max: 10
+        - Variations Available:
+            type: multiple choice
+            values: [ "Small", "Medium", "Large", "XL"]
         - Description: string
         - Last Update: time
+Sales Agent:
+    pk: Employee ID
+    data:
+        - First Name: string
+        - Last Name: string
+        - Sex: [ "Yes", "No", "HR is calling" ]
+        - Hiring Date: date
+        - Salary: string
+        - TIN: string
 Document:
     pk: Document ID
     data:

@@ -17,14 +17,18 @@ def create(data):
     if isinstance(col_type, str):
         col_type = col_type.lower()
 
+
     if col_type == "date":
         html_code=f"""<b-form-datepicker id="{col_varname}" show-decade-nav v-model="{entity_varname}.{col_varname}" class="mb-2"></b-form-datepicker>"""
 
-    if col_type == "time":
+    elif col_type == "time":
         html_code=f"""<b-form-timepicker id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2"></b-form-timepicker>"""
 
+    elif col_type == "yes-no":
+        html_code=f"""<b-form-checkbox id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2" value="yes" unchecked-value="no">{{{{ {entity_varname}.{col_varname} }}}}</b-form-checkbox>"""
+
     elif col_type == "multi-line-string":
-        html_code=f"""<textarea class="form-control" id="{col_varname}" v-model="{entity_varname}.{col_varname}" placeholder="" rows="4"></textarea>"""
+        html_code=f"""<textarea class="form-control" id="{col_varname}" v-model="{entity_varname}.{col_varname}" placeholder="" rows="4" max-rows="8"></textarea>"""
 
     elif isinstance(col_type, list):
         html_code=f"""<select class="form-control" id="{col_varname}" v-model="{entity_varname}.{col_varname}">
@@ -88,7 +92,19 @@ def create(data):
             if int(col_type.get('max', 0)) != 0:
                 rating_max = int(col_type.get('max', 0))
 
-            html_code=f"""<b-form-rating id="{col_varname}" v-model="{entity_varname}.{col_varname}" stars="{rating_max}" show-value></b-form-tags>"""
+            html_code=f"""<b-form-rating id="{col_varname}" v-model="{entity_varname}.{col_varname}" stars="{rating_max}" show-value></b-form-rating>"""
+
+        #A group of check boxes for multiple choice inputs
+        if col_type["type"] == "multiple choice":
+
+            values = col_type.get('values', [])
+
+            html_code=f"""<b-form-checkbox-group id="{col_varname}" v-model="{entity_varname}.{col_varname}" stars="{rating_max}" show-value>"""
+            
+            for value in values:
+                html_code+=f"""<b-form-checkbox value="{value}">{value}</b-form-checkbox>"""
+            
+            html_code+=f"""</b-form-checkbox-group>"""
 
 
     else:
