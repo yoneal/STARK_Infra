@@ -319,13 +319,13 @@ def set_type(col_type):
 
     if isinstance(col_type, dict):
         #special/complex types
-        if col_type["type"] == "int-spinner" or col_type["type"] == "decimal-spinner":
+        if col_type["type"] in [ "int-spinner", "decimal-spinner" ]:
             col_type_id = 'N'
         
-        if col_type["type"] == "tags":
+        if col_type["type"] in [ "tags", "multiple choice" ]:
             col_type_id = 'SS'
     
-    elif col_type == "int" or col_type == "number":
+    elif col_type in [ "int", "number" ]:
         col_type_id = 'N'
 
     return col_type_id
