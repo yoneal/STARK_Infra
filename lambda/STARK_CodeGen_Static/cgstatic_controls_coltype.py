@@ -118,10 +118,14 @@ def create(data):
 
             values  = col_type.get('values', [])
             buttons = ""
+
+            #FIXME: no ugly hack needed once we use BootstrapVue b-form-group instead of basic Bootstrap form groups
+            ugly_hack = "" #need for now to force radio bar to render under the label like the others, instead of beside the label
             if col_type["type"] == "radio bar":
                 buttons = 'buttons button-variant="outline-secondary"'
+                ugly_hack = "<br>"
 
-            html_code=f"""<b-form-radio-group id="{col_varname}" v-model="{entity_varname}.{col_varname}" {buttons}>"""
+            html_code=f"""{ugly_hack}<b-form-radio-group id="{col_varname}" v-model="{entity_varname}.{col_varname}" {buttons}>"""
             
             for value in values:
                 html_code+=f"""<b-form-radio value="{value}">{value}</b-form-radio>"""
