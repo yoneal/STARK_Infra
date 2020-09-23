@@ -24,7 +24,7 @@ def create(data):
     elif col_type == "time":
         html_code=f"""<b-form-timepicker id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2"></b-form-timepicker>"""
 
-    elif col_type == "yes-no" or col_type == "boolean":
+    elif col_type in [ "yes-no", "boolean" ]:
         if col_type == "yes-no":
             checked   ="Yes"
             unchecked ="No"
@@ -35,7 +35,7 @@ def create(data):
         html_code=f"""<b-form-checkbox id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2" value="{checked}" unchecked-value="{unchecked}">{{{{ {entity_varname}.{col_varname} }}}}</b-form-checkbox>"""
 
     elif col_type == "multi-line-string":
-        html_code=f"""<textarea class="form-control" id="{col_varname}" v-model="{entity_varname}.{col_varname}" placeholder="" rows="4" max-rows="8"></textarea>"""
+        html_code=f"""<b-form-textarea id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2" rows="4" max-rows="8"></b-form-textarea>"""
 
     elif isinstance(col_type, list):
         html_code=f"""<select class="form-control" id="{col_varname}" v-model="{entity_varname}.{col_varname}">
@@ -55,7 +55,7 @@ def create(data):
         #Spinbutton - useful as a user-friendly int chooser. 
         #   Can also be transformed to a generic string chooser, as long as the internal value is mapped to integers
         #       We should probably handle that as a different col type, though
-        if col_type["type"] == "int-spinner" or col_type["type"] == "decimal-spinner":
+        if col_type["type"] in [ "int-spinner", "decimal-spinner"]:
 
             spin_wrap = "wrap"
             spin_min  = 0
@@ -84,7 +84,7 @@ def create(data):
 
         #Tags input - really user-friendly UX for multiple values in a field (think of the "To:" fields in email)
         #FIXME: This has more capabilities built-in, please add them here too (like validators and the other props)
-        if col_type["type"] == "tags":
+        elif col_type["type"] == "tags":
             tag_limit = 5
 
             if int(col_type.get('limit', 0)) != 0:
@@ -93,7 +93,7 @@ def create(data):
             html_code=f"""<b-form-tags input-id="{col_varname}" v-model="{entity_varname}.{col_varname}" :limit="{tag_limit}" remove-on-delete></b-form-tags>"""
 
         #Rating - nice UI to give a 1-5 (or 1-N) feedback
-        if col_type["type"] == "rating":
+        elif col_type["type"] == "rating":
             rating_max = 5
 
             if int(col_type.get('max', 0)) != 0:
@@ -102,7 +102,7 @@ def create(data):
             html_code=f"""<b-form-rating id="{col_varname}" v-model="{entity_varname}.{col_varname}" stars="{rating_max}" show-value></b-form-rating>"""
 
         #A group of check boxes for multiple choice inputs
-        if col_type["type"] == "multiple choice":
+        elif col_type["type"] == "multiple choice":
 
             values = col_type.get('values', [])
 
@@ -112,6 +112,22 @@ def create(data):
                 html_code+=f"""<b-form-checkbox value="{value}">{value}</b-form-checkbox>"""
             
             html_code+=f"""</b-form-checkbox-group>"""
+
+
+        elif col_type["type"] in [ "radio button", "radio bar" ]:
+
+            values  = col_type.get('values', [])
+            buttons = ""
+            if col_type["type"] == "radio bar":
+                buttons = 'buttons button-variant="outline-secondary"'
+
+            html_code=f"""<b-form-radio-group id="{col_varname}" v-model="{entity_varname}.{col_varname}" {buttons}>"""
+            
+            for value in values:
+                html_code+=f"""<b-form-radio value="{value}">{value}</b-form-radio>"""
+            
+            html_code+=f"""</b-form-radio-group>"""
+
 
 
     else:

@@ -32,6 +32,12 @@ Item:
             type: multiple choice
             values: [ "Small", "Medium", "Large", "XL"]
         - Description: string
+        - Packaging Type:
+            type: radio button
+            values: [ "Traditional Box", "Standard Cardboard", "Eco-Friendly" ]
+        - Max Discount Rate:
+            type: radio bar
+            values: [ "None", "10%", "15%", "20%", "25%" ]
         - Last Update: time
 Sales Agent:
     pk: Employee ID
