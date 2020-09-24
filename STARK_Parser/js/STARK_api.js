@@ -31,7 +31,7 @@ Item:
         - Variations Available:
             type: multiple choice
             values: [ "Small", "Medium", "Large", "XL"]
-        - Description: string
+        - Description: multi-line-string
         - Packaging Type:
             type: radio button
             values: [ "Traditional Box", "Standard Cardboard", "Eco-Friendly" ]

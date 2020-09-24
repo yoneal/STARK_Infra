@@ -80,12 +80,6 @@ def create(data):
             </b-modal>
         </div>
 
-        <div class="d-flex justify-content-center" id="loading-spinner" :style="{{visibility: visibility}}">
-        <!--
-            Stub because this isn't used by default by anything other than the ListView page.
-        -->
-        </div>
-
         <div class="container hidden" id="vue-root" :style="{{visibility: visibility}}">
             <div class="row">
                 <div class="col">

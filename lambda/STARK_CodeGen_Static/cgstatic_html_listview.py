@@ -55,22 +55,6 @@ def create(data):
                     <li class="breadcrumb-item active" aria-current="page">{entity}</li>
                 </ol>
             </nav>
-
-
-            <!-- 
-                Empty because this isn't used by the ListView page by default, but the stub is needed so that VueJS won't complain about 
-                the loading modal reference in our shared JS library that backs this module
-            -->
-            <div>
-                <b-modal id="loading-modal"
-                    no-close-on-backdrop
-                    no-close-on-esc
-                    hide-header
-                    hide-footer
-                    centered
-                    size="sm">
-                </b-modal>
-            </div>
             
             <button type="button" class="btn btn-primary mb-2" onClick="window.location.href='{entity_varname}_add.html'"> <b>+</b> Add </button>
             <div class="row">
