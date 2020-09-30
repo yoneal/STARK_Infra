@@ -5,9 +5,7 @@ from collections import OrderedDict
 
 def parse(data):
 
-    entities        = data['entities']
-    data_model      = data['model']
-    project_name    = data['project_name']
+    data_model      = data['data_model']
     project_varname = data['project_varname']
 
 

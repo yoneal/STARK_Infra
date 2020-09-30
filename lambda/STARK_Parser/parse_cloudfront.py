@@ -5,10 +5,7 @@ from collections import OrderedDict
 
 def parse(data):
 
-    entities        = data['entities']
-    data_model      = data['model']
-    project_name    = data['project_name']
-    project_varname = data['project_varname']
+    data_model      = data['data_model']
 
     #CLOUDFRONT-SETTINGS-START
     cf_enable = False

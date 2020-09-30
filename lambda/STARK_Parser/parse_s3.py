@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 def parse(data):
 
-    data_model      = data['model']
+    data_model      = data['data_model']
     project_varname = data['project_varname']
 
     #S3-SETTINGS-START

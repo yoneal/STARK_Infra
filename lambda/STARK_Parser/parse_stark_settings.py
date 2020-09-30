@@ -12,7 +12,4 @@ def parse(data):
 
     parsed = { }
 
-
-
-
     return parsed
