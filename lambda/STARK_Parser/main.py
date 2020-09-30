@@ -89,7 +89,7 @@ def lambda_handler(event, context):
     cloud_resources['CodeGen_Metadata']['Entities'] = entities
 
     data = {
-        'entities': entities
+        'entities': entities,
         'data_model': data_model,
         'project_name': project_name,
         'project_varname': project_varname
