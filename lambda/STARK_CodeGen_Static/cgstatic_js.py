@@ -38,7 +38,7 @@ def create(data):
 
     for col, col_type in cols.items():
         col_varname = col.replace(" ", "_").lower()
-        js_list_code = cg_coltype.create({
+        js_list_code = cg_coltype.create_list({
             "col": col,
             "col_type": col_type,
             "col_varname": col_varname

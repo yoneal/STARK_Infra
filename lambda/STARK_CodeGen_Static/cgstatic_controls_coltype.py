@@ -134,7 +134,7 @@ def create(data):
     return html_code
 
 
-def create_lists(data):
+def create_list(data):
 
     col         = data['col']
     col_type    = data['col_type']
