@@ -140,14 +140,21 @@ def create_list(data):
     col_type    = data['col_type']
     col_varname = data['col_varname']
     js_code     = ""
+    listable    = False
 
     if isinstance(col_type, str):
         col_type = col_type.lower()
 
+    #We only make lists for specific column types and just return immediately for anything else
+    if isinstance(col_type, list) or ( isinstance(col_type, dict) and col_type["type"] in [ "multiple choice", "radio button", "radio bar" ] ):
+        listable = True
+
+    if not listable: 
+        return None
+
     ##############
     #Our list begins with a declaration of the list, based on the column's variable name
     js_code += f"""'{col_varname}': ["""
-
 
     if isinstance(col_type, list):
         for item in col_type:
@@ -162,7 +169,6 @@ def create_list(data):
             for item in items:
                 js_code += f"""
                 {{ value: '{item}', text: '{item}' }},"""
-
 
     #remove final comma
     js_code = js_code[:-1]

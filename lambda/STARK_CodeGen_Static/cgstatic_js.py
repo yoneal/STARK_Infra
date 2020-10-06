@@ -44,7 +44,8 @@ def create(data):
             "col_varname": col_varname
         })
 
-        source_code += f"""
+        if js_list_code != None:
+            source_code += f"""
             {js_list_code}"""
 
     source_code = source_code[:-1] #remove last comma
