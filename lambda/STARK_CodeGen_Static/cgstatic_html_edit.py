@@ -17,7 +17,7 @@ def create(data):
 
     #Convert human-friendly names to variable-friendly names
     entity_varname = entity.replace(" ", "_").lower()
-    pk_varname = entity.replace(" ", "_").lower()
+    pk_varname = pk.replace(" ", "_").lower()
 
     source_code = f"""\
         <!DOCTYPE html>

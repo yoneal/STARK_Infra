@@ -14,7 +14,7 @@ def create(data):
 
     #Convert human-friendly names to variable-friendly names
     entity_varname = entity.replace(" ", "_").lower()
-    pk_varname = entity.replace(" ", "_").lower()
+    pk_varname = pk.replace(" ", "_").lower()
 
     source_code = f"""\
         <!DOCTYPE html>
@@ -55,7 +55,7 @@ def create(data):
                     <li class="breadcrumb-item active" aria-current="page">{entity}</li>
                 </ol>
             </nav>
-            
+
             <button type="button" class="btn btn-primary mb-2" onClick="window.location.href='{entity_varname}_add.html'"> <b>+</b> Add </button>
             <div class="row">
                 <div class="col overflow-auto">

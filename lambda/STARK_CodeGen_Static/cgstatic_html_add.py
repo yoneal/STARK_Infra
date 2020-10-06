@@ -17,8 +17,8 @@ def create(data):
 
     #Convert human-friendly names to variable-friendly names
     entity_varname = entity.replace(" ", "_").lower()
-    pk_varname = entity.replace(" ", "_").lower()
-    
+    pk_varname = pk.replace(" ", "_").lower()
+
     source_code = f"""\
         <!DOCTYPE html>
         <html lang="en">
@@ -106,7 +106,7 @@ def create(data):
                             <label for="{col_varname}">{col}</label>
                             {html_control_code}
                         </div>"""
-    
+
     source_code += f"""\
                         <button type="button" class="btn btn-secondary" onClick="window.location.href='{entity_varname}.html'">Back</button>
                         <button type="button" class="btn btn-primary float-right" onClick="root.add()">Add</button>

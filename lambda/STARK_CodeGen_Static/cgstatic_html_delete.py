@@ -14,7 +14,7 @@ def create(data):
 
     #Convert human-friendly names to variable-friendly names
     entity_varname = entity.replace(" ", "_").lower()
-    pk_varname = entity.replace(" ", "_").lower()
+    pk_varname = pk.replace(" ", "_").lower()
 
     source_code = f"""\
         <!DOCTYPE html>
@@ -99,7 +99,7 @@ def create(data):
                                 <input type="text" class="form-control-plaintext" readonly id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}">
                             </div>
                         </div>"""
-    
+
     source_code += f"""\
                         <button type="button" class="btn btn-secondary" onClick="window.location.href='{entity_varname}.html'">Back</button>
                         <button type="button" class="btn btn-danger float-right" onClick="root.delete()">Delete</button>
