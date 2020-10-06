@@ -4,6 +4,9 @@
 #Python Standard Library
 import textwrap
 
+#Private modules
+import cgstatic_controls_coltype as cg_coltype
+
 def create(data):
 
     entity = data["Entity"]
@@ -27,6 +30,23 @@ def create(data):
         col_varname = col.replace(" ", "_").lower()
         source_code += f"""
                     '{col_varname}': '',""" 
+    source_code = source_code[:-1] #remove last comma
+
+    source_code += f"""
+                }},
+                lists: {{"""
+
+    for col, col_type in cols.items():
+        col_varname = col.replace(" ", "_").lower()
+        js_list_code = cg_coltype.create({
+            "col": col,
+            "col_type": col_type,
+            "col_varname": col_varname
+        })
+
+        source_code += f"""
+            {js_list_code}"""
+
     source_code = source_code[:-1] #remove last comma
 
     source_code += f"""

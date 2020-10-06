@@ -108,13 +108,7 @@ def create(data):
 
             values = col_type.get('values', [])
 
-            html_code=f"""<b-form-checkbox-group id="{col_varname}" v-model="{entity_varname}.{col_varname}">"""
-            
-            for value in values:
-                html_code+=f"""<b-form-checkbox value="{value}">{value}</b-form-checkbox>"""
-            
-            html_code+=f"""</b-form-checkbox-group>"""
-
+            html_code=f"""<b-form-checkbox-group id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}"></b-form-checkbox-group>"""
 
         elif col_type["type"] in [ "radio button", "radio bar" ]:
 
@@ -127,12 +121,7 @@ def create(data):
                 buttons = 'buttons button-variant="outline-secondary"'
                 ugly_hack = "<br>"
 
-            html_code=f"""{ugly_hack}<b-form-radio-group id="{col_varname}" v-model="{entity_varname}.{col_varname}" {buttons}>"""
-            
-            for value in values:
-                html_code+=f"""<b-form-radio value="{value}">{value}</b-form-radio>"""
-            
-            html_code+=f"""</b-form-radio-group>"""
+            html_code=f"""{ugly_hack}<b-form-radio-group id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}" {buttons}></b-form-radio-group>"""
 
 
 
@@ -143,3 +132,45 @@ def create(data):
                       
 
     return html_code
+
+
+def create_lists(data):
+
+    col         = data['col']
+    col_type    = data['col_type']
+    col_varname = data['col_varname']
+    js_code     = ""
+
+    if isinstance(col_type, str):
+        col_type = col_type.lower()
+
+    ##############
+    #Our list begins with a declaration of the list, based on the column's variable name
+    js_code += f"""'{col_varname}': ["""
+
+
+    if isinstance(col_type, list):
+        for item in col_type:
+            js_code += f"""
+                {{ value: '{item}', text: '{item}' }},"""
+
+    elif isinstance(col_type, dict):
+        #A group of check boxes for multiple choice inputs
+        if col_type["type"] in [ "multiple choice", "radio button", "radio bar" ]:
+            values  = col_type.get('values', [])
+
+            for value in values:
+                js_code += f"""
+                {{ value: '{item}', text: '{item}' }},"""
+
+
+    #remove final comma
+    js_code = js_code[:-1]
+
+
+    #############
+    #Close the list to end
+    js_code += f"""
+            ],"""
+
+    return js_code
