@@ -11,7 +11,7 @@ def create(data):
     pk     = data['PK']
 
     entity_varname = entity.replace(" ", "_").lower()
-    pk_varname     = entity.replace(" ", "_").lower()
+    pk_varname     = pk.replace(" ", "_").lower()
 
     source_code = f"""\
         var root = new Vue({{

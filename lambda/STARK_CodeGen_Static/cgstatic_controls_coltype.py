@@ -38,13 +38,15 @@ def create(data):
         html_code=f"""<b-form-textarea id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2" rows="4" max-rows="8"></b-form-textarea>"""
 
     elif isinstance(col_type, list):
-        html_code=f"""<select class="form-control" id="{col_varname}" v-model="{entity_varname}.{col_varname}">
-                                <option disabled value="">Please select one</option>"""
+        html_code=f"""<b-form-select id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}">
+                                <template v-slot:first>
+                                    <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
+                                </template>"""
         for item in col_type:
             html_code+=f"""
                                 <option>{item}</option>"""
         html_code+=f"""
-                            </select>"""
+                            </b-form-select>"""
 
     elif isinstance(col_type, dict):
         #These are the complex data types that need additional settings as part of their spec
