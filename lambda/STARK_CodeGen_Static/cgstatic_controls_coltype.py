@@ -157,9 +157,9 @@ def create_list(data):
     elif isinstance(col_type, dict):
         #A group of check boxes for multiple choice inputs
         if col_type["type"] in [ "multiple choice", "radio button", "radio bar" ]:
-            values  = col_type.get('values', [])
+            items  = col_type.get('values', [])
 
-            for value in values:
+            for item in items:
                 js_code += f"""
                 {{ value: '{item}', text: '{item}' }},"""
 
