@@ -46,7 +46,7 @@ def create(data):
 
         if js_list_code != None:
             source_code += f"""
-            {js_list_code}"""
+                    {js_list_code}"""
 
     source_code = source_code[:-1] #remove last comma
 
