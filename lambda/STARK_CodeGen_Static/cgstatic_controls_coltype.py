@@ -156,7 +156,7 @@ def create_list(data):
     if isinstance(col_type, list):
         for item in col_type:
             js_code += f"""
-                {{ value: '{item}', text: '{item}' }},"""
+                        {{ value: '{item}', text: '{item}' }},"""
 
     elif isinstance(col_type, dict):
         #A group of check boxes for multiple choice inputs
@@ -165,7 +165,7 @@ def create_list(data):
 
             for item in items:
                 js_code += f"""
-                {{ value: '{item}', text: '{item}' }},"""
+                        {{ value: '{item}', text: '{item}' }},"""
 
     #remove final comma
     js_code = js_code[:-1]
@@ -174,13 +174,6 @@ def create_list(data):
     #############
     #Close the list to end
     js_code += f"""
-            ],"""
-
-    js_code += f"""
-no indent
-    1 indent
-        2 indents
-            3 indents (same as list closing square bracket)
-                4 indents omg!!!!"""
+                    ],"""
 
     return js_code
