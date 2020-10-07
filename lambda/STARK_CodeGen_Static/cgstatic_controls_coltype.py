@@ -176,4 +176,11 @@ def create_list(data):
     js_code += f"""
             ],"""
 
+    js_code += f"""
+no indent
+    1 indent
+        2 indents
+            3 indents (same as list closing square bracket)
+                4 indents omg!!!!"""
+
     return js_code
