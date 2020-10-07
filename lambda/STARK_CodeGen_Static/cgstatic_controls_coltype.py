@@ -42,9 +42,6 @@ def create(data):
                                 <template v-slot:first>
                                     <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                 </template>"""
-        for item in col_type:
-            html_code+=f"""
-                                <option>{item}</option>"""
         html_code+=f"""
                             </b-form-select>"""
 
