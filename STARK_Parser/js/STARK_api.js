@@ -61,7 +61,7 @@ Document:
         loading_message: '',
         visibility: 'visible',
         spinner_display: 'block',
-        success_message: 'STARK Parser is idle',
+        success_message: 'Welcome to STARK: Serverless Transformation and Acceleration Resource Kit.<br> The STARK Parser is idle',
         msg_counter: 0,
         ui_visibility: 'block'
     },
