@@ -17,8 +17,8 @@ def create(data):
     pk      = data["PK"]
 
     #Convert human-friendly names to variable-friendly names
-    entity_varname = converter.convert_friendly_to_system(entity)
-    pk_varname = converter.convert_friendly_to_system(pk)
+    entity_varname = converter.convert_to_system_name(entity)
+    pk_varname = converter.convert_to_system_name(pk)
 
     source_code = f"""\
         <!DOCTYPE html>
@@ -93,7 +93,7 @@ def create(data):
                         </div>"""
 
     for col, col_type in cols.items():
-        col_varname = converter.convert_friendly_to_system(col)
+        col_varname = converter.convert_to_system_name(col)
         html_control_code = cg_coltype.create({
             "col": col,
             "col_type": col_type,

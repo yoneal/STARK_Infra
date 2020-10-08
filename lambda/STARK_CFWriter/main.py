@@ -35,7 +35,7 @@ def lambda_handler(event, context):
     #       as a unique identifier. Make this a GUID for prod use.
     #       We do still need a user-supplied project name for display purposes (header of each HTML page, login screen, etc), though.
     project_name    = cloud_resources["Project Name"]
-    project_varname = converter.convert_friendly_to_system(project_name)
+    project_varname = converter.convert_to_system_name(project_name)
 
     #So that cloud_resources can be used by our CodeGen components (which are lambda-backed custom resources in this resulting CF/SAM template),
     #   we need to dump cloud_resources into ParamStore as a YAML string
@@ -191,8 +191,8 @@ def lambda_handler(event, context):
                     WriteCapacityUnits: {ddb_wcu_provisioned}"""
 
     for entity in lambda_entities:
-        entity_logical_name = converter.convert_friendly_to_system(entity, "cf-resource")
-        entity_endpoint_name = converter.convert_friendly_to_system(entity)
+        entity_logical_name = converter.convert_to_system_name(entity, "cf-resource")
+        entity_endpoint_name = converter.convert_to_system_name(entity)
         cf_template += f"""
         STARKBackendApiFor{entity_logical_name}:
             Type: AWS::Serverless::Function

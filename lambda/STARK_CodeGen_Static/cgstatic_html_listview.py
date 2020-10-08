@@ -16,8 +16,8 @@ def create(data):
     pk      = data["PK"]
 
     #Convert human-friendly names to variable-friendly names
-    entity_varname = converter.convert_friendly_to_system(entity)
-    pk_varname = converter.convert_friendly_to_system(pk)
+    entity_varname = converter.convert_to_system_name(entity)
+    pk_varname = converter.convert_to_system_name(pk)
 
     source_code = f"""\
         <!DOCTYPE html>
@@ -84,7 +84,7 @@ def create(data):
                                     <th scope="row"><a :href="'{entity_varname}_view.html?{pk_varname}=' + {entity_varname}.{pk_varname}">{{{{ {entity_varname}.{pk_varname} }}}}</a></th>"""
 
     for col in cols:
-        col_varname = converter.convert_friendly_to_system(col)
+        col_varname = converter.convert_to_system_name(col)
         source_code += f"""
                                     <td>{{{{ {entity_varname}.{col_varname} }}}}</td>"""
 

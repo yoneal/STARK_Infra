@@ -16,15 +16,15 @@ def create(data):
     ddb_table_name = data["DynamoDB Name"]
 
     #Convert human-friendly names to variable-friendly names
-    entity_varname = converter.convert_friendly_to_system(entity)
-    pk_varname     = converter.convert_friendly_to_system(pk)
+    entity_varname = converter.convert_to_system_name(entity)
+    pk_varname     = converter.convert_to_system_name(pk)
 
     default_sk     = entity + "|info"
  
     #Create the column dict we'll use in the code as a declaration
     col_dict = '{ "pk": pk, "sk": sk, '
     for col in columns:
-        col_varname = converter.convert_friendly_to_system(col)
+        col_varname = converter.convert_to_system_name(col)
         col_dict += f'"{col_varname}": {col_varname}, '
     col_dict = col_dict[:-2]
     col_dict += ' }'
@@ -33,7 +33,7 @@ def create(data):
     dict_to_var_code = f"""pk = data.get('pk', '')
         sk = data.get('sk', '')"""
     for col, col_type in columns.items():
-        col_varname = converter.convert_friendly_to_system(col)
+        col_varname = converter.convert_to_system_name(col)
 
         col_type_id = set_type(col_type)
 
@@ -49,7 +49,7 @@ def create(data):
     #This is for our DDB update call
     update_expression = ""
     for col in columns:
-        col_varname = converter.convert_friendly_to_system(col)
+        col_varname = converter.convert_to_system_name(col)
         update_expression += f"""#{col_varname} = :{col_varname}, """
     update_expression = update_expression[:-2]
 
@@ -99,7 +99,7 @@ def create(data):
                     data['sk'] = default_sk"""
 
     for col, col_type in columns.items():
-        col_varname = converter.convert_friendly_to_system(col)
+        col_varname = converter.convert_to_system_name(col)
         source_code +=f"""
                 data['{col_varname}'] = payload.get('{col_varname}','')"""
 
@@ -188,7 +188,7 @@ def create(data):
                     'sk': record['sk']['S'],"""
 
     for col, col_type in columns.items():
-        col_varname = converter.convert_friendly_to_system(col)
+        col_varname = converter.convert_to_system_name(col)
         col_type_id = set_type(col_type)
 
         source_code +=f"""
@@ -228,7 +228,7 @@ def create(data):
                     'sk': record['sk']['S'],"""
 
     for col, col_type in columns.items():
-        col_varname = converter.convert_friendly_to_system(col)
+        col_varname = converter.convert_to_system_name(col)
         col_type_id = set_type(col_type)
 
         source_code +=f"""
@@ -268,7 +268,7 @@ def create(data):
             ExpressionAttributeNames={{"""
 
     for col in columns:
-        col_varname = converter.convert_friendly_to_system(col)
+        col_varname = converter.convert_to_system_name(col)
         source_code +=f"""
                 '#{col_varname}' : '{col_varname}',"""  
 
@@ -277,7 +277,7 @@ def create(data):
             ExpressionAttributeValues={{"""
 
     for col, col_type in columns.items():
-        col_varname = converter.convert_friendly_to_system(col)
+        col_varname = converter.convert_to_system_name(col)
         col_type_id = set_type(col_type)
 
         source_code +=f"""
@@ -297,7 +297,7 @@ def create(data):
         item['sk'] = {{'S' : sk}}"""
 
     for col, col_type in columns.items():
-        col_varname = converter.convert_friendly_to_system(col)
+        col_varname = converter.convert_to_system_name(col)
         col_type_id = set_type(col_type)
 
         source_code +=f"""

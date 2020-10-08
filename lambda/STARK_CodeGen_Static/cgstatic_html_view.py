@@ -16,8 +16,8 @@ def create(data):
     pk      = data["PK"]
 
     #Convert human-friendly names to variable-friendly names
-    entity_varname = converter.convert_friendly_to_system(entity)
-    pk_varname     = converter.convert_friendly_to_system(pk)
+    entity_varname = converter.convert_to_system_name(entity)
+    pk_varname     = converter.convert_to_system_name(pk)
 
     source_code = f"""\
         <!DOCTYPE html>
@@ -94,7 +94,7 @@ def create(data):
                         </div>"""
 
     for col in cols:
-        col_varname = converter.convert_friendly_to_system(col)
+        col_varname = converter.convert_to_system_name(col)
         source_code += f"""
                         <div class="form-group row">
                             <label for="{col_varname}" class="col-sm-2 col-form-label">{col}</label>

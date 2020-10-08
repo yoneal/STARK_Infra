@@ -27,8 +27,8 @@ def lambda_handler(event, context):
     jsonified_payload = json.loads(raw_data_model)
     data_model = yaml.safe_load(jsonified_payload["data_model"])
 
-    project_varname = converter.convert_friendly_to_system(data_model.get('__STARK_project_name__'))
-    CF_stack_name   = converter.convert_friendly_to_system(data_model.get('__STARK_project_name__'), "cf-stack")
+    project_varname = converter.convert_to_system_name(data_model.get('__STARK_project_name__'))
+    CF_stack_name   = converter.convert_to_system_name(data_model.get('__STARK_project_name__'), "cf-stack")
 
     CF_url = f'https://waynestark-stark-prototype-codegenbucket.s3-ap-southeast-1.amazonaws.com/STARK_SAM_{project_varname}.yaml'
 

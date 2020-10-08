@@ -31,7 +31,7 @@ def create(data):
     i=0
     graphics = ["default_1", "default_2", "default_3", "default_4"]
     for entity in entities:
-        entity_varname = converter.convert_friendly_to_system(entity)
+        entity_varname = converter.convert_to_system_name(entity)
         i+=1
         graphic = graphics[i % len(graphics)]
         source_code += f"""

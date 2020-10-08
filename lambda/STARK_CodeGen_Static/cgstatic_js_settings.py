@@ -18,7 +18,7 @@ def create(data):
 
     #Each entity is a big module, has own endpoint
     for entity in entities:
-        entity_endpoint_name = converter.convert_friendly_to_system(entity)
+        entity_endpoint_name = converter.convert_to_system_name(entity)
         source_code += f"""
             '{entity_endpoint_name}_url':'https://{api_gateway_id}.execute-api.ap-southeast-1.amazonaws.com/{entity_endpoint_name}',"""
 

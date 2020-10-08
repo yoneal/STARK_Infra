@@ -31,7 +31,7 @@ helper = CfnResource() #We're using the AWS-provided helper library to minimize 
 def create_handler(event, context):
     #Project name from our CF template
     project_name    = event.get('ResourceProperties', {}).get('Project','')
-    project_varname = converter.convert_friendly_to_system(project_name)
+    project_varname = converter.convert_to_system_name(project_name)
 
     #UpdateToken = we need this as part of the Lambda deployment package path, to force CF to redeploy our Lambdas
     update_token = event.get('ResourceProperties', {}).get('UpdateToken','')
@@ -55,7 +55,7 @@ def create_handler(event, context):
     for entity in entities:
         #Step 1: generate source code.
         data = {
-            "Entity": converter.convert_friendly_to_system(entity), 
+            "Entity": converter.convert_to_system_name(entity), 
             "Columns": models[entity]["data"], 
             "PK": models[entity]["pk"], 
             "DynamoDB Name": ddb_table_name
@@ -71,7 +71,7 @@ def create_handler(event, context):
         #Step 4: create Lambda deployment package, send to S3
         deploy_lambda({
             'Project': project_varname, 
-            'Entity': converter.convert_friendly_to_system(entity),
+            'Entity': converter.convert_to_system_name(entity),
             'Bucket': codegen_bucket_name,
             'Update Token': update_token
         })

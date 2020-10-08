@@ -71,7 +71,7 @@ def lambda_handler(event, context):
                         "Content-Type": "application/json",
                 }
             }
-            project_varname = converter.convert_friendly_to_system(data_model.get(project_name))
+            project_varname = converter.convert_to_system_name(data_model.get(project_name))
 
         elif key == "__STARK_advanced__":
             pass

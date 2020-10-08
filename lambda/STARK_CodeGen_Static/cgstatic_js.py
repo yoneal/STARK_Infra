@@ -14,8 +14,8 @@ def create(data):
     cols   = data["Columns"]
     pk     = data['PK']
 
-    entity_varname = converter.convert_friendly_to_system(entity)
-    pk_varname     = converter.convert_friendly_to_system(pk)
+    entity_varname = converter.convert_to_system_name(entity)
+    pk_varname     = converter.convert_to_system_name(pk)
 
     source_code = f"""\
         var root = new Vue({{
@@ -28,7 +28,7 @@ def create(data):
 
 
     for col in cols:
-        col_varname = converter.convert_friendly_to_system(col)
+        col_varname = converter.convert_to_system_name(col)
         source_code += f"""
                     '{col_varname}': '',""" 
     source_code = source_code[:-1] #remove last comma
@@ -38,7 +38,7 @@ def create(data):
                 lists: {{"""
 
     for col, col_type in cols.items():
-        col_varname = converter.convert_friendly_to_system(col)
+        col_varname = converter.convert_to_system_name(col)
         js_list_code = cg_coltype.create_list({
             "col": col,
             "col_type": col_type,
