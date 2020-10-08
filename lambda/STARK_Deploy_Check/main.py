@@ -26,7 +26,7 @@ def lambda_handler(event, context):
     jsonified_payload = json.loads(raw_data_model)
     data_model = yaml.safe_load(jsonified_payload["data_model"])
 
-    CF_stack_name = converter.convert_to_system_name(data_model.get(data_model.get('__STARK_project_name__'), "cf-stack")
+    CF_stack_name = converter.convert_to_system_name(data_model.get('__STARK_project_name__'), "cf-stack")
 
     
     print("Sleep for 10!")
