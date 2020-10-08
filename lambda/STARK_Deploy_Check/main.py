@@ -10,6 +10,9 @@ from time import sleep
 import yaml
 import boto3
 
+#Private modules
+import convert_friendly_to_system as converter
+
 client = boto3.client('cloudformation')
 
 def lambda_handler(event, context):
@@ -23,7 +26,7 @@ def lambda_handler(event, context):
     jsonified_payload = json.loads(raw_data_model)
     data_model = yaml.safe_load(jsonified_payload["data_model"])
 
-    CF_stack_name = (data_model.get('__STARK_project_name__')).replace(" ", "").lower()
+    CF_stack_name = converter.convert_friendly_to_system(data_model.get(data_model.get('__STARK_project_name__'), "cf-stack")
 
     
     print("Sleep for 10!")

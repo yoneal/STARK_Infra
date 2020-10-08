@@ -11,6 +11,7 @@ import yaml
 import boto3
 
 #Private modules
+import convert_friendly_to_system as converter
 import parse_stark_settings as stark_settings_parser
 import parse_api_gateway as api_gateway_parser
 import parse_cloudfront as cloudfront_parser
@@ -70,8 +71,7 @@ def lambda_handler(event, context):
                         "Content-Type": "application/json",
                 }
             }
-            #FIXME: This needs a better sanitizer
-            project_varname = project_name.replace(" ", "_").lower()
+            project_varname = converter.convert_friendly_to_system(data_model.get(project_name)
 
         elif key == "__STARK_advanced__":
             pass
