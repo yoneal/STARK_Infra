@@ -4,6 +4,9 @@
 #Python Standard Library
 import textwrap
 
+#Private modules
+import convert_friendly_to_system as converter
+
 def create(data):
 
     api_gateway_id  = data['API Gateway ID']
@@ -15,7 +18,7 @@ def create(data):
 
     #Each entity is a big module, has own endpoint
     for entity in entities:
-        entity_endpoint_name = entity.replace(" ", "_").lower()
+        entity_endpoint_name = converter.convert_friendly_to_system(entity)
         source_code += f"""
             '{entity_endpoint_name}_url':'https://{api_gateway_id}.execute-api.ap-southeast-1.amazonaws.com/{entity_endpoint_name}',"""
 

@@ -15,6 +15,7 @@ from crhelper import CfnResource
 #Private modules
 import cgdynamic_modules as cg_mod
 import cgdynamic_dynamodb as cg_ddb
+import convert_friendly_to_system as converter
 
 s3  = boto3.client('s3')
 ssm = boto3.client('ssm')
@@ -30,7 +31,7 @@ helper = CfnResource() #We're using the AWS-provided helper library to minimize 
 def create_handler(event, context):
     #Project name from our CF template
     project_name    = event.get('ResourceProperties', {}).get('Project','')
-    project_varname = project_name.replace(" ", "_").lower()
+    project_varname = converter.convert_friendly_to_system(project_name)
 
     #UpdateToken = we need this as part of the Lambda deployment package path, to force CF to redeploy our Lambdas
     update_token = event.get('ResourceProperties', {}).get('UpdateToken','')
@@ -54,7 +55,7 @@ def create_handler(event, context):
     for entity in entities:
         #Step 1: generate source code.
         data = {
-            "Entity": entity.replace(" ", "_").lower(), 
+            "Entity": converter.convert_friendly_to_system(entity), 
             "Columns": models[entity]["data"], 
             "PK": models[entity]["pk"], 
             "DynamoDB Name": ddb_table_name
@@ -70,7 +71,7 @@ def create_handler(event, context):
         #Step 4: create Lambda deployment package, send to S3
         deploy_lambda({
             'Project': project_varname, 
-            'Entity': entity.replace(" ", "_").lower(),
+            'Entity': converter.convert_friendly_to_system(entity),
             'Bucket': codegen_bucket_name,
             'Update Token': update_token
         })

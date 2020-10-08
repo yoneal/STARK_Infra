@@ -21,6 +21,7 @@ import cgstatic_html_view as cg_view
 import cgstatic_html_delete as cg_delete
 import cgstatic_html_listview as cg_listview
 import cgstatic_html_homepage as cg_homepage
+import convert_friendly_to_system as converter
 
 s3  = boto3.client('s3')
 ssm = boto3.client('ssm')
@@ -33,7 +34,7 @@ def create_handler(event, context):
     #Project and bucket name from our CF template
     bucket_name     = event.get('ResourceProperties', {}).get('Bucket','')
     project_name    = event.get('ResourceProperties', {}).get('Project','')
-    project_varname = project_name.replace(" ", "_").lower()
+    project_varname = converter.convert_friendly_to_system(project_name)
 
     #FIXME: Temporary way to retrieve cloud_resources. PROD version will use S3 file for unlimited length.
     cloud_resources = yaml.safe_load(ssm.get_parameter(Name="STARK_cloud_resources_" + project_varname).get('Parameter', {}).get('Value'))
@@ -52,7 +53,7 @@ def create_handler(event, context):
         pk   = models[entity]["pk"]
         cols = models[entity]["data"]
         cgstatic_data = { "Entity": entity, "PK": pk, "Columns": cols, "Bucket Name": bucket_name, "Project Name": project_name }
-        entity_varname = entity.replace(" ", "_").lower()
+        entity_varname = converter.convert_friendly_to_system(entity)
 
         deploy(source_code=cg_add.create(cgstatic_data), bucket_name=bucket_name, key=f"{entity_varname}_add.html")
         deploy(source_code=cg_edit.create(cgstatic_data), bucket_name=bucket_name, key=f"{entity_varname}_edit.html")

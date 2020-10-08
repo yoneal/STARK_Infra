@@ -7,6 +7,7 @@ import textwrap
 
 #Private modules
 import cgstatic_controls_coltype as cg_coltype
+import convert_friendly_to_system as converter
 
 def create(data):
 
@@ -16,8 +17,8 @@ def create(data):
     pk      = data["PK"]
 
     #Convert human-friendly names to variable-friendly names
-    entity_varname = entity.replace(" ", "_").lower()
-    pk_varname = pk.replace(" ", "_").lower()
+    entity_varname = converter.convert_friendly_to_system(entity)
+    pk_varname = converter.convert_friendly_to_system(pk)
 
     source_code = f"""\
         <!DOCTYPE html>
@@ -92,7 +93,7 @@ def create(data):
                         </div>"""
 
     for col, col_type in cols.items():
-        col_varname = col.replace(" ", "_").lower()
+        col_varname = converter.convert_friendly_to_system(col)
         html_control_code = cg_coltype.create({
             "col": col,
             "col_type": col_type,

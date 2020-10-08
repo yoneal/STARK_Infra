@@ -6,6 +6,7 @@ import textwrap
 
 #Private modules
 import cgstatic_controls_coltype as cg_coltype
+import convert_friendly_to_system as converter
 
 def create(data):
 
@@ -13,8 +14,8 @@ def create(data):
     cols   = data["Columns"]
     pk     = data['PK']
 
-    entity_varname = entity.replace(" ", "_").lower()
-    pk_varname     = pk.replace(" ", "_").lower()
+    entity_varname = converter.convert_friendly_to_system(entity)
+    pk_varname     = converter.convert_friendly_to_system(pk)
 
     source_code = f"""\
         var root = new Vue({{
@@ -27,7 +28,7 @@ def create(data):
 
 
     for col in cols:
-        col_varname = col.replace(" ", "_").lower()
+        col_varname = converter.convert_friendly_to_system(col)
         source_code += f"""
                     '{col_varname}': '',""" 
     source_code = source_code[:-1] #remove last comma
@@ -37,7 +38,7 @@ def create(data):
                 lists: {{"""
 
     for col, col_type in cols.items():
-        col_varname = col.replace(" ", "_").lower()
+        col_varname = converter.convert_friendly_to_system(col)
         js_list_code = cg_coltype.create_list({
             "col": col,
             "col_type": col_type,

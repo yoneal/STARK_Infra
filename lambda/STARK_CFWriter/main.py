@@ -11,6 +11,9 @@ from uuid import uuid4
 import yaml
 import boto3
 
+#Private modules
+import convert_friendly_to_system as converter
+
 s3  = boto3.client('s3')
 ssm = boto3.client('ssm')
 
@@ -32,7 +35,7 @@ def lambda_handler(event, context):
     #       as a unique identifier. Make this a GUID for prod use.
     #       We do still need a user-supplied project name for display purposes (header of each HTML page, login screen, etc), though.
     project_name    = cloud_resources["Project Name"]
-    project_varname = project_name.replace(" ", "_").lower()
+    project_varname = converter.convert_friendly_to_system(project_name)
 
     #So that cloud_resources can be used by our CodeGen components (which are lambda-backed custom resources in this resulting CF/SAM template),
     #   we need to dump cloud_resources into ParamStore as a YAML string
@@ -190,8 +193,8 @@ def lambda_handler(event, context):
     for entity in lambda_entities:
         #CF logical names must have no spaces, underscores, etc
         #FIXME: implement other necessary removals or whitelisting here
-        entity_logical_name = entity.replace("_", "").replace(" ", "")
-        entity_endpoint_name = entity.replace(" ", "_").lower()
+        entity_logical_name = converter.convert_friendly_to_system(entity, "cf-resource")
+        entity_endpoint_name = converter.convert_friendly_to_system(entity)
         cf_template += f"""
         STARKBackendApiFor{entity_logical_name}:
             Type: AWS::Serverless::Function

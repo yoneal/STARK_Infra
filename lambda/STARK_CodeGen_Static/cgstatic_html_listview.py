@@ -5,6 +5,9 @@
 import base64
 import textwrap
 
+#Private modules
+import convert_friendly_to_system as converter
+
 def create(data):
 
     project = data["Project Name"]
@@ -13,8 +16,8 @@ def create(data):
     pk      = data["PK"]
 
     #Convert human-friendly names to variable-friendly names
-    entity_varname = entity.replace(" ", "_").lower()
-    pk_varname = pk.replace(" ", "_").lower()
+    entity_varname = converter.convert_friendly_to_system(entity)
+    pk_varname = converter.convert_friendly_to_system(pk)
 
     source_code = f"""\
         <!DOCTYPE html>
@@ -81,7 +84,7 @@ def create(data):
                                     <th scope="row"><a :href="'{entity_varname}_view.html?{pk_varname}=' + {entity_varname}.{pk_varname}">{{{{ {entity_varname}.{pk_varname} }}}}</a></th>"""
 
     for col in cols:
-        col_varname = col.replace(" ", "_").lower()
+        col_varname = converter.convert_friendly_to_system(col)
         source_code += f"""
                                     <td>{{{{ {entity_varname}.{col_varname} }}}}</td>"""
 

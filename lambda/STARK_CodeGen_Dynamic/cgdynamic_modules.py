@@ -5,6 +5,9 @@
 import base64
 import textwrap
 
+#Private modules
+import convert_friendly_to_system as converter
+
 def create(data):
 
     entities  = data["Entities"]
@@ -28,7 +31,7 @@ def create(data):
     i=0
     graphics = ["default_1", "default_2", "default_3", "default_4"]
     for entity in entities:
-        entity_varname = entity.replace(" ", "_").lower()
+        entity_varname = converter.convert_friendly_to_system(entity)
         i+=1
         graphic = graphics[i % len(graphics)]
         source_code += f"""
