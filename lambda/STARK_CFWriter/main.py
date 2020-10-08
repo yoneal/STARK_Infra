@@ -191,8 +191,6 @@ def lambda_handler(event, context):
                     WriteCapacityUnits: {ddb_wcu_provisioned}"""
 
     for entity in lambda_entities:
-        #CF logical names must have no spaces, underscores, etc
-        #FIXME: implement other necessary removals or whitelisting here
         entity_logical_name = converter.convert_friendly_to_system(entity, "cf-resource")
         entity_endpoint_name = converter.convert_friendly_to_system(entity)
         cf_template += f"""
