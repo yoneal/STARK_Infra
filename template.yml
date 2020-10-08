@@ -33,7 +33,7 @@ Resources:
                 - AWSLambdaFullAccess
             Layers:
                 - arn:aws:lambda:ap-southeast-1:201649379729:layer:pyyaml_layer_mk1:2
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:STARK_friendly_to_system_names:2	
+                - arn:aws:lambda:ap-southeast-1:201649379729:layer:STARK_friendly_to_system_names:2
             Timeout: 60
     STARKCFWriterFunc:
         Type: AWS::Serverless::Function
@@ -47,7 +47,7 @@ Resources:
                 - AWSLambdaBasicExecutionRole
             Layers:
                 - arn:aws:lambda:ap-southeast-1:201649379729:layer:pyyaml_layer_mk1:2
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:STARK_friendly_to_system_names:2	
+                - arn:aws:lambda:ap-southeast-1:201649379729:layer:STARK_friendly_to_system_names:2
             Timeout: 60
     STARKDeployFunc:
         Type: AWS::Serverless::Function
@@ -69,7 +69,7 @@ Resources:
                 - AWSCloudFormationFullAccess
             Layers:
                 - arn:aws:lambda:ap-southeast-1:201649379729:layer:pyyaml_layer_mk1:2
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:STARK_friendly_to_system_names:2	
+                - arn:aws:lambda:ap-southeast-1:201649379729:layer:STARK_friendly_to_system_names:2
             Timeout: 600
     STARKDeployCheckFunc:
         Type: AWS::Serverless::Function
@@ -91,7 +91,7 @@ Resources:
                 - AWSCloudFormationFullAccess
             Layers:
                 - arn:aws:lambda:ap-southeast-1:201649379729:layer:pyyaml_layer_mk1:2
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:STARK_friendly_to_system_names:2	
+                - arn:aws:lambda:ap-southeast-1:201649379729:layer:STARK_friendly_to_system_names:2
             Timeout: 600
     STARKCodeGenStaticWriter:
         Type: AWS::Serverless::Function
@@ -106,7 +106,7 @@ Resources:
             Layers:
                 - arn:aws:lambda:ap-southeast-1:201649379729:layer:CF_CustomResourceHelper_layer:1
                 - arn:aws:lambda:ap-southeast-1:201649379729:layer:pyyaml_layer_mk1:2
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:STARK_friendly_to_system_names:2	
+                - arn:aws:lambda:ap-southeast-1:201649379729:layer:STARK_friendly_to_system_names:2
             Timeout: 60
     STARKCodeGenDynamicWriter:
         Type: AWS::Serverless::Function
@@ -121,7 +121,7 @@ Resources:
             Layers:
                 - arn:aws:lambda:ap-southeast-1:201649379729:layer:CF_CustomResourceHelper_layer:1
                 - arn:aws:lambda:ap-southeast-1:201649379729:layer:pyyaml_layer_mk1:2
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:STARK_friendly_to_system_names:2	
+                - arn:aws:lambda:ap-southeast-1:201649379729:layer:STARK_friendly_to_system_names:2
             Timeout: 60
     STARKBucketPreloaderFunc:
         Type: AWS::Serverless::Function
