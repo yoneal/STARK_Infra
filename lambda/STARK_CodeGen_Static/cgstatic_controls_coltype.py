@@ -167,10 +167,6 @@ def create_list(data):
                 js_code += f"""
                         {{ value: '{item}', text: '{item}' }},"""
 
-    #remove final comma
-    js_code = js_code[:-1]
-
-
     #############
     #Close the list to end
     js_code += f"""

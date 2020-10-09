@@ -31,7 +31,6 @@ def create(data):
         col_varname = converter.convert_to_system_name(col)
         source_code += f"""
                     '{col_varname}': '',""" 
-    source_code = source_code[:-1] #remove last comma
 
     source_code += f"""
                 }},
@@ -48,8 +47,6 @@ def create(data):
         if js_list_code != None:
             source_code += f"""
                     {js_list_code}"""
-
-    source_code = source_code[:-1] #remove last comma
 
     source_code += f"""
                 }},
