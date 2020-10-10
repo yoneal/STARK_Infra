@@ -41,7 +41,7 @@ def lambda_handler(event, context):
 
     url    = ''
     result = ''
-    if stack_status == 'CREATE_COMPLETE':
+    if stack_status in [ 'CREATE_COMPLETE', 'UPDATE_COMPLETE' ]:
 
         response = client.describe_stack_resource(
             StackName=CF_stack_name,
