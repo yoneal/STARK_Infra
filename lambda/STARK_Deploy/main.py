@@ -32,6 +32,7 @@ def lambda_handler(event, context):
 
     CF_url = f'https://waynestark-stark-prototype-codegenbucket.s3-ap-southeast-1.amazonaws.com/STARK_SAM_{project_varname}.yaml'
 
+    payload = ""
     try:
         response = client.create_stack(
             StackName=CF_stack_name,
@@ -44,12 +45,6 @@ def lambda_handler(event, context):
             OnFailure='DELETE',
             EnableTerminationProtection=False
         )
-
-        payload = {
-            'status': 'CloudFormation Execution Started',
-            'message': "Look at you, testing out next-gen serverless tech! Don't worry, it's coming!",
-            'retry': True
-        }
 
     except ClientError as error:
 
@@ -68,6 +63,14 @@ def lambda_handler(event, context):
                 'message': "Sorry, STARK failed to deploy due to an internal error. It's not you, it's us! {" + error.response['Error']['Code'] + "}",
                 'retry': False
             }        
+
+
+    if payload == "":
+        payload = {
+            'status': 'CloudFormation Execution Started',
+            'message': "Look at you, testing out next-gen serverless tech! Don't worry, it's coming!",
+            'retry': True
+        }
 
 
 
