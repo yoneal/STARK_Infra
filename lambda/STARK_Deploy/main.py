@@ -57,13 +57,10 @@ def lambda_handler(event, context):
             response = client.update_stack(
                 StackName=CF_stack_name,
                 TemplateURL=CF_url,
-                TimeoutInMinutes=10,
                 Capabilities=[
                     'CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND',
                 ],
                 RoleARN='arn:aws:iam::201649379729:role/STARK_POC_Deploy_CloudFormationServiceRole',
-                OnFailure='DELETE',
-                EnableTerminationProtection=False
             )            
         else:
             payload = {
