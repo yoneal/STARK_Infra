@@ -54,7 +54,7 @@ def lambda_handler(event, context):
     except ClientError as error:
 
         if error.response['Error']['Code'] == 'AlreadyExistsException':
-            response = client.create_stack(
+            response = client.update_stack(
                 StackName=CF_stack_name,
                 TemplateURL=CF_url,
                 TimeoutInMinutes=10,
