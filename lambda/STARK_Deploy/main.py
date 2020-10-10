@@ -52,11 +52,25 @@ def lambda_handler(event, context):
         }
 
     except ClientError as error:
-        payload = {
-            'status': 'CloudFormation Execution Failed',
-            'message': "Sorry, STARK failed to deploy due to an internal error. It's not you, it's us! {" + error.response['Error']['Code'] + "}",
-            'retry': False
-        }        
+
+        if error.response['Error']['Code'] == 'AlreadyExistsException':
+            response = client.create_stack(
+                StackName=CF_stack_name,
+                TemplateURL=CF_url,
+                TimeoutInMinutes=10,
+                Capabilities=[
+                    'CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND',
+                ],
+                RoleARN='arn:aws:iam::201649379729:role/STARK_POC_Deploy_CloudFormationServiceRole',
+                OnFailure='DELETE',
+                EnableTerminationProtection=False
+            )            
+        else:
+            payload = {
+                'status': 'CloudFormation Execution Failed',
+                'message': "Sorry, STARK failed to deploy due to an internal error. It's not you, it's us! {" + error.response['Error']['Code'] + "}",
+                'retry': False
+            }        
 
 
 
