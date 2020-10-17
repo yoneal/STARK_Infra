@@ -191,7 +191,7 @@ def create(data):
                             data.forEach(function(arrayItem) {{
                                 value = arrayItem['{foreign_field}']
                                 text  = arrayItem['{foreign_display}']
-                                root.lists.gender.push({{ value: value, text: text }})
+                                root.lists.{foreign_entity}.push({{ value: value, text: text }})
                             }})
                             root.list_status.{foreign_entity} = 'populated'
                             loading_modal.hide();
