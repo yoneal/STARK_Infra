@@ -144,7 +144,7 @@ def create(data):
 
                 list: function () {{
                     spinner.show()
-                    customer_app.list().then( function(data) {{
+                    {entity_app}.list().then( function(data) {{
                         root.listview_table = data;
                         console.log("DONE! Retreived list.");
                         spinner.hide()
