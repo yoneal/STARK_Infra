@@ -15,7 +15,7 @@ from crhelper import CfnResource
 import cgstatic_js_app as cg_js_app
 import cgstatic_js_view as cg_js_view
 import cgstatic_js_homepage as cg_js_home
-import cgstatic_js_settings as cg_js_settings
+import cgstatic_js_stark as cg_js_stark
 import cgstatic_html_add  as cg_add
 import cgstatic_html_edit as cg_edit
 import cgstatic_html_view as cg_view
@@ -45,9 +45,9 @@ def create_handler(event, context):
     models          = cloud_resources["DynamoDB"]["Models"]
     api_gateway_id  = ssm.get_parameter(Name=ApiG_param_name).get('Parameter', {}).get('Value')
 
-    #STARK Settings JS file for the project
-    settings_data = { 'API Gateway ID': api_gateway_id, 'Entities': models }
-    deploy(cg_js_settings.create(settings_data), bucket_name=bucket_name, key=f"js/STARK_settings.js")
+    #STARK main JS file
+    data = { 'API Gateway ID': api_gateway_id, 'Entities': models }
+    deploy(cg_js_stark.create(data), bucket_name=bucket_name, key=f"js/STARK.js")
 
     #For each entity, we'll create a set of HTML and JS Files
     for entity in models:
