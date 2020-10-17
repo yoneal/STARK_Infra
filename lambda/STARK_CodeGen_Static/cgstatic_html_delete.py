@@ -47,10 +47,10 @@ def create(data):
             "col_type": col_type,
         })
     
-    for related in entities:
-        related_varname = converter.convert_to_system_name(related)
-        source_code += f"""
-            <script src="js/{related_varname}_app.js" defer></script>"""
+        for related in entities:
+            related_varname = converter.convert_to_system_name(related)
+            source_code += f"""
+                <script src="js/{related_varname}_app.js" defer></script>"""
 
     
 
