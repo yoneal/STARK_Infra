@@ -10,6 +10,11 @@ Customer:
         - Gender: [ Male, Female, LGBTQ+ ]
         - Join Date: date
         - Preferred Customer: yes-no
+        - Customer Type: 
+            type: relationship
+            has_one: Customer Type
+            value: Customer Type
+            display: Customer Type
         - Remarks: multi-line-string
 Item:
     pk: Product Code
@@ -39,15 +44,10 @@ Item:
             type: radio bar
             values: [ "None", "10%", "15%", "20%", "25%" ]
         - Last Update: time
-Sales Agent:
-    pk: Employee ID
+Customer Type:
+    pk: Customer Type
     data:
-        - First Name: string
-        - Last Name: string
-        - Sex: [ "Yes", "No", "HR is calling" ]
-        - Hiring Date: date
-        - Salary: string
-        - TIN: string
+        - Description: multi-line-string
 Document:
     pk: Document ID
     data:

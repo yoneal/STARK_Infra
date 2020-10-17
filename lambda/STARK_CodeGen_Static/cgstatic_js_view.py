@@ -50,6 +50,23 @@ def create(data):
 
     source_code += f"""
                 }},
+                list_status: {{"""
+
+    #FIXME: These kinds of logic (determining col types, lists, retreiving settings, etc) are repetitive, should be refactored shipped to a central lib
+    for col, col_type in cols.items():
+        if col_type["type"] == "relationship":
+            has_one = col_type.get('has_one', '')
+            if  has_one != '':
+                #simple 1-1 relationship
+                foreign_entity  = converter.convert_to_system_name(has_one)
+
+                source_code += f"""
+                    '{foreign_entity}': 'empty',"""
+
+
+
+    source_code += f"""
+                }},
                 visibility: 'hidden',
             }},
             methods:{{
@@ -153,10 +170,42 @@ def create(data):
                         console.log("Encountered an error! [" + error + "]")
                         spinner.hide()
                     }});
-                }},
+                }},"""
+
+    for col, col_type in cols.items():
+        if col_type["type"] == "relationship":
+            has_one = col_type.get('has_one', '')
+            if  has_one != '':
+                #simple 1-1 relationship
+                foreign_entity  = converter.convert_to_system_name(has_one)
+                foreign_field   = converter.convert_to_system_name(col_type.get('value', foreign_entity))
+                foreign_display = converter.convert_to_system_name(col_type.get('display', foreign_field))
+
+                source_code += f"""
+                list_{foreign_entity}: function () {{
+                    if (this.list_status.gender == 'empty') {{
+                        loading_modal.show();
+
+                        //FIXME: for now, generic list() is used. Can be optimized to use a list function that only retrieves specific columns
+                        {foreign_entity}_app.list().then( function(data) {{
+                            data.forEach(function(arrayItem) {{
+                                value = arrayItem['{foreign_field}']
+                                text  = arrayItem['{foreign_display}']
+                                root.lists.gender.push({{ value: value, text: text }})
+                            }})
+                            root.list_status.{foreign_entity} = 'populated'
+                            loading_modal.hide();
+                        }}).catch(function(error) {{
+                            console.log("Encountered an error! [" + error + "]")
+                            loading_modal.hide();
+                        }});
+                    }}
+                }},"""
+
+
+    source_code += f"""
             }}
         }})
-
     """
 
     return textwrap.dedent(source_code)

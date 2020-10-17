@@ -5,6 +5,9 @@
 import base64
 import textwrap
 
+#Private modules
+import convert_friendly_to_system as converter
+
 def create(data):
 
     col             = data['col']
@@ -41,8 +44,7 @@ def create(data):
         html_code=f"""<b-form-select id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}">
                                 <template v-slot:first>
                                     <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
-                                </template>"""
-        html_code+=f"""
+                                </template>
                             </b-form-select>"""
 
     elif isinstance(col_type, dict):
@@ -119,6 +121,19 @@ def create(data):
                 ugly_hack = "<br>"
 
             html_code=f"""{ugly_hack}<b-form-radio-group id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}" {buttons}></b-form-radio-group>"""
+
+        elif col_type["type"] == "relationship":
+            has_one = col_type.get('has_one', '')
+
+            if  has_one != '':
+                #simple 1-1 relationship
+                foreign_entity  = converter.convert_to_system_name(has_one)
+
+                html_code=f"""<b-form-select id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}" onmouseover="root.list_{foreign_entity}()" onfocus="root.list_{foreign_entity}()">
+                                <template v-slot:first>
+                                    <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
+                                </template>
+                            </b-form-select>"""
 
 
 
