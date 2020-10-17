@@ -6,6 +6,7 @@ import base64
 import textwrap
 
 #Private modules
+import cgstatic_relationships as cg_rel
 import convert_friendly_to_system as converter
 
 def create(data):

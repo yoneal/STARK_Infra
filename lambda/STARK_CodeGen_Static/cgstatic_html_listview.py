@@ -37,23 +37,7 @@ def create(data):
             <script src="js/STARK_spinner.js" defer></script>
             <script src="js/STARK_loading_modal.js" defer></script>
             <script src="js/{entity_varname}_app.js" defer></script>
-            <script src="js/{entity_varname}_view.js" defer></script>"""
-
-    #Figure out which other _app.js files we need to add based on relationships
-    for col, col_type in cols.items():
-        entities = cg_rel.get({
-            "col": col,
-            "col_type": col_type,
-        })
-    
-    for related in entities:
-        related_varname = converter.convert_to_system_name(related)
-        source_code = f"""
-            <script src="js/{related_varname}_app.js" defer></script>"""
-
-    
-
-    source_code = f"""
+            <script src="js/{entity_varname}_view.js" defer></script>
             <script src="js/generic_root_list.js" defer></script>
 
             <title>{project} - {entity}</title>
