@@ -158,9 +158,11 @@ def create_list(data):
         col_type = col_type.lower()
 
     #We only make lists for specific column types and just return immediately for anything else
-    if isinstance(col_type, list) 
-    or ( isinstance(col_type, dict) and col_type["type"] in [ "multiple choice", "radio button", "radio bar"] )
-    or ( isinstance(col_type, dict) and col_type == "relationship" and col_type.get('has_one','') != ''):
+    if isinstance(col_type, list) or ( 
+        isinstance(col_type, dict) and col_type["type"] in [ "multiple choice", "radio button", "radio bar"] 
+        ) or ( 
+        isinstance(col_type, dict) and col_type == "relationship" and col_type.get('has_one','') != ''
+        ):
         listable = True
 
     if not listable: 
