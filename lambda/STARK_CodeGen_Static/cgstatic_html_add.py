@@ -51,9 +51,7 @@ def create(data):
         for related in entities:
             related_varname = converter.convert_to_system_name(related)
             source_code += f"""
-                <script src="js/{related_varname}_app.js" defer></script>"""
-
-    
+            <script src="js/{related_varname}_app.js" defer></script>"""
 
     source_code += f"""
             <script src="js/generic_root_get.js" defer></script>
