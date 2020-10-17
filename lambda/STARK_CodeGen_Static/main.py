@@ -12,7 +12,8 @@ import boto3
 from crhelper import CfnResource
 
 #Private modules
-import cgstatic_js as cg_js
+import cgstatic_js_app as cg_js_app
+import cgstatic_js_view as cg_js_view
 import cgstatic_js_homepage as cg_js_home
 import cgstatic_js_settings as cg_js_settings
 import cgstatic_html_add  as cg_add
@@ -60,7 +61,8 @@ def create_handler(event, context):
         deploy(source_code=cg_delete.create(cgstatic_data), bucket_name=bucket_name, key=f"{entity_varname}_delete.html")
         deploy(source_code=cg_view.create(cgstatic_data), bucket_name=bucket_name, key=f"{entity_varname}_view.html")
         deploy(source_code=cg_listview.create(cgstatic_data), bucket_name=bucket_name, key=f"{entity_varname}.html")
-        deploy(source_code=cg_js.create(cgstatic_data), bucket_name=bucket_name, key=f"js/{entity_varname}.js")
+        deploy(source_code=cg_js_app.create(cgstatic_data), bucket_name=bucket_name, key=f"js/{entity_varname}_app.js")
+        deploy(source_code=cg_js_view.create(cgstatic_data), bucket_name=bucket_name, key=f"js/{entity_varname}_view.js")
   
     #HTML+JS for our homepage
     homepage_data = { "Project Name": project_name }

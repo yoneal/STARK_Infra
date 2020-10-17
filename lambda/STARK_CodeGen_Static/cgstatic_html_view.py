@@ -36,7 +36,8 @@ def create(data):
             <script src="js/STARK_settings.js" defer></script>
             <script src="js/STARK_spinner.js" defer></script>
             <script src="js/STARK_loading_modal.js" defer></script>
-            <script src="js/{entity_varname}.js" defer></script>
+            <script src="js/{entity_varname}_app.js" defer></script>
+            <script src="js/{entity_varname}_view.js" defer></script>
             <script src="js/generic_root_get.js" defer></script>
 
             <title>{project} - {entity}</title>

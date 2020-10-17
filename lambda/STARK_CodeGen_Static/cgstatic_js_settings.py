@@ -22,8 +22,32 @@ def create(data):
         source_code += f"""
             '{entity_endpoint_name}_url':'https://{api_gateway_id}.execute-api.ap-southeast-1.amazonaws.com/{entity_endpoint_name}',"""
 
-    #Close the settings data structure
+    #STARK-provided common methods go here
     source_code += f"""
+            'methods_with_body': ["POST", "DELETE", "PUT"],
+
+            request: function(method, fetchURL, payload='') {{
+
+                let fetchData = {{
+                    mode: 'cors',
+                    headers: {{ "Content-Type": "application/json" }},
+                    method: method,
+                }}
+
+                if(this.methods_with_body.includes(method)) {{
+                    console.log("stringifying payload")
+                    console.log(payload)
+                    fetchData['body'] = JSON.stringify(payload)
+                }}
+
+                return fetch(fetchUrl, fetchData).then( function(response) {{
+                    if (!response.ok) {{
+                        console.log(response)
+                        throw Error(response.statusText);
+                    }}
+                    return response
+                }}).then((response) => response.json())
+            }}
         }};
     """
 
