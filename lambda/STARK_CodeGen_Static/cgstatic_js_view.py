@@ -54,7 +54,7 @@ def create(data):
 
     #FIXME: These kinds of logic (determining col types, lists, retreiving settings, etc) are repetitive, should be refactored shipped to a central lib
     for col, col_type in cols.items():
-        if col_type["type"] == "relationship":
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
             if  has_one != '':
                 #simple 1-1 relationship
@@ -173,7 +173,7 @@ def create(data):
                 }},"""
 
     for col, col_type in cols.items():
-        if col_type["type"] == "relationship":
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
             if  has_one != '':
                 #simple 1-1 relationship
