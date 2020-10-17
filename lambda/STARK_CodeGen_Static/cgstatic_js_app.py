@@ -21,7 +21,7 @@ def create(data):
     source_code = f"""\
         var {entity_app} = {{
             
-            api_endpoint: STARK.{entity_varname},
+            api_endpoint: STARK.{entity_varname}_url,
 
             add: function (payload) {{
                 fetchUrl = this.api_endpoint
