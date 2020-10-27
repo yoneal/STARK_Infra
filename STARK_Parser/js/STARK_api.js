@@ -30,6 +30,7 @@ Item:
         - Categories:
             type: tags
             limit: 3
+            values: [ "Regular", "Deluxe", "Premium" ]
         - Rating:
             type: rating
             max: 10

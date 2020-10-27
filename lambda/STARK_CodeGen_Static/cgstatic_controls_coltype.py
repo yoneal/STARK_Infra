@@ -87,11 +87,23 @@ def create(data):
         #FIXME: This has more capabilities built-in, please add them here too (like validators and the other props)
         elif col_type["type"] == "tags":
             tag_limit = 5
+            attribs_for_tags_list = ''
+            datalist_helper = ''
 
             if int(col_type.get('limit', 0)) != 0:
                 tag_limit = int(col_type.get('limit', 0))
+            if col_type.get('values','') != '':
+                #Do not include validator for now, that's for later sprint
+                #attribs_for_tags_list = f""":input-attrs="{{ list: '{entity_varname}-tags-list', autocomplete: 'off' }}" :tag-validator="validate_{entity_varname}" add-on-change"""
+                attribs_for_tags_list = f""":input-attrs="{{ list: '{entity_varname}-tags-list', autocomplete: 'off' }}" add-on-change"""
+                datalist_helper = f"""<b-form-datalist id="categories-tags-list" :options="lists.Categories"></b-form-datalist>"""
 
-            html_code=f"""<b-form-tags input-id="{col_varname}" v-model="{entity_varname}.{col_varname}" :limit="{tag_limit}" remove-on-delete></b-form-tags>"""
+            html_code=f"""<b-form-tags input-id="{col_varname}" v-model="{entity_varname}.{col_varname}" :limit="{tag_limit}" remove-on-delete {attribs_for_tags_list}></b-form-tags>"""
+
+            if datalist_helper != '':
+                html_code=f"""
+                            {datalist_helper}"""
+            #FIXME: Eventually (later sprint) we may have to make datalist helper creation more generic (reusable by most other control types)
 
         #Rating - nice UI to give a 1-5 (or 1-N) feedback
         elif col_type["type"] == "rating":
@@ -136,7 +148,6 @@ def create(data):
                             </b-form-select>"""
 
 
-
     else:
         html_code=f"""<input type="text" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}">"""
 
@@ -162,6 +173,8 @@ def create_list(data):
         isinstance(col_type, dict) and col_type["type"] in [ "multiple choice", "radio button", "radio bar"] 
     ) or ( 
         isinstance(col_type, dict) and col_type["type"] == "relationship" and col_type.get('has_one','') != ''
+    ) or (
+        isinstance(col_type, dict) and col_type["type"] == "tags" and col_type.get('values','') != '' 
     ):
         listable = True
 
@@ -178,12 +191,10 @@ def create_list(data):
                         {{ value: '{item}', text: '{item}' }},"""
 
     elif isinstance(col_type, dict):
-        #A group of check boxes for multiple choice inputs
-        if col_type["type"] in [ "multiple choice", "radio button", "radio bar" ]:
-            items  = col_type.get('values', [])
+        items = col_type.get('values', [])
 
-            for item in items:
-                js_code += f"""
+        for item in items:
+            js_code += f"""
                         {{ value: '{item}', text: '{item}' }},"""
 
 
