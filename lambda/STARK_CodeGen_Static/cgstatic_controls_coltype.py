@@ -101,7 +101,7 @@ def create(data):
             html_code=f"""<b-form-tags input-id="{col_varname}" v-model="{entity_varname}.{col_varname}" :limit="{tag_limit}" remove-on-delete {attribs_for_tags_list}></b-form-tags>"""
 
             if datalist_helper != '':
-                html_code=f"""
+                html_code+=f"""
                             {datalist_helper}"""
             #FIXME: Eventually (later sprint) we may have to make datalist helper creation more generic (reusable by most other control types)
 
