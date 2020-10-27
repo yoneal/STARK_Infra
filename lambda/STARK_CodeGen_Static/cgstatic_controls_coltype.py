@@ -94,9 +94,9 @@ def create(data):
                 tag_limit = int(col_type.get('limit', 0))
             if col_type.get('values','') != '':
                 #Do not include validator for now, that's for later sprint
-                #attribs_for_tags_list = f""":input-attrs="{{ list: '{entity_varname}-tags-list', autocomplete: 'off' }}" :tag-validator="validate_{entity_varname}" add-on-change"""
-                attribs_for_tags_list = f""":input-attrs="{{ list: '{entity_varname}-tags-list', autocomplete: 'off' }}" add-on-change"""
-                datalist_helper = f"""<b-form-datalist id="categories-tags-list" :options="lists.Categories"></b-form-datalist>"""
+                #attribs_for_tags_list = f""":input-attrs="{{ list: '{col_varname}-tags-list', autocomplete: 'off' }}" :tag-validator="validate_{entity_varname}" add-on-change"""
+                attribs_for_tags_list = f""":input-attrs="{{ list: '{col_varname}-tags-list', autocomplete: 'off' }}" add-on-change"""
+                datalist_helper = f"""<b-form-datalist id="{col_varname}-tags-list" :options="lists.{col_varname}"></b-form-datalist>"""
 
             html_code=f"""<b-form-tags input-id="{col_varname}" v-model="{entity_varname}.{col_varname}" :limit="{tag_limit}" remove-on-delete {attribs_for_tags_list}></b-form-tags>"""
 
