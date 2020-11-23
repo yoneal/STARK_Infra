@@ -4,6 +4,7 @@
 #Python Standard Library
 import base64
 import json
+import os
 from collections import OrderedDict 
 
 #Extra modules
@@ -11,8 +12,8 @@ import yaml
 import boto3
 
 #Private modules
-import convert_friendly_to_system as converter
 import parse_stark_settings as stark_settings_parser
+import convert_friendly_to_system as converter
 import parse_api_gateway as api_gateway_parser
 import parse_cloudfront as cloudfront_parser
 import parse_dynamodb as dynamodb_parser
@@ -20,13 +21,26 @@ import parse_lambda as lambda_parser
 import parse_sqs as sqs_parser
 import parse_s3 as s3_parser
 
+#Get environment variable - this will allow us to take different branches depending on whether we are LOCAL or PROD (or any other future valid value)
+ENV_TYPE = os.environ['STARK_ENVIRONMENT_TYPE']
+if ENV_TYPE == "PROD":
+    default_response_headers = { "Content-Type": "application/json" }
+else:
+    default_response_headers = { 
+        "Content-Type": "application/json", 
+        "Access-Control-Allow-Origin": "*"
+    }
+
+
 #We need SSM to access the Parameter Store, where the function name of the CF Writer lambda will be stored
 #We don't want to hard-code that name here, that's yucky
-ssm_client              = boto3.client('ssm')
-CFWriter_FuncName       = ssm_client.get_parameter(Name='STARK_CFWriter_FunctionName').get('Parameter', {}).get('Value', '')
+ssm_client        = boto3.client('ssm')
+CFWriter_FuncName = ssm_client.get_parameter(Name='STARK_CFWriter_FunctionName').get('Parameter', {}).get('Value', '')
 
 #And of course a Lambda client, so we can invoke the function whose name we retrieved above
 lambda_client = boto3.client('lambda')
+
+
 
 def lambda_handler(event, context):
 
@@ -37,9 +51,7 @@ def lambda_handler(event, context):
           "isBase64Encoded": False,
           "statusCode": 500,
           "body": json.dumps("STARK Internal Error - no CFWriter function name found!"),
-          "headers": {
-            "Content-Type": "application/json",
-          }
+          "headers": default_response_headers
         }
 
     isBase64Encoded = event.get('isBase64Encoded', False)
@@ -67,9 +79,7 @@ def lambda_handler(event, context):
                     "isBase64Encoded": False,
                     "statusCode": 200,
                     "body": json.dumps("Code:NoProjectName"),
-                    "headers": {
-                        "Content-Type": "application/json",
-                }
+                    "headers": default_response_headers
             }
             project_varname = converter.convert_to_system_name(project_name)
 
@@ -137,7 +147,5 @@ def lambda_handler(event, context):
         "isBase64Encoded": False,
         "statusCode": 200,
         "body": json.dumps("Success"),
-        "headers": {
-            "Content-Type": "application/json",
-        }
+        "headers": default_response_headers
     }

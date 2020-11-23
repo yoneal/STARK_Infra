@@ -28,6 +28,9 @@ Resources:
             Runtime: python3.8
             Handler: main.lambda_handler
             CodeUri: lambda/STARK_Parser
+            Environment:
+                Variables:
+                    STARK_ENVIRONMENT_TYPE: PROD
             Policies:
                 - AmazonSSMReadOnlyAccess
                 - AWSLambdaFullAccess
