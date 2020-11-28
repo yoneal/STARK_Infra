@@ -9,6 +9,7 @@ phases:
       - export BUCKET=waynestark-pipeline-0
       - export WEBSITE=waynestark-stark-prototype
       - aws cloudformation package --template-file template.yml --s3-bucket $BUCKET --output-template-file outputtemplate.yml
+      - cp STARK_Parser/js/STARK_settings_PROD.js STARK_Parser/js/STARK_settings.js
       - aws s3 cp STARK_Parser s3://$WEBSITE --recursive --acl public-read
       - aws s3 cp outputtemplate.yml s3://$BUCKET
 
