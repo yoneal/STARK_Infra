@@ -25,22 +25,23 @@ import parse_s3 as s3_parser
 ENV_TYPE = os.environ['STARK_ENVIRONMENT_TYPE']
 if ENV_TYPE == "PROD":
     default_response_headers = { "Content-Type": "application/json" }
+
+    #We need SSM to access the Parameter Store, where the function name of the CF Writer lambda will be stored
+    #We don't want to hard-code that name here, that's yucky
+    ssm_client        = boto3.client('ssm')
+    CFWriter_FuncName = ssm_client.get_parameter(Name='STARK_CFWriter_FunctionName').get('Parameter', {}).get('Value', '')
+
+    #And of course a Lambda client, so we can invoke the function whose name we retrieved above
+    lambda_client = boto3.client('lambda')
+
 else:
+    #We only have to do this because `SAM local start-api` doesn't follow CORS info from template.yml, which is bullshit
     default_response_headers = { 
         "Content-Type": "application/json", 
         "Access-Control-Allow-Origin": "*"
     }
 
-
-#We need SSM to access the Parameter Store, where the function name of the CF Writer lambda will be stored
-#We don't want to hard-code that name here, that's yucky
-ssm_client        = boto3.client('ssm')
-CFWriter_FuncName = ssm_client.get_parameter(Name='STARK_CFWriter_FunctionName').get('Parameter', {}).get('Value', '')
-
-#And of course a Lambda client, so we can invoke the function whose name we retrieved above
-lambda_client = boto3.client('lambda')
-
-
+    CFWriter_FuncName = 'stub for local testing'
 
 def lambda_handler(event, context):
 
@@ -136,13 +137,15 @@ def lambda_handler(event, context):
     #   If parser needs to specifically pass a YAML document, use:
     #       Payload=json.dumps(yaml.dump(cloud_resources))
 
-    response = lambda_client.invoke(
-        FunctionName = CFWriter_FuncName,
-        InvocationType = 'RequestResponse',
-        LogType= 'Tail',
-        Payload=json.dumps(cloud_resources)
-    )
+    if ENV_TYPE == "PROD":
+        response = lambda_client.invoke(
+            FunctionName = CFWriter_FuncName,
+            InvocationType = 'RequestResponse',
+            LogType= 'Tail',
+            Payload=json.dumps(cloud_resources)
+        )
     
+
     return {
         "isBase64Encoded": False,
         "statusCode": 200,
