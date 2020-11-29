@@ -44,6 +44,9 @@ Resources:
             Runtime: python3.8
             Handler: main.lambda_handler
             CodeUri: lambda/STARK_CFWriter
+            Environment:
+                Variables:
+                    STARK_ENVIRONMENT_TYPE: PROD
             Policies:
                 - AmazonS3FullAccess
                 - AmazonSSMFullAccess
@@ -66,6 +69,9 @@ Resources:
             Runtime: python3.8
             Handler: main.lambda_handler
             CodeUri: lambda/STARK_Deploy
+            Environment:
+                Variables:
+                    STARK_ENVIRONMENT_TYPE: PROD
             Policies:
                 - AmazonSSMReadOnlyAccess
                 - AWSLambdaFullAccess
@@ -88,6 +94,9 @@ Resources:
             Runtime: python3.8
             Handler: main.lambda_handler
             CodeUri: lambda/STARK_Deploy_Check
+            Environment:
+                Variables:
+                    STARK_ENVIRONMENT_TYPE: PROD
             Policies:
                 - AmazonSSMReadOnlyAccess
                 - AWSLambdaFullAccess
@@ -102,6 +111,9 @@ Resources:
             Runtime: python3.8
             Handler: main.lambda_handler
             CodeUri: lambda/STARK_CodeGen_Static
+            Environment:
+                Variables:
+                    STARK_ENVIRONMENT_TYPE: PROD
             Policies:
                 - AmazonS3FullAccess
                 - AmazonSSMReadOnlyAccess
@@ -117,6 +129,9 @@ Resources:
             Runtime: python3.8
             Handler: main.lambda_handler
             CodeUri: lambda/STARK_CodeGen_Dynamic
+            Environment:
+                Variables:
+                    STARK_ENVIRONMENT_TYPE: PROD
             Policies:
                 - AmazonS3FullAccess
                 - AmazonSSMReadOnlyAccess

@@ -144,7 +144,8 @@ def lambda_handler(event, context):
             LogType= 'Tail',
             Payload=json.dumps(cloud_resources)
         )
-    
+    else:
+        print(json.dumps(cloud_resources))
 
     return {
         "isBase64Encoded": False,

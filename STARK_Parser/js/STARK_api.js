@@ -76,6 +76,8 @@ Document:
                 data_model: this.form.data_model
             }
 
+            console.log(JSON.stringify(data))
+            
             let fetchData = {
                 mode: 'cors',
                 body: JSON.stringify(data),

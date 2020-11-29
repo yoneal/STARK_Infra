@@ -4,6 +4,7 @@
 #Python Standard Library
 import base64
 import json
+import os
 import textwrap
 from uuid import uuid4
 
@@ -14,13 +15,34 @@ import boto3
 #Private modules
 import convert_friendly_to_system as converter
 
-s3  = boto3.client('s3')
-ssm = boto3.client('ssm')
 
-preloader_service_token  = ssm.get_parameter(Name="STARK_CustomResource_BucketPreloaderLambda_ARN").get('Parameter', {}).get('Value')
-cg_static_service_token  = ssm.get_parameter(Name="STARK_CustomResource_CodeGenStaticLambda_ARN").get('Parameter', {}).get('Value')
-cg_dynamic_service_token = ssm.get_parameter(Name="STARK_CustomResource_CodeGenDynamicLambda_ARN").get('Parameter', {}).get('Value')
-codegen_bucket_name      = ssm.get_parameter(Name="STARK_CodeGenBucketName").get('Parameter', {}).get('Value')
+#Get environment variable - this will allow us to take different branches depending on whether we are LOCAL or PROD (or any other future valid value)
+ENV_TYPE = os.environ['STARK_ENVIRONMENT_TYPE']
+if ENV_TYPE == "PROD":
+    default_response_headers = { "Content-Type": "application/json" }
+
+    s3  = boto3.client('s3')
+    ssm = boto3.client('ssm')
+
+    preloader_service_token  = ssm.get_parameter(Name="STARK_CustomResource_BucketPreloaderLambda_ARN").get('Parameter', {}).get('Value')
+    cg_static_service_token  = ssm.get_parameter(Name="STARK_CustomResource_CodeGenStaticLambda_ARN").get('Parameter', {}).get('Value')
+    cg_dynamic_service_token = ssm.get_parameter(Name="STARK_CustomResource_CodeGenDynamicLambda_ARN").get('Parameter', {}).get('Value')
+    codegen_bucket_name      = ssm.get_parameter(Name="STARK_CodeGenBucketName").get('Parameter', {}).get('Value')
+
+else:
+    #We only have to do this because `SAM local start-api` doesn't follow CORS info from template.yml, which is bullshit
+    default_response_headers = { 
+        "Content-Type": "application/json", 
+        "Access-Control-Allow-Origin": "*"
+    }
+
+    preloader_service_token  = "PreloaderService-FakeLocalToken"
+    cg_static_service_token  = "CGStaticService-FakeLocalToken"
+    cg_dynamic_service_token = "CGDynamicService-FakeLocalToken"
+    codegen_bucket_name      = "codegen-fake-local-bucket"
+
+
+
 
 def lambda_handler(event, context):
 
@@ -37,22 +59,23 @@ def lambda_handler(event, context):
     project_name    = cloud_resources["Project Name"]
     project_varname = converter.convert_to_system_name(project_name)
 
-    #So that cloud_resources can be used by our CodeGen components (which are lambda-backed custom resources in this resulting CF/SAM template),
-    #   we need to dump cloud_resources into ParamStore as a YAML string
-    response = ssm.put_parameter(
-        Name="STARK_cloud_resources_" + project_varname,
-        Description="Cloud resources for this project, as determined by the STARK Parser",
-        Value=yaml.dump(cloud_resources, sort_keys=False),
-        Type='String',
-        DataType='text',
-        Overwrite=True
-    )
-    #FIXME: Code above will work ok for YAML strings that are under 4KB (ParamStore standard tier limit).
-    #       Real long-term solution should be to turn this into an S3 key, and have our YAML dumped in a STARK staging bucket instead.
-    #FIXME: Also, this results in the ParamStore entry not being part of Stack, so it pollutes ParamStore because the entry created here
-    #       survives the stack. This isn't a problem for S3 (we can just have a huge collection of text files there), but is a problem for
-    #       ParamStore (which has a practical limit, so it can't be our "unlimited config storage" infra)
-
+    if ENV_TYPE == "PROD":
+        #So that cloud_resources can be used by our CodeGen components (which are lambda-backed custom resources in this resulting CF/SAM template),
+        #   we need to dump cloud_resources into ParamStore as a YAML string
+        response = ssm.put_parameter(
+            Name="STARK_cloud_resources_" + project_varname,
+            Description="Cloud resources for this project, as determined by the STARK Parser",
+            Value=yaml.dump(cloud_resources, sort_keys=False),
+            Type='String',
+            DataType='text',
+            Overwrite=True
+        )
+        #FIXME: Code above will work ok for YAML strings that are under 4KB (ParamStore standard tier limit).
+        #       Real long-term solution should be to turn this into an S3 key, and have our YAML dumped in a STARK staging bucket instead.
+        #FIXME: Also, this results in the ParamStore entry not being part of Stack, so it pollutes ParamStore because the entry created here
+        #       survives the stack. This isn't a problem for S3 (we can just have a huge collection of text files there), but is a problem for
+        #       ParamStore (which has a practical limit, so it can't be our "unlimited config storage" infra)
+        
 
     ###############################################################################################################
     #Load and sanitize data here, for whatever IaC rules that govern them (e.g., S3 Bucket names must be lowercase)
@@ -79,19 +102,14 @@ def lambda_handler(event, context):
     #Lambda-related data
     lambda_entities = cloud_resources['Lambda']['entities']
 
-
     #FIXME: Should this transformation be here or in the Parser?
     #Let this remain here now, but probably should be the job of the parser in the future.
     if ddb_capacity_type != "PROVISIONED":
         ddb_capacity_type = "PAY_PER_REQUEST"
 
-
-
     #Some default values not yet from the Parser, but should be added to Parser later
     s3_versioning     = "Enabled"
     s3_access_control = "PublicRead"
-
-
 
     #Update Token - this token forces CloudFormation to update the resources that do dynamic code generation,
     #               as well as forced re-deployment of Lambdas (by using this as a deployment package path/folder)
@@ -252,23 +270,22 @@ def lambda_handler(event, context):
             DependsOn:
                 -   STARKCGDynamic"""
 
-
-    response = s3.put_object(
-        Body=textwrap.dedent(cf_template).encode(),
-        Bucket='waynestark-stark-prototype-codegenbucket',
-        Key=f'STARK_SAM_{project_varname}.yaml',
-        Metadata={
-            'STARK_Description': 'Writer output for CloudFormation'
-        }
-    )
-
+    if ENV_TYPE == "PROD":
+        response = s3.put_object(
+            Body=textwrap.dedent(cf_template).encode(),
+            Bucket='waynestark-stark-prototype-codegenbucket',
+            Key=f'STARK_SAM_{project_varname}.yaml',
+            Metadata={
+                'STARK_Description': 'Writer output for CloudFormation'
+            }
+        )
+    else:
+        print(textwrap.dedent(cf_template))
 
 
     return {
         "isBase64Encoded": False,
         "statusCode": 200,
         "body": json.dumps("Success"),
-        "headers": {
-            "Content-Type": "application/json",
-        }
+        "headers": default_response_headers
     }
