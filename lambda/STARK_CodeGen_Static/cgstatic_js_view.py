@@ -191,9 +191,9 @@ def create(data):
                             data.forEach(function(arrayItem) {{
                                 value = arrayItem['{foreign_field}']
                                 text  = arrayItem['{foreign_display}']
-                                root.lists.{foreign_entity}.push({{ value: value, text: text }})
+                                root.lists.{foreign_field}.push({{ value: value, text: text }})
                             }})
-                            root.list_status.{foreign_entity} = 'populated'
+                            root.list_status.{foreign_field} = 'populated'
                             loading_modal.hide();
                         }}).catch(function(error) {{
                             console.log("Encountered an error! [" + error + "]")
