@@ -183,7 +183,7 @@ def create(data):
 
                 source_code += f"""
                 list_{foreign_entity}: function () {{
-                    if (this.list_status.{foreign_entity} == 'empty') {{
+                    if (this.list_status.{foreign_field} == 'empty') {{
                         loading_modal.show();
 
                         //FIXME: for now, generic list() is used. Can be optimized to use a list function that only retrieves specific columns
