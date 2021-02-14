@@ -58,10 +58,10 @@ def create(data):
             has_one = col_type.get('has_one', '')
             if  has_one != '':
                 #simple 1-1 relationship
-                foreign_entity  = converter.convert_to_system_name(has_one)
+                col_varname = converter.convert_to_system_name(col)
 
                 source_code += f"""
-                    '{foreign_entity}': 'empty',"""
+                    '{col_varname}': 'empty',"""
 
 
 
