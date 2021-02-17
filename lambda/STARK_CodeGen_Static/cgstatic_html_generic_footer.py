@@ -7,7 +7,7 @@ import textwrap
 
 def create():
 
-    source_code += f"""\
+    source_code = f"""\
         </body>
         </html>
     """
