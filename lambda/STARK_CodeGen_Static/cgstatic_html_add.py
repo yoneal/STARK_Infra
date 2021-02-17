@@ -22,9 +22,9 @@ def create(data):
 
     #Convert human-friendly names to variable-friendly names
     entity_varname = converter.convert_to_system_name(entity)
-    pk_varname = converter.convert_to_system_name(pk)
+    pk_varname     = converter.convert_to_system_name(pk)
 
-    source_code = cg_header.create(data)
+    source_code  = cg_header.create(data)
     source_code += cg_bodyhead.create(data, "New")
 
     source_code += f"""\
