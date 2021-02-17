@@ -56,6 +56,6 @@ def create(data, breadcrumb):
             </b-modal>
         </div>
 
-    """
+"""
 
     return source_code
