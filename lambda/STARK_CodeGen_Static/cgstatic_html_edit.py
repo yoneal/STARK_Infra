@@ -27,7 +27,7 @@ def create(data):
     source_code  = cg_header.create(data)
     source_code += cg_bodyhead.create(data, "Edit")
 
-    source_code = f"""\
+    source_code += f"""\
         <div class="container hidden" id="vue-root" :style="{{visibility: visibility}}">
             <div class="row">
                 <div class="col">
