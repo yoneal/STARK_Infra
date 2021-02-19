@@ -15,7 +15,7 @@ import convert_friendly_to_system as converter
 
 def create(data):
 
-    project = data["Project Name"]
+    #project = data["Project Name"]
     entity  = data["Entity"]
     cols    = data["Columns"]
     pk      = data["PK"]
