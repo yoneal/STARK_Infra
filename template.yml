@@ -14,30 +14,30 @@ Resources:
                     - "*"
                 MaxAge: 200
                 AllowCredentials: False
-    # CFCustomResourceHelperLayer:
-    #     Type: AWS::Lambda::LayerVersion
-    #     Properties:
-    #         Content:
-    #             S3Bucket: 
-    #             S3Key: CF_CustomResourceHelper_py38.zip
-    #         Description: Lambda-backed custom resource library for CloudFormation
-    #         LayerName: CF_CustomResourceHelper
-    # PyYamlLayer:
-    #     Type: AWS::Lambda::LayerVersion
-    #     Properties:
-    #         Content:
-    #             S3Bucket: 
-    #             S3Key: yaml_py38.zip
-    #         Description: YAML module for Python 3 
-    #         LayerName: PyYAML
-    # STARKFriendlyToSystemNamesLayer:
-    #     Type: AWS::Lambda::LayerVersion
-    #     Properties:
-    #         Content:
-    #             S3Bucket: 
-    #             S3Key: STARK_friendly_to_system_name_py38.zip
-    #         Description: STARK module for converting user-supplied, human-friendly identifiers into system-friendly entity or variable names
-    #         LayerName: STARK_friendly_to_system_name
+    CFCustomResourceHelperLayer:
+        Type: AWS::Lambda::LayerVersion
+        Properties:
+            Content:
+                S3Bucket: waynestark-stark-prototype-codegenbucket
+                S3Key: CF_CustomResourceHelper_py38.zip
+            Description: Lambda-backed custom resource library for CloudFormation
+            LayerName: CF_CustomResourceHelper
+    PyYamlLayer:
+        Type: AWS::Lambda::LayerVersion
+        Properties:
+            Content:
+                S3Bucket: waynestark-stark-prototype-codegenbucket
+                S3Key: yaml_py38.zip
+            Description: YAML module for Python 3 
+            LayerName: PyYAML
+    STARKFriendlyToSystemNamesLayer:
+        Type: AWS::Lambda::LayerVersion
+        Properties:
+            Content:
+                S3Bucket: waynestark-stark-prototype-codegenbucket
+                S3Key: STARK_friendly_to_system_name_py38.zip
+            Description: STARK module for converting user-supplied, human-friendly identifiers into system-friendly entity or variable names
+            LayerName: STARK_friendly_to_system_name
     STARKParserFunc:
         Type: AWS::Serverless::Function
         Properties:
@@ -59,8 +59,8 @@ Resources:
                 - AmazonSSMReadOnlyAccess
                 - AWSLambdaFullAccess
             Layers:
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:pyyaml_layer_mk1:2
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:STARK_friendly_to_system_names:2
+                - !Ref PyYamlLayer
+                - !Ref STARKFriendlyToSystemNamesLayer
             Timeout: 60
     STARKCFWriterFunc:
         Type: AWS::Serverless::Function
@@ -76,8 +76,8 @@ Resources:
                 - AmazonSSMFullAccess
                 - AWSLambdaBasicExecutionRole
             Layers:
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:pyyaml_layer_mk1:2
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:STARK_friendly_to_system_names:2
+                - !Ref PyYamlLayer
+                - !Ref STARKFriendlyToSystemNamesLayer
             Timeout: 60
     STARKDeployFunc:
         Type: AWS::Serverless::Function
@@ -101,8 +101,8 @@ Resources:
                 - AWSLambdaFullAccess
                 - AWSCloudFormationFullAccess
             Layers:
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:pyyaml_layer_mk1:2
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:STARK_friendly_to_system_names:2
+                - !Ref PyYamlLayer
+                - !Ref STARKFriendlyToSystemNamesLayer
             Timeout: 600
     STARKDeployCheckFunc:
         Type: AWS::Serverless::Function
@@ -126,8 +126,8 @@ Resources:
                 - AWSLambdaFullAccess
                 - AWSCloudFormationFullAccess
             Layers:
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:pyyaml_layer_mk1:2
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:STARK_friendly_to_system_names:2
+                - !Ref PyYamlLayer
+                - !Ref STARKFriendlyToSystemNamesLayer
             Timeout: 600
     STARKCodeGenStaticWriter:
         Type: AWS::Serverless::Function
@@ -143,9 +143,9 @@ Resources:
                 - AmazonSSMReadOnlyAccess
                 - AWSLambdaBasicExecutionRole
             Layers:
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:CF_CustomResourceHelper_layer:1
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:pyyaml_layer_mk1:2
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:STARK_friendly_to_system_names:2
+                - !Ref CFCustomResourceHelperLayer
+                - !Ref PyYamlLayer
+                - !Ref STARKFriendlyToSystemNamesLayer
             Timeout: 60
     STARKCodeGenDynamicWriter:
         Type: AWS::Serverless::Function
@@ -161,9 +161,9 @@ Resources:
                 - AmazonSSMReadOnlyAccess
                 - AWSLambdaFullAccess 
             Layers:
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:CF_CustomResourceHelper_layer:1
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:pyyaml_layer_mk1:2
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:STARK_friendly_to_system_names:2
+                - !Ref CFCustomResourceHelperLayer
+                - !Ref PyYamlLayer
+                - !Ref STARKFriendlyToSystemNamesLayer
             Timeout: 60
     STARKBucketPreloaderFunc:
         Type: AWS::Serverless::Function
@@ -176,7 +176,7 @@ Resources:
                 - AmazonSSMReadOnlyAccess
                 - AWSLambdaBasicExecutionRole
             Layers:
-                - arn:aws:lambda:ap-southeast-1:201649379729:layer:CF_CustomResourceHelper_layer:1
+                - !Ref CFCustomResourceHelperLayer
             Timeout: 60
     ParameterStoreApiID:
         Type: AWS::SSM::Parameter
