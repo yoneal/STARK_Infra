@@ -28,7 +28,7 @@ Resources:
             Content:
                 S3Bucket: waynestark-stark-prototype-codegenbucket
                 S3Key: yaml_py38.zip
-            Description: YAML module for Python 3 
+            Description: YAML module for Python 3.x
             LayerName: PyYAML
     STARKFriendlyToSystemNamesLayer:
         Type: AWS::Lambda::LayerVersion
