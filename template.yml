@@ -57,7 +57,7 @@ Resources:
                     STARK_ENVIRONMENT_TYPE: PROD
             Policies:
                 - AmazonSSMReadOnlyAccess
-                - AWSLambdaFullAccess
+                - AWSLambda_FullAccess
             Layers:
                 - !Ref PyYamlLayer
                 - !Ref STARKFriendlyToSystemNamesLayer
@@ -98,7 +98,7 @@ Resources:
                     STARK_ENVIRONMENT_TYPE: PROD
             Policies:
                 - AmazonSSMReadOnlyAccess
-                - AWSLambdaFullAccess
+                - AWSLambda_FullAccess
                 - AWSCloudFormationFullAccess
             Layers:
                 - !Ref PyYamlLayer
@@ -123,7 +123,7 @@ Resources:
                     STARK_ENVIRONMENT_TYPE: PROD
             Policies:
                 - AmazonSSMReadOnlyAccess
-                - AWSLambdaFullAccess
+                - AWSLambda_FullAccess
                 - AWSCloudFormationFullAccess
             Layers:
                 - !Ref PyYamlLayer
@@ -159,7 +159,7 @@ Resources:
             Policies:
                 - AmazonS3FullAccess
                 - AmazonSSMReadOnlyAccess
-                - AWSLambdaFullAccess 
+                - AWSLambda_FullAccess 
             Layers:
                 - !Ref CFCustomResourceHelperLayer
                 - !Ref PyYamlLayer
