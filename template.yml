@@ -125,6 +125,7 @@ Resources:
                 - AmazonSSMReadOnlyAccess
                 - AWSLambda_FullAccess
                 - AWSCloudFormationFullAccess
+                - IAMFullAccess
             Layers:
                 - !Ref PyYamlLayer
                 - !Ref STARKFriendlyToSystemNamesLayer
@@ -186,6 +187,15 @@ Resources:
             Tier: Standard
             Type: String
             Value: !Ref STARKParserApi
+    ParameterStoreApiID:
+        Type: AWS::SSM::Parameter
+        Properties:
+            Description: API ID of the HttpApi created by STARK-Pipeline-0
+            Name: STARKPipeline0_HttpApiID
+            Tier: Standard
+            Type: String
+            Value: !Ref STARKParserApi
+
 Outputs:
     STARKParserApiID:
         Description: API Gateway HttpApi API ID
