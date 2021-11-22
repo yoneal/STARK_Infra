@@ -32,6 +32,8 @@ def lambda_handler(event, context):
 
     CF_url = f'https://waynestark-stark-prototype-codegenbucket.s3-ap-southeast-1.amazonaws.com/STARK_SAM_{project_varname}.yaml'
 
+    print ("Trying to execute CF for template: STARK_SAM_{project_varname}.yaml")
+
     payload = ""
     try:
         response = client.create_stack(
@@ -60,7 +62,7 @@ def lambda_handler(event, context):
         else:
             payload = {
                 'status': 'CloudFormation Execution Failed',
-                'message': "Sorry, STARK failed to deploy due to an internal error. It's not you, it's us! {" + error.response['Error']['Code'] + "}",
+                'message': "Sorry, STARK failed to deploy due to an internal error. It's not you, it's us! {" + error.response['Error']['Code'] + " for template " + project_varname + ".yaml}",
                 'retry': False
             }        
 
