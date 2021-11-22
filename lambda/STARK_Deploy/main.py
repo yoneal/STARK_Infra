@@ -64,7 +64,8 @@ def lambda_handler(event, context):
                 'status': 'CloudFormation Execution Failed',
                 'message': "Sorry, STARK failed to deploy due to an internal error. It's not you, it's us! {" + error.response['Error']['Code'] + " for template " + project_varname + ".yaml}",
                 'retry': False
-            }        
+            }
+            print(error.response['Error'])
 
 
     if payload == "":
