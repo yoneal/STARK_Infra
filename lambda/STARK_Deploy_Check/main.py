@@ -1,4 +1,4 @@
-#Handles the POST action of the STARK DEPLOY POC, but using YAML
+#Tracks status of CF Deploy after it is successfully triggered by STARK_Deploy
 
 #Python Standard Library
 import base64
