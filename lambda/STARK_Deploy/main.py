@@ -32,7 +32,7 @@ def lambda_handler(event, context):
 
     CF_url = f'https://waynestark-stark-prototype-codegenbucket.s3-ap-southeast-1.amazonaws.com/STARK_SAM_{project_varname}.yaml'
 
-    print ("Trying to execute CF for template: STARK_SAM_{project_varname}.yaml")
+    print (f'Trying to execute CF for template: STARK_SAM_{project_varname}.yaml')
 
     payload = ""
     try:
