@@ -226,7 +226,7 @@ Resources:
             Name: STARK_CustomResource_BucketPreloaderLambda_ARN
             Tier: Standard
             Type: String
-            Value: !GetAtt STARKBucketPreloaderFunc.ARN
+            Value: !GetAtt STARKBucketPreloaderFunc.Arn
     ParameterStoreCodeGenDynamicARN:
         Type: AWS::SSM::Parameter
         Properties:
@@ -234,7 +234,7 @@ Resources:
             Name: STARK_CustomResource_CodeGenDynamicLambda_ARN
             Tier: Standard
             Type: String
-            Value: !GetAtt STARKCodeGenDynamicWriter.ARN
+            Value: !GetAtt STARKCodeGenDynamicWriter.Arn
     ParameterStoreCodeGenStaticARN:
         Type: AWS::SSM::Parameter
         Properties:
@@ -242,7 +242,7 @@ Resources:
             Name: STARK_CustomResource_CodeGenStaticLambda_ARN
             Tier: Standard
             Type: String
-            Value: !GetAtt STARKCodeGenStaticWriter.ARN
+            Value: !GetAtt STARKCodeGenStaticWriter.Arn
 
 
 
