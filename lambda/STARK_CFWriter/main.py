@@ -174,6 +174,7 @@ def lambda_handler(event, context):
                 Remarks: This will create the customized STARK HTML/CSS/JS files into the STARKSystemBucket, based on the supplied entities
             DependsOn:
                 -   STARKSystemBucket
+                -   STARKCodeGenParamApiId
         STARKCGDynamic:
             Type: AWS::CloudFormation::CustomResource
             Properties:
