@@ -18,4 +18,5 @@ artifacts:
   files:
     - template.yml
     - outputtemplate.yml
+    - template_configuration.yml
 

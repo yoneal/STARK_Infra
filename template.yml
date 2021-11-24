@@ -1,6 +1,13 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: AWS SAM template for the STARK infra
+Parameters:
+    UserCodeGenBucketNameParameter:
+        Type: String
+        Description: Name for user bucket that will hold deployment packages created by STARK
+    UserSourceBucketNameParameter:
+        Type: String
+        Description: Name for user bucket that will hold the generic STARK static files that will be copied by the code generator
 Resources:
     STARKParserApi:
         Type: AWS::Serverless::HttpApi
@@ -188,14 +195,56 @@ Resources:
             Tier: Standard
             Type: String
             Value: !Ref STARKParserApi
-    ParameterStoreApiID:
+    ParameterStoreCodeGenBucketName:
         Type: AWS::SSM::Parameter
         Properties:
-            Description: API ID of the HttpApi created by STARK-Pipeline-0
-            Name: STARKPipeline0_HttpApiID
+            Description: Name of the bucket that holds deployment packages for end-user systems created by STARK.
+            Name: STARK_CodeGenBucketName
             Tier: Standard
             Type: String
-            Value: !Ref STARKParserApi
+            Value: !Ref UserCodeGenBucketNameParameter
+    ParameterStoreSourceBucketName:
+        Type: AWS::SSM::Parameter
+        Properties:
+            Description: Name of the bucket that holds the generic STARK static files that will be copied by the code generator for end-user systems. This and CodeGenBucket will soon be merged into just one bucket.
+            Name: STARK_SourceBucketName
+            Tier: Standard
+            Type: String
+            Value: !Ref UserSourceBucketNameParameter
+    ParameterStoreCFWriterARN:
+        Type: AWS::SSM::Parameter
+        Properties:
+            Description: Invokable name of the CFWriter lambda function. Placed here to avoid hard-coding into the Parser func itself.
+            Name: STARK_CFWriter_FunctionName
+            Tier: Standard
+            Type: String
+            Value: !GetAtt STARKCFWriterFunc.Arn
+    ParameterStoreBucketPreloaderARN:
+        Type: AWS::SSM::Parameter
+        Properties:
+            Description: Service token for Lambda-backed custom resource that preloads STARK files to the STARK-generated S3 bucket for end-user systems.
+            Name: STARK_CustomResource_BucketPreloaderLambda_ARN
+            Tier: Standard
+            Type: String
+            Value: !GetAtt STARKBucketPreloaderFunc.ARN
+    ParameterStoreCodeGenDynamicARN:
+        Type: AWS::SSM::Parameter
+        Properties:
+            Description: Service token for Lambda-backed custom resource that creates the STARK-generated Lambda files for end-user systems.
+            Name: STARK_CustomResource_CodeGenDynamicLambda_ARN
+            Tier: Standard
+            Type: String
+            Value: !GetAtt STARKCodeGenDynamicWriter.ARN
+    ParameterStoreCodeGenStaticARN:
+        Type: AWS::SSM::Parameter
+        Properties:
+            Description: Service token for Lambda-backed custom resource that creates the STARK-generated static files for end-user systems.
+            Name: STARK_CustomResource_CodeGenStaticLambda_ARN
+            Tier: Standard
+            Type: String
+            Value: !GetAtt STARKCodeGenStaticWriter.ARN
+
+
 
 Outputs:
     STARKParserApiID:
