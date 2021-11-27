@@ -38,6 +38,7 @@ def create_handler(event, context):
     project_varname = converter.convert_to_system_name(project_name)
 
     #FIXME: Temporary way to retrieve cloud_resources. PROD version will use S3 file for unlimited length.
+    #FIXME: Nov 28, 2021
     cloud_resources = yaml.safe_load(ssm.get_parameter(Name="STARK_cloud_resources_" + project_varname).get('Parameter', {}).get('Value'))
 
     #Get relevant info from cloud_resources
