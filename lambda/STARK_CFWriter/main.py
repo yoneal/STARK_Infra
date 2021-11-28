@@ -247,7 +247,7 @@ def lambda_handler(event, context):
                                 Ref: STARKApiGateway
                 Runtime: python3.8
                 Handler: lambda_function.lambda_handler
-                CodeUri: s3://{codegen_bucket_name}/{project_varname}/{update_token}/{entity_endpoint_name}.zip
+                CodeUri: s3://{codegen_bucket_name}/codegen_dynamic/{project_varname}/{update_token}/{entity_endpoint_name}.zip
                 Role: arn:aws:iam::201649379729:role/WayneStark_test_lambda_role_1
             DependsOn:
                 -   STARKCGDynamic"""
@@ -266,7 +266,7 @@ def lambda_handler(event, context):
                                 Ref: STARKApiGateway
                 Runtime: python3.8
                 Handler: lambda_function.lambda_handler
-                CodeUri: s3://{codegen_bucket_name}/{project_varname}/{update_token}/sys_modules.zip
+                CodeUri: s3://{codegen_bucket_name}/codegen_dynamic/{project_varname}/{update_token}/sys_modules.zip
                 Role: arn:aws:iam::201649379729:role/WayneStark_test_lambda_role_1
             DependsOn:
                 -   STARKCGDynamic"""

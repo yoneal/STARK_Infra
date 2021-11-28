@@ -119,7 +119,7 @@ def deploy_lambda(data):
     entity  = data['Entity']
     bucket  = data['Bucket']
     token   = data['Update Token']
-    key     = f"{project}/{token}/{entity}.zip"
+    key     = f"codegen_dynamic/{project}/{token}/{entity}.zip"
 
     print(f"Deploying {key}...")
 

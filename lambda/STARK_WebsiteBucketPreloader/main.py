@@ -26,13 +26,17 @@ def preload_files(event, _):
     target_bucket      = s3.Bucket(target_bucket_name)
     source_bucket      = s3.Bucket(source_bucket_name)
 
+    #FIXME: Optimize in the future to not use objects.all(); query the correct prefix instead.
+    #       Hint: S3 client.list_objects to be able to specify prefix.
     for object in source_bucket.objects.all():
         copy_source = {
             'Bucket': source_bucket_name,
             'Key': object.key
         }
-        target_bucket.copy(copy_source, object.key)
-        s3.Object(target_bucket_name, object.key).Acl().put(ACL='public-read')
+        #We only want to copy files inside the "STARKWebSource" folder
+        if object.key[0:15] == "STARKWebSource/":
+            target_bucket.copy(copy_source, object.key[15:])
+            s3.Object(target_bucket_name, object.key[15:]).Acl().put(ACL='public-read')
 
 
 @helper.delete
