@@ -8,6 +8,12 @@ Parameters:
     UserSourceBucketNameParameter:
         Type: String
         Description: Name for user bucket that will hold the generic STARK static files that will be copied by the code generator
+    UserCICDPipelineBucketNameParameter:
+        Type: String
+        Description: Name for user bucket that will be used for the default STARK CI/CD pipeline. Not yet used in template, just needed for config.
+    UserWebsiteBucketNameParameter:
+        Type: String
+        Description: Name for user bucket that will be used as the website bucket for the STARK Parser UI. Not yet used in template, just needed for config.
 Resources:
     STARKParserApi:
         Type: AWS::Serverless::HttpApi
