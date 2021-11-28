@@ -13,8 +13,8 @@ from crhelper import CfnResource
 s3  = boto3.resource('s3')
 ssm = boto3.client('ssm')
 
-response = ssm.get_parameter(Name="STARK_SourceBucketName")
-source_bucket_name = response.get('Parameter', {}).get('Value')
+response            = ssm.get_parameter(Name="STARK_CodeGenBucketName")
+codegen_bucket_name = response.get('Parameter', {}).get('Value')
 
 helper = CfnResource() #We're using the AWS-provided helper library to minimize the tedious boilerplate just to signal back to CloudFormation
 
@@ -24,13 +24,13 @@ def preload_files(event, _):
 
     target_bucket_name = event.get('ResourceProperties', {}).get('Bucket','')
     target_bucket      = s3.Bucket(target_bucket_name)
-    source_bucket      = s3.Bucket(source_bucket_name)
+    source_bucket      = s3.Bucket(codegen_bucket_name)
 
     #FIXME: Optimize in the future to not use objects.all(); query the correct prefix instead.
     #       Hint: S3 client.list_objects to be able to specify prefix.
     for object in source_bucket.objects.all():
         copy_source = {
-            'Bucket': source_bucket_name,
+            'Bucket': codegen_bucket_name,
             'Key': object.key
         }
         #We only want to copy files inside the "STARKWebSource" folder
