@@ -81,6 +81,7 @@ Resources:
             Environment:
                 Variables:
                     STARK_ENVIRONMENT_TYPE: PROD
+                    CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
             Policies:
                 - AmazonS3FullAccess
                 - AmazonSSMFullAccess
@@ -106,6 +107,7 @@ Resources:
             Environment:
                 Variables:
                     STARK_ENVIRONMENT_TYPE: PROD
+                    CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
             Policies:
                 - AmazonSSMReadOnlyAccess
                 - AWSLambda_FullAccess
@@ -150,6 +152,7 @@ Resources:
             Environment:
                 Variables:
                     STARK_ENVIRONMENT_TYPE: PROD
+                    CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
             Policies:
                 - AmazonS3FullAccess
                 - AmazonSSMReadOnlyAccess
@@ -168,6 +171,7 @@ Resources:
             Environment:
                 Variables:
                     STARK_ENVIRONMENT_TYPE: PROD
+                    CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
             Policies:
                 - AmazonS3FullAccess
                 - AmazonSSMReadOnlyAccess
@@ -183,6 +187,10 @@ Resources:
             Runtime: python3.8
             Handler: main.lambda_handler
             CodeUri: lambda/STARK_WebsiteBucketPreloader
+            Environment:
+                Variables:
+                    STARK_ENVIRONMENT_TYPE: PROD
+                    CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
             Policies:
                 - AmazonS3FullAccess
                 - AmazonSSMReadOnlyAccess

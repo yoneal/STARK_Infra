@@ -30,6 +30,7 @@ def lambda_handler(event, context):
     project_varname = converter.convert_to_system_name(data_model.get('__STARK_project_name__'))
     CF_stack_name   = converter.convert_to_system_name(data_model.get('__STARK_project_name__'), "cf-stack")
 
+    #FIXME: Hard-coded! WTF. Fix along with the switch from ParamStore to S3, with codegen bucket name being stored in environment variable.
     CF_url = f'https://waynestark-stark-prototype-codegenbucket.s3-ap-southeast-1.amazonaws.com/STARK_SAM_{project_varname}.yaml'
 
     print (f'Trying to execute CF for template: STARK_SAM_{project_varname}.yaml')
