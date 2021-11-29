@@ -28,24 +28,24 @@ Resources:
         Type: AWS::Lambda::LayerVersion
         Properties:
             Content:
-                S3Bucket: waynestark-stark-prototype-codegenbucket
-                S3Key: CF_CustomResourceHelper_py38.zip
+                S3Bucket: !Ref UserCodeGenBucketNameParameter
+                S3Key: STARKLambdaLayers/CF_CustomResourceHelper_py38.zip
             Description: Lambda-backed custom resource library for CloudFormation
             LayerName: CF_CustomResourceHelper
     PyYamlLayer:
         Type: AWS::Lambda::LayerVersion
         Properties:
             Content:
-                S3Bucket: waynestark-stark-prototype-codegenbucket
-                S3Key: yaml_py38.zip
+                S3Bucket: !Ref UserCodeGenBucketNameParameter
+                S3Key: STARKLambdaLayers/yaml_py38.zip
             Description: YAML module for Python 3.x
             LayerName: PyYAML
     STARKFriendlyToSystemNamesLayer:
         Type: AWS::Lambda::LayerVersion
         Properties:
             Content:
-                S3Bucket: waynestark-stark-prototype-codegenbucket
-                S3Key: STARK_friendly_to_system_name_py38.zip
+                S3Bucket: !Ref UserCodeGenBucketNameParameter
+                S3Key: STARKLambdaLayers/STARK_friendly_to_system_name_py38.zip
             Description: STARK module for converting user-supplied, human-friendly identifiers into system-friendly entity or variable names
             LayerName: STARK_friendly_to_system_name
     STARKParserFunc:

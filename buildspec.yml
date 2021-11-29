@@ -14,6 +14,7 @@ phases:
       - aws s3 cp STARK_Parser s3://$WEBSITE --recursive --acl public-read
       - aws s3 cp STARK_SourceBucket_files s3://$CODEGEN/STARKWebSource --recursive
       - aws s3 cp outputtemplate.yml s3://$BUCKET
+      - aws s3 cp lambda/packaged_layers/python s3://$CODEGEN/STARKLambdaLayers --recursive
 
 artifacts:
   type: zip
