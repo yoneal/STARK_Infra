@@ -61,21 +61,15 @@ def lambda_handler(event, context):
 
     if ENV_TYPE == "PROD":
         #So that cloud_resources can be used by our CodeGen components (which are lambda-backed custom resources in this resulting CF/SAM template),
-        #   we need to dump cloud_resources into ParamStore as a YAML string
-        response = ssm.put_parameter(
-            Name="STARK_cloud_resources_" + project_varname,
-            Description="Cloud resources for this project, as determined by the STARK Parser",
-            Value=yaml.dump(cloud_resources, sort_keys=False),
-            Type='String',
-            DataType='text',
-            Overwrite=True
+        #   we need to dump cloud_resources into the shared repository for STARK components.
+        response = s3.put_object(
+            Body=yaml.dump(cloud_resources, sort_keys=False, encoding='utf-8'),
+            Bucket=codegen_bucket_name,
+            Key=f'STARK_cloud_resources/{project_varname}.yaml',
+            Metadata={
+                'STARK_Description': 'Cloud resources for this project, as determined by the STARK Parser'
+            }
         )
-        #FIXME: Code above will work ok for YAML strings that are under 4KB (ParamStore standard tier limit).
-        #       Real long-term solution should be to turn this into an S3 key, and have our YAML dumped in a STARK staging bucket instead.
-        #FIXME: Also, this results in the ParamStore entry not being part of Stack, so it pollutes ParamStore because the entry created here
-        #       survives the stack. This isn't a problem for S3 (we can just have a huge collection of text files there), but is a problem for
-        #       ParamStore (which has a practical limit, so it can't be our "unlimited config storage" infra)
-        
 
     ###############################################################################################################
     #Load and sanitize data here, for whatever IaC rules that govern them (e.g., S3 Bucket names must be lowercase)
