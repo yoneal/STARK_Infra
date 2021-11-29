@@ -39,12 +39,19 @@ def create_handler(event, context):
     #DynamoDB table name from our CF template
     ddb_table_name = event.get('ResourceProperties', {}).get('DDBTable','')
 
-    #Bucket for our generated lambda deploymentment packages
+    #Bucket for our generated lambda deploymentment packages and cloud resources document
     codegen_bucket_name = ssm.get_parameter(Name="STARK_CodeGenBucketName").get('Parameter', {}).get('Value')
 
-
     #FIXME: Temporary way to retrieve cloud_resources. PROD version will use S3 file for unlimited length.
-    cloud_resources = yaml.safe_load(ssm.get_parameter(Name="STARK_cloud_resources_" + project_varname).get('Parameter', {}).get('Value'))
+    #cloud_resources = yaml.safe_load(ssm.get_parameter(Name="STARK_cloud_resources_" + project_varname).get('Parameter', {}).get('Value'))
+
+    #Cloud resources document
+    response = s3.get_object(
+        Bucket=codegen_bucket_name,
+        Key=f'STARK_cloud_resources/{project_varname}.yaml'
+    )
+    cloud_resources = yaml.safe_load(response['Body'].read().decode('utf-8')) 
+
 
     entities = cloud_resources['CodeGen_Metadata']['Entities']
     #FIXME: Now that we're using the DynamoDB models, we don't actually need the Entities metatada... consider removing it

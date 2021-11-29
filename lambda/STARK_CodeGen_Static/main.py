@@ -37,9 +37,15 @@ def create_handler(event, context):
     project_name    = event.get('ResourceProperties', {}).get('Project','')
     project_varname = converter.convert_to_system_name(project_name)
 
-    #FIXME: Temporary way to retrieve cloud_resources. PROD version will use S3 file for unlimited length.
-    #FIXME: Nov 28, 2021
-    cloud_resources = yaml.safe_load(ssm.get_parameter(Name="STARK_cloud_resources_" + project_varname).get('Parameter', {}).get('Value'))
+    #Bucket for our cloud resources document
+    codegen_bucket_name = ssm.get_parameter(Name="STARK_CodeGenBucketName").get('Parameter', {}).get('Value')
+
+    #Cloud resources document
+    response = s3.get_object(
+        Bucket=codegen_bucket_name,
+        Key=f'STARK_cloud_resources/{project_varname}.yaml'
+    )
+    cloud_resources = yaml.safe_load(response['Body'].read().decode('utf-8')) 
 
     #Get relevant info from cloud_resources
     ApiG_param_name = cloud_resources['CodeGen_Metadata']['STARK_CodeGen_ApiGatewayId_ParameterName']
