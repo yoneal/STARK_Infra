@@ -225,14 +225,6 @@ Resources:
         DependsOn:
             -   STARKParserApi
             -   STARKWebsiteUpdaterFunc
-    ParameterStoreApiID:
-        Type: AWS::SSM::Parameter
-        Properties:
-            Description: API ID of the HttpApi created by STARK-Pipeline-0
-            Name: STARKPipeline0_HttpApiID
-            Tier: Standard
-            Type: String
-            Value: !Ref STARKParserApi
     ParameterStoreCFWriterARN:
         Type: AWS::SSM::Parameter
         Properties:
