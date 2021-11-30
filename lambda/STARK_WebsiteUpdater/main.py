@@ -30,9 +30,9 @@ def update_config_file(event, _):
 
     source_code = f"""\
         const STARK={{
-            'parser_url':'https://{endpoint}/parser',
-            'deploy_url':'https://{endpoint}/deploy',
-            'deploy_check_url':'https://{endpoint}/deploy_check'
+            'parser_url':'{endpoint}/parser',
+            'deploy_url':'{endpoint}/deploy',
+            'deploy_check_url':'{endpoint}/deploy_check'
         }};"""
 
     source_code = textwrap.dedent(source_code)
