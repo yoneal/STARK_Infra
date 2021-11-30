@@ -222,9 +222,6 @@ Resources:
         Properties:
             ServiceToken: !GetAtt STARKWebsiteUpdaterFunc.Arn
             Remarks: This will update STARK_settings.js with the appropriate API Gateway ID
-        DependsOn:
-            -   STARKParserApi
-            -   STARKWebsiteUpdaterFunc
     ParameterStoreCFWriterARN:
         Type: AWS::SSM::Parameter
         Properties:
