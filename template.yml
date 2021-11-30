@@ -222,6 +222,7 @@ Resources:
         Properties:
             ServiceToken: arn:aws:lambda:ap-southeast-1:201649379729:function:STARK-lambda-pipeline-stac-STARKWebsiteUpdaterFunc-TcTWY0Cr9Nxb
             ApiGatewayId: !Ref STARKParserApi
+            UpdateToken: RandomTokenFromBuildScript
             Remarks: This will update STARK_settings.js with the appropriate API Gateway ID
         DependsOn:
             -   STARKParserApi
