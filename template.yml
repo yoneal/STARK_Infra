@@ -208,6 +208,7 @@ Resources:
                 Variables:
                     STARK_ENVIRONMENT_TYPE: PROD
                     CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
+                    WEBSITE_BUCKET_NAME: !Ref UserWebsiteBucketNameParameter
                     API_GATEWAY_ID: !Ref STARKParserApi
             Policies:
                 - AmazonS3FullAccess
@@ -216,8 +217,14 @@ Resources:
             Layers:
                 - !Ref CFCustomResourceHelperLayer
             Timeout: 60
+    STARKWebsiteUpdaterRun:
+        Type: AWS::CloudFormation::CustomResource
+        Properties:
+            ServiceToken: !GetAtt STARKWebsiteUpdaterFunc.Arn
+            Remarks: This will update STARK_settings.js with the appropriate API Gateway ID
         DependsOn:
-            - STARKParserApi
+            -   STARKParserApi
+            -   STARKWebsiteUpdaterFunc
     ParameterStoreApiID:
         Type: AWS::SSM::Parameter
         Properties:
