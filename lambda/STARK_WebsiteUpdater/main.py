@@ -50,4 +50,5 @@ def delete_action(event, _):
     pass
 
 def lambda_handler(event, context):
+    print("Step 6")
     helper(event, context)
