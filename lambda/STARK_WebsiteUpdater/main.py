@@ -13,7 +13,7 @@ import boto3
 from crhelper import CfnResource
 
 s3  = boto3.client('s3')
-#api = boto3.client('apigatewayv2')
+api = boto3.client('apigatewayv2')
 
 website_bucket_name = os.environ['WEBSITE_BUCKET_NAME']
 api_gateway_id      = os.environ['API_GATEWAY_ID']
