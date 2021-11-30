@@ -220,7 +220,8 @@ Resources:
     STARKWebsiteUpdaterRun:
         Type: AWS::CloudFormation::CustomResource
         Properties:
-            ServiceToken: !GetAtt STARKWebsiteUpdaterFunc.Arn
+            ServiceToken: arn:aws:lambda:ap-southeast-1:201649379729:function:STARK-lambda-pipeline-stac-STARKWebsiteUpdaterFunc-TcTWY0Cr9Nxb
+            UpdateToken: AWS::StackId
             Remarks: This will update STARK_settings.js with the appropriate API Gateway ID
         DependsOn:
             -   STARKParserApi

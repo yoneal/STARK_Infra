@@ -132,6 +132,7 @@ def lambda_handler(event, context):
             Type: AWS::CloudFormation::CustomResource
             Properties:
                 ServiceToken: {preloader_service_token}
+                UpdateToken: {update_token}
                 Bucket:
                     Ref: STARKSystemBucket
                 Remarks: This will preload all STARK HTML/CSS/JS files into the STARKSystemBucket
