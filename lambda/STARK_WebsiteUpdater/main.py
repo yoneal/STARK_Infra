@@ -12,7 +12,7 @@ import boto3
 from crhelper import CfnResource
 
 print("Step 1")
-s3  = boto3.resource('s3')
+s3  = boto3.client('s3')
 print("Step 2")
 api = boto3.client('apigatewayv2')
 
@@ -24,6 +24,7 @@ print("Step 4")
 helper = CfnResource() #We're using the AWS-provided helper library to minimize the tedious boilerplate just to signal back to CloudFormation
 
 print("Step 5")
+
 @helper.create
 @helper.update
 def update_config_file(event, _):
@@ -31,6 +32,7 @@ def update_config_file(event, _):
 
     response = api.get_api(ApiId=api_gateway_id)
     endpoint = response['ApiEndpoint']
+    #endpoint = "58z1dafmul.execute-api.ap-southeast-1.amazonaws.com"
 
     print(f"Updating config file (stub) with {endpoint} within {website_bucket_name}...")
 
@@ -43,12 +45,25 @@ def update_config_file(event, _):
 
     print(source_code)
 
+    deploy(source_code=source_code, bucket_name=website_bucket_name, key=f"js/STARK_settings.js")
+
 
 @helper.delete
 def delete_action(event, _):
     print("Delete action - no action...")
-    pass
 
 def lambda_handler(event, context):
     print("Step 6")
     helper(event, context)
+
+def deploy(source_code, bucket_name, key):
+
+    response = s3.put_object(
+        ACL='public-read',
+        Body=source_code.encode(),
+        Bucket=bucket_name,
+        Key=key,
+        ContentType="text/html",
+    )
+
+    return response
