@@ -214,6 +214,7 @@ Resources:
                 - AmazonS3FullAccess
                 - AmazonSSMReadOnlyAccess
                 - AWSLambdaBasicExecutionRole
+                - ReadOnlyAccess
             Layers:
                 - !Ref CFCustomResourceHelperLayer
             Timeout: 60
