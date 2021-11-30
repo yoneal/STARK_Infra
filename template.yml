@@ -216,8 +216,8 @@ Resources:
             Layers:
                 - !Ref CFCustomResourceHelperLayer
             Timeout: 60
-            DependsOn:
-                - STARKParserApi
+        DependsOn:
+            - STARKParserApi
     ParameterStoreApiID:
         Type: AWS::SSM::Parameter
         Properties:
