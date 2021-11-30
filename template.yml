@@ -226,14 +226,6 @@ Resources:
             Tier: Standard
             Type: String
             Value: !Ref STARKParserApi
-    ParameterStoreCodeGenBucketName:
-        Type: AWS::SSM::Parameter
-        Properties:
-            Description: Name of the bucket that holds deployment packages for end-user systems created by STARK.
-            Name: STARK_CodeGenBucketName
-            Tier: Standard
-            Type: String
-            Value: !Ref UserCodeGenBucketNameParameter
     ParameterStoreCFWriterARN:
         Type: AWS::SSM::Parameter
         Properties:
