@@ -3,6 +3,7 @@
 #Python Standard Library
 import base64
 import json
+import os
 import textwrap
 from time import sleep
 
@@ -24,14 +25,12 @@ def lambda_handler(event, context):
     if isBase64Encoded:
         raw_data_model = base64.b64decode(raw_data_model).decode()
 
-    jsonified_payload = json.loads(raw_data_model)
-    data_model = yaml.safe_load(jsonified_payload["data_model"])
-
-    project_varname = converter.convert_to_system_name(data_model.get('__STARK_project_name__'))
-    CF_stack_name   = converter.convert_to_system_name(data_model.get('__STARK_project_name__'), "cf-stack")
-
-    #FIXME: Hard-coded! WTF. Fix along with the switch from ParamStore to S3, with codegen bucket name being stored in environment variable.
-    CF_url = f'https://waynestark-stark-prototype-codegenbucket.s3-ap-southeast-1.amazonaws.com/STARK_SAM_{project_varname}.yaml'
+    codegen_bucket_name = os.environ['CODEGEN_BUCKET_NAME']
+    jsonified_payload   = json.loads(raw_data_model)
+    data_model          = yaml.safe_load(jsonified_payload["data_model"])
+    project_varname     = converter.convert_to_system_name(data_model.get('__STARK_project_name__'))
+    CF_stack_name       = converter.convert_to_system_name(data_model.get('__STARK_project_name__'), "cf-stack")
+    CF_url              = f'https://{codegen_bucket_name}.s3-ap-southeast-1.amazonaws.com/STARK_SAM_{project_varname}.yaml'
 
     print (f'Trying to execute CF for template: STARK_SAM_{project_varname}.yaml')
 

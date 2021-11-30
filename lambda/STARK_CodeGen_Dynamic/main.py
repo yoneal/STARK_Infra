@@ -4,6 +4,7 @@
 #Python Standard Library
 import base64
 import json
+import os
 import textwrap
 import zipfile
 
@@ -40,7 +41,7 @@ def create_handler(event, context):
     ddb_table_name = event.get('ResourceProperties', {}).get('DDBTable','')
 
     #Bucket for our generated lambda deploymentment packages and cloud resources document
-    codegen_bucket_name = ssm.get_parameter(Name="STARK_CodeGenBucketName").get('Parameter', {}).get('Value')
+    codegen_bucket_name = os.environ['CODEGEN_BUCKET_NAME']
 
     #FIXME: Temporary way to retrieve cloud_resources. PROD version will use S3 file for unlimited length.
     #cloud_resources = yaml.safe_load(ssm.get_parameter(Name="STARK_cloud_resources_" + project_varname).get('Parameter', {}).get('Value'))

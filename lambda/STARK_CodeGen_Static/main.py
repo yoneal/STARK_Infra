@@ -4,6 +4,7 @@
 #Python Standard Library
 import base64
 import json
+import os
 import textwrap
 
 #Extra modules
@@ -38,7 +39,7 @@ def create_handler(event, context):
     project_varname = converter.convert_to_system_name(project_name)
 
     #Bucket for our cloud resources document
-    codegen_bucket_name = ssm.get_parameter(Name="STARK_CodeGenBucketName").get('Parameter', {}).get('Value')
+    codegen_bucket_name = os.environ['CODEGEN_BUCKET_NAME']
 
     #Cloud resources document
     response = s3.get_object(

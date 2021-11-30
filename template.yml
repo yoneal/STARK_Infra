@@ -198,6 +198,26 @@ Resources:
             Layers:
                 - !Ref CFCustomResourceHelperLayer
             Timeout: 60
+    STARKWebsiteUpdaterFunc:
+        Type: AWS::Serverless::Function
+        Properties:
+            Runtime: python3.8
+            Handler: main.lambda_handler
+            CodeUri: lambda/STARK_WebsiteUpdater
+            Environment:
+                Variables:
+                    STARK_ENVIRONMENT_TYPE: PROD
+                    CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
+                    API_GATEWAY_ID: !Ref STARKParserApi
+            Policies:
+                - AmazonS3FullAccess
+                - AmazonSSMReadOnlyAccess
+                - AWSLambdaBasicExecutionRole
+            Layers:
+                - !Ref CFCustomResourceHelperLayer
+            Timeout: 60
+            DependsOn:
+                - STARKParserApi
     ParameterStoreApiID:
         Type: AWS::SSM::Parameter
         Properties:
@@ -246,8 +266,6 @@ Resources:
             Tier: Standard
             Type: String
             Value: !GetAtt STARKCodeGenStaticWriter.Arn
-
-
 
 Outputs:
     STARKParserApiID:

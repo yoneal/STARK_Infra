@@ -16,7 +16,7 @@ import boto3
 import convert_friendly_to_system as converter
 
 
-#Get environment variable - this will allow us to take different branches depending on whether we are LOCAL or PROD (or any other future valid value)
+#Get environment type - this will allow us to take different branches depending on whether we are LOCAL or PROD (or any other future valid value)
 ENV_TYPE = os.environ['STARK_ENVIRONMENT_TYPE']
 if ENV_TYPE == "PROD":
     default_response_headers = { "Content-Type": "application/json" }
@@ -24,10 +24,11 @@ if ENV_TYPE == "PROD":
     s3  = boto3.client('s3')
     ssm = boto3.client('ssm')
 
+    codegen_bucket_name      = os.environ['CODEGEN_BUCKET_NAME']
     preloader_service_token  = ssm.get_parameter(Name="STARK_CustomResource_BucketPreloaderLambda_ARN").get('Parameter', {}).get('Value')
     cg_static_service_token  = ssm.get_parameter(Name="STARK_CustomResource_CodeGenStaticLambda_ARN").get('Parameter', {}).get('Value')
     cg_dynamic_service_token = ssm.get_parameter(Name="STARK_CustomResource_CodeGenDynamicLambda_ARN").get('Parameter', {}).get('Value')
-    codegen_bucket_name      = ssm.get_parameter(Name="STARK_CodeGenBucketName").get('Parameter', {}).get('Value')
+
 
 else:
     #We only have to do this because `SAM local start-api` doesn't follow CORS info from template.yml, which is bullshit

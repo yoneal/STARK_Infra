@@ -5,15 +5,16 @@
 #Python Standard Library
 import base64
 import json
-import os
 
 #Extra modules
 import boto3
 from crhelper import CfnResource
 
 s3  = boto3.resource('s3')
+ssm = boto3.client('ssm')
 
-codegen_bucket_name = os.environ['CODEGEN_BUCKET_NAME']
+response            = ssm.get_parameter(Name="STARK_CodeGenBucketName")
+codegen_bucket_name = response.get('Parameter', {}).get('Value')
 
 helper = CfnResource() #We're using the AWS-provided helper library to minimize the tedious boilerplate just to signal back to CloudFormation
 
