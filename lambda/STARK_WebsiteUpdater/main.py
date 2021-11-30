@@ -32,6 +32,7 @@ def update_config_file(event, _):
     print(f"Updating config file (stub) with {endpoint} within {website_bucket_name}...")
 
     source_code = f"""\
+        //Updated by STARKWebsiteUpdaterFunc!
         const STARK={{
             'parser_url':'https://{endpoint}.amazonaws.com/parser',
             'deploy_url':'https://{endpoint}.amazonaws.com/deploy',
