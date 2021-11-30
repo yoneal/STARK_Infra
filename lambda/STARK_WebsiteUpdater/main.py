@@ -23,11 +23,8 @@ helper = CfnResource() #We're using the AWS-provided helper library to minimize 
 @helper.create
 @helper.update
 def update_config_file(event, _):
-    print("Will update JS config file...")
-
-    #response = api.get_api(ApiId=api_gateway_id)
-    #endpoint = response['ApiEndpoint']
-    endpoint = "58z1dafmul.execute-api.ap-southeast-1.amazonaws.com"
+    response = api.get_api(ApiId=api_gateway_id)
+    endpoint = response['ApiEndpoint']
 
     print(f"Updating config file (stub) with {endpoint} within {website_bucket_name}...")
 
