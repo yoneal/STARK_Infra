@@ -19,7 +19,6 @@ import cgdynamic_dynamodb as cg_ddb
 import convert_friendly_to_system as converter
 
 s3  = boto3.client('s3')
-ssm = boto3.client('ssm')
 lmb = boto3.client('lambda')
 
 lambda_path_filename = '/tmp/lambda_function.py'
@@ -42,9 +41,6 @@ def create_handler(event, context):
 
     #Bucket for our generated lambda deploymentment packages and cloud resources document
     codegen_bucket_name = os.environ['CODEGEN_BUCKET_NAME']
-
-    #FIXME: Temporary way to retrieve cloud_resources. PROD version will use S3 file for unlimited length.
-    #cloud_resources = yaml.safe_load(ssm.get_parameter(Name="STARK_cloud_resources_" + project_varname).get('Parameter', {}).get('Value'))
 
     #Cloud resources document
     response = s3.get_object(
