@@ -230,6 +230,24 @@ Resources:
         DependsOn:
             -   STARKParserApi
             -   STARKWebsiteUpdaterFunc
+    STARKProjectConfigWriterFunc:
+        Type: AWS::Serverless::Function
+        Properties:
+            Runtime: python3.8
+            Handler: main.lambda_handler
+            CodeUri: lambda/STARK_ProjectConfigWriter
+            Environment:
+                Variables:
+                    STARK_ENVIRONMENT_TYPE: PROD
+                    CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
+            Policies:
+                - AmazonS3FullAccess
+                - AmazonSSMReadOnlyAccess
+                - AWSLambdaBasicExecutionRole
+                - ReadOnlyAccess
+            Layers:
+                - !Ref CFCustomResourceHelperLayer
+            Timeout: 60
     STARKConfigWriterFunc:
         Type: AWS::Serverless::Function
         Properties:
@@ -245,6 +263,7 @@ Resources:
                     BUCKET_PRELOADER_ARN: !GetAtt STARKBucketPreloaderFunc.Arn
                     CG_DYNAMIC_ARN: !GetAtt STARKCodeGenDynamicWriter.Arn
                     CG_STATIC_ARN: !GetAtt STARKCodeGenStaticWriter.Arn
+                    PROJECT_CONFIG_WRITER_ARN: !GetAtt STARKProjectConfigWriterFunc.Arn
             Policies:
                 - AmazonS3FullAccess
                 - AmazonSSMReadOnlyAccess
@@ -261,6 +280,7 @@ Resources:
             Remarks: This will update STARK_settings.js with the appropriate API Gateway ID
         DependsOn:
             -   STARKConfigWriterFunc
+
 Outputs:
     STARKParserApiID:
         Description: API Gateway HttpApi API ID

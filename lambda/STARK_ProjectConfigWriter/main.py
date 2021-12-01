@@ -1,5 +1,5 @@
 #This is the Lambda function of the Lamba-backed custom resource used 
-#   during the deployment of STARK infrastructure itself that creates the  
+#   during the deployment of a STARK project that creates the  
 #   configuration file for resources that the code generator needs.
 
 #Python Standard Library
@@ -25,15 +25,13 @@ def make_config_file(event, _):
     bucket_preloader_arn = os.environ['BUCKET_PRELOADER_ARN']
     cf_writer_arn        = os.environ['CF_WRITER_ARN']
     cg_dynamic_arn       = os.environ['CG_DYNAMIC_ARN']
-    cg_static_arn        = os.environ['CG_STATIC_ARN']
-    proj_conf_writer_arn = os.environ['PROJECT_CONFIG_WRITER_ARN']
+    cg_static_arn        = os.environ['CG_STATIC_ARN'] 
 
     source_code = f"""\
         BucketPreloaderLambda_ARN: '{bucket_preloader_arn}'
         CFWriter_ARN: '{cf_writer_arn}'
         CGDynamic_ARN: '{cg_dynamic_arn}'
         CGStatic_ARN: '{cg_static_arn}'
-        ProjConfWriter_ARN: '{proj_conf_writer_arn}'
         """
 
     source_code = textwrap.dedent(source_code)
