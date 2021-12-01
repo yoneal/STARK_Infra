@@ -67,6 +67,7 @@ Resources:
                     STARK_ENVIRONMENT_TYPE: PROD
                     CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
             Policies:
+                - AmazonS3ReadOnlyAccess
                 - AmazonSSMReadOnlyAccess
                 - AWSLambda_FullAccess
             Layers:
