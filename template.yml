@@ -221,13 +221,45 @@ Resources:
     STARKWebsiteUpdaterRun:
         Type: AWS::CloudFormation::CustomResource
         Properties:
-            ServiceToken: arn:aws:lambda:ap-southeast-1:201649379729:function:STARK-lambda-pipeline-stac-STARKWebsiteUpdaterFunc-TcTWY0Cr9Nxb
+            ServiceToken: !GetAtt STARKWebsiteUpdaterFunc.Arn
             ApiGatewayId: !Ref STARKParserApi
             UpdateToken: RandomTokenFromBuildScript
             Remarks: This will update STARK_settings.js with the appropriate API Gateway ID
         DependsOn:
             -   STARKParserApi
             -   STARKWebsiteUpdaterFunc
+    STARKConfigWriterFunc:
+        Type: AWS::Serverless::Function
+        Properties:
+            Runtime: python3.8
+            Handler: main.lambda_handler
+            CodeUri: lambda/STARK_ConfigWriter
+            Environment:
+                Variables:
+                    STARK_ENVIRONMENT_TYPE: PROD
+                    CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
+                    API_GATEWAY_ID: !Ref STARKParserApi
+                    CF_WRITER_ARN: !GetAtt STARKCFWriterFunc.Arn
+                    BUCKET_PRELOADER_ARN: !GetAtt STARKBucketPreloaderFunc.Arn
+                    CG_DYNAMIC_ARN: !GetAtt STARKCodeGenDynamicWriter.Arn
+                    CG_STATIC_ARN: !GetAtt STARKCodeGenStaticWriter.Arn
+            Policies:
+                - AmazonS3FullAccess
+                - AmazonSSMReadOnlyAccess
+                - AWSLambdaBasicExecutionRole
+                - ReadOnlyAccess
+            Layers:
+                - !Ref CFCustomResourceHelperLayer
+            Timeout: 60
+    STARKConfigWriterRun:
+        Type: AWS::CloudFormation::CustomResource
+        Properties:
+            ServiceToken: !GetAtt STARKConfigWriterFunc.Arn
+            UpdateToken: RandomTokenFromBuildScript
+            Remarks: This will update STARK_settings.js with the appropriate API Gateway ID
+        DependsOn:
+            -   STARKConfigWriterFunc
+
     ParameterStoreCFWriterARN:
         Type: AWS::SSM::Parameter
         Properties:

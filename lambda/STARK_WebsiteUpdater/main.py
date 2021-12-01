@@ -1,4 +1,4 @@
-#This is the Lambda function of the Lamba-backed custom resource used by
+#This is the Lambda function of the Lamba-backed custom resource used
 #   during the deployment of STARK infrastructure itself.  
 #   This will write the API Gateway ID into the JS config file.
 
@@ -26,7 +26,7 @@ def update_config_file(event, _):
     response = api.get_api(ApiId=api_gateway_id)
     endpoint = response['ApiEndpoint']
 
-    print(f"Updating config file (stub) with {endpoint} within {website_bucket_name}...")
+    print(f"Updating config file with {endpoint} within {website_bucket_name}...")
 
     source_code = f"""\
         const STARK={{
@@ -54,7 +54,7 @@ def deploy(source_code, bucket_name, key):
         Body=source_code.encode(),
         Bucket=bucket_name,
         Key=key,
-        ContentType="text/html",
+        ContentType="text/javascript",
     )
 
     return response
