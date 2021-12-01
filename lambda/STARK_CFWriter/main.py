@@ -32,6 +32,7 @@ if ENV_TYPE == "PROD":
     preloader_service_token  = config['BucketPreloaderLambda_ARN']
     cg_static_service_token  = config['CGStatic_ARN']
     cg_dynamic_service_token = config['CGDynamic_ARN']
+    confwriter_service_token = config['ProjConfWriter_ARN']
 
 else:
     #We only have to do this because `SAM local start-api` doesn't follow CORS info from template.yml, which is bullshit
@@ -43,8 +44,8 @@ else:
     preloader_service_token  = "PreloaderService-FakeLocalToken"
     cg_static_service_token  = "CGStaticService-FakeLocalToken"
     cg_dynamic_service_token = "CGDynamicService-FakeLocalToken"
+    confwriter_service_token = "ConfWriterService-FakeLocalToken"
     codegen_bucket_name      = "codegen-fake-local-bucket"
-
 
 
 
@@ -77,10 +78,6 @@ def lambda_handler(event, context):
 
     ###############################################################################################################
     #Load and sanitize data here, for whatever IaC rules that govern them (e.g., S3 Bucket names must be lowercase)
-
-    #Project Metadata
-    ApiG_param_name = cloud_resources['CodeGen_Metadata']['STARK_CodeGen_ApiGatewayId_ParameterName']
-
 
     #S3-related data
     s3_bucket_name    = cloud_resources["S3 webserve"]["bucket_name"].lower()
@@ -153,23 +150,14 @@ def lambda_handler(event, context):
                         - "*"
                     MaxAge: 200
                     AllowCredentials: False
-        STARKCodeGenParamApiId:
-            Type: AWS::SSM::Parameter
-            Properties:
-                Name: {ApiG_param_name}
-                Description: API Gateway ID of your project
-                Type: String
-                DataType: text
-                Value: 
-                    Ref: STARKApiGateway
         STARKCGStatic:
             Type: AWS::CloudFormation::CustomResource
             Properties:
                 ServiceToken: {cg_static_service_token}
                 UpdateToken: {update_token}
-                Bucket:
-                    Ref: STARKSystemBucket
                 Project: {project_name}
+                Bucket: !Ref STARKSystemBucket
+                ApiGatewayId:  !Ref STARKApiGateway
                 Remarks: This will create the customized STARK HTML/CSS/JS files into the STARKSystemBucket, based on the supplied entities
             DependsOn:
                 -   STARKSystemBucket

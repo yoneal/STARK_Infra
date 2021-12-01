@@ -159,6 +159,7 @@ Resources:
                 - AmazonS3FullAccess
                 - AmazonSSMReadOnlyAccess
                 - AWSLambdaBasicExecutionRole
+                - ReadOnlyAccess
             Layers:
                 - !Ref CFCustomResourceHelperLayer
                 - !Ref PyYamlLayer
@@ -230,24 +231,6 @@ Resources:
         DependsOn:
             -   STARKParserApi
             -   STARKWebsiteUpdaterFunc
-    STARKProjectConfigWriterFunc:
-        Type: AWS::Serverless::Function
-        Properties:
-            Runtime: python3.8
-            Handler: main.lambda_handler
-            CodeUri: lambda/STARK_ProjectConfigWriter
-            Environment:
-                Variables:
-                    STARK_ENVIRONMENT_TYPE: PROD
-                    CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
-            Policies:
-                - AmazonS3FullAccess
-                - AmazonSSMReadOnlyAccess
-                - AWSLambdaBasicExecutionRole
-                - ReadOnlyAccess
-            Layers:
-                - !Ref CFCustomResourceHelperLayer
-            Timeout: 60
     STARKConfigWriterFunc:
         Type: AWS::Serverless::Function
         Properties:
@@ -268,7 +251,6 @@ Resources:
                 - AmazonS3FullAccess
                 - AmazonSSMReadOnlyAccess
                 - AWSLambdaBasicExecutionRole
-                - ReadOnlyAccess
             Layers:
                 - !Ref CFCustomResourceHelperLayer
             Timeout: 60

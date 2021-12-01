@@ -26,14 +26,12 @@ def make_config_file(event, _):
     cf_writer_arn        = os.environ['CF_WRITER_ARN']
     cg_dynamic_arn       = os.environ['CG_DYNAMIC_ARN']
     cg_static_arn        = os.environ['CG_STATIC_ARN']
-    proj_conf_writer_arn = os.environ['PROJECT_CONFIG_WRITER_ARN']
 
     source_code = f"""\
         BucketPreloaderLambda_ARN: '{bucket_preloader_arn}'
         CFWriter_ARN: '{cf_writer_arn}'
         CGDynamic_ARN: '{cg_dynamic_arn}'
         CGStatic_ARN: '{cg_static_arn}'
-        ProjConfWriter_ARN: '{proj_conf_writer_arn}'
         """
 
     source_code = textwrap.dedent(source_code)

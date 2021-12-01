@@ -9,18 +9,21 @@ import convert_friendly_to_system as converter
 
 def create(data):
 
-    api_gateway_id  = data['API Gateway ID']
+    api_endpoint  = data['API Endpoint']
     entities        = data['Entities']
 
+    #FIXME: BUG! region is hardcoded here. Use endpoint property to get entire endpoint url programmatically, instead of stitching API ID with rest of URL compenents
+    #           This has been done already in STARK_ConfigWriter, follow pattern there. 
+    #           Might have to fix in main.py, and pass full endpoint here instead of just the id.
     source_code = f"""\
         const STARK={{
-            'sys_modules_url':'https://{api_gateway_id}.execute-api.ap-southeast-1.amazonaws.com/sys_modules',"""
+            'sys_modules_url':'{api_endpoint}/sys_modules',"""
 
     #Each entity is a big module, has own endpoint
     for entity in entities:
         entity_endpoint_name = converter.convert_to_system_name(entity)
         source_code += f"""
-            '{entity_endpoint_name}_url':'https://{api_gateway_id}.execute-api.ap-southeast-1.amazonaws.com/{entity_endpoint_name}',"""
+            '{entity_endpoint_name}_url':'{api_endpoint}/{entity_endpoint_name}',"""
 
     #STARK-provided common methods go here
     source_code += f"""

@@ -27,15 +27,20 @@ import convert_friendly_to_system as converter
 
 s3  = boto3.client('s3')
 ssm = boto3.client('ssm')
+api = boto3.client('apigatewayv2')
+
 helper = CfnResource() #We're using the AWS-provided helper library to minimize the tedious boilerplate just to signal back to CloudFormation
 
 @helper.create
 @helper.update
 def create_handler(event, context):
-    #Project and bucket name from our CF template
+    #Project, bucket name and API Gateway ID from our CF template
     bucket_name     = event.get('ResourceProperties', {}).get('Bucket','')
     project_name    = event.get('ResourceProperties', {}).get('Project','')
     project_varname = converter.convert_to_system_name(project_name)
+    api_gateway_id  = event.get('ResourceProperties', {}).get('ApiGatewayId','')
+    response = api.get_api(ApiId=api_gateway_id)
+    endpoint = response['ApiEndpoint']
 
     #Bucket for our cloud resources document
     codegen_bucket_name = os.environ['CODEGEN_BUCKET_NAME']
@@ -48,12 +53,10 @@ def create_handler(event, context):
     cloud_resources = yaml.safe_load(response['Body'].read().decode('utf-8')) 
 
     #Get relevant info from cloud_resources
-    ApiG_param_name = cloud_resources['CodeGen_Metadata']['STARK_CodeGen_ApiGatewayId_ParameterName']
     models          = cloud_resources["DynamoDB"]["Models"]
-    api_gateway_id  = ssm.get_parameter(Name=ApiG_param_name).get('Parameter', {}).get('Value')
 
     #STARK main JS file
-    data = { 'API Gateway ID': api_gateway_id, 'Entities': models }
+    data = { 'API Endpoint': endpoint, 'Entities': models }
     deploy(cg_js_stark.create(data), bucket_name=bucket_name, key=f"js/STARK.js")
 
     #For each entity, we'll create a set of HTML and JS Files
