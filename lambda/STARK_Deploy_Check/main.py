@@ -51,6 +51,7 @@ def lambda_handler(event, context):
         result = 'SUCCESS'
         retry  = False
         url    = response['StackResourceDetail']['PhysicalResourceId']
+        #FIXME: This has region encoded - please fix, maybe similar to CGStatic and WebsiteUpdater fixes.
         url    = "http://" + url + ".s3-website-ap-southeast-1.amazonaws.com/"
 
     elif stack_status == 'CREATE_FAILED':
