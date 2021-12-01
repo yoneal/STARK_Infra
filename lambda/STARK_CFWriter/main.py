@@ -20,20 +20,23 @@ import convert_friendly_to_system as converter
 ENV_TYPE = os.environ['STARK_ENVIRONMENT_TYPE']
 if ENV_TYPE == "PROD":
     default_response_headers = { "Content-Type": "application/json" }
-
     s3  = boto3.client('s3')
-    ssm = boto3.client('ssm')
 
-    codegen_bucket_name      = os.environ['CODEGEN_BUCKET_NAME']
-    preloader_service_token  = ssm.get_parameter(Name="STARK_CustomResource_BucketPreloaderLambda_ARN").get('Parameter', {}).get('Value')
-    cg_static_service_token  = ssm.get_parameter(Name="STARK_CustomResource_CodeGenStaticLambda_ARN").get('Parameter', {}).get('Value')
-    cg_dynamic_service_token = ssm.get_parameter(Name="STARK_CustomResource_CodeGenDynamicLambda_ARN").get('Parameter', {}).get('Value')
-
+    #Get resource ids from STARK configuration document
+    codegen_bucket_name  = os.environ['CODEGEN_BUCKET_NAME']
+    response = s3.get_object(
+        Bucket=codegen_bucket_name,
+        Key=f'STARKConfiguration/STARK_config.yml'
+    )
+    config = yaml.safe_load(response['Body'].read().decode('utf-8')) 
+    preloader_service_token  = config['BucketPreloaderLambda_ARN']
+    cg_static_service_token  = config['CGStatic_ARN']
+    cg_dynamic_service_token = config['CGDynamic_ARN']
 
 else:
     #We only have to do this because `SAM local start-api` doesn't follow CORS info from template.yml, which is bullshit
-    default_response_headers = { 
-        "Content-Type": "application/json", 
+    default_response_headers = {
+        "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*"
     }
 

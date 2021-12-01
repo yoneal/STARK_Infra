@@ -65,6 +65,7 @@ Resources:
             Environment:
                 Variables:
                     STARK_ENVIRONMENT_TYPE: PROD
+                    CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
             Policies:
                 - AmazonSSMReadOnlyAccess
                 - AWSLambda_FullAccess
@@ -259,40 +260,6 @@ Resources:
             Remarks: This will update STARK_settings.js with the appropriate API Gateway ID
         DependsOn:
             -   STARKConfigWriterFunc
-
-    ParameterStoreCFWriterARN:
-        Type: AWS::SSM::Parameter
-        Properties:
-            Description: Invokable name of the CFWriter lambda function. Placed here to avoid hard-coding into the Parser func itself.
-            Name: STARK_CFWriter_FunctionName
-            Tier: Standard
-            Type: String
-            Value: !GetAtt STARKCFWriterFunc.Arn
-    ParameterStoreBucketPreloaderARN:
-        Type: AWS::SSM::Parameter
-        Properties:
-            Description: Service token for Lambda-backed custom resource that preloads STARK files to the STARK-generated S3 bucket for end-user systems.
-            Name: STARK_CustomResource_BucketPreloaderLambda_ARN
-            Tier: Standard
-            Type: String
-            Value: !GetAtt STARKBucketPreloaderFunc.Arn
-    ParameterStoreCodeGenDynamicARN:
-        Type: AWS::SSM::Parameter
-        Properties:
-            Description: Service token for Lambda-backed custom resource that creates the STARK-generated Lambda files for end-user systems.
-            Name: STARK_CustomResource_CodeGenDynamicLambda_ARN
-            Tier: Standard
-            Type: String
-            Value: !GetAtt STARKCodeGenDynamicWriter.Arn
-    ParameterStoreCodeGenStaticARN:
-        Type: AWS::SSM::Parameter
-        Properties:
-            Description: Service token for Lambda-backed custom resource that creates the STARK-generated static files for end-user systems.
-            Name: STARK_CustomResource_CodeGenStaticLambda_ARN
-            Tier: Standard
-            Type: String
-            Value: !GetAtt STARKCodeGenStaticWriter.Arn
-
 Outputs:
     STARKParserApiID:
         Description: API Gateway HttpApi API ID

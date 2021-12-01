@@ -19,7 +19,7 @@ helper = CfnResource() #We're using the AWS-provided helper library to minimize 
 @helper.create
 @helper.update
 def make_config_file(event, _):
-    print(f"Creating config file within {codegen_bucket_name}...")
+    print(f"Creating STARK configuration file...")
 
     codegen_bucket_name  = os.environ['CODEGEN_BUCKET_NAME']
     bucket_preloader_arn = os.environ['BUCKET_PRELOADER_ARN']

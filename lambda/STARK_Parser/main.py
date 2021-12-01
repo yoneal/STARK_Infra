@@ -25,13 +25,18 @@ import parse_s3 as s3_parser
 ENV_TYPE = os.environ['STARK_ENVIRONMENT_TYPE']
 if ENV_TYPE == "PROD":
     default_response_headers = { "Content-Type": "application/json" }
+    s3  = boto3.client('s3')
 
-    #We need SSM to access the Parameter Store, where the function name of the CF Writer lambda will be stored
-    #We don't want to hard-code that name here, that's yucky
-    ssm_client        = boto3.client('ssm')
-    CFWriter_FuncName = ssm_client.get_parameter(Name='STARK_CFWriter_FunctionName').get('Parameter', {}).get('Value', '')
+    #Get resource ids from STARK configuration document
+    codegen_bucket_name  = os.environ['CODEGEN_BUCKET_NAME']
+    response = s3.get_object(
+        Bucket=codegen_bucket_name,
+        Key=f'STARKConfiguration/STARK_config.yml'
+    )
+    config = yaml.safe_load(response['Body'].read().decode('utf-8')) 
+    CFWriter_FuncName = config['CFWriter_ARN']
 
-    #And of course a Lambda client, so we can invoke the function whose name we retrieved above
+    #And of course a Lambda client, so we can invoke the function whose ARN we retrieved above
     lambda_client = boto3.client('lambda')
 
 else:
