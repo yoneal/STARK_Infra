@@ -274,7 +274,7 @@ def lambda_handler(event, context):
         response = s3.put_object(
             Body=textwrap.dedent(cf_template).encode(),
             Bucket='waynestark-stark-prototype-codegenbucket',
-            Key=f'STARK_SAM_{project_varname}.yaml',
+            Key=f'codegen_dynamic/{project_varname}/STARK_SAM_{project_varname}.yaml',
             Metadata={
                 'STARK_Description': 'Writer output for CloudFormation'
             }
