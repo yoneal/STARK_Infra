@@ -10,7 +10,7 @@ phases:
       - WEBSITE=$(cat template_configuration.json | python3 -c "import sys, json; print(json.load(sys.stdin)['Parameters']['UserWebsiteBucketNameParameter'])")
       - CODEGEN=$(cat template_configuration.json | python3 -c "import sys, json; print(json.load(sys.stdin)['Parameters']['UserCodeGenBucketNameParameter'])")
       - sed -i "s/RandomTokenFromBuildScript/$(date)/" template.yml
-      - aws cloudformation package --template-file template.yml --s3-bucket $BUCKET --output-template-file outputtemplate.yml
+      - aws cloudformation package --template-file template.yml --s3-bucket $BUCKET --s3-prefix STARK_Projects --output-template-file outputtemplate.yml
       - aws s3 cp STARK_Parser s3://$WEBSITE --recursive --acl public-read
       - aws s3 cp STARK_SourceBucket_files s3://$CODEGEN/STARKWebSource --recursive
       - aws s3 cp outputtemplate.yml s3://$BUCKET
