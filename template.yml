@@ -141,6 +141,7 @@ Resources:
                 - AmazonSSMReadOnlyAccess
                 - AWSLambda_FullAccess
                 - AWSCloudFormationFullAccess
+                - AmazonS3ReadOnlyAccess
             Layers:
                 - !Ref PyYamlLayer
                 - !Ref STARKFriendlyToSystemNamesLayer

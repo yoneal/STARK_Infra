@@ -13,7 +13,8 @@ import boto3
 #Private modules
 import convert_friendly_to_system as converter
 
-client = boto3.client('cloudformation')
+cfn = boto3.client('cloudformation')
+s3  = boto3.client('s3')
 
 def lambda_handler(event, context):
 
@@ -32,7 +33,7 @@ def lambda_handler(event, context):
     print("Sleep for 10!")
     sleep(10)
 
-    response = client.describe_stacks(
+    response = cfn.describe_stacks(
         StackName=CF_stack_name
     )
 
@@ -43,16 +44,17 @@ def lambda_handler(event, context):
     result = ''
     if stack_status in [ 'CREATE_COMPLETE', 'UPDATE_COMPLETE' ]:
 
-        response = client.describe_stack_resource(
+        response = cfn.describe_stack_resource(
             StackName=CF_stack_name,
             LogicalResourceId='STARKSystemBucket'
         )
 
-        result = 'SUCCESS'
-        retry  = False
-        url    = response['StackResourceDetail']['PhysicalResourceId']
-        #FIXME: This has region encoded - please fix, maybe similar to CGStatic and WebsiteUpdater fixes.
-        url    = "http://" + url + ".s3-website-ap-southeast-1.amazonaws.com/"
+        result          = 'SUCCESS'
+        retry           = False
+        bucket_name     = response['StackResourceDetail']['PhysicalResourceId']
+        response        = s3.get_bucket_location(Bucket=bucket_name)
+        bucket_location = response['LocationConstraint']
+        url             = f"http://{bucket_name}.s3-website-{bucket_location}.amazonaws.com/"
 
     elif stack_status == 'CREATE_FAILED':
         result = 'FAILED'

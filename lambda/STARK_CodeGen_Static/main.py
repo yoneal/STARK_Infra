@@ -26,7 +26,6 @@ import cgstatic_html_homepage as cg_homepage
 import convert_friendly_to_system as converter
 
 s3  = boto3.client('s3')
-ssm = boto3.client('ssm')
 api = boto3.client('apigatewayv2')
 
 helper = CfnResource() #We're using the AWS-provided helper library to minimize the tedious boilerplate just to signal back to CloudFormation

@@ -15,7 +15,8 @@ from botocore.exceptions import ClientError
 #Private modules
 import convert_friendly_to_system as converter
 
-client = boto3.client('cloudformation')
+cfn = boto3.client('cloudformation')
+s3  = boto3.client('s3')
 
 def lambda_handler(event, context):
 
@@ -30,13 +31,15 @@ def lambda_handler(event, context):
     data_model          = yaml.safe_load(jsonified_payload["data_model"])
     project_varname     = converter.convert_to_system_name(data_model.get('__STARK_project_name__'))
     CF_stack_name       = converter.convert_to_system_name(data_model.get('__STARK_project_name__'), "cf-stack")
-    CF_url              = f'https://{codegen_bucket_name}.s3-ap-southeast-1.amazonaws.com/codegen_dynamic/{project_varname}/STARK_SAM_{project_varname}.yaml'
+    response            = s3.get_bucket_location(Bucket=codegen_bucket_name)
+    bucket_location     = response['LocationConstraint']
+    CF_url              = f'https://{codegen_bucket_name}.s3-{bucket_location}.amazonaws.com/codegen_dynamic/{project_varname}/STARK_SAM_{project_varname}.yaml'
 
     print (f'Trying to execute CF for template: STARK_SAM_{project_varname}.yaml')
 
     payload = ""
     try:
-        response = client.create_stack(
+        response = cfn.create_stack(
             StackName=CF_stack_name,
             TemplateURL=CF_url,
             TimeoutInMinutes=10,
@@ -51,7 +54,7 @@ def lambda_handler(event, context):
     except ClientError as error:
 
         if error.response['Error']['Code'] == 'AlreadyExistsException':
-            response = client.update_stack(
+            response = cfn.update_stack(
                 StackName=CF_stack_name,
                 TemplateURL=CF_url,
                 Capabilities=[
