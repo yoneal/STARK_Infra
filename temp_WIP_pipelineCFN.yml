@@ -1,0 +1,9 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS SAM template for the STARK infra
+Resources:
+    STARKParserApi:
+        Type: AWS::CodeCommit::Repository
+        Properties:
+            RepositoryName: STARK_v1_contributor
+            RepositoryDescription: Default Git repo for the STARK tool, for contributors
