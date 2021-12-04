@@ -1,9 +1,23 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: AWS SAM template for the STARK infra
+Description: WIP template for the STARK infra CI/CD pipeline. Will be merged with template.yml and CFWriter when complete, then deleted. 
 Resources:
-    STARKParserApi:
+    STARKRepo:
         Type: AWS::CodeCommit::Repository
         Properties:
             RepositoryName: STARK_v1_contributor
             RepositoryDescription: Default Git repo for the STARK tool, for contributors
+    STARKBuildProject:
+        Type: AWS::CodeBuild::Project
+        Properties:
+            Artifacts:
+                Type: CODEPIPELINE  
+            Description: Default Build Project for the STARK CI/CD Pipeline
+            Environment:
+                ComputeType: BUILD_GENERAL1_SMALL
+                Image: "aws/codebuild/standard:4.0"
+                Type: LINUX_CONTAINER
+            Name: STARK_v1_contributor_build
+            ServiceRole: arn:aws:iam::201649379729:role/service-role/codebuild-STARK-lambda-pipeline-build-service-role
+            Source:
+                Type: CODEPIPELINE
