@@ -22,11 +22,13 @@ Resources:
             Source:
                 Type: CODEPIPELINE
     STARKCICDPipeline:
-        Type: AWS:CodePipeline::Pipeline
+        Type: AWS::CodePipeline::Pipeline
         Properties:
             Name: STARK_v1_contributor_pipeline
-            ArtifactStore: waynestark-pipeline-0
-            RoleArn: https://ap-southeast-1.console.aws.amazon.com/iam/home?region=ap-southeast-1#/roles/AWSCodePipelineServiceRole-ap-southeast-1-STARK-lambda-pipeline
+            ArtifactStore: 
+                Type: S3
+                Location: waynestark-pipeline-0
+            RoleArn: arn:aws:iam::201649379729:role/service-role/AWSCodePipelineServiceRole-ap-southeast-1-STARK-lambda-pipeline
             Stages:
                 -
                     Name: Source
