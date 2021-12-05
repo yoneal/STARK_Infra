@@ -65,3 +65,42 @@ Resources:
                                 - Name: SourceArtifact
                             OutputArtifacts:
                                 - Name: BuildArtifact
+                -
+                    Name: Deploy
+                    Actions:
+                        -
+                            Name: ChangeSetReplace
+                            RunOrder: 3
+                            ActionTypeId:
+                                Category: Deploy
+                                Owner: AWS
+                                Provider: CloudFormation
+                                Version: '1'
+                            Configuration:
+                                ActionMode: CHANGE_SET_REPLACE
+                                StackName: STARK-v1-contributor
+                                Capabilities: CAPABILITY_IAM, CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
+                                ChangeSetName: STARK-v1-contributor-changeset
+                                TemplatePath: "BuildArtifact::outputtemplate.yml"
+                                TemplateConfiguration: "BuildArtifact::template_configuration.json"
+                                RoleArn: "arn:aws:iam::201649379729:role/cfn-lambda-pipeline"
+                            InputArtifacts:
+                                - Name: BuildArtifact
+                            OutputArtifacts: []
+                        -
+                            Name: ExecuteChangeSet
+                            RunOrder: 4
+                            ActionTypeId:
+                                Category: Deploy
+                                Owner: AWS
+                                Provider: CloudFormation
+                                Version: '1'
+                            Configuration:
+                                ActionMode: CHANGE_SET_EXECUTE
+                                StackName: STARK-v1-contributor
+                                Capabilities: CAPABILITY_IAM, CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
+                                ChangeSetName: STARK-v1-contributor-changeset
+                            InputArtifacts:
+                                - Name: BuildArtifact
+                            OutputArtifacts: []
+                
