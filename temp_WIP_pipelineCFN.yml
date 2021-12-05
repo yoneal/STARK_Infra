@@ -42,9 +42,26 @@ Resources:
                                 Provider: CodeCommit
                                 Version: '1'
                             Configuration:
-                                RepositoryName: !Ref STARKRepo
+                                RepositoryName: !GetAtt STARKRepo.Name
                                 PollForSourceChanges: 'true'
                                 BranchName: master
                             InputArtifacts: []
                             OutputArtifacts:
                                 - Name: SourceArtifact
+                -
+                    Name: Build
+                    Actions:
+                        -
+                            Name: BuildAction
+                            RunOrder: 2
+                            ActionTypeId:
+                                Category: Build
+                                Owner: AWS
+                                Provider: CodeBuild
+                                Version: '1'
+                            Configuration:
+                                ProjectName: !Ref STARKBuildProject
+                            InputArtifacts:
+                                - Name: SourceArtifact
+                            OutputArtifacts:
+                                - Name: BuildArtifact
