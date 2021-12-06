@@ -15,24 +15,26 @@ Resources:
                               - codebuild.amazonaws.com"
                         Action: "sts:AssumeRole"
             Policies:
-                Version: "2012-10-17"
-                Statement:
-                  - 
-                      Effect: Allow
-                      Action:
-                          - 'logs:CreateLogGroup'
-                          - 'logs:CreateLogStream'
-                          - 'logs:PutLogEvents'
-                          - 's3:PutObject',
-                          - 's3:GetObject',
-                          - 's3:GetObjectVersion',
-                          - 's3:GetBucketAcl',
-                          - 's3:GetBucketLocation'
-                          - 'codebuild:CreateReportGroup',
-                          - 'codebuild:CreateReport',
-                          - 'codebuild:UpdateReport',
-                          - 'codebuild:BatchPutTestCases'
-                      Resource: '*'
+                - PolicyName: PolicyForSTARKCodeBuildServiceRole
+                  PolicyDocument:
+                      Version: "2012-10-17"
+                      Statement:
+                        - 
+                            Effect: Allow
+                            Action:
+                                - 'logs:CreateLogGroup'
+                                - 'logs:CreateLogStream'
+                                - 'logs:PutLogEvents'
+                                - 's3:PutObject'
+                                - 's3:GetObject'
+                                - 's3:GetObjectVersion'
+                                - 's3:GetBucketAcl'
+                                - 's3:GetBucketLocation'
+                                - 'codebuild:CreateReportGroup'
+                                - 'codebuild:CreateReport'
+                                - 'codebuild:UpdateReport'
+                                - 'codebuild:BatchPutTestCases'
+                            Resource: '*'
     STARKRepo:
         Type: AWS::CodeCommit::Repository
         Properties:
