@@ -12,7 +12,7 @@ Resources:
                         Effect: Allow
                         Principal:
                            Service: 
-                              - codebuild.amazonaws.com"
+                              - "codebuild.amazonaws.com"
                         Action: "sts:AssumeRole"
             Policies:
                 - PolicyName: PolicyForSTARKCodeBuildServiceRole
@@ -23,7 +23,7 @@ Resources:
                             Effect: Allow
                             Action:
                                 - 'logs:CreateLogGroup'
-                                - 'logs:CreateLogStream'
+                                - 'logs:CreateLogStream'  
                                 - 'logs:PutLogEvents'
                                 - 's3:PutObject'
                                 - 's3:GetObject'
