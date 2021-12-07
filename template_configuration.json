@@ -1,7 +1,7 @@
 {
   "Parameters" : {
-    "UserCodeGenBucketNameParameter" : "waynestark-stark-prototype-codegenbucket",
-    "UserCICDPipelineBucketNameParameter" : "waynestark-pipeline-0",
+    "UserCodeGenBucketNameParameter" : "stark-v1-contributor-codegenbucket",
+    "UserCICDPipelineBucketNameParameter" : "stark-v1-contributor-pipeline",
     "UserWebsiteBucketNameParameter" : "waynestark-stark-prototype"
   }
 }
