@@ -6,16 +6,16 @@ Resources:
         Type: AWS::IAM::Role
         Properties:
             AssumeRolePolicyDocument:
-                Version: "2012-10-17"
+                Version: '2012-10-17'
                 Statement: 
                     - 
                         Effect: Allow
                         Principal:
                            Service: 
-                              - "codebuild.amazonaws.com"
-                        Action: "sts:AssumeRole"
+                              - 'codebuild.amazonaws.com'
+                        Action: 'sts:AssumeRole'
             ManagedPolicyArns:
-                - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+                - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
             Policies:
                 - PolicyName: PolicyForSTARKCodeBuildServiceRole
                   PolicyDocument:
@@ -41,18 +41,18 @@ Resources:
         Type: AWS::IAM::Role
         Properties:
             AssumeRolePolicyDocument:
-                Version: "2012-10-17"
+                Version: '2012-10-17'
                 Statement: 
                     - 
                         Effect: Allow
                         Principal:
                            Service: 
-                              - "codepipeline.amazonaws.com"
-                        Action: "sts:AssumeRole"
+                              - 'codepipeline.amazonaws.com'
+                        Action: 'sts:AssumeRole'
             Policies:
                 - PolicyName: PolicyForSTARKCodePipelineServiceRole
                   PolicyDocument:
-                      Version: "2012-10-17"
+                      Version: '2012-10-17'
                       Statement:
                           - 
                               Sid: VisualEditor0
@@ -133,6 +133,46 @@ Resources:
                               Effect: Allow
                               Action: 'codestar-connections:UseConnection'
                               Resource: '*'
+    STARKCodePipelineDeployServiceRole:
+        Type: AWS::IAM::Role
+        Properties:
+            AssumeRolePolicyDocument:
+                Version: '2012-10-17'
+                Statement: 
+                    - 
+                        Effect: Allow
+                        Principal:
+                           Service: 
+                              - 'cloudformation.amazonaws.com'
+                        Action: 'sts:AssumeRole'
+            ManagedPolicyArns:
+                - 'arn:aws:iam::aws:policy/AWSLambdaExecute'
+            Policies:
+                - PolicyName: PolicyForSTARKCodePipelineDeployServiceRole
+                  PolicyDocument:
+                      Version: '2012-10-17'
+                      Statement:
+                          - 
+                              Sid: VisualEditor0
+                              Effect: Allow
+                              Action:
+                                  - iam:GetRole
+                                  - apigateway:*
+                                  - iam:CreateRole
+                                  - iam:DeleteRole
+                                  - iam:AttachRolePolicy
+                                  - cloudformation:CreateChangeSet
+                                  - s3:GetBucketVersioning
+                                  - iam:PutRolePolicy
+                                  - s3:GetObject
+                                  - iam:PassRole
+                                  - iam:DetachRolePolicy
+                                  - iam:DeleteRolePolicy
+                                  - ssm:*
+                                  - codedeploy:*
+                                  - lambda:*
+                                  - s3:GetObjectVersion
+                              Resource: "*"
     STARKRepo:
         Type: AWS::CodeCommit::Repository
         Properties:
@@ -214,7 +254,7 @@ Resources:
                                 ChangeSetName: STARK-v1-contributor-changeset
                                 TemplatePath: "BuildArtifact::outputtemplate.yml"
                                 TemplateConfiguration: "BuildArtifact::template_configuration.json"
-                                RoleArn: "arn:aws:iam::201649379729:role/cfn-lambda-pipeline"
+                                RoleArn: !GetAtt STARKCodePipelineDeployServiceRole.Arn
                             InputArtifacts:
                                 - Name: BuildArtifact
                             OutputArtifacts: []
