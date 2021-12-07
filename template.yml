@@ -2,12 +2,12 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: AWS SAM template for the STARK infra
 Parameters:
-    UserCodeGenBucketNameParameter:
-        Type: String
-        Description: Name for user bucket that will hold static files and deployment packages created by STARK
     UserCICDPipelineBucketNameParameter:
         Type: String
         Description: Name for user bucket that will be used for the default STARK CI/CD pipeline.
+    UserCodeGenBucketNameParameter:
+        Type: String
+        Description: Name for user bucket that will hold static files and deployment packages created by STARK
     UserWebsiteBucketNameParameter:
         Type: String
         Description: Name for user bucket that will be used as the website bucket for the STARK Parser UI. Not yet used in template, just needed for config.
