@@ -49,8 +49,6 @@ Resources:
                            Service: 
                               - "codepipeline.amazonaws.com"
                         Action: "sts:AssumeRole"
-            ManagedPolicyArns:
-                - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
             Policies:
                 - PolicyName: PolicyForSTARKCodePipelineServiceRole
                   PolicyDocument:
