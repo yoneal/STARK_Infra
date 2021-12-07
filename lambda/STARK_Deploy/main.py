@@ -35,6 +35,16 @@ def lambda_handler(event, context):
     bucket_location     = response['LocationConstraint']
     CF_url              = f'https://{codegen_bucket_name}.s3-{bucket_location}.amazonaws.com/codegen_dynamic/{project_varname}/STARK_SAM_{project_varname}.yaml'
 
+    #We need the service role for Cloudformation from our central config file
+    response = s3.get_object(
+        Bucket=codegen_bucket_name,
+        Key=f'STARKConfiguration/STARK_config.yml'
+    )
+    config = yaml.safe_load(response['Body'].read().decode('utf-8')) 
+    cf_deploy_role_arn = config['CFDeployRole_ARN']
+
+
+
     print (f'Trying to execute CF for template: STARK_SAM_{project_varname}.yaml')
     print (f'URL: {CF_url}')
 
@@ -47,7 +57,7 @@ def lambda_handler(event, context):
             Capabilities=[
                 'CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND',
             ],
-            RoleARN='arn:aws:iam::201649379729:role/STARK_POC_Deploy_CloudFormationServiceRole',
+            RoleARN=cf_deploy_role_arn,
             OnFailure='DELETE',
             EnableTerminationProtection=False
         )
@@ -61,7 +71,7 @@ def lambda_handler(event, context):
                 Capabilities=[
                     'CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND',
                 ],
-                RoleARN='arn:aws:iam::201649379729:role/STARK_POC_Deploy_CloudFormationServiceRole',
+                RoleARN=cf_deploy_role_arn,
             )            
         else:
             payload = {

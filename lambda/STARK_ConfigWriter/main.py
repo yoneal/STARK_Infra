@@ -26,12 +26,14 @@ def make_config_file(event, _):
     cf_writer_arn        = os.environ['CF_WRITER_ARN']
     cg_dynamic_arn       = os.environ['CG_DYNAMIC_ARN']
     cg_static_arn        = os.environ['CG_STATIC_ARN']
+    cf_deploy_role_arn   = os.environ['CF_DEPLOY_ROLE_ARN']
 
     source_code = f"""\
         BucketPreloaderLambda_ARN: '{bucket_preloader_arn}'
         CFWriter_ARN: '{cf_writer_arn}'
         CGDynamic_ARN: '{cg_dynamic_arn}'
         CGStatic_ARN: '{cg_static_arn}'
+        CFDeployRole_ARN: '{cf_deploy_role_arn}'
         """
 
     source_code = textwrap.dedent(source_code)

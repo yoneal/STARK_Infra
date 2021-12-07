@@ -12,6 +12,20 @@ Parameters:
         Type: String
         Description: Name for user bucket that will be used as the website bucket for the STARK Parser UI. Not yet used in template, just needed for config.
 Resources:
+    STARKCloudFormationDeployServiceRole:
+        Type: AWS::IAM::Role
+        Properties:
+            AssumeRolePolicyDocument:
+                Version: '2012-10-17'
+                Statement: 
+                    - 
+                        Effect: Allow
+                        Principal:
+                           Service: 
+                              - 'cloudformation.amazonaws.com'
+                        Action: 'sts:AssumeRole'
+            ManagedPolicyArns:
+                - 'arn:aws:iam::aws:policy/AdministratorAccess'
     STARKParserApi:
         Type: AWS::Serverless::HttpApi
         Properties:
@@ -247,6 +261,7 @@ Resources:
                     BUCKET_PRELOADER_ARN: !GetAtt STARKBucketPreloaderFunc.Arn
                     CG_DYNAMIC_ARN: !GetAtt STARKCodeGenDynamicWriter.Arn
                     CG_STATIC_ARN: !GetAtt STARKCodeGenStaticWriter.Arn
+                    CF_DEPLOY_ROLE_ARN: !GetAtt STARKCloudFormationDeployServiceRole.Arn
             Policies:
                 - AmazonS3FullAccess
                 - AmazonSSMReadOnlyAccess
