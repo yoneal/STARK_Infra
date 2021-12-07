@@ -198,7 +198,7 @@ Resources:
             Name: STARK_v1_contributor_pipeline
             ArtifactStore: 
                 Type: S3
-                Location: waynestark-pipeline-0
+                Location: !Ref UserCICDPipelineBucketNameParameter
             RoleArn: !GetAtt STARKCodePipelineServiceRole.Arn
             Stages:
                 -
