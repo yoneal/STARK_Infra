@@ -14,6 +14,8 @@ Resources:
                            Service: 
                               - "codebuild.amazonaws.com"
                         Action: "sts:AssumeRole"
+            ManagedPolicyArns:
+                - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
             Policies:
                 - PolicyName: PolicyForSTARKCodeBuildServiceRole
                   PolicyDocument:
@@ -112,7 +114,7 @@ Resources:
                             Configuration:
                                 ActionMode: CHANGE_SET_REPLACE
                                 StackName: STARK-v1-contributor
-                                Capabilities: CAPABILITY_IAM, CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
+                                Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
                                 ChangeSetName: STARK-v1-contributor-changeset
                                 TemplatePath: "BuildArtifact::outputtemplate.yml"
                                 TemplateConfiguration: "BuildArtifact::template_configuration.json"
@@ -131,7 +133,7 @@ Resources:
                             Configuration:
                                 ActionMode: CHANGE_SET_EXECUTE
                                 StackName: STARK-v1-contributor
-                                Capabilities: CAPABILITY_IAM, CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
+                                Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
                                 ChangeSetName: STARK-v1-contributor-changeset
                             InputArtifacts:
                                 - Name: BuildArtifact
