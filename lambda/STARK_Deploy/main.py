@@ -43,8 +43,6 @@ def lambda_handler(event, context):
     config = yaml.safe_load(response['Body'].read().decode('utf-8')) 
     cf_deploy_role_arn = config['CFDeployRole_ARN']
 
-
-
     print (f'Trying to execute CF for template: STARK_SAM_{project_varname}.yaml')
     print (f'URL: {CF_url}')
 
