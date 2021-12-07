@@ -36,6 +36,7 @@ def lambda_handler(event, context):
     CF_url              = f'https://{codegen_bucket_name}.s3-{bucket_location}.amazonaws.com/codegen_dynamic/{project_varname}/STARK_SAM_{project_varname}.yaml'
 
     print (f'Trying to execute CF for template: STARK_SAM_{project_varname}.yaml')
+    print (f'URL: {CF_url}')
 
     payload = ""
     try:
