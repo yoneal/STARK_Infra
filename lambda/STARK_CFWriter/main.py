@@ -141,25 +141,26 @@ def lambda_handler(event, context):
                 ManagedPolicyArns:
                     - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
                 Policies:
-                    - PolicyName: PolicyForSTARKCodePipelineDeployServiceRole
-                    PolicyDocument:
-                        Version: '2012-10-17'
-                        Statement:
-                            - 
-                                Sid: VisualEditor0
-                                Effect: Allow
-                                Action:
-                                    - iam:GetRole
-                                    - 'dynamodb:BatchGetItem'
-                                    - 'dynamodb:BatchWriteItem'
-                                    - 'dynamodb:ConditionCheckItem'
-                                    - 'dynamodb:PutItem'
-                                    - 'dynamodb:DeleteItem'
-                                    - 'dynamodb:GetItem'
-                                    - 'dynamodb:Scan'
-                                    - 'dynamodb:Query'
-                                    - 'dynamodb:UpdateItem'
-                                Resource: '*'
+                    - 
+                        PolicyName: PolicyForSTARKCodePipelineDeployServiceRole
+                        PolicyDocument:
+                            Version: '2012-10-17'
+                            Statement:
+                                - 
+                                    Sid: VisualEditor0
+                                    Effect: Allow
+                                    Action:
+                                        - 'iam:GetRole'
+                                        - 'dynamodb:BatchGetItem'
+                                        - 'dynamodb:BatchWriteItem'
+                                        - 'dynamodb:ConditionCheckItem'
+                                        - 'dynamodb:PutItem'
+                                        - 'dynamodb:DeleteItem'
+                                        - 'dynamodb:GetItem'
+                                        - 'dynamodb:Scan'
+                                        - 'dynamodb:Query'
+                                        - 'dynamodb:UpdateItem'
+                                    Resource: '*'
         STARKFilesPreloader:
             Type: AWS::CloudFormation::CustomResource
             Properties:
