@@ -126,6 +126,40 @@ def lambda_handler(event, context):
                 WebsiteConfiguration:
                     ErrorDocument: {s3_error_document}
                     IndexDocument: {s3_index_document}
+        STARKDefaultLambdaServiceRole:
+            Type: AWS::IAM::Role
+            Properties:
+                AssumeRolePolicyDocument:
+                    Version: '2012-10-17'
+                    Statement: 
+                        - 
+                            Effect: Allow
+                            Principal:
+                            Service: 
+                                - 'lambda.amazonaws.com'
+                            Action: 'sts:AssumeRole'
+                ManagedPolicyArns:
+                    - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+                Policies:
+                    - PolicyName: PolicyForSTARKCodePipelineDeployServiceRole
+                    PolicyDocument:
+                        Version: '2012-10-17'
+                        Statement:
+                            - 
+                                Sid: VisualEditor0
+                                Effect: Allow
+                                Action:
+                                    - iam:GetRole
+                                    - 'dynamodb:BatchGetItem'
+                                    - 'dynamodb:BatchWriteItem'
+                                    - 'dynamodb:ConditionCheckItem'
+                                    - 'dynamodb:PutItem'
+                                    - 'dynamodb:DeleteItem'
+                                    - 'dynamodb:GetItem'
+                                    - 'dynamodb:Scan'
+                                    - 'dynamodb:Query'
+                                    - 'dynamodb:UpdateItem'
+                                Resource: '*'
         STARKFilesPreloader:
             Type: AWS::CloudFormation::CustomResource
             Properties:
@@ -233,7 +267,7 @@ def lambda_handler(event, context):
                 Runtime: python3.8
                 Handler: lambda_function.lambda_handler
                 CodeUri: s3://{codegen_bucket_name}/codegen_dynamic/{project_varname}/{update_token}/{entity_endpoint_name}.zip
-                Role: arn:aws:iam::201649379729:role/WayneStark_test_lambda_role_1
+                Role: !GetAtt STARKDefaultLambdaServiceRole.Arn
             DependsOn:
                 -   STARKCGDynamic"""
 
@@ -252,7 +286,7 @@ def lambda_handler(event, context):
                 Runtime: python3.8
                 Handler: lambda_function.lambda_handler
                 CodeUri: s3://{codegen_bucket_name}/codegen_dynamic/{project_varname}/{update_token}/sys_modules.zip
-                Role: arn:aws:iam::201649379729:role/WayneStark_test_lambda_role_1
+                Role: !GetAtt STARKDefaultLambdaServiceRole.Arn
             DependsOn:
                 -   STARKCGDynamic"""
 
