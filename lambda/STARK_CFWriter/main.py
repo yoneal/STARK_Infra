@@ -135,8 +135,8 @@ def lambda_handler(event, context):
                         - 
                             Effect: Allow
                             Principal:
-                            Service: 
-                                - 'lambda.amazonaws.com'
+                                Service: 
+                                    - 'lambda.amazonaws.com'
                             Action: 'sts:AssumeRole'
                 ManagedPolicyArns:
                     - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
