@@ -27,6 +27,7 @@ import convert_friendly_to_system as converter
 
 s3  = boto3.client('s3')
 api = boto3.client('apigatewayv2')
+git = boto3.client('codecommit')
 
 helper = CfnResource() #We're using the AWS-provided helper library to minimize the tedious boilerplate just to signal back to CloudFormation
 
@@ -59,24 +60,37 @@ def create_handler(event, context):
     deploy(cg_js_stark.create(data), bucket_name=bucket_name, key=f"js/STARK.js")
 
     #For each entity, we'll create a set of HTML and JS Files
+    files_to_commit = []
     for entity in models:
         pk   = models[entity]["pk"]
         cols = models[entity]["data"]
         cgstatic_data = { "Entity": entity, "PK": pk, "Columns": cols, "Bucket Name": bucket_name, "Project Name": project_name }
         entity_varname = converter.convert_to_system_name(entity)
 
-        deploy(source_code=cg_add.create(cgstatic_data), bucket_name=bucket_name, key=f"{entity_varname}_add.html")
-        deploy(source_code=cg_edit.create(cgstatic_data), bucket_name=bucket_name, key=f"{entity_varname}_edit.html")
-        deploy(source_code=cg_delete.create(cgstatic_data), bucket_name=bucket_name, key=f"{entity_varname}_delete.html")
-        deploy(source_code=cg_view.create(cgstatic_data), bucket_name=bucket_name, key=f"{entity_varname}_view.html")
-        deploy(source_code=cg_listview.create(cgstatic_data), bucket_name=bucket_name, key=f"{entity_varname}.html")
-        deploy(source_code=cg_js_app.create(cgstatic_data), bucket_name=bucket_name, key=f"js/{entity_varname}_app.js")
-        deploy(source_code=cg_js_view.create(cgstatic_data), bucket_name=bucket_name, key=f"js/{entity_varname}_view.js")
+        deploy(source_code=cg_add.create(cgstatic_data), bucket_name=bucket_name, key=f"{entity_varname}_add.html", files_to_commit=files_to_commit)
+        deploy(source_code=cg_edit.create(cgstatic_data), bucket_name=bucket_name, key=f"{entity_varname}_edit.html", files_to_commit=files_to_commit)
+        deploy(source_code=cg_delete.create(cgstatic_data), bucket_name=bucket_name, key=f"{entity_varname}_delete.html", files_to_commit=files_to_commit)
+        deploy(source_code=cg_view.create(cgstatic_data), bucket_name=bucket_name, key=f"{entity_varname}_view.html", files_to_commit=files_to_commit)
+        deploy(source_code=cg_listview.create(cgstatic_data), bucket_name=bucket_name, key=f"{entity_varname}.html", files_to_commit=files_to_commit)
+        deploy(source_code=cg_js_app.create(cgstatic_data), bucket_name=bucket_name, key=f"js/{entity_varname}_app.js", files_to_commit=files_to_commit)
+        deploy(source_code=cg_js_view.create(cgstatic_data), bucket_name=bucket_name, key=f"js/{entity_varname}_view.js", files_to_commit=files_to_commit)
   
     #HTML+JS for our homepage
     homepage_data = { "Project Name": project_name }
     deploy(source_code=cg_homepage.create(homepage_data), bucket_name=bucket_name, key=f"index.html")
     deploy(source_code=cg_js_home.create(homepage_data), bucket_name=bucket_name, key=f"js/STARK_home.js")
+
+    ############################################
+    #Commit our static files to the project repo
+    response = git.create_commit(
+        repositoryName=repo_name,
+        branchName='master',
+        authorName='STARK',
+        email='STARK@fakedomainstark.com',
+        commitMessage='Initial commit of static files',
+        putFiles=files_to_commit
+    )
+
 
 
 @helper.delete
@@ -88,7 +102,12 @@ def lambda_handler(event, context):
     helper(event, context)
 
 
-def deploy(source_code, bucket_name, key):
+def deploy(source_code, bucket_name, key, files_to_commit):
+
+    files_to_commit.append({
+        'filePath': f"static/{key}",
+        'fileContent': source_code.encode()
+    })
 
     response = s3.put_object(
         ACL='public-read',
@@ -97,6 +116,7 @@ def deploy(source_code, bucket_name, key):
         Key=key,
         ContentType="text/html",
     )
+
 
     return response
 
