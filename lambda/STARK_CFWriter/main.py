@@ -469,7 +469,7 @@ def lambda_handler(event, context):
                 Project: {project_name}
                 Bucket: !Ref STARKSystemBucket
                 ApiGatewayId: !Ref STARKApiGateway
-                RepoName: !Ref STARKProjectRepo.Name
+                RepoName: !GetAtt STARKProjectRepo.Name
                 Remarks: This will create the customized STARK HTML/CSS/JS files into the STARKSystemBucket, based on the supplied entities
             DependsOn:
                 -   STARKSystemBucket
@@ -481,7 +481,7 @@ def lambda_handler(event, context):
                 UpdateToken: {update_token}
                 Project: {project_name}
                 DDBTable: {ddb_table_name}
-                RepoName: !Ref STARKProjectRepo.Name
+                RepoName: !GetAtt STARKProjectRepo.Name
                 Remarks: This will create the customized STARK lambda functions, based on the supplied entities
         STARKDynamoDB:
             Type: AWS::DynamoDB::Table
