@@ -30,7 +30,6 @@ def make_config_file(event, _):
     api_gateway_id       = os.environ['API_GATEWAY_ID']
     cicd_bucket_name     = os.environ['CICD_BUCKET_NAME']
 
-
     source_code = f"""\
         API_Gateway_ID: '{api_gateway_id}'
         BucketPreloaderLambda_ARN: '{bucket_preloader_arn}'

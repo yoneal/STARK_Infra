@@ -32,6 +32,7 @@ if ENV_TYPE == "PROD":
     preloader_service_token  = config['BucketPreloaderLambda_ARN']
     cg_static_service_token  = config['CGStatic_ARN']
     cg_dynamic_service_token = config['CGDynamic_ARN']
+    cicd_bucket_name         = config['CICD_Bucket_Name']
 
 else:
     #We only have to do this because `SAM local start-api` doesn't follow CORS info from template.yml, which is bullshit
@@ -59,8 +60,9 @@ def lambda_handler(event, context):
     #FIXME: Project Name is used here as unique identifier. For now it's a user-supplied string, which is unreliable
     #       as a unique identifier. Make this a GUID for prod use.
     #       We do still need a user-supplied project name for display purposes (header of each HTML page, login screen, etc), though.
-    project_name    = cloud_resources["Project Name"]
-    project_varname = converter.convert_to_system_name(project_name)
+    project_name      = cloud_resources["Project Name"]
+    project_varname   = converter.convert_to_system_name(project_name)
+    project_stackname = converter.convert_to_system_name(project_name, 'cf-stack')
 
     if ENV_TYPE == "PROD":
         #So that cloud_resources can be used by our CodeGen components (which are lambda-backed custom resources in this resulting CF/SAM template),
@@ -358,8 +360,8 @@ def lambda_handler(event, context):
             Name: STARK_{project_varname}_pipeline
             ArtifactStore: 
                 Type: S3
-                Location: !Ref UserCICDPipelineBucketNameParameter
-            RoleArn: !GetAtt STARKCodePipelineServiceRole.Arn
+                Location: {cicd_bucket_name}
+            RoleArn: !GetAtt STARKProjectCodePipelineServiceRole.Arn
             Stages:
                 -
                     Name: Source
@@ -373,7 +375,7 @@ def lambda_handler(event, context):
                                 Provider: CodeCommit
                                 Version: '1'
                             Configuration:
-                                RepositoryName: !GetAtt STARKRepo.Name
+                                RepositoryName: !GetAtt STARKProjectRepo.Name
                                 PollForSourceChanges: 'true'
                                 BranchName: master
                             InputArtifacts: []
@@ -391,7 +393,7 @@ def lambda_handler(event, context):
                                 Provider: CodeBuild
                                 Version: '1'
                             Configuration:
-                                ProjectName: !Ref STARKBuildProject
+                                ProjectName: !Ref STARKProjectBuildProject
                             InputArtifacts:
                                 - Name: SourceArtifact
                             OutputArtifacts:
@@ -409,12 +411,12 @@ def lambda_handler(event, context):
                                 Version: '1'
                             Configuration:
                                 ActionMode: CHANGE_SET_REPLACE
-                                StackName: STARK-v1-contributor
+                                StackName: STARK-project-{project_stackname}
                                 Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
-                                ChangeSetName: STARK-v1-contributor-changeset
+                                ChangeSetName: STARK-project-{project_stackname}-changeset
                                 TemplatePath: "BuildArtifact::outputtemplate.yml"
                                 TemplateConfiguration: "BuildArtifact::template_configuration.json"
-                                RoleArn: !GetAtt STARKCodePipelineDeployServiceRole.Arn
+                                RoleArn: !GetAtt STARKProjectCodePipelineDeployServiceRole.Arn
                             InputArtifacts:
                                 - Name: BuildArtifact
                             OutputArtifacts: []
@@ -428,13 +430,12 @@ def lambda_handler(event, context):
                                 Version: '1'
                             Configuration:
                                 ActionMode: CHANGE_SET_EXECUTE
-                                StackName: STARK-v1-contributor
+                                StackName: STARK-project-{project_stackname}
                                 Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
-                                ChangeSetName: STARK-v1-contributor-changeset
+                                ChangeSetName: STARK-project-{project_stackname}-changeset
                             InputArtifacts:
                                 - Name: BuildArtifact
                             OutputArtifacts: []
-
 
         STARKFilesPreloader:
             Type: AWS::CloudFormation::CustomResource
