@@ -32,6 +32,7 @@ helper = CfnResource() #We're using the AWS-provided helper library to minimize 
 def create_handler(event, context):
     #Project name from our CF template
     project_name    = event.get('ResourceProperties', {}).get('Project','')
+    repo_name       = event.get('ResourceProperties', {}).get('RepoName','')
     project_varname = converter.convert_to_system_name(project_name)
 
     #UpdateToken = we need this as part of the Lambda deployment package path, to force CF to redeploy our Lambdas
@@ -57,10 +58,12 @@ def create_handler(event, context):
 
     ##########################################
     #Create our entity Lambdas (API endpoint backing)
+    files_to_commit = []
     for entity in entities:
+        entity_varname = converter.convert_to_system_name(entity) 
         #Step 1: generate source code.
         data = {
-            "Entity": converter.convert_to_system_name(entity), 
+            "Entity": entity_varname, 
             "Columns": models[entity]["data"], 
             "PK": models[entity]["pk"], 
             "DynamoDB Name": ddb_table_name
@@ -76,35 +79,19 @@ def create_handler(event, context):
         #Step 4: create Lambda deployment package, send to S3
         deploy_lambda({
             'Project': project_varname, 
-            'Entity': converter.convert_to_system_name(entity),
+            'Entity': entity_varname,
             'Bucket': codegen_bucket_name,
             'Update Token': update_token
         })
 
-        #Step 5: commit code to the project repo
+        #Step 5: Add source code to our commit list to the project repo
         #       This is not part of our Lambda deployment, but for the dev environment setup
+        files_to_commit.append({
+            'filePath': f"lambda/{entity_varname}",
+            'fileContent': source_code.encode()
+            })
 
-        response = git.create_commit(
-            repositoryName='string',
-            branchName='string',
-            parentCommitId='string',
-            authorName='string',
-            email='string',
-            commitMessage='string',
-            keepEmptyFolders=True|False,
-            putFiles=[
-                {
-                    'filePath': 'string',
-                    'fileMode': 'EXECUTABLE'|'NORMAL'|'SYMLINK',
-                    'fileContent': b'bytes',
-                    'sourceFile': {
-                        'filePath': 'string',
-                        'isMove': True|False
-                    }
-                },
-            ],
-        )
-        
+
     ################################################
     #Create our Lambda for the /modules API endpoint
     source_code = cg_mod.create({"Entities": entities})
@@ -116,6 +103,17 @@ def create_handler(event, context):
             'Bucket': codegen_bucket_name,
             'Update Token': update_token
     })
+
+    ##################################################
+    #Commit our lambda source code to the project repo
+    response = git.create_commit(
+        repositoryName=repo_name,
+        branchName='master',
+        authorName='STARK',
+        email='STARK@fakedomainstark.com',
+        commitMessage='Initial commit of Lambda source codes',
+        putFiles=files_to_commit
+    )
 
 
 @helper.delete
