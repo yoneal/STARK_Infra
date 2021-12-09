@@ -87,9 +87,9 @@ def create_handler(event, context):
         #Step 5: Add source code to our commit list to the project repo
         #       This is not part of our Lambda deployment, but for the dev environment setup
         files_to_commit.append({
-            'filePath': f"lambda/{entity_varname}",
+            'filePath': f"lambda/{entity_varname}/main.py",
             'fileContent': source_code.encode()
-            })
+        })
 
 
     ################################################
@@ -102,6 +102,11 @@ def create_handler(event, context):
             'Entity': 'sys_modules',
             'Bucket': codegen_bucket_name,
             'Update Token': update_token
+    })
+    
+    files_to_commit.append({
+        'filePath': f"lambda/sys_modules/main.py",
+        'fileContent': source_code.encode()
     })
 
     ##################################################
