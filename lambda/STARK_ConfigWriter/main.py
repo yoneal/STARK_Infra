@@ -27,13 +27,18 @@ def make_config_file(event, _):
     cg_dynamic_arn       = os.environ['CG_DYNAMIC_ARN']
     cg_static_arn        = os.environ['CG_STATIC_ARN']
     cf_deploy_role_arn   = os.environ['CF_DEPLOY_ROLE_ARN']
+    api_gateway_id       = os.environ['API_GATEWAY_ID']
+    cicd_bucket_name     = os.environ['CICD_BUCKET_NAME']
+
 
     source_code = f"""\
+        API_Gateway_ID: '{api_gateway_id}'
         BucketPreloaderLambda_ARN: '{bucket_preloader_arn}'
+        CFDeployRole_ARN: '{cf_deploy_role_arn}'
         CFWriter_ARN: '{cf_writer_arn}'
         CGDynamic_ARN: '{cg_dynamic_arn}'
         CGStatic_ARN: '{cg_static_arn}'
-        CFDeployRole_ARN: '{cf_deploy_role_arn}'
+        CICD_Bucket_Name: '{cicd_bucket_name}'
         """
 
     source_code = textwrap.dedent(source_code)

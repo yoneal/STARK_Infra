@@ -256,6 +256,7 @@ Resources:
                 Variables:
                     STARK_ENVIRONMENT_TYPE: PROD
                     CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
+                    CICD_BUCKET_NAME: !Ref UserCICDPipelineBucketNameParameter
                     API_GATEWAY_ID: !Ref STARKParserApi
                     CF_WRITER_ARN: !GetAtt STARKCFWriterFunc.Arn
                     BUCKET_PRELOADER_ARN: !GetAtt STARKBucketPreloaderFunc.Arn
