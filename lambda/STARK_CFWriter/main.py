@@ -311,31 +311,32 @@ def lambda_handler(event, context):
                 ManagedPolicyArns:
                     - 'arn:aws:iam::aws:policy/AWSLambdaExecute'
                 Policies:
-                    - PolicyName: PolicyForSTARKProjectCodePipelineDeployServiceRole
-                    PolicyDocument:
-                        Version: '2012-10-17'
-                        Statement:
-                            - 
-                                Sid: VisualEditor0
-                                Effect: Allow
-                                Action:
-                                    - 'iam:GetRole'
-                                    - 'apigateway:*'
-                                    - 'iam:CreateRole'
-                                    - 'iam:DeleteRole'
-                                    - 'iam:AttachRolePolicy'
-                                    - 'cloudformation:CreateChangeSet'
-                                    - 's3:GetBucketVersioning'
-                                    - 'iam:PutRolePolicy'
-                                    - 's3:GetObject'
-                                    - 'iam:PassRole'
-                                    - 'iam:DetachRolePolicy'
-                                    - 'iam:DeleteRolePolicy'
-                                    - 'ssm:*'
-                                    - 'codedeploy:*'
-                                    - 'lambda:*'
-                                    - 's3:GetObjectVersion'
-                                Resource: '*'
+                    - 
+                        PolicyName: PolicyForSTARKProjectCodePipelineDeployServiceRole
+                        PolicyDocument:
+                            Version: '2012-10-17'
+                            Statement:
+                                - 
+                                    Sid: VisualEditor0
+                                    Effect: Allow
+                                    Action:
+                                        - 'iam:GetRole'
+                                        - 'apigateway:*'
+                                        - 'iam:CreateRole'
+                                        - 'iam:DeleteRole'
+                                        - 'iam:AttachRolePolicy'
+                                        - 'cloudformation:CreateChangeSet'
+                                        - 's3:GetBucketVersioning'
+                                        - 'iam:PutRolePolicy'
+                                        - 's3:GetObject'
+                                        - 'iam:PassRole'
+                                        - 'iam:DetachRolePolicy'
+                                        - 'iam:DeleteRolePolicy'
+                                        - 'ssm:*'
+                                        - 'codedeploy:*'
+                                        - 'lambda:*'
+                                        - 's3:GetObjectVersion'
+                                    Resource: '*'
         STARKProjectRepo:
             Type: AWS::CodeCommit::Repository
             Properties:
