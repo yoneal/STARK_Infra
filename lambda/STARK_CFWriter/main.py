@@ -172,8 +172,8 @@ def lambda_handler(event, context):
                         - 
                             Effect: Allow
                             Principal:
-                            Service: 
-                                - 'codebuild.amazonaws.com'
+                                Service: 
+                                    - 'codebuild.amazonaws.com'
                             Action: 'sts:AssumeRole'
                 ManagedPolicyArns:
                     - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
@@ -208,8 +208,8 @@ def lambda_handler(event, context):
                         - 
                             Effect: Allow
                             Principal:
-                            Service: 
-                                - 'codepipeline.amazonaws.com'
+                                Service: 
+                                    - 'codepipeline.amazonaws.com'
                             Action: 'sts:AssumeRole'
                 Policies:
                     - 
@@ -305,8 +305,8 @@ def lambda_handler(event, context):
                         - 
                             Effect: Allow
                             Principal:
-                            Service: 
-                                - 'cloudformation.amazonaws.com'
+                                Service: 
+                                    - 'cloudformation.amazonaws.com'
                             Action: 'sts:AssumeRole'
                 ManagedPolicyArns:
                     - 'arn:aws:iam::aws:policy/AWSLambdaExecute'
