@@ -20,6 +20,7 @@ import convert_friendly_to_system as converter
 
 s3  = boto3.client('s3')
 lmb = boto3.client('lambda')
+git = boto3.client('codecommit')
 
 lambda_path_filename = '/tmp/lambda_function.py'
 lambda_path_zipfile = '/tmp/lambda.zip'
@@ -80,6 +81,30 @@ def create_handler(event, context):
             'Update Token': update_token
         })
 
+        #Step 5: commit code to the project repo
+        #       This is not part of our Lambda deployment, but for the dev environment setup
+
+        response = git.create_commit(
+            repositoryName='string',
+            branchName='string',
+            parentCommitId='string',
+            authorName='string',
+            email='string',
+            commitMessage='string',
+            keepEmptyFolders=True|False,
+            putFiles=[
+                {
+                    'filePath': 'string',
+                    'fileMode': 'EXECUTABLE'|'NORMAL'|'SYMLINK',
+                    'fileContent': b'bytes',
+                    'sourceFile': {
+                        'filePath': 'string',
+                        'isMove': True|False
+                    }
+                },
+            ],
+        )
+        
     ################################################
     #Create our Lambda for the /modules API endpoint
     source_code = cg_mod.create({"Entities": entities})
