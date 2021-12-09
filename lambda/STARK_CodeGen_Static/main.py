@@ -55,12 +55,14 @@ def create_handler(event, context):
     #Get relevant info from cloud_resources
     models          = cloud_resources["DynamoDB"]["Models"]
 
+    #Collect list of files to commit to project repository
+    files_to_commit = []
+
     #STARK main JS file
     data = { 'API Endpoint': endpoint, 'Entities': models }
     deploy(cg_js_stark.create(data), bucket_name=bucket_name, key=f"js/STARK.js", files_to_commit=files_to_commit)
 
     #For each entity, we'll create a set of HTML and JS Files
-    files_to_commit = []
     for entity in models:
         pk   = models[entity]["pk"]
         cols = models[entity]["data"]
