@@ -178,26 +178,27 @@ def lambda_handler(event, context):
                 ManagedPolicyArns:
                     - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
                 Policies:
-                    - PolicyName: PolicyForSTARKProjectCodeBuildServiceRole
-                    PolicyDocument:
-                        Version: "2012-10-17"
-                        Statement:
-                            - 
-                                Effect: Allow
-                                Action:
-                                    - 'logs:CreateLogGroup'
-                                    - 'logs:CreateLogStream'  
-                                    - 'logs:PutLogEvents'
-                                    - 's3:PutObject'
-                                    - 's3:GetObject'
-                                    - 's3:GetObjectVersion'
-                                    - 's3:GetBucketAcl'
-                                    - 's3:GetBucketLocation'
-                                    - 'codebuild:CreateReportGroup'
-                                    - 'codebuild:CreateReport'
-                                    - 'codebuild:UpdateReport'
-                                    - 'codebuild:BatchPutTestCases'
-                                Resource: '*'
+                    - 
+                        PolicyName: PolicyForSTARKProjectCodeBuildServiceRole
+                        PolicyDocument:
+                            Version: "2012-10-17"
+                            Statement:
+                                - 
+                                    Effect: Allow
+                                    Action:
+                                        - 'logs:CreateLogGroup'
+                                        - 'logs:CreateLogStream'  
+                                        - 'logs:PutLogEvents'
+                                        - 's3:PutObject'
+                                        - 's3:GetObject'
+                                        - 's3:GetObjectVersion'
+                                        - 's3:GetBucketAcl'
+                                        - 's3:GetBucketLocation'
+                                        - 'codebuild:CreateReportGroup'
+                                        - 'codebuild:CreateReport'
+                                        - 'codebuild:UpdateReport'
+                                        - 'codebuild:BatchPutTestCases'
+                                    Resource: '*'
         STARKProjectCodePipelineServiceRole:
             Type: AWS::IAM::Role
             Properties:

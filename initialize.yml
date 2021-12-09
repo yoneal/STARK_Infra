@@ -153,31 +153,32 @@ Resources:
             ManagedPolicyArns:
                 - 'arn:aws:iam::aws:policy/AWSLambdaExecute'
             Policies:
-                - PolicyName: PolicyForSTARKCodePipelineDeployServiceRole
-                  PolicyDocument:
-                      Version: '2012-10-17'
-                      Statement:
-                          - 
-                              Sid: VisualEditor0
-                              Effect: Allow
-                              Action:
-                                  - 'iam:GetRole'
-                                  - 'apigateway:*'
-                                  - 'iam:CreateRole'
-                                  - 'iam:DeleteRole'
-                                  - 'iam:AttachRolePolicy'
-                                  - 'cloudformation:CreateChangeSet'
-                                  - 's3:GetBucketVersioning'
-                                  - 'iam:PutRolePolicy'
-                                  - 's3:GetObject'
-                                  - 'iam:PassRole'
-                                  - 'iam:DetachRolePolicy'
-                                  - 'iam:DeleteRolePolicy'
-                                  - 'ssm:*'
-                                  - 'codedeploy:*'
-                                  - 'lambda:*'
-                                  - 's3:GetObjectVersion'
-                              Resource: '*'
+                - 
+                    PolicyName: PolicyForSTARKCodePipelineDeployServiceRole
+                    PolicyDocument:
+                        Version: '2012-10-17'
+                        Statement:
+                            - 
+                                Sid: VisualEditor0
+                                Effect: Allow
+                                Action:
+                                    - 'iam:GetRole'
+                                    - 'apigateway:*'
+                                    - 'iam:CreateRole'
+                                    - 'iam:DeleteRole'
+                                    - 'iam:AttachRolePolicy'
+                                    - 'cloudformation:CreateChangeSet'
+                                    - 's3:GetBucketVersioning'
+                                    - 'iam:PutRolePolicy'
+                                    - 's3:GetObject'
+                                    - 'iam:PassRole'
+                                    - 'iam:DetachRolePolicy'
+                                    - 'iam:DeleteRolePolicy'
+                                    - 'ssm:*'
+                                    - 'codedeploy:*'
+                                    - 'lambda:*'
+                                    - 's3:GetObjectVersion'
+                                Resource: '*'
     STARKRepo:
         Type: AWS::CodeCommit::Repository
         Properties:
