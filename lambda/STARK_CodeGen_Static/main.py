@@ -57,7 +57,7 @@ def create_handler(event, context):
 
     #STARK main JS file
     data = { 'API Endpoint': endpoint, 'Entities': models }
-    deploy(cg_js_stark.create(data), bucket_name=bucket_name, key=f"js/STARK.js")
+    deploy(cg_js_stark.create(data), bucket_name=bucket_name, key=f"js/STARK.js", files_to_commit=files_to_commit)
 
     #For each entity, we'll create a set of HTML and JS Files
     files_to_commit = []
@@ -77,8 +77,8 @@ def create_handler(event, context):
   
     #HTML+JS for our homepage
     homepage_data = { "Project Name": project_name }
-    deploy(source_code=cg_homepage.create(homepage_data), bucket_name=bucket_name, key=f"index.html")
-    deploy(source_code=cg_js_home.create(homepage_data), bucket_name=bucket_name, key=f"js/STARK_home.js")
+    deploy(source_code=cg_homepage.create(homepage_data), bucket_name=bucket_name, key=f"index.html", files_to_commit=files_to_commit)
+    deploy(source_code=cg_js_home.create(homepage_data), bucket_name=bucket_name, key=f"js/STARK_home.js", files_to_commit=files_to_commit)
 
     ############################################
     #Commit our static files to the project repo
