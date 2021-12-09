@@ -285,12 +285,12 @@ def lambda_handler(event, context):
                                     Action: 'iam:PassRole'
                                     Resource: '*'
                                     Condition:
-                                    StringEqualsIfExists:
-                                        iam:PassedToService:
-                                        - 'cloudformation.amazonaws.com'
-                                        - 'elasticbeanstalk.amazonaws.com'
-                                        - 'ec2.amazonaws.com'
-                                        - 'ecs-tasks.amazonaws.com'
+                                        StringEqualsIfExists:
+                                            iam:PassedToService:
+                                            - 'cloudformation.amazonaws.com'
+                                            - 'elasticbeanstalk.amazonaws.com'
+                                            - 'ec2.amazonaws.com'
+                                            - 'ecs-tasks.amazonaws.com'
                                 -
                                     Sid: VisualEditor2
                                     Effect: Allow
