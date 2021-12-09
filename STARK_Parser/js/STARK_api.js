@@ -227,6 +227,9 @@ Document:
                         root.loading_message = "DID YOU KNOW: Trying out STARK proves you are a person of exquisite taste and sophistication. (True story)"
                     }
                     else if (root.msg_counter == 3) {
+                        root.loading_message = "Serverless is the most sustainable form of computing. Thanks for being a good friend to the environment!"
+                    }
+                    else if (root.msg_counter == 4) {
                         root.loading_message = "It won't be long now dawg, we're almost done!"
                     }
                     else {
