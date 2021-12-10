@@ -474,6 +474,7 @@ def lambda_handler(event, context):
             DependsOn:
                 -   STARKSystemBucket
                 -   STARKApiGateway
+                -   STARKCGDynamic
         STARKCGDynamic:
             Type: AWS::CloudFormation::CustomResource
             Properties:

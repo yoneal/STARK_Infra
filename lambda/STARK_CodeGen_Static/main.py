@@ -85,15 +85,24 @@ def create_handler(event, context):
 
     ############################################
     #Commit our static files to the project repo
+
+    #First, get commit id of initial commit by CGDynamic (the lambda source codes commit)
+
+    response = git.get_branch(
+        repositoryName=repo_name,
+        branchName='master'        
+    )
+    commit_id = response['branch']['commitId']
+
     response = git.create_commit(
         repositoryName=repo_name,
         branchName='master',
+        parentCommitId=commit_id,
         authorName='STARK',
         email='STARK@fakedomainstark.com',
         commitMessage='Initial commit of static files',
         putFiles=files_to_commit
     )
-
 
 
 @helper.delete
