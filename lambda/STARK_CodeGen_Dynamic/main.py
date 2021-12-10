@@ -6,7 +6,6 @@ import base64
 import json
 import os
 import textwrap
-import zipfile
 
 #Extra modules
 import yaml
@@ -16,6 +15,9 @@ from crhelper import CfnResource
 #Private modules
 import cgdynamic_modules as cg_mod
 import cgdynamic_dynamodb as cg_ddb
+import cgdynamic_buildspec as cg_build
+import cgdynamic_sam_template as cg_sam
+import cgdynamic_template_conf as cg_conf
 import convert_friendly_to_system as converter
 
 s3  = boto3.client('s3')
@@ -33,6 +35,8 @@ def create_handler(event, context):
     #Project name from our CF template
     project_name    = event.get('ResourceProperties', {}).get('Project','')
     repo_name       = event.get('ResourceProperties', {}).get('RepoName','')
+    website_bucket  = event.get('ResourceProperties', {}).get('Bucket','')
+
     project_varname = converter.convert_to_system_name(project_name)
 
     #UpdateToken = we need this as part of the Lambda deployment package path, to force CF to redeploy our Lambdas
@@ -57,7 +61,7 @@ def create_handler(event, context):
     models   = cloud_resources["DynamoDB"]["Models"]
 
     ##########################################
-    #Create our entity Lambdas (API endpoint backing)
+    #Creat code for our entity Lambdas (API endpoint backing)
     files_to_commit = []
     for entity in entities:
         entity_varname = converter.convert_to_system_name(entity) 
@@ -70,22 +74,7 @@ def create_handler(event, context):
         }
         source_code = cg_ddb.create(data)
 
-        #Step 2: write source code to a source file in /tmp
-        create_source_file(source_code)
-
-        #Step 3: zip the source file to create a Lambda deployment package
-        create_zip_file()
-
-        #Step 4: create Lambda deployment package, send to S3
-        deploy_lambda({
-            'Project': project_varname, 
-            'Entity': entity_varname,
-            'Bucket': codegen_bucket_name,
-            'Update Token': update_token
-        })
-
-        #Step 5: Add source code to our commit list to the project repo
-        #       This is not part of our Lambda deployment, but for the dev environment setup
+        #Step 2: Add source code to our commit list to the project repo
         files_to_commit.append({
             'filePath': f"lambda/{entity_varname}/main.py",
             'fileContent': source_code.encode()
@@ -95,22 +84,49 @@ def create_handler(event, context):
     ################################################
     #Create our Lambda for the /modules API endpoint
     source_code = cg_mod.create({"Entities": entities})
-    create_source_file(source_code)
-    create_zip_file()
-    deploy_lambda({
-            'Project': project_varname, 
-            'Entity': 'sys_modules',
-            'Bucket': codegen_bucket_name,
-            'Update Token': update_token
-    })
     
     files_to_commit.append({
         'filePath': f"lambda/sys_modules/main.py",
         'fileContent': source_code.encode()
     })
 
+    ###########################################
+    #Create build files we need fo our pipeline:
+    # - template.yml
+    # - buildspec.yml
+    # - template_configuration.json
+    data = { 'project_varname': project_varname }
+
+    source_code = cg_build(data)
+    files_to_commit.append({
+        'filePath': "buildspec.yml",
+        'fileContent': source_code.encode()
+    })
+
+    data = { 
+        'codegen_bucket_name': codegen_bucket_name,
+        'cloud_resources': cloud_resources
+    }
+    source_code = cg_sam(data)
+    files_to_commit.append({
+        'filePath': "template.yml",
+        'fileContent': source_code.encode()
+    })
+
+    data = {
+        'cicd_bucket': cicd_bucket,
+        'website_bucket': website_bucket
+    }
+    source_code = cg_sam(data)
+    files_to_commit.append({
+        'filePath': "template_configuration.json",
+        'fileContent': source_code.encode()
+    })
+   
+
+
     ##################################################
-    #Commit our lambda source code to the project repo
+    #Commit files to the project repo
     response = git.create_commit(
         repositoryName=repo_name,
         branchName='master',
@@ -132,35 +148,3 @@ def no_op(_, __):
 
 def lambda_handler(event, context):
     helper(event, context)
-
-
-def create_source_file(source_code):
-
-    with open(lambda_path_filename, 'w') as source_file:
-        source_file.write(source_code)
-
-    return 0
-
-def create_zip_file():
-    zipfile.ZipFile(lambda_path_zipfile, mode='w').write(lambda_path_filename, arcname="lambda_function.py")
-
-    return 0
-
-def deploy_lambda(data):
-    project = data['Project']
-    entity  = data['Entity']
-    bucket  = data['Bucket']
-    token   = data['Update Token']
-    key     = f"codegen_dynamic/{project}/{token}/{entity}.zip"
-
-    print(f"Deploying {key}...")
-
-    response = s3.upload_file(lambda_path_zipfile, bucket, key)
-
-    print(response)
-
-    print(f"Deployed {key}...")
-
-
-    return response
-

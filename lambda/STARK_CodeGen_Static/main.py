@@ -54,14 +54,14 @@ def create_handler(event, context):
     cloud_resources = yaml.safe_load(response['Body'].read().decode('utf-8')) 
 
     #Get relevant info from cloud_resources
-    models          = cloud_resources["DynamoDB"]["Models"]
+    models = cloud_resources["DynamoDB"]["Models"]
 
     #Collect list of files to commit to project repository
     files_to_commit = []
 
     #STARK main JS file
     data = { 'API Endpoint': endpoint, 'Entities': models }
-    deploy(cg_js_stark.create(data), bucket_name=bucket_name, key=f"js/STARK.js", files_to_commit=files_to_commit)
+    add_to_commit(cg_js_stark.create(data), key=f"js/STARK.js", files_to_commit=files_to_commit)
 
     #For each entity, we'll create a set of HTML and JS Files
     for entity in models:
@@ -70,18 +70,28 @@ def create_handler(event, context):
         cgstatic_data = { "Entity": entity, "PK": pk, "Columns": cols, "Bucket Name": bucket_name, "Project Name": project_name }
         entity_varname = converter.convert_to_system_name(entity)
 
-        deploy(source_code=cg_add.create(cgstatic_data), bucket_name=bucket_name, key=f"{entity_varname}_add.html", files_to_commit=files_to_commit)
-        deploy(source_code=cg_edit.create(cgstatic_data), bucket_name=bucket_name, key=f"{entity_varname}_edit.html", files_to_commit=files_to_commit)
-        deploy(source_code=cg_delete.create(cgstatic_data), bucket_name=bucket_name, key=f"{entity_varname}_delete.html", files_to_commit=files_to_commit)
-        deploy(source_code=cg_view.create(cgstatic_data), bucket_name=bucket_name, key=f"{entity_varname}_view.html", files_to_commit=files_to_commit)
-        deploy(source_code=cg_listview.create(cgstatic_data), bucket_name=bucket_name, key=f"{entity_varname}.html", files_to_commit=files_to_commit)
-        deploy(source_code=cg_js_app.create(cgstatic_data), bucket_name=bucket_name, key=f"js/{entity_varname}_app.js", files_to_commit=files_to_commit)
-        deploy(source_code=cg_js_view.create(cgstatic_data), bucket_name=bucket_name, key=f"js/{entity_varname}_view.js", files_to_commit=files_to_commit)
+        add_to_commit(source_code=cg_add.create(cgstatic_data), key=f"{entity_varname}_add.html", files_to_commit=files_to_commit)
+        add_to_commit(source_code=cg_edit.create(cgstatic_data), key=f"{entity_varname}_edit.html", files_to_commit=files_to_commit)
+        add_to_commit(source_code=cg_delete.create(cgstatic_data), key=f"{entity_varname}_delete.html", files_to_commit=files_to_commit)
+        add_to_commit(source_code=cg_view.create(cgstatic_data), key=f"{entity_varname}_view.html", files_to_commit=files_to_commit)
+        add_to_commit(source_code=cg_listview.create(cgstatic_data), key=f"{entity_varname}.html", files_to_commit=files_to_commit)
+        add_to_commit(source_code=cg_js_app.create(cgstatic_data), key=f"js/{entity_varname}_app.js", files_to_commit=files_to_commit)
+        add_to_commit(source_code=cg_js_view.create(cgstatic_data), key=f"js/{entity_varname}_view.js", files_to_commit=files_to_commit)
   
     #HTML+JS for our homepage
     homepage_data = { "Project Name": project_name }
-    deploy(source_code=cg_homepage.create(homepage_data), bucket_name=bucket_name, key=f"index.html", files_to_commit=files_to_commit)
-    deploy(source_code=cg_js_home.create(homepage_data), bucket_name=bucket_name, key=f"js/STARK_home.js", files_to_commit=files_to_commit)
+    add_to_commit(source_code=cg_homepage.create(homepage_data), key=f"index.html", files_to_commit=files_to_commit)
+    add_to_commit(source_code=cg_js_home.create(homepage_data), key=f"js/STARK_home.js", files_to_commit=files_to_commit)
+
+
+    ###############################################
+    #Get pre-built static files from codegen bucket
+    prebuilt_static_files = []
+    list_prebuilt_static_files(codegen_bucket_name, prebuilt_static_files)
+    for static_file in prebuilt_static_files:
+        #We don't want to include the "STARKWebSource/" prefix in our list of keys, hence the string slice in static_file
+        add_to_commit(source_code=get_file_from_bucket(bucket_name, static_file), key=static_file[15:], files_to_commit=files_to_commit)
+
 
     ############################################
     #Commit our static files to the project repo
@@ -114,21 +124,29 @@ def lambda_handler(event, context):
     helper(event, context)
 
 
-def deploy(source_code, bucket_name, key, files_to_commit):
+def add_to_commit(source_code, key, files_to_commit):
 
     files_to_commit.append({
         'filePath': f"static/{key}",
         'fileContent': source_code.encode()
     })
 
-    response = s3.put_object(
-        ACL='public-read',
-        Body=source_code.encode(),
-        Bucket=bucket_name,
-        Key=key,
-        ContentType="text/html",
-    )
-
-
     return response
 
+def list_prebuilt_static_files(bucket_name, prebuilt_static_files):
+    response = s3.list_objects_v2(
+        Bucket = bucket_name,
+        Prefix = "STARKWebSource/",
+    )
+
+    for static_file in response['Contents']:
+        prebuilt_static_files.append(static_file['Key'])
+
+def get_file_from_bucket(bucket_name, static_file, files_to_commit):
+    response = s3.get_object(
+        Bucket = bucket_name,
+        Key = static_file
+    )
+
+    source_code = response['Body']
+    return source_code

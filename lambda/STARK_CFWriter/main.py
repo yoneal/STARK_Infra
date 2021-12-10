@@ -41,7 +41,6 @@ else:
         "Access-Control-Allow-Origin": "*"
     }
 
-    preloader_service_token  = "PreloaderService-FakeLocalToken"
     cg_static_service_token  = "CGStaticService-FakeLocalToken"
     cg_dynamic_service_token = "CGDynamicService-FakeLocalToken"
     codegen_bucket_name      = "codegen-fake-local-bucket"
@@ -439,16 +438,6 @@ def lambda_handler(event, context):
                                     - Name: BuildArtifact
                                 OutputArtifacts: []
 
-        STARKFilesPreloader:
-            Type: AWS::CloudFormation::CustomResource
-            Properties:
-                ServiceToken: {preloader_service_token}
-                UpdateToken: {update_token}
-                Bucket:
-                    Ref: STARKSystemBucket
-                Remarks: This will preload all STARK HTML/CSS/JS files into the STARKSystemBucket
-            DependsOn:
-                -   STARKSystemBucket
         STARKApiGateway:
             Type: AWS::Serverless::HttpApi
             Properties:

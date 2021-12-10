@@ -201,23 +201,6 @@ Resources:
                 - !Ref PyYamlLayer
                 - !Ref STARKFriendlyToSystemNamesLayer
             Timeout: 60
-    STARKBucketPreloaderFunc:
-        Type: AWS::Serverless::Function
-        Properties:
-            Runtime: python3.8
-            Handler: main.lambda_handler
-            CodeUri: lambda/STARK_WebsiteBucketPreloader
-            Environment:
-                Variables:
-                    STARK_ENVIRONMENT_TYPE: PROD
-                    CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
-            Policies:
-                - AmazonS3FullAccess
-                - AmazonSSMReadOnlyAccess
-                - AWSLambdaBasicExecutionRole
-            Layers:
-                - !Ref CFCustomResourceHelperLayer
-            Timeout: 60
     STARKWebsiteUpdaterFunc:
         Type: AWS::Serverless::Function
         Properties:
@@ -261,7 +244,6 @@ Resources:
                     CICD_BUCKET_NAME: !Ref UserCICDPipelineBucketNameParameter
                     API_GATEWAY_ID: !Ref STARKParserApi
                     CF_WRITER_ARN: !GetAtt STARKCFWriterFunc.Arn
-                    BUCKET_PRELOADER_ARN: !GetAtt STARKBucketPreloaderFunc.Arn
                     CG_DYNAMIC_ARN: !GetAtt STARKCodeGenDynamicWriter.Arn
                     CG_STATIC_ARN: !GetAtt STARKCodeGenStaticWriter.Arn
                     CF_DEPLOY_ROLE_ARN: !GetAtt STARKCloudFormationDeployServiceRole.Arn

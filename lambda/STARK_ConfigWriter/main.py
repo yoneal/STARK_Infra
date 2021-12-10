@@ -22,7 +22,6 @@ def make_config_file(event, _):
     print(f"Creating STARK configuration file...")
 
     codegen_bucket_name  = os.environ['CODEGEN_BUCKET_NAME']
-    bucket_preloader_arn = os.environ['BUCKET_PRELOADER_ARN']
     cf_writer_arn        = os.environ['CF_WRITER_ARN']
     cg_dynamic_arn       = os.environ['CG_DYNAMIC_ARN']
     cg_static_arn        = os.environ['CG_STATIC_ARN']
@@ -32,7 +31,6 @@ def make_config_file(event, _):
 
     source_code = f"""\
         API_Gateway_ID: '{api_gateway_id}'
-        BucketPreloaderLambda_ARN: '{bucket_preloader_arn}'
         CFDeployRole_ARN: '{cf_deploy_role_arn}'
         CFWriter_ARN: '{cf_writer_arn}'
         CGDynamic_ARN: '{cg_dynamic_arn}'
