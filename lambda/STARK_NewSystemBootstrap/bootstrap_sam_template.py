@@ -102,6 +102,10 @@ def create(data):
     AWSTemplateFormatVersion: '2010-09-09'
     Transform: AWS::Serverless-2016-10-31
     Description: Bootstraps a new STARK-generated system
+    Parameters:
+        Placeholder:
+            Type: String
+            Description: Placeholder, just so the boostrap template is compatible with our pipeline configuration (expects template configuration).
     Resources:
         STARKSystemBucket:
             Type: AWS::S3::Bucket

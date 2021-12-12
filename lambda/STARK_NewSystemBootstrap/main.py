@@ -15,6 +15,7 @@ from crhelper import CfnResource
 #Private modules
 import bootstrap_buildspec as boot_build
 import bootstrap_sam_template as boot_sam
+import bootstrap_template_conf as boot_conf
 import convert_friendly_to_system as converter
 
 s3  = boto3.client('s3')
@@ -79,6 +80,12 @@ def create_handler(event, context):
     source_code = boot_sam.create(data)
     files_to_commit.append({
         'filePath': "template.yml",
+        'fileContent': source_code.encode()
+    })   
+
+    source_code = boot_conf.create()
+    files_to_commit.append({
+        'filePath': "template_configuration.json",
         'fileContent': source_code.encode()
     })   
 
