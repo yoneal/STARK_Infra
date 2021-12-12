@@ -36,6 +36,7 @@ def create_handler(event, context):
     project_name    = event.get('ResourceProperties', {}).get('Project','')
     repo_name       = event.get('ResourceProperties', {}).get('RepoName','')
     website_bucket  = event.get('ResourceProperties', {}).get('Bucket','')
+    cicd_bucket     = event.get('ResourceProperties', {}).get('CICDBucket','')
 
     project_varname = converter.convert_to_system_name(project_name)
 
@@ -97,7 +98,7 @@ def create_handler(event, context):
     # - template_configuration.json
     data = { 'project_varname': project_varname }
 
-    source_code = cg_build(data)
+    source_code = cg_build.create(data)
     files_to_commit.append({
         'filePath': "buildspec.yml",
         'fileContent': source_code.encode()
@@ -107,7 +108,7 @@ def create_handler(event, context):
         'codegen_bucket_name': codegen_bucket_name,
         'cloud_resources': cloud_resources
     }
-    source_code = cg_sam(data)
+    source_code = cg_sam.create(data)
     files_to_commit.append({
         'filePath': "template.yml",
         'fileContent': source_code.encode()
@@ -117,7 +118,7 @@ def create_handler(event, context):
         'cicd_bucket': cicd_bucket,
         'website_bucket': website_bucket
     }
-    source_code = cg_sam(data)
+    source_code = cg_conf.create(data)
     files_to_commit.append({
         'filePath': "template_configuration.json",
         'fileContent': source_code.encode()

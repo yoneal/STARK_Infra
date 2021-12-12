@@ -471,6 +471,8 @@ def lambda_handler(event, context):
                 UpdateToken: {update_token}
                 Project: {project_name}
                 DDBTable: {ddb_table_name}
+                CICDBucket: {cicd_bucket_name}
+                Bucket: !Ref STARKSystemBucket
                 RepoName: !GetAtt STARKProjectRepo.Name
                 Remarks: This will create the customized STARK lambda functions, based on the supplied entities
         STARKDynamoDB:
