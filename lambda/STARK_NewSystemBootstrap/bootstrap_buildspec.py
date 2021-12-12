@@ -31,6 +31,7 @@ def create(data):
             files:
                 - template.yml
                 - outputtemplate.yml
+                - template_configuration.json
         """
 
     return textwrap.dedent(source_code)
