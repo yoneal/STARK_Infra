@@ -29,7 +29,6 @@ if ENV_TYPE == "PROD":
         Key=f'STARKConfiguration/STARK_config.yml'
     )
     config = yaml.safe_load(response['Body'].read().decode('utf-8')) 
-    preloader_service_token  = config['BucketPreloaderLambda_ARN']
     cleaner_service_token    = config['Cleaner_ARN']
     cg_static_service_token  = config['CGStatic_ARN']
     cg_dynamic_service_token = config['CGDynamic_ARN']
@@ -42,6 +41,7 @@ else:
         "Access-Control-Allow-Origin": "*"
     }
 
+    cleaner_service_token    = "CleanerService-FakeLocalToken"
     cg_static_service_token  = "CGStaticService-FakeLocalToken"
     cg_dynamic_service_token = "CGDynamicService-FakeLocalToken"
     codegen_bucket_name      = "codegen-fake-local-bucket"
