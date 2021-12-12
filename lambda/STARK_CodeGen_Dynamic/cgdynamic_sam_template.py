@@ -232,7 +232,7 @@ def create(data):
                             ApiId:
                                 Ref: STARKApiGateway
                 Runtime: python3.8
-                Handler: lambda_function.lambda_handler
+                Handler: main.lambda_handler
                 CodeUri: lambda/{entity_endpoint_name}
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn"""
 
@@ -249,7 +249,7 @@ def create(data):
                             ApiId:
                                 Ref: STARKApiGateway
                 Runtime: python3.8
-                Handler: lambda_function.lambda_handler
+                Handler: main.lambda_handler
                 CodeUri: lambda/sys_modules
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn"""
 
