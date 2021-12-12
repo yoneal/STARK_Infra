@@ -126,9 +126,12 @@ def lambda_handler(event, context):
 
 def add_to_commit(source_code, key, files_to_commit):
 
+    if type(source_code) is str:
+        source_code = source_code.encode()
+
     files_to_commit.append({
         'filePath': f"static/{key}",
-        'fileContent': source_code.encode()
+        'fileContent': source_code 
     })
 
 def list_prebuilt_static_files(bucket_name, prebuilt_static_files):
