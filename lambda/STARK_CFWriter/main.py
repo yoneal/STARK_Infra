@@ -512,68 +512,6 @@ def lambda_handler(event, context):
                     ReadCapacityUnits: {ddb_rcu_provisioned}
                     WriteCapacityUnits: {ddb_wcu_provisioned}"""
 
-    for entity in lambda_entities:
-        entity_logical_name = converter.convert_to_system_name(entity, "cf-resource")
-        entity_endpoint_name = converter.convert_to_system_name(entity)
-        cf_template += f"""
-        STARKBackendApiFor{entity_logical_name}:
-            Type: AWS::Serverless::Function
-            Properties:
-                Events:
-                    {entity_logical_name}GetEvent:
-                        Type: HttpApi
-                        Properties:
-                            Path: /{entity_endpoint_name}
-                            Method: GET
-                            ApiId:
-                                Ref: STARKApiGateway
-                    {entity_logical_name}PostEvent:
-                        Type: HttpApi
-                        Properties:
-                            Path: /{entity_endpoint_name}
-                            Method: POST
-                            ApiId:
-                                Ref: STARKApiGateway
-                    {entity_logical_name}PutEvent:
-                        Type: HttpApi
-                        Properties:
-                            Path: /{entity_endpoint_name}
-                            Method: PUT
-                            ApiId:
-                                Ref: STARKApiGateway
-                    {entity_logical_name}DeleteEvent:
-                        Type: HttpApi
-                        Properties:
-                            Path: /{entity_endpoint_name}
-                            Method: DELETE
-                            ApiId:
-                                Ref: STARKApiGateway
-                Runtime: python3.8
-                Handler: lambda_function.lambda_handler
-                CodeUri: s3://{codegen_bucket_name}/codegen_dynamic/{project_varname}/{update_token}/{entity_endpoint_name}.zip
-                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
-            DependsOn:
-                -   STARKCGDynamic"""
-
-    cf_template += f"""
-        STARKBackendApiForSysModules:
-            Type: AWS::Serverless::Function
-            Properties:
-                Events:
-                    SysModulesGetEvent:
-                        Type: HttpApi
-                        Properties:
-                            Path: /sys_modules
-                            Method: GET
-                            ApiId:
-                                Ref: STARKApiGateway
-                Runtime: python3.8
-                Handler: lambda_function.lambda_handler
-                CodeUri: s3://{codegen_bucket_name}/codegen_dynamic/{project_varname}/{update_token}/sys_modules.zip
-                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
-            DependsOn:
-                -   STARKCGDynamic"""
-
     if ENV_TYPE == "PROD":
         response = s3.put_object(
             Body=textwrap.dedent(cf_template).encode(),
