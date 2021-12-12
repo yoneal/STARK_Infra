@@ -88,12 +88,19 @@ def create(data):
     AWSTemplateFormatVersion: '2010-09-09'
     Transform: AWS::Serverless-2016-10-31
     Description: AWS SAM template for STARK code gen
+    Parameters:
+        UserCICDPipelineBucketNameParameter:
+            Type: String
+            Description: Name for user bucket that will be used for the default STARK CI/CD pipeline.
+        UserWebsiteBucketNameParameter:
+            Type: String
+            Description: Name for user bucket that will be used as the website bucket for the STARK Parser UI. Not yet used in template, just needed for config.
     Resources:
         STARKSystemBucket:
             Type: AWS::S3::Bucket
             Properties:
                 AccessControl: {s3_access_control}
-                BucketName: {s3_bucket_name}
+                BucketName: !Ref UserWebsiteBucketNameParameter
                 VersioningConfiguration:
                     Status: {s3_versioning}
                 WebsiteConfiguration:
@@ -211,9 +218,7 @@ def create(data):
                 Runtime: python3.8
                 Handler: lambda_function.lambda_handler
                 CodeUri: s3://{codegen_bucket_name}/codegen_dynamic/{project_varname}/{update_token}/{entity_endpoint_name}.zip
-                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
-            DependsOn:
-                -   STARKCGDynamic"""
+                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn"""
 
     cf_template += f"""
         STARKBackendApiForSysModules:
@@ -230,8 +235,6 @@ def create(data):
                 Runtime: python3.8
                 Handler: lambda_function.lambda_handler
                 CodeUri: s3://{codegen_bucket_name}/codegen_dynamic/{project_varname}/{update_token}/sys_modules.zip
-                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
-            DependsOn:
-                -   STARKCGDynamic"""
+                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn"""
 
-    return cf_template
+    return textwrap.dedent(cf_template)
