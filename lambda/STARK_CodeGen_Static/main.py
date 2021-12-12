@@ -140,7 +140,7 @@ def list_prebuilt_static_files(bucket_name, prebuilt_static_files):
     for static_file in response['Contents']:
         prebuilt_static_files.append(static_file['Key'])
 
-def get_file_from_bucket(bucket_name, static_file, files_to_commit):
+def get_file_from_bucket(bucket_name, static_file):
     response = s3.get_object(
         Bucket = bucket_name,
         Key = static_file
