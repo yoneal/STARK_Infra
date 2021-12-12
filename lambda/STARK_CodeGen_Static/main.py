@@ -131,8 +131,6 @@ def add_to_commit(source_code, key, files_to_commit):
         'fileContent': source_code.encode()
     })
 
-    return response
-
 def list_prebuilt_static_files(bucket_name, prebuilt_static_files):
     response = s3.list_objects_v2(
         Bucket = bucket_name,
