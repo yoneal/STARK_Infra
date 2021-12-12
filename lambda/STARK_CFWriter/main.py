@@ -30,6 +30,7 @@ if ENV_TYPE == "PROD":
     )
     config = yaml.safe_load(response['Body'].read().decode('utf-8')) 
     preloader_service_token  = config['BucketPreloaderLambda_ARN']
+    cleaner_service_token    = config['Cleaner_ARN']
     cg_static_service_token  = config['CGStatic_ARN']
     cg_dynamic_service_token = config['CGDynamic_ARN']
     cicd_bucket_name         = config['CICD_Bucket_Name']
@@ -127,6 +128,16 @@ def lambda_handler(event, context):
                 WebsiteConfiguration:
                     ErrorDocument: {s3_error_document}
                     IndexDocument: {s3_index_document}
+        STARKBucketCleaner:
+            Type: AWS::CloudFormation::CustomResource
+            Properties:
+                ServiceToken: {cleaner_service_token}
+                UpdateToken: {update_token}
+                Bucket:
+                    Ref: STARKSystemBucket
+                Remarks: This will empty the STARKSystemBucket for DELETE STACK operations
+            DependsOn:
+                -   STARKSystemBucket
         STARKProjectDefaultLambdaServiceRole:
             Type: AWS::IAM::Role
             Properties:

@@ -22,6 +22,7 @@ def make_config_file(event, _):
     print(f"Creating STARK configuration file...")
 
     codegen_bucket_name  = os.environ['CODEGEN_BUCKET_NAME']
+    cleaner_arn          = os.environ['CLEANER_ARN']
     cf_writer_arn        = os.environ['CF_WRITER_ARN']
     cg_dynamic_arn       = os.environ['CG_DYNAMIC_ARN']
     cg_static_arn        = os.environ['CG_STATIC_ARN']
@@ -36,6 +37,7 @@ def make_config_file(event, _):
         CGDynamic_ARN: '{cg_dynamic_arn}'
         CGStatic_ARN: '{cg_static_arn}'
         CICD_Bucket_Name: '{cicd_bucket_name}'
+        Cleaner_ARN: '{cleaner_arn}'
         """
 
     source_code = textwrap.dedent(source_code)

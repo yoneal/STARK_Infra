@@ -201,6 +201,22 @@ Resources:
                 - !Ref PyYamlLayer
                 - !Ref STARKFriendlyToSystemNamesLayer
             Timeout: 60
+    STARKBucketCleanerFunc:
+        Type: AWS::Serverless::Function
+        Properties:
+            Runtime: python3.8
+            Handler: main.lambda_handler
+            CodeUri: lambda/STARK_WebsiteBucketCleaner
+            Environment:
+                Variables:
+                    STARK_ENVIRONMENT_TYPE: PROD
+            Policies:
+                - AmazonS3FullAccess
+                - AmazonSSMReadOnlyAccess
+                - AWSLambdaBasicExecutionRole
+            Layers:
+                - !Ref CFCustomResourceHelperLayer
+            Timeout: 60
     STARKWebsiteUpdaterFunc:
         Type: AWS::Serverless::Function
         Properties:
@@ -243,6 +259,7 @@ Resources:
                     CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
                     CICD_BUCKET_NAME: !Ref UserCICDPipelineBucketNameParameter
                     API_GATEWAY_ID: !Ref STARKParserApi
+                    CLEANER_ARN: !GetAtt STARKBucketCleanerFunc.Arn
                     CF_WRITER_ARN: !GetAtt STARKCFWriterFunc.Arn
                     CG_DYNAMIC_ARN: !GetAtt STARKCodeGenDynamicWriter.Arn
                     CG_STATIC_ARN: !GetAtt STARKCodeGenStaticWriter.Arn
