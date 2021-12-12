@@ -234,6 +234,8 @@ Resources:
                 - AWSCodeCommitFullAccess
             Layers:
                 - !Ref CFCustomResourceHelperLayer
+                - !Ref PyYamlLayer
+                - !Ref STARKFriendlyToSystemNamesLayer
             Timeout: 60
     STARKWebsiteUpdaterFunc:
         Type: AWS::Serverless::Function
