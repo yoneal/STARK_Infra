@@ -90,7 +90,7 @@ def create_handler(event, context):
     list_prebuilt_static_files(codegen_bucket_name, prebuilt_static_files)
     for static_file in prebuilt_static_files:
         #We don't want to include the "STARKWebSource/" prefix in our list of keys, hence the string slice in static_file
-        add_to_commit(source_code=get_file_from_bucket(bucket_name, static_file), key=static_file[15:], files_to_commit=files_to_commit)
+        add_to_commit(source_code=get_file_from_bucket(codegen_bucket_name, static_file), key=static_file[15:], files_to_commit=files_to_commit)
 
 
     ############################################
