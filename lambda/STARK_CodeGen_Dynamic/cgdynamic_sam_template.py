@@ -233,7 +233,7 @@ def create(data):
                                 Ref: STARKApiGateway
                 Runtime: python3.8
                 Handler: lambda_function.lambda_handler
-                CodeUri: s3://{codegen_bucket_name}/codegen_dynamic/{project_varname}/{update_token}/{entity_endpoint_name}.zip
+                CodeUri: lambda/{entity_endpoint_name}
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn"""
 
     cf_template += f"""
@@ -250,7 +250,7 @@ def create(data):
                                 Ref: STARKApiGateway
                 Runtime: python3.8
                 Handler: lambda_function.lambda_handler
-                CodeUri: s3://{codegen_bucket_name}/codegen_dynamic/{project_varname}/{update_token}/sys_modules.zip
+                CodeUri: lambda/sys_modules
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn"""
 
     return textwrap.dedent(cf_template)
