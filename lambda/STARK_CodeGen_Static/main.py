@@ -108,7 +108,7 @@ def create_handler(event, context):
         repositoryName=repo_name,
         branchName='master',
         parentCommitId=commit_id,
-        authorName='STARK',
+        authorName='STARK::CGStatic',
         email='STARK@fakedomainstark.com',
         commitMessage='Initial commit of static files',
         putFiles=files_to_commit

@@ -29,10 +29,11 @@ if ENV_TYPE == "PROD":
         Key=f'STARKConfiguration/STARK_config.yml'
     )
     config = yaml.safe_load(response['Body'].read().decode('utf-8')) 
-    cleaner_service_token    = config['Cleaner_ARN']
-    cg_static_service_token  = config['CGStatic_ARN']
-    cg_dynamic_service_token = config['CGDynamic_ARN']
-    cicd_bucket_name         = config['CICD_Bucket_Name']
+    bootstrapper_service_token = config['Bootstrapper_ARN']
+    cleaner_service_token      = config['Cleaner_ARN']
+    cg_static_service_token    = config['CGStatic_ARN']
+    cg_dynamic_service_token   = config['CGDynamic_ARN']
+    cicd_bucket_name           = config['CICD_Bucket_Name']
 
 else:
     #We only have to do this because `SAM local start-api` doesn't follow CORS info from template.yml, which is bullshit
@@ -41,11 +42,12 @@ else:
         "Access-Control-Allow-Origin": "*"
     }
 
-    cleaner_service_token    = "CleanerService-FakeLocalToken"
-    cg_static_service_token  = "CGStaticService-FakeLocalToken"
-    cg_dynamic_service_token = "CGDynamicService-FakeLocalToken"
-    codegen_bucket_name      = "codegen-fake-local-bucket"
-
+    bootstrapper_service_token = "BootstrapperService-FakeLocalToken"
+    cleaner_service_token      = "CleanerService-FakeLocalToken"
+    cg_static_service_token    = "CGStaticService-FakeLocalToken"
+    cg_dynamic_service_token   = "CGDynamicService-FakeLocalToken"
+    codegen_bucket_name        = "codegen-fake-local-bucket"
+    cicd_bucket_name           = "cicd-fake-local-bucket"
 
 
 def lambda_handler(event, context):
@@ -118,61 +120,6 @@ def lambda_handler(event, context):
     Transform: AWS::Serverless-2016-10-31
     Description: AWS SAM template for STARK code gen
     Resources:
-        STARKSystemBucket:
-            Type: AWS::S3::Bucket
-            Properties:
-                AccessControl: {s3_access_control}
-                BucketName: {s3_bucket_name}
-                VersioningConfiguration:
-                    Status: {s3_versioning}
-                WebsiteConfiguration:
-                    ErrorDocument: {s3_error_document}
-                    IndexDocument: {s3_index_document}
-        STARKBucketCleaner:
-            Type: AWS::CloudFormation::CustomResource
-            Properties:
-                ServiceToken: {cleaner_service_token}
-                UpdateToken: {update_token}
-                Bucket:
-                    Ref: STARKSystemBucket
-                Remarks: This will empty the STARKSystemBucket for DELETE STACK operations
-            DependsOn:
-                -   STARKSystemBucket
-        STARKProjectDefaultLambdaServiceRole:
-            Type: AWS::IAM::Role
-            Properties:
-                AssumeRolePolicyDocument:
-                    Version: '2012-10-17'
-                    Statement: 
-                        - 
-                            Effect: Allow
-                            Principal:
-                                Service: 
-                                    - 'lambda.amazonaws.com'
-                            Action: 'sts:AssumeRole'
-                ManagedPolicyArns:
-                    - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
-                Policies:
-                    - 
-                        PolicyName: PolicyForSTARKCodePipelineDeployServiceRole
-                        PolicyDocument:
-                            Version: '2012-10-17'
-                            Statement:
-                                - 
-                                    Sid: VisualEditor0
-                                    Effect: Allow
-                                    Action:
-                                        - 'iam:GetRole'
-                                        - 'dynamodb:BatchGetItem'
-                                        - 'dynamodb:BatchWriteItem'
-                                        - 'dynamodb:ConditionCheckItem'
-                                        - 'dynamodb:PutItem'
-                                        - 'dynamodb:DeleteItem'
-                                        - 'dynamodb:GetItem'
-                                        - 'dynamodb:Scan'
-                                        - 'dynamodb:Query'
-                                        - 'dynamodb:UpdateItem'
-                                    Resource: '*'
         STARKProjectCodeBuildServiceRole:
             Type: AWS::IAM::Role
             Properties:
@@ -449,68 +396,17 @@ def lambda_handler(event, context):
                                     - Name: BuildArtifact
                                 OutputArtifacts: []
 
-        STARKApiGateway:
-            Type: AWS::Serverless::HttpApi
-            Properties:
-                CorsConfiguration:
-                    AllowOrigins:
-                        - "*"
-                    AllowHeaders:
-                        - "*"
-                    AllowMethods:
-                        - "*"
-                    MaxAge: 200
-                    AllowCredentials: False
-        STARKCGStatic:
+        STARKBootstrapper:
             Type: AWS::CloudFormation::CustomResource
             Properties:
-                ServiceToken: {cg_static_service_token}
-                UpdateToken: {update_token}
-                Project: {project_name}
-                Bucket: !Ref STARKSystemBucket
-                ApiGatewayId: !Ref STARKApiGateway
-                RepoName: !GetAtt STARKProjectRepo.Name
-                Remarks: This will create the customized STARK HTML/CSS/JS files into the STARKSystemBucket, based on the supplied entities
-            DependsOn:
-                -   STARKSystemBucket
-                -   STARKApiGateway
-                -   STARKCGDynamic
-        STARKCGDynamic:
-            Type: AWS::CloudFormation::CustomResource
-            Properties:
-                ServiceToken: {cg_dynamic_service_token}
+                ServiceToken: {bootstrapper_service_token}
                 UpdateToken: {update_token}
                 Project: {project_name}
                 DDBTable: {ddb_table_name}
                 CICDBucket: {cicd_bucket_name}
-                Bucket: !Ref STARKSystemBucket
                 RepoName: !GetAtt STARKProjectRepo.Name
-                Remarks: This will create the customized STARK lambda functions, based on the supplied entities
-        STARKDynamoDB:
-            Type: AWS::DynamoDB::Table
-            Properties:
-                TableName: {ddb_table_name}
-                BillingMode: {ddb_capacity_type}
-                AttributeDefinitions:
-                    -
-                        AttributeName: pk
-                        AttributeType: S
-                    -
-                        AttributeName: sk
-                        AttributeType: S
-                KeySchema:
-                    -
-                        AttributeName: pk
-                        KeyType: HASH
-                    -
-                        AttributeName: sk
-                        KeyType: RANGE"""
+                Remarks: Bootstraps the new system to allow the newly-created pipeline to trigger code generation"""
 
-    if ddb_capacity_type == "PROVISIONED":
-        cf_template += f"""
-                ProvisionedThroughput:
-                    ReadCapacityUnits: {ddb_rcu_provisioned}
-                    WriteCapacityUnits: {ddb_wcu_provisioned}"""
 
     if ENV_TYPE == "PROD":
         response = s3.put_object(

@@ -20,6 +20,7 @@ import convert_friendly_to_system as converter
 def create(data):
 
     cloud_resources = data['cloud_resources']
+    repo_name       = data['repo_name']
 
     #Get environment type - this will allow us to take different branches depending on whether we are LOCAL or PROD (or any other future valid value)
     ENV_TYPE = os.environ['STARK_ENVIRONMENT_TYPE']
@@ -34,6 +35,9 @@ def create(data):
         )
         config = yaml.safe_load(response['Body'].read().decode('utf-8')) 
         cleaner_service_token    = config['Cleaner_ARN']  
+        cg_static_service_token  = config['CGStatic_ARN']
+        cg_dynamic_service_token = config['CGDynamic_ARN']
+        cicd_bucket_name         = config['CICD_Bucket_Name']
 
     else:
         #We only have to do this because `SAM local start-api` doesn't follow CORS info from template.yml, which is bullshit
@@ -43,6 +47,10 @@ def create(data):
         }
         codegen_bucket_name      = "codegen-fake-local-bucket"
         cleaner_service_token    = "CleanerService-FakeLocalToken"
+        cg_static_service_token  = "CGStaticService-FakeLocalToken"
+        cg_dynamic_service_token = "CGDynamicService-FakeLocalToken"
+        codegen_bucket_name      = "codegen-fake-local-bucket"
+        cicd_bucket_name         = "cicd-fake-local-bucket"
 
 
     #Get Project Name
@@ -93,20 +101,13 @@ def create(data):
     cf_template = f"""\
     AWSTemplateFormatVersion: '2010-09-09'
     Transform: AWS::Serverless-2016-10-31
-    Description: AWS SAM template for STARK code gen
-    Parameters:
-        UserCICDPipelineBucketNameParameter:
-            Type: String
-            Description: Name for user bucket that will be used for the default STARK CI/CD pipeline.
-        UserWebsiteBucketNameParameter:
-            Type: String
-            Description: Name for user bucket that will be used as the website bucket for the STARK Parser UI. Not yet used in template, just needed for config.
+    Description: Bootstraps a new STARK-generated system
     Resources:
         STARKSystemBucket:
             Type: AWS::S3::Bucket
             Properties:
                 AccessControl: {s3_access_control}
-                BucketName: !Ref UserWebsiteBucketNameParameter
+                BucketName: {s3_bucket_name}
                 VersioningConfiguration:
                     Status: {s3_versioning}
                 WebsiteConfiguration:
@@ -138,7 +139,7 @@ def create(data):
                     - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
                 Policies:
                     - 
-                        PolicyName: PolicyForSTARKProjectDefaultLambdaServiceRole
+                        PolicyName: PolicyForSTARKCodePipelineDeployServiceRole
                         PolicyDocument:
                             Version: '2012-10-17'
                             Statement:
@@ -169,6 +170,31 @@ def create(data):
                         - "*"
                     MaxAge: 200
                     AllowCredentials: False
+        STARKCGStatic:
+            Type: AWS::CloudFormation::CustomResource
+            Properties:
+                ServiceToken: {cg_static_service_token}
+                UpdateToken: {update_token}
+                Project: {project_name}
+                Bucket: !Ref STARKSystemBucket
+                ApiGatewayId: !Ref STARKApiGateway
+                RepoName: {repo_name}
+                Remarks: This will create the customized STARK HTML/CSS/JS files into the STARKSystemBucket, based on the supplied entities
+            DependsOn:
+                -   STARKSystemBucket
+                -   STARKApiGateway
+                -   STARKCGDynamic
+        STARKCGDynamic:
+            Type: AWS::CloudFormation::CustomResource
+            Properties:
+                ServiceToken: {cg_dynamic_service_token}
+                UpdateToken: {update_token}
+                Project: {project_name}
+                DDBTable: {ddb_table_name}
+                CICDBucket: {cicd_bucket_name}
+                Bucket: !Ref STARKSystemBucket
+                RepoName: {repo_name}
+                Remarks: This will create the customized STARK lambda functions, based on the supplied entities
         STARKDynamoDB:
             Type: AWS::DynamoDB::Table
             Properties:
@@ -194,63 +220,5 @@ def create(data):
                 ProvisionedThroughput:
                     ReadCapacityUnits: {ddb_rcu_provisioned}
                     WriteCapacityUnits: {ddb_wcu_provisioned}"""
-
-    for entity in lambda_entities:
-        entity_logical_name = converter.convert_to_system_name(entity, "cf-resource")
-        entity_endpoint_name = converter.convert_to_system_name(entity)
-        cf_template += f"""
-        STARKBackendApiFor{entity_logical_name}:
-            Type: AWS::Serverless::Function
-            Properties:
-                Events:
-                    {entity_logical_name}GetEvent:
-                        Type: HttpApi
-                        Properties:
-                            Path: /{entity_endpoint_name}
-                            Method: GET
-                            ApiId:
-                                Ref: STARKApiGateway
-                    {entity_logical_name}PostEvent:
-                        Type: HttpApi
-                        Properties:
-                            Path: /{entity_endpoint_name}
-                            Method: POST
-                            ApiId:
-                                Ref: STARKApiGateway
-                    {entity_logical_name}PutEvent:
-                        Type: HttpApi
-                        Properties:
-                            Path: /{entity_endpoint_name}
-                            Method: PUT
-                            ApiId:
-                                Ref: STARKApiGateway
-                    {entity_logical_name}DeleteEvent:
-                        Type: HttpApi
-                        Properties:
-                            Path: /{entity_endpoint_name}
-                            Method: DELETE
-                            ApiId:
-                                Ref: STARKApiGateway
-                Runtime: python3.8
-                Handler: lambda_function.lambda_handler
-                CodeUri: s3://{codegen_bucket_name}/codegen_dynamic/{project_varname}/{update_token}/{entity_endpoint_name}.zip
-                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn"""
-
-    cf_template += f"""
-        STARKBackendApiForSysModules:
-            Type: AWS::Serverless::Function
-            Properties:
-                Events:
-                    SysModulesGetEvent:
-                        Type: HttpApi
-                        Properties:
-                            Path: /sys_modules
-                            Method: GET
-                            ApiId:
-                                Ref: STARKApiGateway
-                Runtime: python3.8
-                Handler: lambda_function.lambda_handler
-                CodeUri: s3://{codegen_bucket_name}/codegen_dynamic/{project_varname}/{update_token}/sys_modules.zip
-                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn"""
 
     return textwrap.dedent(cf_template)

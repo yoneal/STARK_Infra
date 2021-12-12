@@ -10,6 +10,7 @@ import convert_friendly_to_system as converter
 
 def create(data):
 
+    cicd_bucket     = data['cicd_bucket']
     project_varname = data['project_varname']
 
     source_code = f"""\
@@ -21,10 +22,8 @@ def create(data):
                     python: 3.8
             build:
                 commands:
-                - BUCKET=$(cat template_configuration.json | python3 -c "import sys, json; print(json.load(sys.stdin)['Parameters']['UserCICDPipelineBucketNameParameter'])")
-                - WEBSITE=$(cat template_configuration.json | python3 -c "import sys, json; print(json.load(sys.stdin)['Parameters']['UserWebsiteBucketNameParameter'])")
+                - BUCKET={cicd_bucket}
                 - aws cloudformation package --template-file template.yml --s3-bucket $BUCKET --s3-prefix {project_varname} --output-template-file outputtemplate.yml
-                - aws s3 cp static s3://$WEBSITE --recursive --acl public-read
                 - aws s3 cp outputtemplate.yml s3://$BUCKET/{project_varname}/
 
         artifacts:
@@ -32,7 +31,6 @@ def create(data):
             files:
                 - template.yml
                 - outputtemplate.yml
-                - template_configuration.json
         """
 
     return textwrap.dedent(source_code)
