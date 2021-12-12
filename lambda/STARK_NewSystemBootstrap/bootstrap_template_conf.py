@@ -13,7 +13,7 @@ def create():
     source_code = f"""\
         {{
             "Parameters" : {{
-                "Placeholder" : "Placeholder",
+                "Placeholder" : "Placeholder"
             }}
         }}
         """
