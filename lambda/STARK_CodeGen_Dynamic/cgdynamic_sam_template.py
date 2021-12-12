@@ -28,7 +28,12 @@ def create(data):
         s3  = boto3.client('s3')
 
         codegen_bucket_name  = os.environ['CODEGEN_BUCKET_NAME']
-  
+        response = s3.get_object(
+            Bucket=codegen_bucket_name,
+            Key=f'STARKConfiguration/STARK_config.yml'
+        )
+        config = yaml.safe_load(response['Body'].read().decode('utf-8')) 
+        cleaner_service_token    = config['Cleaner_ARN']  
 
     else:
         #We only have to do this because `SAM local start-api` doesn't follow CORS info from template.yml, which is bullshit
@@ -37,6 +42,7 @@ def create(data):
             "Access-Control-Allow-Origin": "*"
         }
         codegen_bucket_name      = "codegen-fake-local-bucket"
+        cleaner_service_token    = "CleanerService-FakeLocalToken"
 
 
     #Get Project Name
@@ -106,6 +112,16 @@ def create(data):
                 WebsiteConfiguration:
                     ErrorDocument: {s3_error_document}
                     IndexDocument: {s3_index_document}
+        STARKBucketCleaner:
+            Type: AWS::CloudFormation::CustomResource
+            Properties:
+                ServiceToken: {cleaner_service_token}
+                UpdateToken: {update_token}
+                Bucket:
+                    Ref: STARKSystemBucket
+                Remarks: This will empty the STARKSystemBucket for DELETE STACK operations
+            DependsOn:
+                -   STARKSystemBucket
         STARKProjectDefaultLambdaServiceRole:
             Type: AWS::IAM::Role
             Properties:
