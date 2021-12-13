@@ -30,10 +30,11 @@ def lambda_handler(event, context):
     jsonified_payload   = json.loads(raw_data_model)
     data_model          = yaml.safe_load(jsonified_payload["data_model"])
     project_varname     = converter.convert_to_system_name(data_model.get('__STARK_project_name__'))
-    CF_stack_name       = converter.convert_to_system_name(data_model.get('__STARK_project_name__'), "cf-stack")
+    project_stack_name  = converter.convert_to_system_name(data_model.get('__STARK_project_name__'), "cf-stack")
     response            = s3.get_bucket_location(Bucket=codegen_bucket_name)
     bucket_location     = response['LocationConstraint']
     CF_url              = f'https://{codegen_bucket_name}.s3-{bucket_location}.amazonaws.com/codegen_dynamic/{project_varname}/STARK_SAM_{project_varname}.yaml'
+    CF_stack_name       = f'CICD-pipeline-{project_stack_name}'
 
     #We need the service role for Cloudformation from our central config file
     response = s3.get_object(
