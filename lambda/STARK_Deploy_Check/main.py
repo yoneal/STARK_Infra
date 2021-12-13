@@ -50,6 +50,7 @@ def lambda_handler(event, context):
 
     try:
         response          = cfn.describe_stacks( StackName=CF_stack_name )
+        print(response)
         stack_status      = response['Stacks'][0]['StackStatus']
         stack_description = response['Stacks'][0]['Description']
     except botocore.exceptions.ClientError as error:
