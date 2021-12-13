@@ -57,6 +57,7 @@ Document:
         - Description: string`,
         },
         api_key: '',
+        current_stack: 0,
         deploy_visibility: 'hidden',
         model_readonly: false,
         loading_message: '',
@@ -189,7 +190,8 @@ Document:
         deploy_check: function () {
 
             let data = {
-                data_model: this.form.data_model
+                data_model: this.form.data_model,
+                current_stack: root.current_stack
             }
 
             let fetchData = {
@@ -214,32 +216,50 @@ Document:
                 console.log("DONE!");
                 console.log(data);
 
+                //Status tracker:
+                //  current_stack tracks which of the three stacks we are currently tracking:
+                //  0 - CI/CD Pipeline stack
+                //  1 - Bootstrapper stack
+                //  2 - Main application stack
+                //  Based on the information
+                const stack_messages = []
+                stack_messages.push() = 'Deployment 1 of 3: Your CI/CD Pipeline... <br>'
+                stack_messages.push() = 'Deployment 1 of 3: Your CI/CD Pipeline... DONE!<br>Deployment 2 of 3: System Bootstrapper...<br>'
+                stack_messages.push() = 'Deployment 1 of 3: Your CI/CD Pipeline... DONE!<br>Deployment 2 of 3: System Bootstrapper...DONE!<br>Deployment 3 of 3: Your main application...<br>'
+                root.current_stack = data['current_stack']
+                root.loading_message = stack_messages[root.current_stack]
+                    
                 //Comm loop:
                 //  data will contain an index 'retry' which is bool. True means we should call root.deploy_check() again.
                 //  While it is looping, each communication also contains `status` and `message` aside from `retry`.
                 //  We should display `status` and `message` to the user.
+
                 if(data['retry'] == true) {
 
                     if (root.msg_counter == 1) {
-                        root.loading_message = "Look at you, testing out next-gen serverless tech! BIG BRAIN MOVE!"
+                        root.loading_message += "Look at you, testing out next-gen serverless tech! BIG BRAIN MOVE!"
                     }
                     else if (root.msg_counter == 2) {
-                        root.loading_message = "DID YOU KNOW: Trying out STARK proves you are a person of exquisite taste and sophistication. (True story)"
+                        root.loading_message += "DID YOU KNOW: Trying out STARK proves you are a person of exquisite taste and sophistication. (True story)"
                     }
                     else if (root.msg_counter == 3) {
-                        root.loading_message = "Serverless is the most sustainable form of computing. Thanks for being a good friend to the environment!"
+                        root.loading_message += "Serverless is the most sustainable form of computing. Thanks for being a good friend to the environment!"
                     }
                     else if (root.msg_counter == 4) {
-                        root.loading_message = "It won't be long now dawg, we're almost done!"
+                        root.loading_message += "It won't be long now dawg, we're almost done!"
                     }
                     else {
-                        root.loading_message = "Hmmm... we're taking a bit longer than usual... must be traffic!"
+                        root.loading_message += "Hmmm... we're taking a bit longer than usual... must be traffic!"
                     }
     
                     root.msg_counter += 1;
+                    if(root.msg_counter > 5) {
+                        //Just reset so we can cycle through the messages instead of looking like we're stuck
+                        root.msg_counter = 1
+                    }
                     root.deploy_check()
                 }
-                else if (data['result'] == "SUCCESS") {
+                else if (data['result'] == "SUCCESS" && data['current_stack'] == 2 ) {
                     //Success:
                     //Data should contain the S3 bucket URL for website hosting that was created for us.
                     //We'll show a link to the user, for clicking and fun.
