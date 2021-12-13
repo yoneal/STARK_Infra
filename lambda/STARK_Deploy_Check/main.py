@@ -52,7 +52,6 @@ def lambda_handler(event, context):
         response          = cfn.describe_stacks( StackName=CF_stack_name )
         print(response)
         stack_status      = response['Stacks'][0]['StackStatus']
-        stack_description = response['Stacks'][0]['Description']
     except botocore.exceptions.ClientError as error:
         if error.response['Error']['Code'] == 'ValidationError':
             if CF_stack_name == f"STARK-project-{project_stackname}":
@@ -78,12 +77,13 @@ def lambda_handler(event, context):
 
     print("Current stack: " + str(current_stack))
     print("Stack status: " + stack_status)
-    print("Stack description: " + stack_description)
 
     url           = ''
     result        = ''
     if stack_status in [ 'CREATE_COMPLETE', 'UPDATE_COMPLETE' ]:
 
+        stack_description = response['Stacks'][0]['Description']
+        print("Stack description: " + stack_description)
 
         if current_stack < 2:
             result = 'SUCCESS'
