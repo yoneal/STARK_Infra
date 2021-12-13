@@ -67,7 +67,7 @@ Document:
         ui_visibility: 'block',
         visibility: 'visible',
         wait_counter: 0,
-        wait_limit: 5
+        wait_limit: 12
     },
     methods:{
         send_to_STARK: function () {
