@@ -118,7 +118,7 @@ def lambda_handler(event, context):
     cf_template = f"""\
     AWSTemplateFormatVersion: '2010-09-09'
     Transform: AWS::Serverless-2016-10-31
-    Description: AWS SAM template for STARK code gen
+    Description: STARK-generated CI/CD Pipeline for Project [{project_name}]
     Resources:
         STARKProjectCodeBuildServiceRole:
             Type: AWS::IAM::Role
