@@ -93,7 +93,7 @@ def create(data):
     cf_template = f"""\
     AWSTemplateFormatVersion: '2010-09-09'
     Transform: AWS::Serverless-2016-10-31
-    Description: AWS SAM template for STARK code gen
+    Description: STARK-generated serverless application, Project [{project_name}]
     Parameters:
         UserCICDPipelineBucketNameParameter:
             Type: String
