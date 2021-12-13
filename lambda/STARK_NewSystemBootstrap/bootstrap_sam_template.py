@@ -101,7 +101,7 @@ def create(data):
     cf_template = f"""\
     AWSTemplateFormatVersion: '2010-09-09'
     Transform: AWS::Serverless-2016-10-31
-    Description: Bootstraps a new STARK-generated system
+    Description: Bootstrapper
     Parameters:
         Placeholder:
             Type: String

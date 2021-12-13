@@ -49,8 +49,9 @@ def lambda_handler(event, context):
     sleep(10)
 
     try:
-        response = cfn.describe_stacks( StackName=CF_stack_name )
-        stack_status = response['Stacks'][0]['StackStatus']
+        response          = cfn.describe_stacks( StackName=CF_stack_name )
+        stack_status      = response['Stacks'][0]['StackStatus']
+        stack_description = response['Stacks'][0]['StackStatus']
     except botocore.exceptions.ClientError as error:
         if error.response['Error']['Code'] == 'ValidationError':
             if CF_stack_name == f"STARK-project-{project_stackname}":
@@ -78,23 +79,31 @@ def lambda_handler(event, context):
     result        = ''
     if stack_status in [ 'CREATE_COMPLETE', 'UPDATE_COMPLETE' ]:
 
-        result = 'SUCCESS: ' + stack_map[current_stack]
 
-        if current_stack == 2:
+        if current_stack < 2:
+            result = 'SUCCESS'
+            retry = True
+            #Tell client to ask for tracking of the next stack
+            current_stack = current_stack + 1
+
+        elif current_stack == 2 and stack_description != "Bootstrapper":
             response = cfn.describe_stack_resource(
                 StackName=CF_stack_name,
                 LogicalResourceId='STARKSystemBucket'
             )
 
+            result          = 'SUCCESS'
             retry           = False
             bucket_name     = response['StackResourceDetail']['PhysicalResourceId']
             response        = s3.get_bucket_location(Bucket=bucket_name)
             bucket_location = response['LocationConstraint']
             url             = f"http://{bucket_name}.s3-website-{bucket_location}.amazonaws.com/"
         else:
-            retry = True
-            #Tell client to ask for tracking of the next stack
-            current_stack = current_stack + 1
+            #Tell client to keep tracking stack 2. We're still waiting for the
+            #   CI/CD pipeline to update the stack from bootstrapper to main application
+            retry         = True
+            result        = ''
+            current_stack = 2
 
 
     elif stack_status == 'CREATE_FAILED':
