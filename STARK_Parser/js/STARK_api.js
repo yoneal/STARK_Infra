@@ -223,19 +223,13 @@ Document:
                 //  0 - CI/CD Pipeline stack
                 //  1 - Bootstrapper stack
                 //  2 - Main application stack
-                //  Based on the information
-                const stack_messages = []
-                stack_messages.push('Deployment 1 of 3: Your CI/CD Pipeline... <br>')
-                stack_messages.push('Deployment 1 of 3: Your CI/CD Pipeline... DONE!<br>Deployment 2 of 3: System Bootstrapper...<br>')
-                stack_messages.push('Deployment 1 of 3: Your CI/CD Pipeline... DONE!<br>Deployment 2 of 3: System Bootstrapper...DONE!<br>Deployment 3 of 3: Your main application...<br>')
-                stack_messages.push('Deployment 1 of 3: Your CI/CD Pipeline... DONE!<br>Deployment 2 of 3: System Bootstrapper...DONE!<br>Deployment 3 of 3: Your main application...DONE!<br>')
+                const stack_messages = [
+                    'Deployment 1 of 3: Your CI/CD Pipeline... <br>',
+                    'Deployment 2 of 3: System Bootstrapper...<br>',
+                    'Deployment 3 of 3: Your main application...<br>'
+                ]
                 root.current_stack = data['current_stack']
-                if (root.current_stack == 2 && data['result'] == "SUCCESS") {
-                    root.loading_message = stack_messages[3]
-                }
-                else {
-                    root.loading_message = stack_messages[root.current_stack]
-                }
+                root.loading_message = stack_messages[root.current_stack]
 
                 //Comm loop:
                 //  data will contain an index 'retry' which is bool. True means we should call root.deploy_check() again.
