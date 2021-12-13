@@ -9,6 +9,7 @@ from time import sleep
 #Extra modules
 import yaml
 import boto3
+import botocore
 
 #Private modules
 import convert_friendly_to_system as converter
@@ -47,11 +48,31 @@ def lambda_handler(event, context):
     print('Sleeping for 10!')
     sleep(10)
 
-    response = cfn.describe_stacks(
-        StackName=CF_stack_name
-    )
+    try:
+        response = cfn.describe_stacks( StackName=CF_stack_name )
+        stack_status = response['Stacks'][0]['StackStatus']
+    except botocore.exceptions.ClientError as error:
+        if error.response['Error']['Code'] == 'ValidationError':
+            if CF_stack_name == f"STARK-project-{project_stackname}":
+                #We should just wait again, the application sometimes takes a while.
+                #   We'll let the client decide how long to retry when it comes to ValidationErrors here
+                #   Implementing client-side retries makes more sense, since our lambda function is stateless.
+                payload = {
+                    'current_stack': current_stack,
+                    'status': 'STACK_NOT_FOUND',
+                    'retry': True,
+                    'result': 'STACK_NOT_FOUND',
+                    'url': ''
+                }
 
-    stack_status = response['Stacks'][0]['StackStatus']
+                return {
+                    "isBase64Encoded": False,
+                    "statusCode": 200,
+                    "body": json.dumps(payload),
+                    "headers": {
+                        "Content-Type": "application/json",
+                    }
+                }
 
     url           = ''
     result        = ''
@@ -77,7 +98,7 @@ def lambda_handler(event, context):
 
 
     elif stack_status == 'CREATE_FAILED':
-        result = 'FAILED: ' + stack_map[current_stack]
+        result = 'FAILED'
         retry = False
 
     elif stack_status == 'ROLLBACK_IN_PROGRESS':

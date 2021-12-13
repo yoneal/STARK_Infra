@@ -59,13 +59,15 @@ Document:
         api_key: '',
         current_stack: 0,
         deploy_visibility: 'hidden',
-        model_readonly: false,
         loading_message: '',
-        visibility: 'visible',
+        model_readonly: false,
+        msg_counter: 0,
         spinner_display: 'block',
         success_message: 'Welcome to STARK: Serverless Transformation and Acceleration Resource Kit.<br> The STARK Parser is idle',
-        msg_counter: 0,
-        ui_visibility: 'block'
+        ui_visibility: 'block',
+        visibility: 'visible',
+        wait_counter: 0,
+        wait_limit: 5
     },
     methods:{
         send_to_STARK: function () {
@@ -226,13 +228,31 @@ Document:
                 stack_messages.push('Deployment 1 of 3: Your CI/CD Pipeline... <br>')
                 stack_messages.push('Deployment 1 of 3: Your CI/CD Pipeline... DONE!<br>Deployment 2 of 3: System Bootstrapper...<br>')
                 stack_messages.push('Deployment 1 of 3: Your CI/CD Pipeline... DONE!<br>Deployment 2 of 3: System Bootstrapper...DONE!<br>Deployment 3 of 3: Your main application...<br>')
+                stack_messages.push('Deployment 1 of 3: Your CI/CD Pipeline... DONE!<br>Deployment 2 of 3: System Bootstrapper...DONE!<br>Deployment 3 of 3: Your main application...DONE!<br>')
                 root.current_stack = data['current_stack']
-                root.loading_message = stack_messages[root.current_stack]
-                    
+                if (root.current_stack == 2 && data['result'] == "SUCCESS") {
+                    root.loading_message = stack_messages[3]
+                }
+                else {
+                    root.loading_message = stack_messages[root.current_stack]
+                }
+
                 //Comm loop:
                 //  data will contain an index 'retry' which is bool. True means we should call root.deploy_check() again.
                 //  While it is looping, each communication also contains `status` and `message` aside from `retry`.
                 //  We should display `status` and `message` to the user.
+                //  There's also a special status to track - "STACK_NOT_FOUND" - that means we should decide here whether to
+                //  retry again (i.e., wait to see if the stack eventually gets created), or if we've waited enough and there's
+                //  probably an internal error that prevented the stack from being created
+                if(data['result'] == "STACK_NOT_FOUND") {
+                    root.wait_counter +=1
+                    if (root.wait_counter > root.wait_limit) {
+                        //We've waited enough, abort
+                        data['retry'] = false
+                        data['result'] = 'FAILED'
+                        data['status'] = 'STACK NOT FOUND: Stack #' + root.current_stack
+                    }
+                }
 
                 if(data['retry'] == true) {
 
@@ -271,7 +291,6 @@ Document:
                 else if (data['result'] == "FAILED") {
                     //This means CF Stack execution eventually failed.
                     console.log("CF Stack Execution failure...");
-                    root.loading_message = ""
                     root.spinner_hide();
                     root.success_message = "Sorry, STARK failed to deploy due to an internal error. It's not you, it's us! {" +  data['status'] + "}";
 
