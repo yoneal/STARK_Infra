@@ -151,6 +151,8 @@ def get_file_from_bucket(bucket_name, static_file):
         Key = static_file
     )
 
+    print(f"File retrieved: {static_file}")
     print(response)
-    source_code = response['Body'].read().decode('ascii')
+    source_code = response['Body'].read().decode()
+    print("Successfully decoded (utf-8 default)")
     return source_code
