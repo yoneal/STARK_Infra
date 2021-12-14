@@ -122,19 +122,13 @@ def lambda_handler(event, context):
 
 def add_to_commit(source_code, key, files_to_commit):
 
-    # if type(source_code) is str:
-    #     source_code = source_code.encode()
-
-    # files_to_commit.append({
-    #     'filePath': f"static/{key}",
-    #     'fileContent': source_code
-    # })
+    if type(source_code) is str:
+        source_code = source_code.encode()
 
     files_to_commit.append({
         'filePath': f"static/{key}",
-        'fileContent': source_code.encode()
+        'fileContent': source_code
     })
-
 
 def list_prebuilt_static_files(bucket_name, prebuilt_static_files):
     response = s3.list_objects_v2(
@@ -151,8 +145,5 @@ def get_file_from_bucket(bucket_name, static_file):
         Key = static_file
     )
 
-    print(f"File retrieved: {static_file}")
-    print(response)
-    source_code = response['Body'].read().decode()
-    print("Successfully decoded (utf-8 default)")
+    source_code = response['Body'].read()
     return source_code
