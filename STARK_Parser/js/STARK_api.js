@@ -290,8 +290,8 @@ Document:
                     root.loading_message = ""
                     root.spinner_hide();
                     root.success_message = "Success! Here's your new system URL: <a href='" + data['url'] + "'>" + data['url'] + "</a>";
-                    root.success_message = "<br> Time start: " + root.deploy_time_start
-                    root.success_message = "<br> Time end: " + root.deploy_time_end
+                    root.success_message += "<br> Time start: " + root.deploy_time_start
+                    root.success_message += "<br> Time end: " + root.deploy_time_end
                 }
                 else if (data['result'] == "FAILED") {
                     //This means CF Stack execution eventually failed.
