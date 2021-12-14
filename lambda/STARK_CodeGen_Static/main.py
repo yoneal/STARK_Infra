@@ -25,9 +25,11 @@ import cgstatic_html_listview as cg_listview
 import cgstatic_html_homepage as cg_homepage
 import convert_friendly_to_system as converter
 
-s3  = boto3.client('s3')
-api = boto3.client('apigatewayv2')
-git = boto3.client('codecommit')
+s3   = boto3.client('s3')
+api  = boto3.client('apigatewayv2')
+git  = boto3.client('codecommit')
+cicd = boto3.client('codepipeline')
+
 
 helper = CfnResource() #We're using the AWS-provided helper library to minimize the tedious boilerplate just to signal back to CloudFormation
 

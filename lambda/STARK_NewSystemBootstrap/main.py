@@ -101,7 +101,8 @@ def create_handler(event, context):
 
     #######################################
     #Immediately trigger the CI/CD pipeline
-    response = cicd.start_pipeline_execution(name=f"STARK_{project_varname}_pipeline")
+    #FIXME: see if uncommenting this actually results in speedup
+    #response = cicd.start_pipeline_execution(name=f"STARK_{project_varname}_pipeline")
 
 
 @helper.delete
