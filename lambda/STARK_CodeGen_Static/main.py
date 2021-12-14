@@ -151,5 +151,7 @@ def get_file_from_bucket(bucket_name, static_file):
         Key = static_file
     )
 
-    source_code = response['Body'].read().decode('utf-8')
+    encoding = response['ContentEncoding']
+    print(encoding)
+    source_code = response['Body'].read().decode(encoding)
     return source_code
