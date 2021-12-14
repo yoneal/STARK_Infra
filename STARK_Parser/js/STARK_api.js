@@ -58,6 +58,8 @@ Document:
         },
         api_key: '',
         current_stack: 0,
+        deploy_time_end: '',
+        deploy_time_start: '',
         deploy_visibility: 'hidden',
         loading_message: '',
         model_readonly: false,
@@ -132,6 +134,9 @@ Document:
             root.success_message = ''
             root.loading_message = "STARK is deploying your system...." 
             root.spinner_show();
+
+            let datetime = new Date()
+            root.deploy_time_start = datetime.getHours() + ":" + datetime.getMinutes() + ":" + datetime.getSeconds()
 
             root.deploy_visibility = 'hidden';
             root.ui_visibility = 'none';
@@ -278,9 +283,15 @@ Document:
                     //Data should contain the S3 bucket URL for website hosting that was created for us.
                     //We'll show a link to the user, for clicking and fun.
                     console.log("Success! Here's your new system URL: " + data['url']);
+
+                    let datetime = new Date()
+                    root.deploy_time_end = datetime.getHours() + ":" + datetime.getMinutes() + ":" + datetime.getSeconds()
+        
                     root.loading_message = ""
                     root.spinner_hide();
                     root.success_message = "Success! Here's your new system URL: <a href='" + data['url'] + "'>" + data['url'] + "</a>";
+                    root.success_message = "<br> Time start: " + root.deploy_time_start
+                    root.success_message = "<br> Time end: " + root.deploy_time_end
                 }
                 else if (data['result'] == "FAILED") {
                     //This means CF Stack execution eventually failed.
