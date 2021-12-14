@@ -125,8 +125,6 @@ def create(data):
                 Bucket:
                     Ref: STARKSystemBucket
                 Remarks: This will empty the STARKSystemBucket for DELETE STACK operations
-            DependsOn:
-                -   STARKSystemBucket
         STARKProjectDefaultLambdaServiceRole:
             Type: AWS::IAM::Role
             Properties:

@@ -17,7 +17,6 @@ phases:
       - aws s3 cp lambda/packaged_layers s3://$CODEGEN/STARKLambdaLayers --recursive --exclude="*" --include="*.zip"
 
 artifacts:
-  type: zip
   files:
     - template.yml
     - outputtemplate.yml

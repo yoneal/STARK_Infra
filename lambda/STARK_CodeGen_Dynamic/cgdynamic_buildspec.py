@@ -28,7 +28,6 @@ def create(data):
                 - aws s3 cp outputtemplate.yml s3://$BUCKET/{project_varname}/
 
         artifacts:
-            type: zip
             files:
                 - template.yml
                 - outputtemplate.yml
