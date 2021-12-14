@@ -21,7 +21,6 @@ import convert_friendly_to_system as converter
 s3   = boto3.client('s3')
 lmb  = boto3.client('lambda')
 git  = boto3.client('codecommit')
-cicd = boto3.client('codepipeline')
 
 helper = CfnResource() #We're using the AWS-provided helper library to minimize the tedious boilerplate just to signal back to CloudFormation
 
@@ -99,10 +98,6 @@ def create_handler(event, context):
         putFiles=files_to_commit
     )
 
-    #######################################
-    #Immediately trigger the CI/CD pipeline
-    #FIXME: see if uncommenting this actually results in speedup
-    #response = cicd.start_pipeline_execution(name=f"STARK_{project_varname}_pipeline")
 
 
 @helper.delete

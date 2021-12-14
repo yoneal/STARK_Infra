@@ -378,9 +378,7 @@ def lambda_handler(event, context):
                 DDBTable: {ddb_table_name}
                 CICDBucket: {cicd_bucket_name}
                 RepoName: !GetAtt STARKProjectRepo.Name
-                Remarks: Bootstraps the new system to allow the newly-created pipeline to trigger code generation
-            DependsOn:
-                - STARKProjectCICDPipeline"""
+                Remarks: Bootstraps the new system to allow the newly-created pipeline to trigger code generation"""
 
 
     if ENV_TYPE == "PROD":
