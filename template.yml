@@ -176,6 +176,7 @@ Resources:
                 - AWSLambdaBasicExecutionRole
                 - ReadOnlyAccess
                 - AWSCodeCommitFullAccess
+                - AWSCodePipeline_FullAccess
             Layers:
                 - !Ref CFCustomResourceHelperLayer
                 - !Ref PyYamlLayer
@@ -232,6 +233,7 @@ Resources:
                 - AmazonSSMReadOnlyAccess
                 - AWSLambdaBasicExecutionRole
                 - AWSCodeCommitFullAccess
+                - AWSCodePipeline_FullAccess
             Layers:
                 - !Ref CFCustomResourceHelperLayer
                 - !Ref PyYamlLayer
