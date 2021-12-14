@@ -24,9 +24,6 @@ s3  = boto3.client('s3')
 lmb = boto3.client('lambda')
 git = boto3.client('codecommit')
 
-lambda_path_filename = '/tmp/lambda_function.py'
-lambda_path_zipfile = '/tmp/lambda.zip'
-
 helper = CfnResource() #We're using the AWS-provided helper library to minimize the tedious boilerplate just to signal back to CloudFormation
 
 @helper.create

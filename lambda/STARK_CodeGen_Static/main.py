@@ -95,9 +95,6 @@ def create_handler(event, context):
 
     ############################################
     #Commit our static files to the project repo
-
-    #First, get commit id of initial commit by CGDynamic (the lambda source codes commit)
-
     response = git.get_branch(
         repositoryName=repo_name,
         branchName='master'        
@@ -113,6 +110,10 @@ def create_handler(event, context):
         commitMessage='Initial commit of static files',
         putFiles=files_to_commit
     )
+
+    #######################################
+    #Immediately trigger the CI/CD pipeline
+    response = cicd.start_pipeline_execution(name=f"STARK_{project_varname}_pipeline")
 
 
 @helper.delete

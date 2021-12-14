@@ -18,12 +18,10 @@ import bootstrap_sam_template as boot_sam
 import bootstrap_template_conf as boot_conf
 import convert_friendly_to_system as converter
 
-s3  = boto3.client('s3')
-lmb = boto3.client('lambda')
-git = boto3.client('codecommit')
-
-lambda_path_filename = '/tmp/lambda_function.py'
-lambda_path_zipfile = '/tmp/lambda.zip'
+s3   = boto3.client('s3')
+lmb  = boto3.client('lambda')
+git  = boto3.client('codecommit')
+cicd = boto3.client('codepipeline')
 
 helper = CfnResource() #We're using the AWS-provided helper library to minimize the tedious boilerplate just to signal back to CloudFormation
 
@@ -90,7 +88,7 @@ def create_handler(event, context):
     })   
 
 
-    ##################################################
+    #################################
     #Commit files to the project repo
     response = git.create_commit(
         repositoryName=repo_name,
@@ -100,6 +98,10 @@ def create_handler(event, context):
         commitMessage='Initial commit - bootstrapper',
         putFiles=files_to_commit
     )
+
+    #######################################
+    #Immediately trigger the CI/CD pipeline
+    response = cicd.start_pipeline_execution(name=f"STARK_{project_varname}_pipeline")
 
 
 @helper.delete
