@@ -61,7 +61,7 @@ def create_handler(event, context):
 
     #STARK main JS file
     data = { 'API Endpoint': endpoint, 'Entities': models }
-    add_to_commit(cg_js_stark.create(data), key=f"js/STARK.js", files_to_commit=files_to_commit)
+    add_to_commit(cg_js_stark.create(data), key=f"js/STARK.js", files_to_commit=files_to_commit, file_path='static')
 
     #For each entity, we'll create a set of HTML and JS Files
     for entity in models:
@@ -70,18 +70,18 @@ def create_handler(event, context):
         cgstatic_data = { "Entity": entity, "PK": pk, "Columns": cols, "Bucket Name": bucket_name, "Project Name": project_name }
         entity_varname = converter.convert_to_system_name(entity)
 
-        add_to_commit(source_code=cg_add.create(cgstatic_data), key=f"{entity_varname}_add.html", files_to_commit=files_to_commit)
-        add_to_commit(source_code=cg_edit.create(cgstatic_data), key=f"{entity_varname}_edit.html", files_to_commit=files_to_commit)
-        add_to_commit(source_code=cg_delete.create(cgstatic_data), key=f"{entity_varname}_delete.html", files_to_commit=files_to_commit)
-        add_to_commit(source_code=cg_view.create(cgstatic_data), key=f"{entity_varname}_view.html", files_to_commit=files_to_commit)
-        add_to_commit(source_code=cg_listview.create(cgstatic_data), key=f"{entity_varname}.html", files_to_commit=files_to_commit)
-        add_to_commit(source_code=cg_js_app.create(cgstatic_data), key=f"js/{entity_varname}_app.js", files_to_commit=files_to_commit)
-        add_to_commit(source_code=cg_js_view.create(cgstatic_data), key=f"js/{entity_varname}_view.js", files_to_commit=files_to_commit)
+        add_to_commit(source_code=cg_add.create(cgstatic_data), key=f"{entity_varname}_add.html", files_to_commit=files_to_commit, file_path='static')
+        add_to_commit(source_code=cg_edit.create(cgstatic_data), key=f"{entity_varname}_edit.html", files_to_commit=files_to_commit, file_path='static')
+        add_to_commit(source_code=cg_delete.create(cgstatic_data), key=f"{entity_varname}_delete.html", files_to_commit=files_to_commit, file_path='static')
+        add_to_commit(source_code=cg_view.create(cgstatic_data), key=f"{entity_varname}_view.html", files_to_commit=files_to_commit, file_path='static')
+        add_to_commit(source_code=cg_listview.create(cgstatic_data), key=f"{entity_varname}.html", files_to_commit=files_to_commit, file_path='static')
+        add_to_commit(source_code=cg_js_app.create(cgstatic_data), key=f"js/{entity_varname}_app.js", files_to_commit=files_to_commit, file_path='static')
+        add_to_commit(source_code=cg_js_view.create(cgstatic_data), key=f"js/{entity_varname}_view.js", files_to_commit=files_to_commit, file_path='static')
   
     #HTML+JS for our homepage
     homepage_data = { "Project Name": project_name }
-    add_to_commit(source_code=cg_homepage.create(homepage_data), key=f"index.html", files_to_commit=files_to_commit)
-    add_to_commit(source_code=cg_js_home.create(homepage_data), key=f"js/STARK_home.js", files_to_commit=files_to_commit)
+    add_to_commit(source_code=cg_homepage.create(homepage_data), key=f"index.html", files_to_commit=files_to_commit, file_path='static')
+    add_to_commit(source_code=cg_js_home.create(homepage_data), key=f"js/STARK_home.js", files_to_commit=files_to_commi, file_path='static't)
 
 
     ###############################################
@@ -90,8 +90,15 @@ def create_handler(event, context):
     list_prebuilt_static_files(codegen_bucket_name, prebuilt_static_files)
     for static_file in prebuilt_static_files:
         #We don't want to include the "STARKWebSource/" prefix in our list of keys, hence the string slice in static_file
-        add_to_commit(source_code=get_file_from_bucket(codegen_bucket_name, static_file), key=static_file[15:], files_to_commit=files_to_commit)
+        add_to_commit(source_code=get_file_from_bucket(codegen_bucket_name, static_file), key=static_file[15:], files_to_commit=files_to_commit, file_path='static')
 
+    ##############################################
+    #Get pre-built utilities for local development
+    prebuilt_utilities = []
+    list_prebuilt_utilities(codegen_bucket_name, prebuilt_utilities)
+    for static_file in prebuilt_utilities:
+        #We don't want to include the "STARKUtilities/" prefix in our list of keys, hence the string slice in static_file
+        add_to_commit(source_code=get_file_from_bucket(codegen_bucket_name, static_file), key=static_file[15:], files_to_commit=files_to_commit, file_path='bin')
 
     ############################################
     #Commit our static files to the project repo
@@ -107,7 +114,7 @@ def create_handler(event, context):
         parentCommitId=commit_id,
         authorName='STARK::CGStatic',
         email='STARK@fakedomainstark.com',
-        commitMessage='Initial commit of static files',
+        commitMessage='Initial commit of static files and prebuilt utilities',
         putFiles=files_to_commit
     )
 
@@ -120,17 +127,18 @@ def lambda_handler(event, context):
     helper(event, context)
 
 
-def add_to_commit(source_code, key, files_to_commit):
+def add_to_commit(source_code, key, files_to_commit, file_path):
 
     if type(source_code) is str:
         source_code = source_code.encode()
 
     files_to_commit.append({
-        'filePath': f"static/{key}",
+        'filePath': f"{file_path}/{key}",
         'fileContent': source_code
     })
 
 def list_prebuilt_static_files(bucket_name, prebuilt_static_files):
+    #Web files
     response = s3.list_objects_v2(
         Bucket = bucket_name,
         Prefix = "STARKWebSource/",
@@ -138,6 +146,18 @@ def list_prebuilt_static_files(bucket_name, prebuilt_static_files):
 
     for static_file in response['Contents']:
         prebuilt_static_files.append(static_file['Key'])
+
+
+def list_prebuilt_utilities(bucket_name, prebuilt_static_files):
+    #Utilities
+    response = s3.list_objects_v2(
+        Bucket = bucket_name,
+        Prefix = "STARKUtilities/",
+    )
+
+    for static_file in response['Contents']:
+        prebuilt_static_files.append(static_file['Key'])
+
 
 def get_file_from_bucket(bucket_name, static_file):
     response = s3.get_object(
