@@ -81,7 +81,7 @@ def create_handler(event, context):
     #HTML+JS for our homepage
     homepage_data = { "Project Name": project_name }
     add_to_commit(source_code=cg_homepage.create(homepage_data), key=f"index.html", files_to_commit=files_to_commit, file_path='static')
-    add_to_commit(source_code=cg_js_home.create(homepage_data), key=f"js/STARK_home.js", files_to_commit=files_to_commi, file_path='static't)
+    add_to_commit(source_code=cg_js_home.create(homepage_data), key=f"js/STARK_home.js", files_to_commit=files_to_commi, file_path='static')
 
 
     ###############################################
