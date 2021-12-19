@@ -159,7 +159,7 @@ def create(data):
                                         - 'dynamodb:Scan'
                                         - 'dynamodb:Query'
                                         - 'dynamodb:UpdateItem'
-                                    Resource: !Join [ ":", [ "arn:aws:dynamodb", {{!Ref AWS::Region}}, {{!Ref AWS::AccountId}}, "table/{ddb_table_name}"] ]
+                                    Resource: !Join [ ":", [ "arn:aws:dynamodb", !Ref AWS::Region, !Ref AWS::AccountId, "table/{ddb_table_name}"] ]
         STARKApiGateway:
             Type: AWS::Serverless::HttpApi
             Properties:
