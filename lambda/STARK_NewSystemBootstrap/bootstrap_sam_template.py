@@ -125,41 +125,6 @@ def create(data):
                 Bucket:
                     Ref: STARKSystemBucket
                 Remarks: This will empty the STARKSystemBucket for DELETE STACK operations
-        STARKProjectDefaultLambdaServiceRole:
-            Type: AWS::IAM::Role
-            Properties:
-                AssumeRolePolicyDocument:
-                    Version: '2012-10-17'
-                    Statement: 
-                        - 
-                            Effect: Allow
-                            Principal:
-                                Service: 
-                                    - 'lambda.amazonaws.com'
-                            Action: 'sts:AssumeRole'
-                ManagedPolicyArns:
-                    - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
-                Policies:
-                    - 
-                        PolicyName: PolicyForSTARKCodePipelineDeployServiceRole
-                        PolicyDocument:
-                            Version: '2012-10-17'
-                            Statement:
-                                - 
-                                    Sid: VisualEditor0
-                                    Effect: Allow
-                                    Action:
-                                        - 'iam:GetRole'
-                                        - 'dynamodb:BatchGetItem'
-                                        - 'dynamodb:BatchWriteItem'
-                                        - 'dynamodb:ConditionCheckItem'
-                                        - 'dynamodb:PutItem'
-                                        - 'dynamodb:DeleteItem'
-                                        - 'dynamodb:GetItem'
-                                        - 'dynamodb:Scan'
-                                        - 'dynamodb:Query'
-                                        - 'dynamodb:UpdateItem'
-                                    Resource: !Join [ ":", [ "arn:aws:dynamodb", !Ref AWS::Region, !Ref AWS::AccountId, "table/{ddb_table_name}"] ]
         STARKApiGateway:
             Type: AWS::Serverless::HttpApi
             Properties:
