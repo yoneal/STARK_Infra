@@ -100,6 +100,11 @@ def create_handler(event, context):
         #We don't want to include the "STARKUtilities/" prefix in our list of keys, hence the string slice in static_file
         add_to_commit(source_code=get_file_from_bucket(codegen_bucket_name, static_file), key=static_file[15:], files_to_commit=files_to_commit, file_path='bin')
 
+    ##########################################
+    #Add cloud resources document to our files
+    add_to_commit(source_code=cloud_resources, key="cloud_resources.yml", files_to_commit=files_to_commit, file_path='')
+
+
     ############################################
     #Commit our static files to the project repo
     response = git.get_branch(
@@ -127,13 +132,18 @@ def lambda_handler(event, context):
     helper(event, context)
 
 
-def add_to_commit(source_code, key, files_to_commit, file_path):
+def add_to_commit(source_code, key, files_to_commit, file_path=''):
 
     if type(source_code) is str:
         source_code = source_code.encode()
 
+    if file_path == '':
+        full_path = key
+    else:
+        full_path = f"{file_path}/{key}"
+
     files_to_commit.append({
-        'filePath': f"{file_path}/{key}",
+        'filePath': full_path,
         'fileContent': source_code
     })
 
