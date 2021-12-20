@@ -130,8 +130,7 @@ def create(data):
             Properties:
                 CorsConfiguration:
                     AllowOrigins:
-                        - "*"
-                        - "http://{s3_bucket_name}.s3-website-{!Ref AWS::Region}.amazonaws.com
+                        - !Join [ "", [ "http://{s3_bucket_name}.s3-website-", !Ref AWS::Region, ".amazonaws.com"] ]
                     AllowHeaders:
                         - "*"
                     AllowMethods:
