@@ -131,6 +131,7 @@ def create(data):
                 CorsConfiguration:
                     AllowOrigins:
                         - "*"
+                        - "http://{s3_bucket_name}.s3-website-{!Ref AWS::Region}.amazonaws.com
                     AllowHeaders:
                         - "*"
                     AllowMethods:
