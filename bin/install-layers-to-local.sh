@@ -10,4 +10,4 @@ cp -rf ../lambda/helpers/* $installpath
 
 echo "Installed custom layers in "$installpath"!"
 echo "Will now install third-party packages..."
-pip install boto3 pyyaml crhelper
+pip install boto3 pyyaml crhelper bcrypt
