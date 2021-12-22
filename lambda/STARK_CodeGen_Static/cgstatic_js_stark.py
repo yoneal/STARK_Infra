@@ -17,6 +17,7 @@ def create(data):
     #           Might have to fix in main.py, and pass full endpoint here instead of just the id.
     source_code = f"""\
         const STARK={{
+            'login_url':'{api_endpoint}/login',
             'sys_modules_url':'{api_endpoint}/sys_modules',"""
 
     #Each entity is a big module, has own endpoint
