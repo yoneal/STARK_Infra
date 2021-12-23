@@ -157,6 +157,30 @@ def create(data):
                                         - 'dynamodb:Query'
                                         - 'dynamodb:UpdateItem'
                                     Resource: !Join [ ":", [ "arn:aws:dynamodb", !Ref AWS::Region, !Ref AWS::AccountId, "table/{ddb_table_name}"] ]
+        CFCustomResourceHelperLayer:
+            Type: AWS::Lambda::LayerVersion
+            Properties:
+                Content:
+                    S3Bucket: !Ref UserCICDPipelineBucketNameParameter
+                    S3Key: {project_varname}/STARKLambdaLayers/CF_CustomResourceHelper_py38.zip
+                Description: Lambda-backed custom resource library for CloudFormation
+                LayerName: {project_varname}_CF_CustomResourceHelper
+        PyYamlLayer:
+            Type: AWS::Lambda::LayerVersion
+            Properties:
+                Content:
+                    S3Bucket: !Ref UserCICDPipelineBucketNameParameter
+                    S3Key: {project_varname}/STARKLambdaLayers/yaml_py38.zip
+                Description: YAML module for Python 3.x
+                LayerName: {project_varname}_PyYAML
+        BcryptLayer:
+            Type: AWS::Lambda::LayerVersion
+            Properties:
+                Content:
+                    S3Bucket: !Ref UserCICDPipelineBucketNameParameter
+                    S3Key: {project_varname}/STARKLambdaLayers/bcrypt_py38.zip
+                Description: bcrypt module for Python 3.x
+                LayerName: {project_varname}_bcrypt       
         STARKApiGateway:
             Type: AWS::Serverless::HttpApi
             Properties:

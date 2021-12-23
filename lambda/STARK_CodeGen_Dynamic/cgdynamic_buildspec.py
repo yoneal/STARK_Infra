@@ -25,6 +25,7 @@ def create(data):
                 - WEBSITE=$(cat template_configuration.json | python3 -c "import sys, json; print(json.load(sys.stdin)['Parameters']['UserWebsiteBucketNameParameter'])")
                 - aws cloudformation package --template-file template.yml --s3-bucket $BUCKET --s3-prefix {project_varname} --output-template-file outputtemplate.yml
                 - aws s3 cp static s3://$WEBSITE --recursive --acl public-read
+                - aws s3 cp lambda/packaged_layers s3://$BUCKET/{project_varname}/STARKLambdaLayers --recursive --exclude="*" --include="*.zip"
                 - aws s3 cp outputtemplate.yml s3://$BUCKET/{project_varname}/
 
         artifacts:
