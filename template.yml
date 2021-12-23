@@ -45,7 +45,7 @@ Resources:
                 S3Bucket: !Ref UserCodeGenBucketNameParameter
                 S3Key: STARKLambdaLayers/CF_CustomResourceHelper_py38.zip
             Description: Lambda-backed custom resource library for CloudFormation
-            LayerName: CF_CustomResourceHelper
+            LayerName: STARK_CF_CustomResourceHelper
     PyYamlLayer:
         Type: AWS::Lambda::LayerVersion
         Properties:
@@ -53,7 +53,7 @@ Resources:
                 S3Bucket: !Ref UserCodeGenBucketNameParameter
                 S3Key: STARKLambdaLayers/yaml_py38.zip
             Description: YAML module for Python 3.x
-            LayerName: PyYAML
+            LayerName: STARK_PyYAML
     BcryptLayer:
         Type: AWS::Lambda::LayerVersion
         Properties:
@@ -61,7 +61,7 @@ Resources:
                 S3Bucket: !Ref UserCodeGenBucketNameParameter
                 S3Key: STARKLambdaLayers/bcrypt_py38.zip
             Description: bcrypt module for Python 3.x
-            LayerName: bcrypt
+            LayerName: STARK_bcrypt
     STARKFriendlyToSystemNamesLayer:
         Type: AWS::Lambda::LayerVersion
         Properties:
