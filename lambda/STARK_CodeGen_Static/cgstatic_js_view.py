@@ -69,7 +69,7 @@ def create(data):
                 }},
                 visibility: 'hidden',
             }},
-            methods:{{
+            methods: {{
 
                 show: function () {{
                     this.visibility = 'visible';
