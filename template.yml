@@ -54,6 +54,14 @@ Resources:
                 S3Key: STARKLambdaLayers/yaml_py38.zip
             Description: YAML module for Python 3.x
             LayerName: PyYAML
+    BcryptLayer:
+        Type: AWS::Lambda::LayerVersion
+        Properties:
+            Content:
+                S3Bucket: !Ref UserCodeGenBucketNameParameter
+                S3Key: STARKLambdaLayers/bcrypt_py38.zip
+            Description: bcrypt module for Python 3.x
+            LayerName: bcrypt
     STARKFriendlyToSystemNamesLayer:
         Type: AWS::Lambda::LayerVersion
         Properties:
