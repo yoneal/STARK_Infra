@@ -100,6 +100,12 @@ def create_handler(event, context):
         #We don't want to include the "STARKUtilities/" prefix in our list of keys, hence the string slice in static_file
         add_to_commit(source_code=get_file_from_bucket(codegen_bucket_name, static_file), key=static_file[15:], files_to_commit=files_to_commit, file_path='bin')
 
+    prebuilt_layers = []
+    list_packaged_layers(codegen_bucket_name, prebuilt_layers)
+    for static_file in prebuilt_layers:
+        #We don't want to include the "STARKLambdaLayers/" prefix in our list of keys, hence the string slice in static_file
+        add_to_commit(source_code=get_file_from_bucket(codegen_bucket_name, static_file), key=static_file[18:], files_to_commit=files_to_commit, file_path='lambda/packaged_layers')
+
     ##########################################
     #Add cloud resources document to our files
     add_to_commit(source_code=yaml.dump(cloud_resources), key="cloud_resources.yml", files_to_commit=files_to_commit, file_path='')
@@ -163,6 +169,16 @@ def list_prebuilt_utilities(bucket_name, prebuilt_static_files):
     response = s3.list_objects_v2(
         Bucket = bucket_name,
         Prefix = "STARKUtilities/",
+    )
+
+    for static_file in response['Contents']:
+        prebuilt_static_files.append(static_file['Key'])
+
+def list_packaged_layers(bucket_name, prebuilt_static_files):
+    #Utilities
+    response = s3.list_objects_v2(
+        Bucket = bucket_name,
+        Prefix = "STARKLambdaLayers/",
     )
 
     for static_file in response['Contents']:
