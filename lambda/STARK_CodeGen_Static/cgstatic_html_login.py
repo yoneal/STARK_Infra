@@ -65,26 +65,30 @@ def create(data):
                         <div v-html="error_message" class="" v-bind:class="{{'mt-3': authFailure, 'p-3': authFailure, 'text-white': authFailure, 'bg-danger': authFailure, }}"></div>
                         <div v-html="info_message" class="" v-bind:class="{{'mt-3': authTry, 'p-3': authTry, 'text-white': authTry, 'bg-info': authTry }}"></div>
 
-                        <b-form class="pt-3">
-                            <b-form-input
-                                id="user_name"
-                                v-model="form.username"
-                                type="text"
-                                placeholder="Username"
-                                class="mb-4"
-                                size="lg"
-                                required
-                            ></b-form-input>
-                    
-                            <b-form-input
-                                id="user_pass"
-                                type="password"
-                                v-model="form.password"
-                                placeholder="Password"
-                                class="mb-4"
-                                size="lg" 
-                                required
-                            ></b-form-input>
+                    <b-form class="pt-3">
+                        <b-form-input
+                            id="user_name"
+                            ref="user_name"
+                            v-model="form.username"
+                            type="text"
+                            placeholder="Username"
+                            class="mb-4"
+                            size="lg"
+                            required
+                            v-on:keyup.enter="onUsernameEnter"
+                        ></b-form-input>
+
+                        <b-form-input
+                            id="user_pass"
+                            ref="user_pass"
+                            type="password"
+                            v-model="form.password"
+                            placeholder="Password"
+                            class="mb-4"
+                            size="lg" 
+                            required
+                            v-on:keyup.enter="root.submit()"
+                        ></b-form-input>
                     
                             <b-button 
                                 block 
