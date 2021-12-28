@@ -28,9 +28,6 @@ def create(data):
             <script src="js/STARK_loading_modal.js" defer></script>
             <script src="js/login.js" defer></script>
 
-            <script src="js/Item_app.js" defer></script>
-
-
             <title>{project_name} :: Login</title>
         </head>
         <body class="bg-light">
@@ -65,7 +62,8 @@ def create(data):
                         title="{project_name}" 
                         sub-title="Please log in to start your adventure.">
 
-                        <div v-html="error_message" class="text-danger mt-3"></div>
+                        <div v-html="error_message" class="" v-bind:class="{{'mt-3': authFailure, 'p-3': authFailure, 'text-white': authFailure, 'bg-danger': authFailure, }}"></div>
+                        <div v-html="info_message" class="" v-bind:class="{{'mt-3': authTry, 'p-3': authTry, 'text-white': authTry, 'bg-info': authTry }}"></div>
 
                         <b-form class="pt-3">
                             <b-form-input

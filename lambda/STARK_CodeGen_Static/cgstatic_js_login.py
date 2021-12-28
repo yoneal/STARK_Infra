@@ -14,7 +14,10 @@ def create(data):
                     username: '',
                     password: '',
                 }},
-                error_message: '&nbsp;'
+                error_message: '',
+                info_message: '',
+                authFailure: false,
+                authTry: false
             }},
             methods: {{
 
@@ -25,7 +28,10 @@ def create(data):
                 }},
             
                 submit: function () {{
-                    root.error_message = "&nbsp;"
+                    root.error_message = ""
+                    root.authFailure   = false
+                    root.authTry       = true
+                    root.info_message  = "Trying to log in..."
                     loading_modal.show()
                     console.log("Logging in!")
 
@@ -45,15 +51,27 @@ def create(data):
                         }}
                         else {{
                             console.log("Invalid username or password!")
-                            root.error_message = "Invalid username or password!"
+                            root.authTry       = false
+                            root.info_message  = ''
+                            root.error_message = "Invalid username or password"
+                            root.authFailure   = true
                         }}
         
                     }}).catch(function(error) {{
                         console.log("Encountered an error! [" + error + "]")
                         loading_modal.hide()
                     }});
+                }},
+
+                onUsernameEnter: function () {{
+                    console.log("Caught ENTER key in username field!")
+                    this.$refs["user_pass"].focus()
                 }}
             }}
         }})
+
+        window.onload = (event) => {{
+            document.getElementById("user_name").focus()
+        }};
     """
     return textwrap.dedent(source_code)
