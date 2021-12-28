@@ -59,8 +59,8 @@ Resources:
         Properties:
             Content:
                 S3Bucket: !Ref UserCodeGenBucketNameParameter
-                S3Key: STARKLambdaLayers/bcrypt_py38.zip
-            Description: bcrypt module for Python 3.x
+                S3Key: STARKLambdaLayers/bcrypt_py39.zip
+            Description: bcrypt module for Python 3.9
             LayerName: STARK_bcrypt
     STARKFriendlyToSystemNamesLayer:
         Type: AWS::Lambda::LayerVersion

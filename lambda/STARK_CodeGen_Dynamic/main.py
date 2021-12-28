@@ -13,6 +13,7 @@ import boto3
 from crhelper import CfnResource
 
 #Private modules
+import cgdynamic_login as cg_login
 import cgdynamic_modules as cg_mod
 import cgdynamic_dynamodb as cg_ddb
 import cgdynamic_buildspec as cg_build
@@ -80,13 +81,23 @@ def create_handler(event, context):
 
 
     ################################################
-    #Create our Lambda for the /modules API endpoint
+    #Create our Lambda for the /sys_modules API endpoint
     source_code = cg_mod.create({"Entities": entities})
     
     files_to_commit.append({
         'filePath': f"lambda/sys_modules/main.py",
         'fileContent': source_code.encode()
     })
+
+    ################################################
+    #Create our Lambda for the /login API endpoint
+    source_code = cg_login.create({"DynamoDB Name": ddb_table_name})
+    
+    files_to_commit.append({
+        'filePath': f"lambda/login/main.py",
+        'fileContent': source_code.encode()
+    })
+
 
     ###########################################
     #Create build files we need fo our pipeline:

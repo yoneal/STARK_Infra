@@ -9,12 +9,9 @@ import convert_friendly_to_system as converter
 
 def create(data):
 
-    api_endpoint  = data['API Endpoint']
-    entities        = data['Entities']
+    api_endpoint = data['API Endpoint']
+    entities     = data['Entities']
 
-    #FIXME: BUG! region is hardcoded here. Use endpoint property to get entire endpoint url programmatically, instead of stitching API ID with rest of URL compenents
-    #           This has been done already in STARK_ConfigWriter, follow pattern there. 
-    #           Might have to fix in main.py, and pass full endpoint here instead of just the id.
     source_code = f"""\
         const STARK={{
             'login_url':'{api_endpoint}/login',
@@ -36,6 +33,7 @@ def create(data):
                     mode: 'cors',
                     headers: {{ "Content-Type": "application/json" }},
                     method: method,
+                    credentials: 'include'
                 }}
 
                 if(this.methods_with_body.includes(method)) {{

@@ -15,11 +15,14 @@ from crhelper import CfnResource
 #Private modules
 import cgstatic_js_app as cg_js_app
 import cgstatic_js_view as cg_js_view
+import cgstatic_js_login as cg_js_login
 import cgstatic_js_homepage as cg_js_home
 import cgstatic_js_stark as cg_js_stark
+import cgstatic_css_login as cg_css_login
 import cgstatic_html_add  as cg_add
 import cgstatic_html_edit as cg_edit
 import cgstatic_html_view as cg_view
+import cgstatic_html_login as cg_login
 import cgstatic_html_delete as cg_delete
 import cgstatic_html_listview as cg_listview
 import cgstatic_html_homepage as cg_homepage
@@ -80,9 +83,14 @@ def create_handler(event, context):
   
     #HTML+JS for our homepage
     homepage_data = { "Project Name": project_name }
-    add_to_commit(source_code=cg_homepage.create(homepage_data), key=f"index.html", files_to_commit=files_to_commit, file_path='static')
+    add_to_commit(source_code=cg_homepage.create(homepage_data), key=f"home.html", files_to_commit=files_to_commit, file_path='static')
     add_to_commit(source_code=cg_js_home.create(homepage_data), key=f"js/STARK_home.js", files_to_commit=files_to_commit, file_path='static')
 
+    #Login HTML+JS+CSS
+    login_data = { "Project Name": project_name }
+    add_to_commit(source_code=cg_login.create(homepage_data), key=f"index.html", files_to_commit=files_to_commit, file_path='static')
+    add_to_commit(source_code=cg_js_login.create(homepage_data), key=f"js/login.js", files_to_commit=files_to_commit, file_path='static')
+    add_to_commit(source_code=cg_css_login.create(homepage_data), key=f"css/login.css", files_to_commit=files_to_commit, file_path='static')
 
     ###############################################
     #Get pre-built static files from codegen bucket

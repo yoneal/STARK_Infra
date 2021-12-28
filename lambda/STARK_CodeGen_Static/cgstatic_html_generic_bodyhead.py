@@ -30,7 +30,7 @@ def create(data, breadcrumb):
 
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                    <li class="breadcrumb-item"><a href="home.html">Home</a></li>
                     <li class="breadcrumb-item"><a href="{entity_varname}.html">{entity}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{breadcrumb}</li>
                 </ol>

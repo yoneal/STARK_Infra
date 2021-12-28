@@ -178,8 +178,8 @@ def create(data):
             Properties:
                 Content:
                     S3Bucket: !Ref UserCICDPipelineBucketNameParameter
-                    S3Key: {project_varname}/STARKLambdaLayers/bcrypt_py38.zip
-                Description: bcrypt module for Python 3.x
+                    S3Key: {project_varname}/STARKLambdaLayers/bcrypt_py39.zip
+                Description: bcrypt module for Python 3.9
                 LayerName: {project_varname}_bcrypt       
         STARKApiGateway:
             Type: AWS::Serverless::HttpApi
@@ -187,12 +187,14 @@ def create(data):
                 CorsConfiguration:
                     AllowOrigins:
                         - !Join [ "", [ "http://{s3_bucket_name}.s3-website-", !Ref AWS::Region, ".amazonaws.com"] ]
+                        - http://localhost
                     AllowHeaders:
+                        - "Content-Type"
                         - "*"
                     AllowMethods:
                         - "*"
+                    AllowCredentials: True
                     MaxAge: 200
-                    AllowCredentials: False
         STARKDynamoDB:
             Type: AWS::DynamoDB::Table
             Properties:
@@ -275,6 +277,26 @@ def create(data):
                 Runtime: python3.8
                 Handler: main.lambda_handler
                 CodeUri: lambda/sys_modules
-                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn"""
+                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
+        STARKBackendApiForLogin:
+            Type: AWS::Serverless::Function
+            Properties:
+                Events:
+                    LoginPostEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /login
+                            Method: POST
+                            ApiId:
+                                Ref: STARKApiGateway
+                Runtime: python3.9
+                Handler: main.lambda_handler
+                CodeUri: lambda/login
+                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
+                Layers:
+                    - !Ref BcryptLayer
+                MemorySize: 1760
+                Timeout: 5
+        """
 
     return textwrap.dedent(cf_template)
