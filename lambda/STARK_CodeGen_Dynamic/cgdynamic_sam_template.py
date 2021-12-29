@@ -162,7 +162,7 @@ def create(data):
             Properties:
                 Content:
                     S3Bucket: !Ref UserCICDPipelineBucketNameParameter
-                    S3Key: {project_varname}/STARKLambdaLayers/CF_CustomResourceHelper_py38.zip
+                    S3Key: {project_varname}/STARKLambdaLayers/CF_CustomResourceHelper_py39.zip
                 Description: Lambda-backed custom resource library for CloudFormation
                 LayerName: {project_varname}_CF_CustomResourceHelper
         PyYamlLayer:
@@ -170,7 +170,7 @@ def create(data):
             Properties:
                 Content:
                     S3Bucket: !Ref UserCICDPipelineBucketNameParameter
-                    S3Key: {project_varname}/STARKLambdaLayers/yaml_py38.zip
+                    S3Key: {project_varname}/STARKLambdaLayers/yaml_py39.zip
                 Description: YAML module for Python 3.x
                 LayerName: {project_varname}_PyYAML
         BcryptLayer:

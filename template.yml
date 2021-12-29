@@ -43,7 +43,7 @@ Resources:
         Properties:
             Content:
                 S3Bucket: !Ref UserCodeGenBucketNameParameter
-                S3Key: STARKLambdaLayers/CF_CustomResourceHelper_py38.zip
+                S3Key: STARKLambdaLayers/CF_CustomResourceHelper_py39.zip
             Description: Lambda-backed custom resource library for CloudFormation
             LayerName: STARK_CF_CustomResourceHelper
     PyYamlLayer:
@@ -51,7 +51,7 @@ Resources:
         Properties:
             Content:
                 S3Bucket: !Ref UserCodeGenBucketNameParameter
-                S3Key: STARKLambdaLayers/yaml_py38.zip
+                S3Key: STARKLambdaLayers/yaml_py39.zip
             Description: YAML module for Python 3.x
             LayerName: STARK_PyYAML
     BcryptLayer:
@@ -67,7 +67,7 @@ Resources:
         Properties:
             Content:
                 S3Bucket: !Ref UserCodeGenBucketNameParameter
-                S3Key: STARKLambdaLayers/STARK_friendly_to_system_name_py38.zip
+                S3Key: STARKLambdaLayers/STARK_friendly_to_system_name_py39.zip
             Description: STARK module for converting user-supplied, human-friendly identifiers into system-friendly entity or variable names
             LayerName: STARK_friendly_to_system_name
     STARKParserFunc:
@@ -81,7 +81,7 @@ Resources:
                         Method: POST
                         ApiId:
                             Ref: STARKParserApi
-            Runtime: python3.8
+            Runtime: python3.9
             Handler: main.lambda_handler
             CodeUri: lambda/STARK_Parser
             Environment:
@@ -99,7 +99,7 @@ Resources:
     STARKCFWriterFunc:
         Type: AWS::Serverless::Function
         Properties:
-            Runtime: python3.8
+            Runtime: python3.9
             Handler: main.lambda_handler
             CodeUri: lambda/STARK_CFWriter
             Environment:
@@ -125,7 +125,7 @@ Resources:
                         Method: POST
                         ApiId:
                             Ref: STARKParserApi
-            Runtime: python3.8
+            Runtime: python3.9
             Handler: main.lambda_handler
             CodeUri: lambda/STARK_Deploy
             Environment:
@@ -153,7 +153,7 @@ Resources:
                         Method: POST
                         ApiId:
                             Ref: STARKParserApi
-            Runtime: python3.8
+            Runtime: python3.9
             Handler: main.lambda_handler
             CodeUri: lambda/STARK_Deploy_Check
             Environment:
@@ -171,7 +171,7 @@ Resources:
     STARKCodeGenStaticWriter:
         Type: AWS::Serverless::Function
         Properties:
-            Runtime: python3.8
+            Runtime: python3.9
             Handler: main.lambda_handler
             CodeUri: lambda/STARK_CodeGen_Static
             Environment:
@@ -192,7 +192,7 @@ Resources:
     STARKCodeGenDynamicWriter:
         Type: AWS::Serverless::Function
         Properties:
-            Runtime: python3.8
+            Runtime: python3.9
             Handler: main.lambda_handler
             CodeUri: lambda/STARK_CodeGen_Dynamic
             Environment:
@@ -212,7 +212,7 @@ Resources:
     STARKBucketCleanerFunc:
         Type: AWS::Serverless::Function
         Properties:
-            Runtime: python3.8
+            Runtime: python3.9
             Handler: main.lambda_handler
             CodeUri: lambda/STARK_WebsiteBucketCleaner
             Environment:
@@ -228,7 +228,7 @@ Resources:
     STARKNewSystemBootstrap:
         Type: AWS::Serverless::Function
         Properties:
-            Runtime: python3.8
+            Runtime: python3.9
             Handler: main.lambda_handler
             CodeUri: lambda/STARK_NewSystemBootstrap
             Environment:
@@ -248,7 +248,7 @@ Resources:
     STARKWebsiteUpdaterFunc:
         Type: AWS::Serverless::Function
         Properties:
-            Runtime: python3.8
+            Runtime: python3.9
             Handler: main.lambda_handler
             CodeUri: lambda/STARK_WebsiteUpdater
             Environment:
@@ -278,7 +278,7 @@ Resources:
     STARKConfigWriterFunc:
         Type: AWS::Serverless::Function
         Properties:
-            Runtime: python3.8
+            Runtime: python3.9
             Handler: main.lambda_handler
             CodeUri: lambda/STARK_ConfigWriter
             Environment:
