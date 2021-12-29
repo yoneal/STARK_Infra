@@ -257,11 +257,15 @@ def create(data):
                             Method: DELETE
                             ApiId:
                                 Ref: STARKApiGateway
-                Runtime: python3.8
+                Runtime: python3.9
                 Handler: main.lambda_handler
                 CodeUri: lambda/{entity_endpoint_name}
-                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn"""
-
+                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
+                Architectures:
+                    - x86_64
+                MemorySize: 128
+                Timeout: 5"""
+    
     cf_template += f"""
         STARKBackendApiForSysModules:
             Type: AWS::Serverless::Function
@@ -278,6 +282,10 @@ def create(data):
                 Handler: main.lambda_handler
                 CodeUri: lambda/sys_modules
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
+                Architectures:
+                    - x86_64
+                MemorySize: 128
+                Timeout: 5
         STARKBackendApiForLogin:
             Type: AWS::Serverless::Function
             Properties:
@@ -295,6 +303,8 @@ def create(data):
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
                 Layers:
                     - !Ref BcryptLayer
+                Architectures:
+                    - x86_64
                 MemorySize: 1760
                 Timeout: 5
         """

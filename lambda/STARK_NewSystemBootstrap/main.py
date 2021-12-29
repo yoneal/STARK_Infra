@@ -10,6 +10,7 @@ import textwrap
 #Extra modules
 import yaml
 import boto3
+import botocore
 from crhelper import CfnResource
 
 #Private modules
@@ -32,9 +33,6 @@ def create_handler(event, context):
     cicd_bucket     = event.get('ResourceProperties', {}).get('CICDBucket','')
     
     project_varname = converter.convert_to_system_name(project_name)
-
-    #UpdateToken = we need this as part of the Lambda deployment package path, to force CF to redeploy our Lambdas
-    update_token = event.get('ResourceProperties', {}).get('UpdateToken','')
 
     #DynamoDB table name from our CF template
     ddb_table_name = event.get('ResourceProperties', {}).get('DDBTable','')
@@ -86,17 +84,39 @@ def create_handler(event, context):
         'fileContent': source_code.encode()
     })   
 
+    ############################################
+    #Commit our static files to the project repo
+    #We have a try-except block here to distringuish a CREATE from an UPDATE.
+    #During CF CREATE, there isn't a branch yet, so it goes to the except block
+    #During CF UPDATE, we need the parent commit id because it won't be the first commmit anymore
 
-    #################################
-    #Commit files to the project repo
-    response = git.create_commit(
-        repositoryName=repo_name,
-        branchName='master',
-        authorName='STARK::Bootstrapper',
-        email='STARK@fakedomainstark.com',
-        commitMessage='Initial commit - bootstrapper',
-        putFiles=files_to_commit
-    )
+    try:
+        response = git.get_branch(
+            repositoryName=repo_name,
+            branchName='master'        
+        )
+        commit_id = response['branch']['commitId']
+        response = git.create_commit(
+            repositoryName=repo_name,
+            branchName='master',
+            parentCommitId=commit_id,
+            authorName='STARK::Bootstrapper',
+            email='STARK@fakedomainstark.com',
+            commitMessage='Initial commit - bootstrapper',
+            putFiles=files_to_commit
+        )
+    except botocore.exceptions.ClientError as error:
+        #Branch doesn't exist yet, because we are in a CREATE op instead of UPDATE.
+        #No need for a parent commit id
+
+        response = git.create_commit(
+            repositoryName=repo_name,
+            branchName='master',
+            authorName='STARK::Bootstrapper',
+            email='STARK@fakedomainstark.com',
+            commitMessage='Initial commit - bootstrapper',
+            putFiles=files_to_commit
+        )
 
 
 
