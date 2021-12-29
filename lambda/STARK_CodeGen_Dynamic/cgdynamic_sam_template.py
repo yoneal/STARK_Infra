@@ -278,7 +278,7 @@ def create(data):
                             Method: GET
                             ApiId:
                                 Ref: STARKApiGateway
-                Runtime: python3.8
+                Runtime: python3.9
                 Handler: main.lambda_handler
                 CodeUri: lambda/sys_modules
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
