@@ -10,6 +10,7 @@ import textwrap
 #Extra modules
 import yaml
 import boto3
+import botocore
 from crhelper import CfnResource
 
 #Private modules
@@ -99,9 +100,9 @@ def create_handler(event, context):
             repositoryName=repo_name,
             branchName='master',
             parentCommitId=commit_id,
-            authorName='STARK::CGStatic',
+            authorName='STARK::Bootstrapper',
             email='STARK@fakedomainstark.com',
-            commitMessage='Initial commit of static files and prebuilt utilities',
+            commitMessage='Initial commit - bootstrapper',
             putFiles=files_to_commit
         )
     except botocore.exceptions.ClientError as error:
