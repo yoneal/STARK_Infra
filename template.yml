@@ -96,6 +96,8 @@ Resources:
                 - !Ref PyYamlLayer
                 - !Ref STARKFriendlyToSystemNamesLayer
             Timeout: 60
+            Architectures:
+                - arm64
     STARKCFWriterFunc:
         Type: AWS::Serverless::Function
         Properties:
