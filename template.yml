@@ -116,6 +116,8 @@ Resources:
                 - !Ref PyYamlLayer
                 - !Ref STARKFriendlyToSystemNamesLayer
             Timeout: 60
+            Architectures:
+                - arm64
     STARKDeployFunc:
         Type: AWS::Serverless::Function
         Properties:
@@ -144,6 +146,8 @@ Resources:
                 - !Ref PyYamlLayer
                 - !Ref STARKFriendlyToSystemNamesLayer
             Timeout: 600
+            Architectures:
+                - arm64
     STARKDeployCheckFunc:
         Type: AWS::Serverless::Function
         Properties:
@@ -170,6 +174,8 @@ Resources:
                 - !Ref PyYamlLayer
                 - !Ref STARKFriendlyToSystemNamesLayer
             Timeout: 600
+            Architectures:
+                - arm64
     STARKCodeGenStaticWriter:
         Type: AWS::Serverless::Function
         Properties:
@@ -191,6 +197,8 @@ Resources:
                 - !Ref PyYamlLayer
                 - !Ref STARKFriendlyToSystemNamesLayer
             Timeout: 60
+            Architectures:
+                - arm64
     STARKCodeGenDynamicWriter:
         Type: AWS::Serverless::Function
         Properties:
@@ -211,6 +219,8 @@ Resources:
                 - !Ref PyYamlLayer
                 - !Ref STARKFriendlyToSystemNamesLayer
             Timeout: 60
+            Architectures:
+                - arm64
     STARKBucketCleanerFunc:
         Type: AWS::Serverless::Function
         Properties:
