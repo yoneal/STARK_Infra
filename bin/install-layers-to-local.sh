@@ -15,7 +15,7 @@ else
 fi
 
 echo "Hello, these are the detected python system paths:"
-echo -e "import sys\nfor path in sys.path:\n  if 'site-packages' in path: print(path)" | $1
+echo -e "import sys\nfor path in sys.path:\n  if 'site-packages' in path: print(path)" | $pycommand
 
 echo "Where do you want to install your lambda layers for local access? (copy-paste the full path here):"
 read installpath
