@@ -15,6 +15,7 @@ def create(data):
     source_code = f"""\
     #Python Standard Library
     import base64
+    import datetime
     import json
     import secrets
 
@@ -121,7 +122,19 @@ def create(data):
 
 
                 #2. Create USER SESSION, with token in it
-                
+                dt_now             = datetime.datetime.now()
+                dt_p12             = dt_now + datetime.timedelta(hours=12)
+                item               = {}
+                item['pk']         = {'S' : sess_id}
+                item['sk']         = {'S' : "sess|info"}
+                item['TTL']        = {'S' : str(dt_p12)}
+                item['sess_start'] = {'S' : str(dt_now)}
+                response = ddb.put_item(
+                    TableName=ddb_table,
+                    Item=item,
+                )
+                #FIXME: embed permissions in session as well? (Tentative design)
+
                 
 
                 #3. Return token (and session ID?) to client for cookie creating purposes
