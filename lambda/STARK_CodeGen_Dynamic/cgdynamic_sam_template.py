@@ -33,7 +33,8 @@ def create(data):
             Key=f'STARKConfiguration/STARK_config.yml'
         )
         config = yaml.safe_load(response['Body'].read().decode('utf-8')) 
-        cleaner_service_token    = config['Cleaner_ARN']  
+        cleaner_service_token   = config['Cleaner_ARN']  
+        prelaunch_service_token = config['Prelaunch_ARN']
 
     else:
         #We only have to do this because `SAM local start-api` doesn't follow CORS info from template.yml, which is bullshit
@@ -307,6 +308,21 @@ def create(data):
                     - x86_64
                 MemorySize: 1760
                 Timeout: 5
+        STARKPreLaunch:
+            Type: AWS::CloudFormation::CustomResource
+            Properties:
+                ServiceToken: {prelaunch_service_token}
+                UpdateToken: {update_token}
+                Project: {project_name}
+                DDBTable: {ddb_table_name}
+                Remarks: Final system pre-launch tasks - things to do after the entirety of the new system's infra and code have been deployed
+            DependsOn:
+                - STARKApiGateway
+                - STARKBackendApiForLogin
+                - STARKBackendApiForSysModules
+                - STARKBucketCleaner
+                - STARKDynamoDB
+                - STARKProjectDefaultLambdaServiceRole
         """
 
     return textwrap.dedent(cf_template)

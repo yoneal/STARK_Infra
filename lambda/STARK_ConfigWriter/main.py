@@ -29,7 +29,8 @@ def make_config_file(event, _):
     cf_deploy_role_arn   = os.environ['CF_DEPLOY_ROLE_ARN']
     api_gateway_id       = os.environ['API_GATEWAY_ID']
     cicd_bucket_name     = os.environ['CICD_BUCKET_NAME']
-    bootstrapper_arn     = os.environ['NEW_SYSTEM_BOOTSTRAP_ARN']
+    bootstrapper_arn     = os.environ['SYSTEM_BOOTSTRAP_ARN']
+    prelaunch_arn        = os.environ['SYSTEM_PRELAUNCH_ARN']
 
     source_code = f"""\
         API_Gateway_ID: '{api_gateway_id}'
@@ -39,7 +40,8 @@ def make_config_file(event, _):
         CGDynamic_ARN: '{cg_dynamic_arn}'
         CGStatic_ARN: '{cg_static_arn}'
         CICD_Bucket_Name: '{cicd_bucket_name}'
-        Cleaner_ARN: '{cleaner_arn}'    
+        Cleaner_ARN: '{cleaner_arn}'
+        Prelaunch_ARN: '{prelaunch_arn}'
         """
 
     source_code = textwrap.dedent(source_code)
