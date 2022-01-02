@@ -124,11 +124,11 @@ def create(data):
                 #2. Create USER SESSION, with token in it
                 dt_now             = datetime.datetime.now()
                 dt_p12             = dt_now + datetime.timedelta(hours=12)
-                item               = {}
-                item['pk']         = {'S' : sess_id}
-                item['sk']         = {'S' : "sess|info"}
-                item['TTL']        = {'S' : str(dt_p12)}
-                item['sess_start'] = {'S' : str(dt_now)}
+                item               = {{}}
+                item['pk']         = {{'S' : sess_id}}
+                item['sk']         = {{'S' : "sess|info"}}
+                item['TTL']        = {{'S' : str(dt_p12)}}
+                item['sess_start'] = {{'S' : str(dt_now)}}
                 response = ddb.put_item(
                     TableName=ddb_table,
                     Item=item,
