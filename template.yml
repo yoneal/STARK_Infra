@@ -280,9 +280,11 @@ Resources:
                 - !Ref CFCustomResourceHelperLayer
                 - !Ref PyYamlLayer
                 - !Ref STARKFriendlyToSystemNamesLayer
-            Timeout: 60
+                - !Ref BcryptLayer
             Architectures:
-                - arm64
+                - x86_64
+            MemorySize: 1760
+            Timeout: 60
     STARKWebsiteUpdaterFunc:
         Type: AWS::Serverless::Function
         Properties:
