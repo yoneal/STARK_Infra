@@ -90,7 +90,6 @@ Resources:
                     CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
             Policies:
                 - AmazonS3ReadOnlyAccess
-                - AmazonSSMReadOnlyAccess
                 - AWSLambda_FullAccess
             Layers:
                 - !Ref PyYamlLayer
@@ -110,7 +109,6 @@ Resources:
                     CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
             Policies:
                 - AmazonS3FullAccess
-                - AmazonSSMFullAccess
                 - AWSLambdaBasicExecutionRole
             Layers:
                 - !Ref PyYamlLayer
@@ -137,7 +135,6 @@ Resources:
                     STARK_ENVIRONMENT_TYPE: PROD
                     CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
             Policies:
-                - AmazonSSMReadOnlyAccess
                 - AWSLambda_FullAccess
                 - AWSCloudFormationFullAccess
                 - IAMFullAccess
@@ -166,7 +163,6 @@ Resources:
                 Variables:
                     STARK_ENVIRONMENT_TYPE: PROD
             Policies:
-                - AmazonSSMReadOnlyAccess
                 - AWSLambda_FullAccess
                 - AWSCloudFormationFullAccess
                 - AmazonS3ReadOnlyAccess
@@ -188,7 +184,6 @@ Resources:
                     CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
             Policies:
                 - AmazonS3FullAccess
-                - AmazonSSMReadOnlyAccess
                 - AWSLambdaBasicExecutionRole
                 - ReadOnlyAccess
                 - AWSCodeCommitFullAccess
@@ -211,7 +206,6 @@ Resources:
                     CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
             Policies:
                 - AmazonS3FullAccess
-                - AmazonSSMReadOnlyAccess
                 - AWSLambda_FullAccess 
                 - AWSCodeCommitFullAccess
             Layers:
@@ -232,7 +226,6 @@ Resources:
                     STARK_ENVIRONMENT_TYPE: PROD
             Policies:
                 - AmazonS3FullAccess
-                - AmazonSSMReadOnlyAccess
                 - AWSLambdaBasicExecutionRole
             Layers:
                 - !Ref CFCustomResourceHelperLayer
@@ -251,7 +244,6 @@ Resources:
                     CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
             Policies:
                 - AmazonS3FullAccess
-                - AmazonSSMReadOnlyAccess
                 - AWSLambdaBasicExecutionRole
                 - AWSCodeCommitFullAccess
             Layers:
@@ -272,10 +264,9 @@ Resources:
                     STARK_ENVIRONMENT_TYPE: PROD
                     CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
             Policies:
-                - AmazonS3FullAccess
-                - AmazonSSMReadOnlyAccess
                 - AWSLambdaBasicExecutionRole
                 - AWSCodeCommitFullAccess
+                - AmazonDynamoDBFullAccess
             Layers:
                 - !Ref CFCustomResourceHelperLayer
                 - !Ref PyYamlLayer
@@ -299,7 +290,6 @@ Resources:
                     API_GATEWAY_ID: !Ref STARKParserApi
             Policies:
                 - AmazonS3FullAccess
-                - AmazonSSMReadOnlyAccess
                 - AWSLambdaBasicExecutionRole
                 - ReadOnlyAccess
             Layers:
@@ -338,7 +328,6 @@ Resources:
                     SYSTEM_PRELAUNCH_ARN: !GetAtt STARKSystemPreLaunch.Arn
             Policies:
                 - AmazonS3FullAccess
-                - AmazonSSMReadOnlyAccess
                 - AWSLambdaBasicExecutionRole
             Layers:
                 - !Ref CFCustomResourceHelperLayer
