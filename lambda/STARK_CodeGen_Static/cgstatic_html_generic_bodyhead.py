@@ -21,10 +21,19 @@ def create(data, breadcrumb):
         <div class="container-fluid">
 
             <div class="row bg-primary mb-3 p-3 text-white" style="background-image: url('images/banner_generic_blue.png')">
-                <div class="col">
+                <div class="col-12 col-md-10">
                 <h2>
                     {project}
                 </h2>
+                </div>
+                <div class="col-12 col-md-2 text-right">
+                    <b-button 
+                        v-b-tooltip.hover title="Log out"
+                        class="mt-3" 
+                        variant="light" 
+                        size="sm">
+                        <img src="images/logout.png" height="20px">
+                    </b-button>
                 </div>
             </div>
 
