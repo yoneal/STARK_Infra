@@ -73,4 +73,4 @@ def hash_password(password):
     print(hashed)
     print(f"Total time for {rounds} rounds: {time_t} seconds")
 
-    return str(hashed)
+    return hashed.decode()
