@@ -11,10 +11,11 @@ import convert_friendly_to_system as converter
 def create(data, breadcrumb):
 
     project = data["Project Name"]
-    entity  = data["Entity"]
-
-    #Convert human-friendly names to variable-friendly names
-    entity_varname = converter.convert_to_system_name(entity)
+    
+    if breadcrumb != "_HomePage":
+        entity  = data["Entity"]
+        #Convert human-friendly names to variable-friendly names
+        entity_varname = converter.convert_to_system_name(entity)
 
     source_code = f"""\
         <body class="bg-light">

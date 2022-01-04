@@ -10,8 +10,6 @@ import cgstatic_html_generic_loadingspinner as cg_loadspin
 
 def create(data):
 
-    project_name = data["Project Name"]
-
     source_code  = cg_header.create(data, "Homepage")
     source_code += cg_bodyhead.create(data, "_Homepage")
 
