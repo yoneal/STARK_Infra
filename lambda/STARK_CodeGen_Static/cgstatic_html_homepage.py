@@ -16,26 +16,6 @@ def create(data):
     source_code += cg_bodyhead.create(data, "_Homepage")
 
     source_code += f"""\
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-            <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-
-            <link rel="stylesheet" href="css/bootstrap.min.css" />
-            <link rel="stylesheet" href="css/bootstrap-vue.css" />
-            <link rel="stylesheet" href="css/STARK.css" />
-
-            <script src="js/vue.js" defer></script>
-            <script src="js/bootstrap-vue.min.js" defer></script>
-            <script src="js/STARK.js" defer></script>
-            <script src="js/STARK_spinner.js" defer></script>
-            <script src="js/STARK_home.js" defer></script>
-
-            <title>{project_name}</title>
-        </head>
-
         <div class="container-fluid" id="vue-root">
             <div class="modules_list_box">
                 <div class="row" id="modules_list">
