@@ -29,7 +29,7 @@ def create(data):
     source_code += cg_loadmod.create()
 
     source_code += f"""\
-        <div class="container hidden" id="vue-root" :style="{{visibility: visibility}}">
+        <div class="container hidden" :style="{{visibility: visibility}}">
             <div class="row">
                 <div class="col">
                     <div class="my-auto">

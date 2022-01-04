@@ -19,7 +19,7 @@ def create(data, breadcrumb):
 
     source_code = f"""\
         <body class="bg-light">
-        <div class="container-fluid">
+        <div class="container-fluid" id="vue-root">
 
             <div class="row bg-primary mb-3 p-3 text-white" style="background-image: url('images/banner_generic_blue.png')">
                 <div class="col-12 col-md-10">

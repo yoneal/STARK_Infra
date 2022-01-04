@@ -34,11 +34,15 @@ def create(data, special="none"):
             <script src="js/vue.js" defer></script>
             <script src="js/bootstrap-vue.min.js" defer></script>
             <script src="js/STARK.js" defer></script>
-            <script src="js/STARK_spinner.js" defer></script>
-            <script src="js/STARK_loading_modal.js" defer></script>"""
-    
-    if special != "HomePage":
+            <script src="js/STARK_spinner.js" defer></script>"""
+
+    if special == "HomePage":
         source_code += f"""\
+            <script src="js/STARK_home.js" defer></script>"""
+
+    else:
+        source_code += f"""\
+            <script src="js/STARK_loading_modal.js" defer></script>
             <script src="js/{entity_varname}_app.js" defer></script>
             <script src="js/{entity_varname}_view.js" defer></script>"""
 
