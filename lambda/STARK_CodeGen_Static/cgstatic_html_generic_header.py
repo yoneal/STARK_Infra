@@ -38,7 +38,7 @@ def create(data, special="none"):
             <script src="js/STARK_loading_modal.js" defer></script>"""
     
     if special != "HomePage":
-        source_code = f"""\
+        source_code += f"""\
             <script src="js/{entity_varname}_app.js" defer></script>
             <script src="js/{entity_varname}_view.js" defer></script>"""
 
