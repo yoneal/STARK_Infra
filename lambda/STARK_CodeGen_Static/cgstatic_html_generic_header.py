@@ -34,11 +34,13 @@ def create(data, special="none"):
             <script src="js/vue.js" defer></script>
             <script src="js/bootstrap-vue.min.js" defer></script>
             <script src="js/STARK.js" defer></script>
-            <script src="js/STARK_spinner.js" defer></script>"""
+            <script src="js/STARK_spinner.js" defer></script>
+"""
 
     if special == "HomePage":
         source_code += f"""\
-            <script src="js/STARK_home.js" defer></script>"""
+            <script src="js/STARK_home.js" defer></script>
+"""
 
     else:
         source_code += f"""\
@@ -60,10 +62,10 @@ def create(data, special="none"):
 
     if(special == "none"):
         source_code += f"""
-                <script src="js/generic_root_get.js" defer></script>"""
+            <script src="js/generic_root_get.js" defer></script>"""
     elif(special == "Listview"):
         source_code += f"""
-                <script src="js/generic_root_list.js" defer></script>"""
+            <script src="js/generic_root_list.js" defer></script>"""
 
     if special != "HomePage":
         source_code += f"""
