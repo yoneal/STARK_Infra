@@ -30,16 +30,16 @@ def create(data):
     source_code += cg_loadmod.create()
 
     source_code += f"""\
-        <div class="container hidden" :style="{{visibility: visibility}}">
-            <div class="row">
-                <div class="col">
-                    <div class="my-auto">
-                        <form class="border p-3">
-                        <input type="hidden" id="orig_{pk_varname}" v-model="{entity_varname}.{pk_varname}">
-                        <div class="form-group">
-                            <label for="{pk_varname}">{pk}</label>
-                            <input type="text" class="form-control" id="{pk_varname}" placeholder="" v-model="{entity_varname}.{pk_varname}">
-                        </div>"""
+            <div class="container hidden" :style="{{visibility: visibility}}">
+                <div class="row">
+                    <div class="col">
+                        <div class="my-auto">
+                            <form class="border p-3">
+                            <input type="hidden" id="orig_{pk_varname}" v-model="{entity_varname}.{pk_varname}">
+                            <div class="form-group">
+                                <label for="{pk_varname}">{pk}</label>
+                                <input type="text" class="form-control" id="{pk_varname}" placeholder="" v-model="{entity_varname}.{pk_varname}">
+                            </div>"""
 
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
@@ -52,15 +52,16 @@ def create(data):
         })
 
         source_code += f"""
-                        <div class="form-group">
-                            <label for="{col_varname}">{col}</label>
-                            {html_control_code}
-                        </div>"""
+                            <div class="form-group">
+                                <label for="{col_varname}">{col}</label>
+                                {html_control_code}
+                            </div>"""
 
     source_code += f"""\
-                        <button type="button" class="btn btn-secondary" onClick="window.location.href='{entity_varname}.html'">Back</button>
-                        <button type="button" class="btn btn-primary float-right" onClick="root.update()">Update</button>
-                        </form>
+                            <button type="button" class="btn btn-secondary" onClick="window.location.href='{entity_varname}.html'">Back</button>
+                            <button type="button" class="btn btn-primary float-right" onClick="root.update()">Update</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

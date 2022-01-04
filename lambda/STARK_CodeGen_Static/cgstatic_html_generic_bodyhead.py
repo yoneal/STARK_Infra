@@ -68,11 +68,7 @@ def create(data, breadcrumb):
                     <li class="breadcrumb-item"><a href="{entity_varname}.html">{entity}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{breadcrumb}</li>
                 </ol>
-            </nav>"""
-       
-    source_code += f"""\
-
-        </div>
+            </nav>
 
 """
 

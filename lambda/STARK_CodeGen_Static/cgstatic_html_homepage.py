@@ -14,7 +14,6 @@ def create(data):
     source_code += cg_bodyhead.create(data, "_HomePage")
 
     source_code += f"""\
-        <div class="container-fluid">
             <div class="modules_list_box">
                 <div class="row" id="modules_list">
                     <template v-for="module in modules" id="modules-template">

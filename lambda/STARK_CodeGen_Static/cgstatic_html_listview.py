@@ -26,7 +26,6 @@ def create(data):
     source_code += cg_bodyhead.create(data, "_Listview")
 
     source_code += f"""\
-        <div class="container-fluid">
             <button type="button" class="btn btn-primary mb-2" onClick="window.location.href='{entity_varname}_add.html'"> <b>+</b> Add </button>
             <div class="row">
                 <div class="col overflow-auto">
