@@ -193,7 +193,10 @@ def create(data):
                         - "Content-Type"
                         - "*"
                     AllowMethods:
-                        - "*"
+                        - GET
+                        - POST
+                        - PUT
+                        - DELETE
                     AllowCredentials: True
                     MaxAge: 200
         STARKDynamoDB:
