@@ -10,8 +10,8 @@ import cgstatic_html_generic_loadingspinner as cg_loadspin
 
 def create(data):
 
-    source_code  = cg_header.create(data, "Homepage")
-    source_code += cg_bodyhead.create(data, "_Homepage")
+    source_code  = cg_header.create(data, "HomePage")
+    source_code += cg_bodyhead.create(data, "_HomePage")
 
     source_code += f"""\
         <div class="container-fluid" id="vue-root">

@@ -13,7 +13,7 @@ def create(data, special="none"):
 
     project = data["Project Name"]
 
-    if special != "Homepage":
+    if special != "HomePage":
         entity  = data["Entity"]
         cols    = data["Columns"]
         #Convert human-friendly names to variable-friendly names
@@ -37,7 +37,7 @@ def create(data, special="none"):
             <script src="js/STARK_spinner.js" defer></script>
             <script src="js/STARK_loading_modal.js" defer></script>"""
     
-    if special != "Homepage":
+    if special != "HomePage":
         source_code = f"""\
             <script src="js/{entity_varname}_app.js" defer></script>
             <script src="js/{entity_varname}_view.js" defer></script>"""
@@ -61,7 +61,7 @@ def create(data, special="none"):
         source_code += f"""
                 <script src="js/generic_root_list.js" defer></script>"""
 
-    if special != "Homepage":
+    if special != "HomePage":
         source_code += f"""
 
             <title>{project} - {entity}</title>
