@@ -10,6 +10,7 @@ import cgstatic_relationships as cg_rel
 import cgstatic_html_generic_header as cg_header
 import cgstatic_html_generic_footer as cg_footer
 import cgstatic_html_generic_bodyhead as cg_bodyhead
+import cgstatic_html_generic_loadingmodal as cg_loadmod
 import convert_friendly_to_system as converter
 
 def create(data):
@@ -25,6 +26,7 @@ def create(data):
 
     source_code  = cg_header.create(data)
     source_code += cg_bodyhead.create(data, "View")
+    source_code += cg_loadmod.create()
 
     source_code += f"""\
         <div class="container hidden" id="vue-root" :style="{{visibility: visibility}}">

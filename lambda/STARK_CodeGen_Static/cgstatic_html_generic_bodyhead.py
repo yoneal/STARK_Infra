@@ -28,6 +28,13 @@ def create(data, breadcrumb):
                 </div>
                 <div class="col-12 col-md-2 text-right">
                     <b-button 
+                        v-b-tooltip.hover title="Settings"
+                        class="mt-3" 
+                        variant="light" 
+                        size="sm">
+                        <img src="images/settings.png" height="20px">
+                    </b-button>
+                    <b-button 
                         v-b-tooltip.hover title="Log out"
                         class="mt-3" 
                         variant="light" 
@@ -36,33 +43,34 @@ def create(data, breadcrumb):
                     </b-button>
                 </div>
             </div>
-
+"""
+    if breadcrumb == "_Listview":
+        source_code += f"""\
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="home.html">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{entity}</li>
+                </ol>
+            </nav>"""
+    elif breadcrumb == "_HomePage":
+        source_code += f"""\
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item active" aria-current="page">Home</li>
+                </ol>
+            </nav>"""
+    else:
+        source_code += f"""\
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="home.html">Home</a></li>
                     <li class="breadcrumb-item"><a href="{entity_varname}.html">{entity}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{breadcrumb}</li>
                 </ol>
-            </nav>
-        </div>
+            </nav>"""
+       
+    source_code += f"""\
 
-        <div>
-            <b-modal id="loading-modal"
-                no-close-on-backdrop
-                no-close-on-esc
-                hide-header
-                hide-footer
-                centered
-                size="sm">
-                <div class="text-center p-3">
-                    <div class="spinner-border" style="width: 5rem; height: 5rem" role="status">
-                        <span class="sr-only">Loading...</span>
-                    </div>
-                    <div class="mt-3">
-                        Loading...
-                    </div>
-                </div>
-            </b-modal>
         </div>
 
 """

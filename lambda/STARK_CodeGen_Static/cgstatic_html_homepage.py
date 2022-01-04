@@ -4,11 +4,18 @@
 #Python Standard Library
 import textwrap
 
+import cgstatic_html_generic_header as cg_header
+import cgstatic_html_generic_bodyhead as cg_bodyhead
+import cgstatic_html_generic_loadingspinner as cg_loadspin
+
 def create(data):
 
     project_name = data["Project Name"]
 
-    source_code = f"""\
+    source_code  = cg_header.create(data, "Homepage")
+    source_code += cg_bodyhead.create(data, "_Homepage")
+
+    source_code += f"""\
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -28,23 +35,8 @@ def create(data):
 
             <title>{project_name}</title>
         </head>
-        <body class="bg-light">
+
         <div class="container-fluid" id="vue-root">
-
-            <div class="row bg-primary mb-3 p-3 text-white" style="background-image: url('images/banner_generic_blue.png')">
-                <div class="col">
-                <h2>
-                    {project_name}
-                </h2>
-                </div>
-            </div>
-
-            <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item active" aria-current="page">Home</li>
-            </ol>
-            </nav>
-
             <div class="modules_list_box">
                 <div class="row" id="modules_list">
                     <template v-for="module in modules" id="modules-template">

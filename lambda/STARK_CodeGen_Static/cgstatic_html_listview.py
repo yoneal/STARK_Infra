@@ -7,6 +7,9 @@ import textwrap
 
 #Private modules
 import convert_friendly_to_system as converter
+import cgstatic_html_generic_header as cg_header
+import cgstatic_html_generic_bodyhead as cg_bodyhead
+import cgstatic_html_generic_loadingspinner as cg_loadspin
 
 def create(data):
 
@@ -19,47 +22,11 @@ def create(data):
     entity_varname = converter.convert_to_system_name(entity)
     pk_varname = converter.convert_to_system_name(pk)
 
-    source_code = f"""\
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-            <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    source_code  = cg_header.create(data, "Listview")
+    source_code += cg_bodyhead.create(data, "_Listview")
 
-            <link rel="stylesheet" href="css/bootstrap.min.css" />
-            <link rel="stylesheet" href="css/bootstrap-vue.css" />
-            <link rel="stylesheet" href="css/STARK.css" />
-
-            <script src="js/vue.js" defer></script>
-            <script src="js/bootstrap-vue.min.js" defer></script>
-            <script src="js/STARK.js" defer></script>
-            <script src="js/STARK_spinner.js" defer></script>
-            <script src="js/STARK_loading_modal.js" defer></script>
-            <script src="js/{entity_varname}_app.js" defer></script>
-            <script src="js/{entity_varname}_view.js" defer></script>
-            <script src="js/generic_root_list.js" defer></script>
-
-            <title>{project} - {entity}</title>
-        </head>
-        <body class="bg-light">
+    source_code += f"""\
         <div class="container-fluid" id="vue-root">
-
-            <div class="row bg-primary mb-3 p-3 text-white" style="background-image: url('images/banner_generic_blue.png')">
-                <div class="col">
-                <h2>
-                    {project}
-                </h2>
-                </div>
-            </div>
-
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="home.html">Home</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{entity}</li>
-                </ol>
-            </nav>
-
             <button type="button" class="btn btn-primary mb-2" onClick="window.location.href='{entity_varname}_add.html'"> <b>+</b> Add </button>
             <div class="row">
                 <div class="col overflow-auto">
@@ -99,12 +66,11 @@ def create(data):
             </div>
 
         </div>
+    """
+    source_code += cg_loadspin.create()
 
-        <div class="d-flex justify-content-center" id="loading-spinner" :style="{{visibility: visibility}}">
-            <div class="spinner-border" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
-        </div>
+    
+    source_code += f"""
 
         </body>
         </html>
