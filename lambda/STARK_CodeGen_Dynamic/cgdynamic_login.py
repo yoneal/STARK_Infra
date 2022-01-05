@@ -31,18 +31,41 @@ def create(data):
 
     def lambda_handler(event, context):
 
+        #Get cookies, if any
+        eventCookies = event.get('cookies')
+        cookies = {{}}
+        for cookie in eventCookies:
+            info = cookie.partition("=")
+            cookies[info[0]] = info[2]
+ 
         method  = event.get('requestContext').get('http').get('method')
         payload = json.loads(event.get('body')).get('Login',"")
         data    = {{}}
         headers = {{"Content-Type": "application/json",}}
         
         if payload == "":
-            return {{
-                "isBase64Encoded": False,
-                "statusCode": 400,
-                "body": json.dumps("Client payload missing"),
-                "headers": headers
-            }}
+            #If payload is blank and there's a session ID cookie, this means this is a logout request.
+            #Else, it's a malformed request.
+            if cookies.get('sessid','') != '':
+                response = logout(cookies['sessid'])
+                print("Logged out")
+                print(response)
+                #Send cookie back, this time with past date, to ask client to delete it
+                headers['Set-Cookie'] = f"sessid={{sess_id}}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=0; Domain=.amazonaws.com"
+                return {{
+                    "isBase64Encoded": False,
+                    "statusCode": 200,
+                    "body": json.dumps("Logged out"),
+                    "headers": headers
+                }}
+                
+            else:
+                return {{
+                    "isBase64Encoded": False,
+                    "statusCode": 400,
+                    "body": json.dumps("Client payload missing"),
+                    "headers": headers
+                }}
         else:
             data['username'] = payload.get('username','')
             data['password'] = payload.get('password','')
@@ -147,6 +170,18 @@ def create(data):
         #3: If `failure` is True, whether due to non-existent user or wrong password, handle here
         if failure == True:
             return False
+
+    def logout(sess_id):
+        #Delete session information
+        key       = {{}}
+        key['pk'] = {{'S' : sess_id}}
+        key['sk'] = {{'S' : "sess|info"}}
+        response = ddb.delete_item(
+            TableName=ddb_table,
+            Key=key
+        )
+        
+        return response
     """
 
     return textwrap.dedent(source_code)
