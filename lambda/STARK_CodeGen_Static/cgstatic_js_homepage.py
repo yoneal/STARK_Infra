@@ -20,6 +20,7 @@ def create(data):
                         mode: 'cors',
                         headers: {{ "Content-Type": "application/json" }},
                         method: "GET",
+                        credentials: "include"
                     }}
 
                     fetch(STARK.sys_modules_url, fetchData)
