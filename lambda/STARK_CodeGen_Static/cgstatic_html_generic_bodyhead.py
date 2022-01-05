@@ -39,7 +39,8 @@ def create(data, breadcrumb):
                         v-b-tooltip.hover title="Log out"
                         class="mt-3" 
                         variant="light" 
-                        size="sm">
+                        size="sm"
+                        onClick="STARK.logout()">
                         <img src="images/logout.png" height="20px">
                     </b-button>
                 </div>

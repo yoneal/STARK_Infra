@@ -49,7 +49,19 @@ def create(data):
                     }}
                     return response
                 }}).then((response) => response.json())
+            }},
+
+            logout: function () {{
+                console.log("Log out command!")
+                /*
+                fetchUrl = STARK.login_url
+                payload=''
+                return STARK.request('POST', fetchUrl, payload)
+                
+                //Redirect back to login screen
+                */
             }}
+
         }};
     """
 
