@@ -14,27 +14,8 @@ def create(data):
             }},
             methods:{{
                 get_module_list: function () {{
-
-                    // This function and relevant parameters should be decoupled from Vue!
-                    let fetchData = {{
-                        mode: 'cors',
-                        headers: {{ "Content-Type": "application/json" }},
-                        method: "GET",
-                        credentials: "include"
-                    }}
-
-                    fetch(STARK.sys_modules_url, fetchData)
-                    .then( function(response) {{
-                        //FIXME:
-                        //Error handling here should just be for network-related failiures
-                        //Actual server errors should be handled properly by the API, giving back useful error messages and status codes.
-                        if (!response.ok) {{
-                            console.log(response)
-                            throw Error(response.statusText);
-                        }}
-                        return response;
-                    }})
-                    .then((response) => response.json())
+                    fetchUrl = STARK.sys_modules_url
+                    STARK.request('GET', fetchUrl)
                     .then( function(data) {{
                         root.modules = data;
                         console.log("DONE! Retreived list of modules.")
