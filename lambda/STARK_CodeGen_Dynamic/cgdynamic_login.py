@@ -51,7 +51,7 @@ def create(data):
                 print("Logged out")
                 print(response)
                 #Send cookie back, this time with past date, to ask client to delete it
-                headers['Set-Cookie'] = f"sessid={{sess_id}}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=0; Domain=.amazonaws.com"
+                headers['Set-Cookie'] = f"sessid={{cookies['sessid']}}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=0; Domain=.amazonaws.com"
                 return {{
                     "isBase64Encoded": False,
                     "statusCode": 200,

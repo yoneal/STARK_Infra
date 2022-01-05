@@ -52,19 +52,23 @@ def create(data):
             }},
 
             logout: function () {{
-                loading_modal.show()
-                console.log("Log out command!")
-                fetchUrl = STARK.login_url
-                payload={{}}
-                STARK.request('POST', fetchUrl, payload).then( function(data) {{
+                var sys_exit = confirm("Log out?");
+                
+                if(sys_exit) {{
+                    console.log("Log out command!")
+                    loading_modal.show()
+                    fetchUrl = STARK.login_url
+                    payload={{}}
+                    STARK.request('POST', fetchUrl, payload).then( function(data) {{
+                            loading_modal.hide()
+                            console.log("Server-side log out successful!");
+                            window.location.href = "index.html";
+                    }})
+                    .catch(function(error) {{
+                        console.log("Encountered an error! [" + error + "]")
                         loading_modal.hide()
-                        console.log("Server-side log out successful!");
-                        window.location.href = "index.html";
-                }})
-                .catch(function(error) {{
-                    console.log("Encountered an error! [" + error + "]")
-                    loading_modal.hide()
-                }});
+                    }});
+                }}
             }}
         }};
     """
