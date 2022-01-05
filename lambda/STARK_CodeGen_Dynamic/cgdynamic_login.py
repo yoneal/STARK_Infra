@@ -32,7 +32,7 @@ def create(data):
     def lambda_handler(event, context):
 
         #Get cookies, if any
-        eventCookies = event.get('cookies')
+        eventCookies = event.get('cookies', {{}})
         cookies = {{}}
         for cookie in eventCookies:
             info = cookie.partition("=")
