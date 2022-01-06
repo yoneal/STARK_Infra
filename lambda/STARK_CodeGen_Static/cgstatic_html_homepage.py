@@ -5,7 +5,9 @@
 import textwrap
 
 import cgstatic_html_generic_header as cg_header
+import cgstatic_html_generic_footer as cg_footer
 import cgstatic_html_generic_bodyhead as cg_bodyhead
+import cgstatic_html_generic_loadingmodal as cg_loadmod
 import cgstatic_html_generic_loadingspinner as cg_loadspin
 
 def create(data):
@@ -32,13 +34,9 @@ def create(data):
             </div>
 
         </div>
-
-        <div class="d-flex justify-content-center" id="loading-spinner" :style="{{visibility: visibility}}">
-            <div class="spinner-border" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
-        </div>
-        </body>
-        </html>"""
+"""
+    source_code += cg_loadspin.create()
+    source_code += cg_loadmod.create()
+    source_code += cg_footer.create()
 
     return textwrap.dedent(source_code)

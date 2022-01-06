@@ -27,7 +27,6 @@ def create(data):
 
     source_code  = cg_header.create(data)
     source_code += cg_bodyhead.create(data, "New")
-    source_code += cg_loadmod.create()
 
     source_code += f"""\
             <div class="container hidden" :style="{{visibility: visibility}}">
@@ -68,6 +67,7 @@ def create(data):
         </div>
 """
 
+    source_code += cg_loadmod.create()
     source_code += cg_footer.create()
 
     return textwrap.dedent(source_code)

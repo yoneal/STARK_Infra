@@ -8,7 +8,9 @@ import textwrap
 #Private modules
 import convert_friendly_to_system as converter
 import cgstatic_html_generic_header as cg_header
+import cgstatic_html_generic_footer as cg_footer
 import cgstatic_html_generic_bodyhead as cg_bodyhead
+import cgstatic_html_generic_loadingmodal as cg_loadmod
 import cgstatic_html_generic_loadingspinner as cg_loadspin
 
 def create(data):
@@ -67,12 +69,7 @@ def create(data):
         </div>
     """
     source_code += cg_loadspin.create()
-
-    
-    source_code += f"""
-
-        </body>
-        </html>
-    """
+    source_code += cg_loadmod.create()
+    source_code += cg_footer.create()
 
     return textwrap.dedent(source_code)
