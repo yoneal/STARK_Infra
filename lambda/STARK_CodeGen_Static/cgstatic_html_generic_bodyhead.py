@@ -53,14 +53,18 @@ def create(data, breadcrumb):
                     <li class="breadcrumb-item"><a href="home.html">Home</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{entity}</li>
                 </ol>
-            </nav>"""
+            </nav>
+
+"""
     elif breadcrumb == "_HomePage":
         source_code += f"""\
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item active" aria-current="page">Home</li>
                 </ol>
-            </nav>"""
+            </nav>
+
+"""
     else:
         source_code += f"""\
             <nav aria-label="breadcrumb">
