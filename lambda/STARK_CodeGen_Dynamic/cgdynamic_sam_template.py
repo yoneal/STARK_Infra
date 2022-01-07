@@ -311,6 +311,25 @@ def create(data):
                     - x86_64
                 MemorySize: 1760
                 Timeout: 5
+        STARKBackendApiForLogout:
+            Type: AWS::Serverless::Function
+            Properties:
+                Events:
+                    LoginPostEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /logout
+                            Method: POST
+                            ApiId:
+                                Ref: STARKApiGateway
+                Runtime: python3.9
+                Handler: main.lambda_handler
+                CodeUri: lambda/logout
+                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
+                Architectures:
+                    - x86_64
+                MemorySize: 128
+                Timeout: 5
         STARKPreLaunch:
             Type: AWS::CloudFormation::CustomResource
             Properties:
