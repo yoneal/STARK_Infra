@@ -98,7 +98,7 @@ def create_handler(event, context):
     })
     source_code = cg_logout.create({"DynamoDB Name": ddb_table_name})
     files_to_commit.append({
-        'filePath': f"lambda/login/main.py",
+        'filePath': f"lambda/logout/main.py",
         'fileContent': source_code.encode()
     })
 
