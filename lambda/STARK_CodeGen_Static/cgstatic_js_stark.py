@@ -15,6 +15,7 @@ def create(data):
     source_code = f"""\
         const STARK={{
             'login_url':'{api_endpoint}/login',
+            'logout_url':'{api_endpoint}/logout',
             'sys_modules_url':'{api_endpoint}/sys_modules',"""
 
     #Each entity is a big module, has own endpoint
@@ -57,7 +58,7 @@ def create(data):
                 if(sys_exit) {{
                     console.log("Log out command!")
                     loading_modal.show()
-                    fetchUrl = STARK.login_url
+                    fetchUrl = STARK.logout_url
                     payload={{}}
                     STARK.request('POST', fetchUrl, payload).then( function(data) {{
                             loading_modal.hide()
