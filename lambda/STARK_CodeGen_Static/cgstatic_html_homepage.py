@@ -19,7 +19,7 @@ def create(data):
             <div class="row row-cols-1 row-cols-md-4">
                 <template v-for="module in modules" id="modules-template">
                     <div class="col mb-4" id="modules_list">
-                        <div class="card mb-3 p-2 module_card" :onclick="'window.location.href=\''  + module.href + '\''">
+                        <div class="card mb-3 p-2 module_card" :onclick="'window.location.href=\\''  + module.href + '\\''">
                             <img class="card-img-top" :src="module.image" :alt="module.image_alt">
                             <div class="card-body">
                                 <h5 class="card-title">{{{{ module.title }}}}</h5>
