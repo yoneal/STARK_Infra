@@ -16,21 +16,19 @@ def create(data):
     source_code += cg_bodyhead.create(data, "_HomePage")
 
     source_code += f"""\
-            <div class="modules_list_box">
-                <div class="row" id="modules_list">
-                    <template v-for="module in modules" id="modules-template">
-                        <div class="col">
-                            <div class="card mb-3 p-2 module_card" :onclick="'window.location.href=\\''  + module.href + '\\''">
-                                <img class="card-img-top" :src="module.image" :alt="module.image_alt">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{{{ module.title }}}}</h5>
-                                    <p class="card-text">{{{{ module.description }}}}</p>
-                                    <a href="#" class="btn btn-primary w-100">Go</a>
-                                </div>
+            <div class="row row-cols-1 row-cols-md-4">
+                <template v-for="module in modules" id="modules-template">
+                    <div class="col mb-4" id="modules_list">
+                        <div class="card mb-3 p-2 module_card" :onclick="'window.location.href=\''  + module.href + '\''">
+                            <img class="card-img-top" :src="module.image" :alt="module.image_alt">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ module.title }}</h5>
+                                <p class="card-text">{{ module.description }}</p>
+                                <a href="#" class="btn btn-primary w-100">Go</a>
                             </div>
                         </div>
-                    </template>
-                </div>
+                    </div>
+                </template>
             </div>
 
         </div>
