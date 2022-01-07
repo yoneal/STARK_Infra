@@ -22,8 +22,8 @@ def create(data):
                         <div class="card mb-3 p-2 module_card" :onclick="'window.location.href=\''  + module.href + '\''">
                             <img class="card-img-top" :src="module.image" :alt="module.image_alt">
                             <div class="card-body">
-                                <h5 class="card-title">{{ module.title }}</h5>
-                                <p class="card-text">{{ module.description }}</p>
+                                <h5 class="card-title">{{{{ module.title }}}}</h5>
+                                <p class="card-text">{{{{ module.description }}}}</p>
                                 <a href="#" class="btn btn-primary w-100">Go</a>
                             </div>
                         </div>
