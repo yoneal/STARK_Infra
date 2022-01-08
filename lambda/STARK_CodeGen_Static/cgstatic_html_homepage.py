@@ -16,7 +16,7 @@ def create(data):
     source_code += cg_bodyhead.create(data, "_HomePage")
 
     source_code += f"""\
-            <div class="row row-cols-1 row-cols-md-2">
+            <div class="row row-cols-1 row-cols-md-6 m-2">
                 <template v-for="module in modules" id="modules-template">
                     <div class="col mb-4" id="modules_list">
                         <div class="card h-100 p-2 module_card" :onclick="'window.location.href=\\''  + module.href + '\\''">
