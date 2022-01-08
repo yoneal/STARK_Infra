@@ -92,6 +92,36 @@ def create_handler(event, context):
     add_to_commit(source_code=cg_js_login.create(homepage_data), key=f"js/login.js", files_to_commit=files_to_commit, file_path='static')
     add_to_commit(source_code=cg_css_login.create(homepage_data), key=f"css/login.css", files_to_commit=files_to_commit, file_path='static')
 
+    ##########################################
+    #Add cloud resources document to our files
+    add_to_commit(source_code=yaml.dump(cloud_resources), key="cloud_resources.yml", files_to_commit=files_to_commit, file_path='')
+
+
+    ############################################
+    #Commit our static files to the project repo
+    #FIXME: There's a codecommit limit of 100 files - this will fail if more than 100 static files are needed,
+    #       such as if a dozen or so entities are requested for code generation. Implement commit chunking here for safety.
+    #       Such chunking - if it results in CGStatic doing many different commits - could make the overall code generation
+    #       slower due to having multiple pipeline runs triggered in CodePipeline, so that's something to take into account.
+    response = git.get_branch(
+        repositoryName=repo_name,
+        branchName='master'        
+    )
+    commit_id = response['branch']['commitId']
+
+    response = git.create_commit(
+        repositoryName=repo_name,
+        branchName='master',
+        parentCommitId=commit_id,
+        authorName='STARK::CGStatic',
+        email='STARK@fakedomainstark.com',
+        commitMessage='Initial commit of static files',
+        putFiles=files_to_commit
+    )
+
+    #Reset files to commit
+    files_to_commit = []
+
     ###############################################
     #Get pre-built static files from codegen bucket
     prebuilt_static_files = []
@@ -114,13 +144,8 @@ def create_handler(event, context):
         #We don't want to include the "STARKLambdaLayers/" prefix in our list of keys, hence the string slice in static_file
         add_to_commit(source_code=get_file_from_bucket(codegen_bucket_name, static_file), key=static_file[18:], files_to_commit=files_to_commit, file_path='lambda/packaged_layers')
 
-    ##########################################
-    #Add cloud resources document to our files
-    add_to_commit(source_code=yaml.dump(cloud_resources), key="cloud_resources.yml", files_to_commit=files_to_commit, file_path='')
-
-
-    ############################################
-    #Commit our static files to the project repo
+    ##############################################
+    #Commit our prebuilt files to the project repo
     response = git.get_branch(
         repositoryName=repo_name,
         branchName='master'        
@@ -133,9 +158,12 @@ def create_handler(event, context):
         parentCommitId=commit_id,
         authorName='STARK::CGStatic',
         email='STARK@fakedomainstark.com',
-        commitMessage='Initial commit of static files and prebuilt utilities',
+        commitMessage='Initial commit of prebuilt files',
         putFiles=files_to_commit
     )
+
+
+
 
 @helper.delete
 def no_op(_, __):
