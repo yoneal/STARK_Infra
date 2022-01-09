@@ -129,12 +129,13 @@ def create_handler(event, context):
     key                 = 0
     chunked_commit_list = {}
     for item in files_to_commit:
+        if ctr == 100:
+            key = key + 1
+            ctr = 0
         ctr = ctr + 1
-        key = ctr % 100
         if chunked_commit_list.get(key, '') == '':
             chunked_commit_list[key] = []
         chunked_commit_list[key].append(item)
-
 
     ctr         = 0
     batch_count = key + 1
