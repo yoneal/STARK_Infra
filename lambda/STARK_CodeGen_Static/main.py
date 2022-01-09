@@ -131,7 +131,7 @@ def create_handler(event, context):
     for item in files_to_commit:
         ctr = ctr + 1
         key = ctr % 100
-        if chunked_commit_list.get(key,''):
+        if chunked_commit_list.get(key, '') == '':
             chunked_commit_list[key] = []
         chunked_commit_list[key].append(item)
 
