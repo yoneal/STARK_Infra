@@ -4,6 +4,7 @@
 #Python Standard Library
 import base64
 import textwrap
+from random import randint
 
 #Private modules
 import convert_friendly_to_system as converter
@@ -66,33 +67,36 @@ def suggest_graphic(entity_name):
     #   Should also include a way to directly specify the desired image name (e.g. "user.png")
 
     default_icon_map = {
-        "award": "award.png",
-        "archive": "archive.png",
-        "book": "book.png",
+        "award": ["award.png"],
+        "archive": ["archive.png"],
+        "book": ["book.png"],
         "commerce": ["shopping-bag.png", "shopping-cart.png"],
         "config": ["gear.png", "sliders.png"],
         "data": ["pie-chart.png"],
         "document": ["file-text.png", "folder.png"],
-        "event": "calendar.png",
+        "event": ["calendar.png"],
         "item": ["box.png","package.png"],
         "location": ["map.png", "map-pin.png"],
         "logistics": ["truck.png"],
         "person": ["user.png", "users.png"],
         "sales": ["dollar.png", "credit-card.png"],
         "tasks": ["clipboard.png"],
-        "travel": "briefcase.png",
-        "type": "tag.png",
+        "travel": ["briefcase.png"],
+        "type": ["tag.png"],
     }
 
     abstract_icons = [ "square.png", "triangle.png", "circle.png", "hexagon.png", "star.png"]
 
+    #The order of these types matter. Types that come first take precedence.
     entity_type_map = {
+        "type": ["type", "category", "categories", "tag", "price"],
+        "tasks": ["task", "to do", "todo", "to-do", "list"],
+        "data": ["data", "report"],
         "award": ["award", "prize"],
         "archive": ["archive", "storage", "warehouse"],
         "book": ["book"],
         "commerce": ["order", "shop"],
         "config": ["config", "configuration", "settings", "option"],
-        "data": ["data", "report"],
         "document": ["document", "file", "form",],
         "event": ["event", "meeting", "date", "call", "conference"],
         "item": ["item", "package", "inventory"],
@@ -100,12 +104,11 @@ def suggest_graphic(entity_name):
         "logistics": ["delivery", "deliveries", "vehicle", "fleet", "shipment"],
         "person": ["customer", "agent", "employee", "student", "teacher", "person", "people", "human"],
         "sales": ["sale", "sale", "purchase", "money", "finance"],
-        "tasks": ["task", "to do", "todo", "to-do", "list"],
         "travel": ["travel"],
-        "type": ["type", "category", "categories", "tag", "price"]
     }
 
     suggested_type = ''
+    entity_name = entity_name.lower()
     for type in entity_type_map:
         #First, try a naive match
         if entity_name in entity_type_map[type]:
@@ -130,6 +133,14 @@ def suggest_graphic(entity_name):
         suggested_type = 'abstract'
 
     print(suggested_type)
+    if suggested_type == 'abstract':
+        limit = len(abstract_icons) - 1
+        suggested_icon = abstract_icons[randint(0, limit)]
+    else:
+        limit = len(default_icon_map[suggested_type]) - 1
+        suggested_icon = default_icon_map[suggested_type][randint(0, limit)]
+
+    print(suggested_icon)
 
 
 
