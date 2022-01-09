@@ -35,7 +35,7 @@ def create(data):
                             {{
                                 "title": "{entity}",
                                 "description": "Add/Edit/Delete/View generic functions for the {entity} module",
-                                "image": "images/{graphic}.png",
+                                "image": "images/{graphic}",
                                 "image_alt": "{entity} graphic",
                                 "href": "{entity_varname}.html"
                             }},"""
