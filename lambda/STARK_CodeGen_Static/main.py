@@ -121,10 +121,8 @@ def create_handler(event, context):
 
     ##############################################
     #Commit our prebuilt files to the project repo
-    #FIXME: There's a codecommit limit of 100 files - this will fail if more than 100 static files are needed,
-    #       such as if a dozen or so entities are requested for code generation. Implement commit chunking here for safety.
-    #       Such chunking - if it results in CGStatic doing many different commits - could make the overall code generation
-    #       slower due to having multiple pipeline runs triggered in CodePipeline, so that's something to take into account.
+    #   There's a codecommit limit of 100 files - this will fail if more than 100 static files are needed,
+    #   such as if a dozen or so entities are requested for code generation. Implement commit chunking here for safety.
     ctr                 = 0
     key                 = 0
     chunked_commit_list = {}

@@ -139,21 +139,40 @@ def create_handler(event, context):
 
     ##################################################
     #Commit files to the project repo
-    response = git.get_branch(
-        repositoryName=repo_name,
-        branchName='master'        
-    )
-    commit_id = response['branch']['commitId']
+    #   There's a codecommit limit of 100 files - this will fail if more than 100 static files are needed,
+    #   such as if a dozen or so entities are requested for code generation. Implement commit chunking here for safety.
+    ctr                 = 0
+    key                 = 0
+    chunked_commit_list = {}
+    for item in files_to_commit:
+        if ctr == 100:
+            key = key + 1
+            ctr = 0
+        ctr = ctr + 1
+        if chunked_commit_list.get(key, '') == '':
+            chunked_commit_list[key] = []
+        chunked_commit_list[key].append(item)
 
-    response = git.create_commit(
-        repositoryName=repo_name,
-        branchName='master',
-        parentCommitId=commit_id,
-        authorName='STARK::CGDynamic',
-        email='STARK@fakedomainstark.com',
-        commitMessage='Initial commit of Lambda source codes',
-        putFiles=files_to_commit
-    )
+    ctr         = 0
+    batch_count = key + 1
+    for commit_batch in chunked_commit_list:
+        ctr = ctr + 1
+
+        response = git.get_branch(
+            repositoryName=repo_name,
+            branchName='master'        
+        )
+        commit_id = response['branch']['commitId']
+
+        response = git.create_commit(
+            repositoryName=repo_name,
+            branchName='master',
+            parentCommitId=commit_id,
+            authorName='STARK::CGDynamic',
+            email='STARK@fakedomainstark.com',
+            commitMessage=f'Initial commit of Lambda source codes (commit {ctr} of {batch_count})',
+            putFiles=files_to_commit
+        )
 
 
 @helper.delete
