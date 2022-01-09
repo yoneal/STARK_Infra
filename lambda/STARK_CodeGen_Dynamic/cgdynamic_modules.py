@@ -26,15 +26,11 @@ def create(data):
             #   (it could be a YAML file in a private bucket, for example, to allow admin to easily change configs without dealing with DDB)
             modules_list = ["""
     
-    #FIXME:
-    #This is just a temporary implementation of randomly assigning colored boxes to our modules/
-    #   Real implem should use default pretty graphics/icons, like in Cobalt
     i=0
-    graphics = ["default_1", "default_2", "default_3", "default_4"]
     for entity in entities:
         entity_varname = converter.convert_to_system_name(entity)
         i+=1
-        graphic = graphics[i % len(graphics)]
+        graphic = suggest_graphic(entity)
         source_code += f"""
                             {{
                                 "title": "{entity}",
@@ -140,8 +136,7 @@ def suggest_graphic(entity_name):
         limit = len(default_icon_map[suggested_type]) - 1
         suggested_icon = default_icon_map[suggested_type][randint(0, limit)]
 
-    print(suggested_icon)
-
+    return suggested_icon
 
 
 
