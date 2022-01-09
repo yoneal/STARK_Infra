@@ -97,31 +97,6 @@ def create_handler(event, context):
     add_to_commit(source_code=yaml.dump(cloud_resources), key="cloud_resources.yml", files_to_commit=files_to_commit, file_path='')
 
 
-    ############################################
-    #Commit our static files to the project repo
-    #FIXME: There's a codecommit limit of 100 files - this will fail if more than 100 static files are needed,
-    #       such as if a dozen or so entities are requested for code generation. Implement commit chunking here for safety.
-    #       Such chunking - if it results in CGStatic doing many different commits - could make the overall code generation
-    #       slower due to having multiple pipeline runs triggered in CodePipeline, so that's something to take into account.
-    response = git.get_branch(
-        repositoryName=repo_name,
-        branchName='master'        
-    )
-    commit_id = response['branch']['commitId']
-
-    response = git.create_commit(
-        repositoryName=repo_name,
-        branchName='master',
-        parentCommitId=commit_id,
-        authorName='STARK::CGStatic',
-        email='STARK@fakedomainstark.com',
-        commitMessage='Initial commit of static files',
-        putFiles=files_to_commit
-    )
-
-    #Reset files to commit
-    files_to_commit = []
-
     ###############################################
     #Get pre-built static files from codegen bucket
     prebuilt_static_files = []
@@ -146,21 +121,41 @@ def create_handler(event, context):
 
     ##############################################
     #Commit our prebuilt files to the project repo
-    response = git.get_branch(
-        repositoryName=repo_name,
-        branchName='master'        
-    )
-    commit_id = response['branch']['commitId']
+    #FIXME: There's a codecommit limit of 100 files - this will fail if more than 100 static files are needed,
+    #       such as if a dozen or so entities are requested for code generation. Implement commit chunking here for safety.
+    #       Such chunking - if it results in CGStatic doing many different commits - could make the overall code generation
+    #       slower due to having multiple pipeline runs triggered in CodePipeline, so that's something to take into account.
+    ctr                 = 0
+    key                 = 0
+    chunked_commit_list = {}
+    for item in files_to_commit:
+        ctr = ctr + 1
+        key = ctr % 100
+        if chunked_commit_list.get(key,''):
+            chunked_commit_list[key] = []
+        chunked_commit_list[key].append(item)
 
-    response = git.create_commit(
-        repositoryName=repo_name,
-        branchName='master',
-        parentCommitId=commit_id,
-        authorName='STARK::CGStatic',
-        email='STARK@fakedomainstark.com',
-        commitMessage='Initial commit of prebuilt files',
-        putFiles=files_to_commit
-    )
+
+    ctr         = 0
+    batch_count = key + 1
+    for commit_batch in chunked_commit_list:
+        ctr = ctr + 1
+
+        response = git.get_branch(
+            repositoryName=repo_name,
+            branchName='master'        
+        )
+        commit_id = response['branch']['commitId']
+
+        response = git.create_commit(
+            repositoryName=repo_name,
+            branchName='master',
+            parentCommitId=commit_id,
+            authorName='STARK::CGStatic',
+            email='STARK@fakedomainstark.com',
+            commitMessage=f"Initial commit of static and prebuilt files (commit {ctr} of {batch_count})",
+            putFiles=chunked_commit_list[commit_batch]
+        )
 
 
 
