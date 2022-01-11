@@ -62,26 +62,28 @@ def suggest_graphic(entity_name):
     #   towards choosing a more appropriate default graphic.
     #   Should also include a way to directly specify the desired image name (e.g. "user.png")
 
+    extension = "svg"
+
     default_icon_map = {
-        "award": ["award.png"],
-        "archive": ["archive.png"],
-        "book": ["book.png"],
-        "commerce": ["shopping-bag.png", "shopping-cart.png"],
-        "config": ["gear.png", "sliders.png"],
-        "data": ["pie-chart.png"],
-        "document": ["file-text.png", "folder.png"],
-        "event": ["calendar.png"],
-        "item": ["box.png","package.png"],
-        "location": ["map.png", "map-pin.png"],
-        "logistics": ["truck.png"],
-        "person": ["user.png", "users.png"],
-        "sales": ["dollar.png", "credit-card.png"],
-        "tasks": ["clipboard.png"],
-        "travel": ["briefcase.png"],
-        "type": ["tag.png"],
+        "award": [f"award.{extension}"],
+        "archive": [f"archive.{extension}"],
+        "book": [f"book.{extension}"],
+        "commerce": [f"shopping-bag.{extension}", f"shopping-cart.{extension}"],
+        "config": [f"gear.{extension}", f"sliders.{extension}"],
+        "data": [f"pie-chart.{extension}"],
+        "document": [f"file-text.{extension}", f"folder.{extension}"],
+        "event": [f"calendar.{extension}"],
+        "item": [f"box.{extension}","package.{extension}"],
+        "location": [f"map.{extension}", f"map-pin.{extension}"],
+        "logistics": [f"truck.{extension}"],
+        "person": [f"user.{extension}", f"users.{extension}"],
+        "sales": [f"dollar.{extension}", f"credit-card.{extension}"],
+        "tasks": [f"clipboard.{extension}"],
+        "travel": [f"briefcase.{extension}"],
+        "type": [f"tag.{extension}"],
     }
 
-    abstract_icons = [ "square.png", "triangle.png", "circle.png", "hexagon.png", "star.png"]
+    abstract_icons = [ f"square.{extension}", f"triangle.{extension}", f"circle.{extension}", f"hexagon.{extension}", f"star.{extension}"]
 
     #The order of these types matter. Types that come first take precedence.
     entity_type_map = {
