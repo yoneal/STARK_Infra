@@ -73,7 +73,7 @@ def suggest_graphic(entity_name):
         "data": [f"pie-chart.{extension}"],
         "document": [f"file-text.{extension}", f"folder.{extension}"],
         "event": [f"calendar.{extension}"],
-        "item": [f"box.{extension}","package.{extension}"],
+        "item": [f"box.{extension}",f"package.{extension}"],
         "location": [f"map.{extension}", f"map-pin.{extension}"],
         "logistics": [f"truck.{extension}"],
         "person": [f"user.{extension}", f"users.{extension}"],

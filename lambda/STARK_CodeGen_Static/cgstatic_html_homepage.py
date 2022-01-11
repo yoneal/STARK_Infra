@@ -18,7 +18,7 @@ def create(data):
     source_code += f"""\
             <div class="d-flex align-content-start flex-wrap">
                 <template v-for="module in modules" id="modules-template">
-                    <div class="p-0 m-2 border border-primary module_card w-100" id="modules_list" :onclick="'window.location.href=\\''  + module.href + '\\''">
+                    <div class="p-0 m-2 border border-primary module_card w-100 text-nowrap" style="overflow-x: hidden" id="modules_list" :onclick="'window.location.href=\\''  + module.href + '\\''">
                         <img class="bg-primary p-2 m-0" :src="module.image" :alt="module.image_alt" height="50px">
                         <span class="card-text align-middle font-weight-bold pl-2 pr-4">{{{{ module.title }}}}</span>                
                     </div>
