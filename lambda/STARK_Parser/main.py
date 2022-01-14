@@ -1,5 +1,4 @@
-#Handles the POST action of the STARK PARSE POC, but using YAML, HTTP API version.
-#Updated to handle POST request from JS FETCH API, using application/json content-type.
+#Handles the POST action of the STARK PARSE POC
 
 #Python Standard Library
 import base64
@@ -134,6 +133,13 @@ def lambda_handler(event, context):
     #For debugging: pretty-print the resulting JSON
     #json_formatted_str = json.dumps(cloud_resources, indent=2)
     #print(json_formatted_str)
+
+    #############################################################
+    #FUTURE: STARK-specific settings parsing will be done here 
+    #cloud_resources["STARK_settings"] = stark_settings_parser.parse(data)
+    #Above is just a stub; in the future, settings parser may be the first call,
+    #and its results passed to all other sub-parsers above, as these STARK
+    #settings may be used to modify the default behavior of the sub-parsers
 
 
     ##############################################################
