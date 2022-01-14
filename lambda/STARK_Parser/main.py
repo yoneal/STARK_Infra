@@ -124,20 +124,19 @@ def lambda_handler(event, context):
     cloud_resources["DynamoDB"] = dynamodb_parser.parse(data)
 
     #SQS #######################
-    cloud_resources["SQS"] = sqs_parser.parse(data)
+    #Disable for now, not yet implemented, just contains stub
+    #cloud_resources["SQS"] = sqs_parser.parse(data)
 
-    #CloudFront
-    cloud_resources["CloudFront"] = cloudfront_parser.parse(data)
+    #CloudFront ##################
+    #Disable for now, not yet implemented, just contains stub
+    #cloud_resources["CloudFront"] = cloudfront_parser.parse(data)
 
     #For debugging: pretty-print the resulting JSON
     #json_formatted_str = json.dumps(cloud_resources, indent=2)
     #print(json_formatted_str)
 
 
-    #####################################################################################
-    #FIXME: In PROD version, all calls below should be a Web API call, not Lambda invokes
-    #####################################################################################
- 
+    ##############################################################
     #PAYLOAD FORMAT NOTE:
     #   If parser needs to specifically pass a YAML document, use:
     #       Payload=json.dumps(yaml.dump(cloud_resources))
