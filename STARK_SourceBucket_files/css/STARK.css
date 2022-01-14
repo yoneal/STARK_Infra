@@ -2,7 +2,7 @@
   visibility: hidden
 }
 
-.module_card:hover {
+.module_card {
   width: 15rem;
   background-color: #e9ecef;
 }
