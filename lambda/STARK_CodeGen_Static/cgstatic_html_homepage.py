@@ -24,7 +24,7 @@ def create(data):
                         <span class="card-text align-middle font-weight-bold pl-2 pr-4">{{{{ module.title }}}}</span>                
                     </div>
                     -->
-                    <div class="card p-0 m-2 border rounded-lg border-secondary module_card" style="width: 15rem;" id="modules_list" :onclick="'window.location.href=\\''  + module.href + '\\''">
+                    <div class="card p-0 m-2 border rounded-lg border-secondary module_card" id="modules_list" :onclick="'window.location.href=\\''  + module.href + '\\''">
                         <img class="card-img-top p-3  m-0" :src="module.image" alt="Card image cap" height="100px">
                         <div class="card-body bg-primary p-2 rounded-bottom">
                             <p class="card-text text-light font-weight-bold text-center">{{{{module.title}}}}</p>

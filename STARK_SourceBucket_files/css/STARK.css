@@ -3,6 +3,11 @@
 }
 
 .module_card:hover {
+  width: 15rem;
+  background-color: #e9ecef;
+}
+
+.module_card:hover {
   box-shadow:0 0 0 .2rem rgba(0,123,255,.25);
 }
 
