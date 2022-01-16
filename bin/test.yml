@@ -1,0 +1,6 @@
+Book:
+    pk: Book ID
+    data:
+        - Title: string
+        - Revision: date
+        - Description: multi-line-string

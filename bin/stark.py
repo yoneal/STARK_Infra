@@ -69,3 +69,28 @@ print(f"Will now create new {construct_type} construct, using {construct_file}..
 #   5.1 Since that's a YAML file, read exsting file, load as python Dict. 
 #   5.2 Add new entries to the cloud_resources Dict under DDB Models. 
 #   5.3 Export back to YAML and write new cloud_resources (similar to how STARK_Parser does it)
+
+import os
+import sys
+print(sys.path)
+print(os.getcwd())
+
+
+#Add STARK_Parser folder to the beginning of sys.path
+STARK_folder = os.getcwd() + '/../lambda/STARK_Parser'
+print(STARK_folder)
+sys.path = [STARK_folder] + sys.path
+print(sys.path)
+import main as stark_parser
+
+
+#Replace STARK_Parser folder in sys.path with STARK_CodeGen_Dynamic
+sys.path[0] = os.getcwd() + '/../lambda/STARK_CodeGen_Dynamic'
+print(sys.path)
+import main as cgdynamic
+
+#Replace CGDynamic folder in sys.path with CGStatic
+sys.path[0] = os.getcwd() + '/../lambda/STARK_CodeGen_Static'
+print(sys.path)
+import main as cgdynamic
+
