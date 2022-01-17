@@ -56,7 +56,7 @@ def create_handler(event, context):
     models   = cloud_resources["DynamoDB"]["Models"]
 
     ##########################################
-    #Creat code for our entity Lambdas (API endpoint backing)
+    #Create code for our entity Lambdas (API endpoint backing)
     files_to_commit = []
     for entity in entities:
         entity_varname = converter.convert_to_system_name(entity) 
