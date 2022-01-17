@@ -39,16 +39,11 @@ def create_handler(event, context):
 
     project_varname = converter.convert_to_system_name(project_name)
 
-    #UpdateToken = we need this as part of the Lambda deployment package path, to force CF to redeploy our Lambdas
-    update_token = event.get('ResourceProperties', {}).get('UpdateToken','')
-
     #DynamoDB table name from our CF template
     ddb_table_name = event.get('ResourceProperties', {}).get('DDBTable','')
 
-    #Bucket for our generated lambda deploymentment packages and cloud resources document
-    codegen_bucket_name = os.environ['CODEGEN_BUCKET_NAME']
-
     #Cloud resources document
+    codegen_bucket_name = os.environ['CODEGEN_BUCKET_NAME']
     response = s3.get_object(
         Bucket=codegen_bucket_name,
         Key=f'STARK_cloud_resources/{project_varname}.yaml'
