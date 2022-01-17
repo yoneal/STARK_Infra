@@ -99,8 +99,7 @@ def lambda_handler(event, context):
 
     cloud_resources = {}
     cloud_resources = {"Project Name": project_name, "CodeGen_Metadata" : {}} 
-  
-    cloud_resources['CodeGen_Metadata']['STARK_CodeGen_ApiGatewayId_ParameterName'] = "STARK_CodeGen_ApiGatewayId_" + project_varname
+
     cloud_resources['CodeGen_Metadata']['Entities'] = entities
 
     data = {
