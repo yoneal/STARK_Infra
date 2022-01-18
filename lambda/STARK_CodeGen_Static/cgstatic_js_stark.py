@@ -13,16 +13,18 @@ def create(data):
     entities     = data['Entities']
 
     source_code = f"""\
+        api_endpoint_1 = '{api_endpoint}'
+
         const STARK={{
-            'login_url':'{api_endpoint}/login',
-            'logout_url':'{api_endpoint}/logout',
-            'sys_modules_url':'{api_endpoint}/sys_modules',"""
+            'login_url':`${{api_endpoint_1}}/login`,
+            'logout_url':`${{api_endpoint_1}}/logout`,
+            'sys_modules_url':`${{api_endpoint_1}}/sys_modules`,"""
 
     #Each entity is a big module, has own endpoint
     for entity in entities:
         entity_endpoint_name = converter.convert_to_system_name(entity)
         source_code += f"""
-            '{entity_endpoint_name}_url':'{api_endpoint}/{entity_endpoint_name}',"""
+            '{entity_endpoint_name}_url':`${{api_endpoint_1}}/{entity_endpoint_name}`,"""
 
     #STARK-provided common methods go here
     source_code += f"""
