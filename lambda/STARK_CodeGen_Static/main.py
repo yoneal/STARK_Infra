@@ -70,7 +70,7 @@ def create_handler(event, context):
     for entity in models:
         pk   = models[entity]["pk"]
         cols = models[entity]["data"]
-        cgstatic_data = { "Entity": entity, "PK": pk, "Columns": cols, "Bucket Name": bucket_name, "Project Name": project_name }
+        cgstatic_data = { "Entity": entity, "PK": pk, "Columns": cols, "Project Name": project_name }
         entity_varname = converter.convert_to_system_name(entity)
 
         add_to_commit(source_code=cg_add.create(cgstatic_data), key=f"{entity_varname}_add.html", files_to_commit=files_to_commit, file_path='static')
