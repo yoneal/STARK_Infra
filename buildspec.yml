@@ -11,11 +11,11 @@ phases:
       - CODEGEN=$(cat template_configuration.json | python3 -c "import sys, json; print(json.load(sys.stdin)['Parameters']['UserCodeGenBucketNameParameter'])")
       - sed -i "s/RandomTokenFromBuildScript/$(date)/" template.yml
       - aws cloudformation package --template-file template.yml --s3-bucket $BUCKET --s3-prefix STARK_InternalInfra_DeploymentPackages --output-template-file outputtemplate.yml
-      - aws s3 cp STARK_Parser s3://$WEBSITE --recursive --acl public-read
-      - aws s3 cp STARK_SourceBucket_files s3://$CODEGEN/STARKWebSource --recursive
-      - aws s3 cp bin s3://$CODEGEN/STARKUtilities --recursive
+      - aws s3 sync STARK_Parser s3://$WEBSITE --delete --acl public-read
+      - aws s3 sync STARK_SourceBucket_files s3://$CODEGEN/STARKWebSource --delete
+      - aws s3 sync bin s3://$CODEGEN/STARKUtilities --delete
       - aws s3 cp outputtemplate.yml s3://$BUCKET/STARK_InternalInfra_DeploymentPackages/
-      - aws s3 cp lambda/packaged_layers s3://$CODEGEN/STARKLambdaLayers --recursive --exclude="*" --include="*.zip"
+      - aws s3 sync lambda/packaged_layers s3://$CODEGEN/STARKLambdaLayers --delete --exclude="*" --include="*.zip"
 
 artifacts:
   files:
