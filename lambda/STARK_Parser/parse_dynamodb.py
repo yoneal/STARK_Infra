@@ -55,7 +55,7 @@ def parse(data):
     for entity in entities:
         parsed["Models"][entity] = {}
         parsed["Models"][entity]["pk"] = data_model.get(entity).get('pk')
-        parsed["Models"][entity]["data"] = OrderedDict() 
+        parsed["Models"][entity]["data"] = {}
 
         attributes = ''
         for column_dict in data_model.get(entity).get("data"):
