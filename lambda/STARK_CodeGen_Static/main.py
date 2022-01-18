@@ -54,7 +54,8 @@ def create_handler(event, context):
         Bucket=codegen_bucket_name,
         Key=f'STARK_cloud_resources/{project_varname}.yaml'
     )
-    cloud_resources = yaml.safe_load(response['Body'].read().decode('utf-8')) 
+    raw_cloud_resources = response['Body'].read().decode('utf-8')
+    cloud_resources     = yaml.safe_load(raw_cloud_resources) 
 
     #Get relevant info from cloud_resources
     models = cloud_resources["DynamoDB"]["Models"]
@@ -94,7 +95,7 @@ def create_handler(event, context):
 
     ##########################################
     #Add cloud resources document to our files
-    add_to_commit(source_code=yaml.dump(cloud_resources), key="cloud_resources.yml", files_to_commit=files_to_commit, file_path='')
+    add_to_commit(source_code=raw_cloud_resources, key="cloud_resources.yml", files_to_commit=files_to_commit, file_path='')
 
 
     ###############################################
