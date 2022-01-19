@@ -81,32 +81,8 @@ def lambda_handler(event, context):
     ###############################################################################################################
     #Load and sanitize data here, for whatever IaC rules that govern them (e.g., S3 Bucket names must be lowercase)
 
-    #S3-related data
-    s3_bucket_name    = cloud_resources["S3 webserve"]["bucket_name"].lower()
-    s3_error_document = cloud_resources["S3 webserve"]["error_document"]
-    s3_index_document = cloud_resources["S3 webserve"]["index_document"]
-
     #DynamoDB-related data
     ddb_table_name            = cloud_resources["DynamoDB"]['Table Name']
-    ddb_capacity_type         = cloud_resources["DynamoDB"]['Capacity Type'].upper()
-    ddb_surge_protection      = cloud_resources["DynamoDB"]['Surge Protection']
-    ddb_surge_protection_fifo = cloud_resources["DynamoDB"]['Surge Protection FIFO']
-    ddb_models                = cloud_resources["DynamoDB"]['Models']
-    ddb_rcu_provisioned       = cloud_resources["DynamoDB"].get("RCU", 0)
-    ddb_wcu_provisioned       = cloud_resources["DynamoDB"].get("WCU", 0)
-    ddb_auto_scaling          = cloud_resources["DynamoDB"].get("Auto Scaling", '')
-
-    #Lambda-related data
-    lambda_entities = cloud_resources['Lambda']['entities']
-
-    #FIXME: Should this transformation be here or in the Parser?
-    #Let this remain here now, but probably should be the job of the parser in the future.
-    if ddb_capacity_type != "PROVISIONED":
-        ddb_capacity_type = "PAY_PER_REQUEST"
-
-    #Some default values not yet from the Parser, but should be added to Parser later
-    s3_versioning     = "Enabled"
-    s3_access_control = "PublicRead"
 
     #Update Token - this token forces CloudFormation to update the resources that do dynamic code generation,
     #               as well as forced re-deployment of Lambdas (by using this as a deployment package path/folder)
