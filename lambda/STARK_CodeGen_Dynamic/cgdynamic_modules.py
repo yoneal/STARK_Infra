@@ -34,12 +34,10 @@ def create(data):
         source_code += f"""
                             {{
                                 "title": "{entity}",
-                                "description": "Add/Edit/Delete/View generic functions for the {entity} module",
                                 "image": "images/{graphic}",
                                 "image_alt": "{entity} graphic",
                                 "href": "{entity_varname}.html"
                             }},"""
-    source_code = source_code[:-1]
 
     source_code += f"""
                         ]
