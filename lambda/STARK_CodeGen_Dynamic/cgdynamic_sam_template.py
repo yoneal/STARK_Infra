@@ -290,6 +290,8 @@ def create(data):
                     - x86_64
                 MemorySize: 128
                 Timeout: 5
+                Layers:
+                    - !Ref PyYamlLayer
         STARKBackendApiForLogin:
             Type: AWS::Serverless::Function
             Properties:

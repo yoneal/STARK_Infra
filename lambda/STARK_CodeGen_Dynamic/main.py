@@ -78,10 +78,14 @@ def create_handler(event, context):
 
     ################################################
     #Create our Lambda for the /sys_modules API endpoint
-    source_code = cg_mod.create({"Entities": entities})
+    source_code, yaml_code = cg_mod.create({"Entities": entities})
     files_to_commit.append({
         'filePath': f"lambda/sys_modules/main.py",
         'fileContent': source_code.encode()
+    })
+    files_to_commit.append({
+        'filePath': f"lambda/sys_modules/modules.yaml",
+        'fileContent': yaml_code.encode()
     })
 
     ###########################################################

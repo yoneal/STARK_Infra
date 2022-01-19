@@ -13,32 +13,29 @@ def create(data):
 
     entities  = data["Entities"]
 
-    #FIXME: See FIXME note in source_code itself
+    #Python code - static, just reads a YAML file that we will create later
     source_code = f"""\
+        #Python Standard Library
         import base64
         import json
 
+        #Extra modules
+        import yaml
+
         def lambda_handler(event, context):
+            with open('modules.yml') as f:
+                modules_raw = f.read()
+                modules_yml = yaml.safe_load(modules_raw)
 
-            #FIXME:
-            #For now, this just returns a hard-coded JSON result,
-            #   instead of querying DynamoDB or whatever our module config function is
-            #   (it could be a YAML file in a private bucket, for example, to allow admin to easily change configs without dealing with DDB)
-            modules_list = ["""
-    
-    for entity in entities:
-        entity_varname = converter.convert_to_system_name(entity)
-        graphic = suggest_graphic(entity)
-        source_code += f"""
-                            {{
-                                "title": "{entity}",
-                                "image": "images/{graphic}",
-                                "image_alt": "{entity} graphic",
-                                "href": "{entity_varname}.html"
-                            }},"""
-
-    source_code += f"""
-                        ]
+            modules_list = []
+            for module in modules_yml:
+                data = {{
+                    "title": module,
+                    "image": modules_yml[module]["image"],
+                    "image_alt": modules_yml[module]["image_alt"],
+                    "href": modules_yml[module]["href"],
+                }}
+                modules_list.append(data)
 
             return {{
                 "isBase64Encoded": False,
@@ -47,10 +44,21 @@ def create(data):
                 "headers": {{
                     "Content-Type": "application/json",
                 }}
-            }}
-        """
+            }}        
+"""
+    #This YAML file is what is dynamic and relies on our entities list
+    yaml_code = ''
+    for entity in entities:
+        entity_varname = converter.convert_to_system_name(entity)
+        graphic = suggest_graphic(entity)
+        yaml_code += f"""\
+            {entity}:
+                image: "images/{graphic}",
+                image_alt: "{entity} graphic",
+                href: "{entity_varname}.html"
+            """
 
-    return textwrap.dedent(source_code)
+    return textwrap.dedent(source_code), textwrap.dedent(yaml_code)
 
 def suggest_graphic(entity_name):
     #FIXME: When STARK data modeling grammar is finalized, it should include a way for
