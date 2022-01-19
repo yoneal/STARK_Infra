@@ -84,7 +84,7 @@ def create_handler(event, context):
         'fileContent': source_code.encode()
     })
     files_to_commit.append({
-        'filePath': f"lambda/sys_modules/modules.yaml",
+        'filePath': f"lambda/sys_modules/modules.yml",
         'fileContent': yaml_code.encode()
     })
 

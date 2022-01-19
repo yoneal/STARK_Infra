@@ -53,8 +53,8 @@ def create(data):
         graphic = suggest_graphic(entity)
         yaml_code += f"""\
             {entity}:
-                image: "images/{graphic}",
-                image_alt: "{entity} graphic",
+                image: "images/{graphic}"
+                image_alt: "{entity} graphic"
                 href: "{entity_varname}.html"
             """
 
