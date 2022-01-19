@@ -120,6 +120,15 @@ def create_handler(event, context):
         #We don't want to include the "STARKLambdaLayers/" prefix in our list of keys, hence the string slice in static_file
         add_to_commit(source_code=get_file_from_bucket(codegen_bucket_name, static_file), key=static_file[18:], files_to_commit=files_to_commit, file_path='lambda/packaged_layers')
 
+    #######################################################################
+    #Get our STARK_Config.yml from the CodeGen bucket - needed by STARK CLI
+    response = s3.get_object(
+        Bucket=codegen_bucket_name,
+        Key=f'STARKConfiguration/STARK_config.yml'
+    )
+    source_code = response['Body'].read()
+    add_to_commit(source_code=source_code, key=f"STARK_config.yml", files_to_commit=files_to_commit, file_path='bin/libstark')
+
     ##############################################
     #Commit our prebuilt files to the project repo
     #   There's a codecommit limit of 100 files - this will fail if more than 100 static files are needed,

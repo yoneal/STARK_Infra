@@ -110,10 +110,7 @@ def create_handler(event, context):
         'fileContent': source_code.encode()
     })
 
-    data = { 
-        'codegen_bucket_name': codegen_bucket_name,
-        'cloud_resources': cloud_resources
-    }
+    data = { 'cloud_resources': cloud_resources }
     source_code = cg_sam.create(data)
     files_to_commit.append({
         'filePath': "template.yml",
@@ -173,9 +170,6 @@ def create_handler(event, context):
 @helper.delete
 def no_op(_, __):
     #Nothing to do, our Lambdas will be deleted by CloudFormation
-    #I suppose we could do cleanup like emptying our deployment packages
-    #in S3, but that doesn't really matter
-
     pass
 
 
