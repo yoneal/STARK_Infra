@@ -56,7 +56,7 @@ def create(data):
                 image: "images/{graphic}"
                 image_alt: "{entity} graphic"
                 href: "{entity_varname}.html"
-            """
+"""
 
     return textwrap.dedent(source_code), textwrap.dedent(yaml_code)
 
@@ -147,6 +147,7 @@ def suggest_graphic(entity_name):
 
 def create_sys_module_entries(data):
     #Used by CLI for inserting new sys_modules to an existing project
+    #UPDATE: Either remove this, or transfer new logic in cgdynamic_cli re: updating YAML-based sys_module
     entities    = data["Entities"]
     source_code = ''
 
