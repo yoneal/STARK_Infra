@@ -26,10 +26,8 @@ def create(data):
             #   (it could be a YAML file in a private bucket, for example, to allow admin to easily change configs without dealing with DDB)
             modules_list = ["""
     
-    i=0
     for entity in entities:
         entity_varname = converter.convert_to_system_name(entity)
-        i+=1
         graphic = suggest_graphic(entity)
         source_code += f"""
                             {{
@@ -139,5 +137,20 @@ def suggest_graphic(entity_name):
     return suggested_icon
 
 
+def create_sys_module_entries(data):
+    #Used by CLI for inserting new sys_modules to an existing project
+    entities    = data["Entities"]
+    source_code = ''
 
+    for entity in entities:
+        entity_varname = converter.convert_to_system_name(entity)
+        graphic = suggest_graphic(entity)
+        source_code += f"""\
+                    {{
+                        "title": "{entity}",
+                        "image": "images/{graphic}",
+                        "image_alt": "{entity} graphic",
+                        "href": "{entity_varname}.html"
+                    }},"""
 
+    return source_code
