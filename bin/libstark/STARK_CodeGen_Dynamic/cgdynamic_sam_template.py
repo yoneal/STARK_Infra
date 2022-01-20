@@ -17,29 +17,24 @@ import boto3
 import convert_friendly_to_system as converter
 
 
-def create(data, cli_mode=False):
+def create(data):
 
     cloud_resources = data['cloud_resources']
 
     #Get environment type - this will allow us to take different branches depending on whether we are LOCAL or PROD (or any other future valid value)
     ENV_TYPE = os.environ['STARK_ENVIRONMENT_TYPE']
-    if ENV_TYPE == "PROD" or cli_mode == True:
+    if ENV_TYPE == "PROD":
         default_response_headers = { "Content-Type": "application/json" }
         s3  = boto3.client('s3')
 
-        if cli_mode == True:
-            cleaner_service_token   = data['Cleaner_ARN']
-            prelaunch_service_token = data['Prelaunch_ARN']
-        else:
-            codegen_bucket_name = os.environ['CODEGEN_BUCKET_NAME']
-
-            response = s3.get_object(
-                Bucket=codegen_bucket_name,
-                Key=f'STARKConfiguration/STARK_config.yml'
-            )
-            config = yaml.safe_load(response['Body'].read().decode('utf-8'))
-            cleaner_service_token   = config['Cleaner_ARN']
-            prelaunch_service_token = config['Prelaunch_ARN']
+        codegen_bucket_name  = os.environ['CODEGEN_BUCKET_NAME']
+        response = s3.get_object(
+            Bucket=codegen_bucket_name,
+            Key=f'STARKConfiguration/STARK_config.yml'
+        )
+        config = yaml.safe_load(response['Body'].read().decode('utf-8')) 
+        cleaner_service_token   = config['Cleaner_ARN']  
+        prelaunch_service_token = config['Prelaunch_ARN']
 
     else:
         #We only have to do this because `SAM local start-api` doesn't follow CORS info from template.yml, which is bullshit
@@ -78,7 +73,7 @@ def create(data, cli_mode=False):
     ddb_auto_scaling          = cloud_resources["DynamoDB"].get("Auto Scaling", '')
 
     #Lambda-related data
-    lambda_entities = cloud_resources['DynamoDB']['Models']
+    lambda_entities = cloud_resources['Lambda']['entities']
 
     #FIXME: Should this transformation be here or in the Parser?
     #Let this remain here now, but probably should be the job of the parser in the future.
@@ -133,22 +128,22 @@ def create(data, cli_mode=False):
             Properties:
                 AssumeRolePolicyDocument:
                     Version: '2012-10-17'
-                    Statement:
-                        -
+                    Statement: 
+                        - 
                             Effect: Allow
                             Principal:
-                                Service:
+                                Service: 
                                     - 'lambda.amazonaws.com'
                             Action: 'sts:AssumeRole'
                 ManagedPolicyArns:
                     - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
                 Policies:
-                    -
+                    - 
                         PolicyName: PolicyForSTARKProjectDefaultLambdaServiceRole
                         PolicyDocument:
                             Version: '2012-10-17'
                             Statement:
-                                -
+                                - 
                                     Sid: VisualEditor0
                                     Effect: Allow
                                     Action:
@@ -186,7 +181,7 @@ def create(data, cli_mode=False):
                     S3Bucket: !Ref UserCICDPipelineBucketNameParameter
                     S3Key: {project_varname}/STARKLambdaLayers/bcrypt_py39.zip
                 Description: bcrypt module for Python 3.9
-                LayerName: {project_varname}_bcrypt
+                LayerName: {project_varname}_bcrypt       
         STARKApiGateway:
             Type: AWS::Serverless::HttpApi
             Properties:
@@ -274,7 +269,7 @@ def create(data, cli_mode=False):
                     - x86_64
                 MemorySize: 128
                 Timeout: 5"""
-
+    
     cf_template += f"""
         STARKBackendApiForSysModules:
             Type: AWS::Serverless::Function
@@ -295,6 +290,8 @@ def create(data, cli_mode=False):
                     - x86_64
                 MemorySize: 128
                 Timeout: 5
+                Layers:
+                    - !Ref PyYamlLayer
         STARKBackendApiForLogin:
             Type: AWS::Serverless::Function
             Properties:
