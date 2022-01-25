@@ -19,6 +19,7 @@ import cgstatic_js_login as cg_js_login
 import cgstatic_js_homepage as cg_js_home
 import cgstatic_js_stark as cg_js_stark
 import cgstatic_css_login as cg_css_login
+import cgstatic_gitignore as cg_git
 import cgstatic_html_add  as cg_add
 import cgstatic_html_edit as cg_edit
 import cgstatic_html_view as cg_view
@@ -106,8 +107,8 @@ def create_handler(event, context):
         #We don't want to include the "STARKWebSource/" prefix in our list of keys, hence the string slice in static_file
         add_to_commit(source_code=get_file_from_bucket(codegen_bucket_name, static_file), key=static_file[15:], files_to_commit=files_to_commit, file_path='static')
 
-    ##############################################
-    #Get pre-built utilities for local development
+    ##################################################################
+    #Get pre-built utilities, layers and helpers for local development
     prebuilt_utilities = []
     list_prebuilt_utilities(codegen_bucket_name, prebuilt_utilities)
     for static_file in prebuilt_utilities:
@@ -120,6 +121,12 @@ def create_handler(event, context):
         #We don't want to include the "STARKLambdaLayers/" prefix in our list of keys, hence the string slice in static_file
         add_to_commit(source_code=get_file_from_bucket(codegen_bucket_name, static_file), key=static_file[18:], files_to_commit=files_to_commit, file_path='lambda/packaged_layers')
 
+    prebuilt_helpers = []
+    list_prebuilt_helpers(codegen_bucket_name, prebuilt_helpers)
+    for static_file in prebuilt_helpers:
+        #We don't want to include the "STARKLambdaHelpers/" prefix in our list of keys, hence the string slice in static_file
+        add_to_commit(source_code=get_file_from_bucket(codegen_bucket_name, static_file), key=static_file[19:], files_to_commit=files_to_commit, file_path='lambda/helpers')
+
     #######################################################################
     #Get our STARK_Config.yml from the CodeGen bucket - needed by STARK CLI
     response = s3.get_object(
@@ -128,6 +135,10 @@ def create_handler(event, context):
     )
     source_code = response['Body'].read()
     add_to_commit(source_code=source_code, key=f"STARK_config.yml", files_to_commit=files_to_commit, file_path='bin/libstark')
+
+    ####################################################################################################
+    #Create the .gitignore file for the project repo - so that cruft doesn't get into commits by default
+    add_to_commit(source_code=cg_git.create(), key=f".gitignore", files_to_commit=files_to_commit, file_path='')
 
     ##############################################
     #Commit our prebuilt files to the project repo
@@ -194,7 +205,6 @@ def add_to_commit(source_code, key, files_to_commit, file_path=''):
     })
 
 def list_prebuilt_static_files(bucket_name, prebuilt_static_files):
-    #Web files
     response = s3.list_objects_v2(
         Bucket = bucket_name,
         Prefix = "STARKWebSource/",
@@ -203,9 +213,16 @@ def list_prebuilt_static_files(bucket_name, prebuilt_static_files):
     for static_file in response['Contents']:
         prebuilt_static_files.append(static_file['Key'])
 
+def list_prebuilt_helpers(bucket_name, prebuilt_static_files):
+    response = s3.list_objects_v2(
+        Bucket = bucket_name,
+        Prefix = "STARKLambdaHelpers/",
+    )
+
+    for static_file in response['Contents']:
+        prebuilt_static_files.append(static_file['Key'])
 
 def list_prebuilt_utilities(bucket_name, prebuilt_static_files):
-    #Utilities
     response = s3.list_objects_v2(
         Bucket = bucket_name,
         Prefix = "STARKUtilities/",
@@ -215,7 +232,6 @@ def list_prebuilt_utilities(bucket_name, prebuilt_static_files):
         prebuilt_static_files.append(static_file['Key'])
 
 def list_packaged_layers(bucket_name, prebuilt_static_files):
-    #Utilities
     response = s3.list_objects_v2(
         Bucket = bucket_name,
         Prefix = "STARKLambdaLayers/",
@@ -223,7 +239,6 @@ def list_packaged_layers(bucket_name, prebuilt_static_files):
 
     for static_file in response['Contents']:
         prebuilt_static_files.append(static_file['Key'])
-
 
 def get_file_from_bucket(bucket_name, static_file):
     response = s3.get_object(
