@@ -307,8 +307,6 @@ def create(data):
                 Handler: main.lambda_handler
                 CodeUri: lambda/login
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
-                Layers:
-                    - !Ref BcryptLayer
                 Architectures:
                     - x86_64
                 MemorySize: 1760

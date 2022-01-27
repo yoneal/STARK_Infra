@@ -271,7 +271,6 @@ Resources:
                 - !Ref CFCustomResourceHelperLayer
                 - !Ref PyYamlLayer
                 - !Ref STARKFriendlyToSystemNamesLayer
-                - !Ref BcryptLayer
             Architectures:
                 - x86_64
             MemorySize: 1760
