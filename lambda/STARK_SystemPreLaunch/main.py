@@ -31,7 +31,7 @@ def create_handler(event, context):
     #FIXME: Default password is static right now, but in prod, this should be random each time and then saved to dev's local machine 
     #           (i.e., where he triggered the Stark CLI for the system generation request)
     password = b"welcome-2-STARK!"
-    hashed = hash_password(password)
+    hashed = scrypt.create_hash(password)
 
     item                  = {}
     item['pk']            = {'S' : user}
@@ -56,15 +56,3 @@ def no_op(_, __):
 
 def lambda_handler(event, context):
     helper(event, context)
-
-
-def hash_password(password):
-    rounds = 14
-    time_s = time.perf_counter()
-    hashed = bcrypt.hashpw(password, bcrypt.gensalt(rounds))
-    time_e = time.perf_counter()
-    time_t = time_e - time_s
-    print(hashed)
-    print(f"Total time for {rounds} rounds: {time_t} seconds")
-
-    return hashed.decode()

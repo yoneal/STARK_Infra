@@ -308,8 +308,8 @@ def create(data):
                 CodeUri: lambda/login
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
                 Architectures:
-                    - x86_64
-                MemorySize: 1760
+                    - arm64
+                MemorySize: 1792
                 Timeout: 5
         STARKBackendApiForLogout:
             Type: AWS::Serverless::Function
