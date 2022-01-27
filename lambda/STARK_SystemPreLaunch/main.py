@@ -30,8 +30,8 @@ def create_handler(event, context):
     
     #FIXME: Default password is static right now, but in prod, this should be random each time and then saved to dev's local machine 
     #           (i.e., where he triggered the Stark CLI for the system generation request)
-    password = b"welcome-2-STARK!"
-    hashed = scrypt.create_hash(password)
+    password = "welcome-2-STARK!"
+    hashed   = scrypt.create_hash(password)
 
     item                  = {}
     item['pk']            = {'S' : user}
