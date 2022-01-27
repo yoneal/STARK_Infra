@@ -266,7 +266,7 @@ def create(data):
                 CodeUri: lambda/{entity_endpoint_name}
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
                 Architectures:
-                    - x86_64
+                    - arm64
                 MemorySize: 128
                 Timeout: 5"""
     
@@ -287,7 +287,7 @@ def create(data):
                 CodeUri: lambda/sys_modules
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
                 Architectures:
-                    - x86_64
+                    - arm64
                 MemorySize: 128
                 Timeout: 5
                 Layers:
@@ -327,7 +327,7 @@ def create(data):
                 CodeUri: lambda/logout
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
                 Architectures:
-                    - x86_64
+                    - arm64
                 MemorySize: 128
                 Timeout: 5
         STARKPreLaunch:
