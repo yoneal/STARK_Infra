@@ -174,14 +174,6 @@ def create(data):
                     S3Key: {project_varname}/STARKLambdaLayers/yaml_py39.zip
                 Description: YAML module for Python 3.x
                 LayerName: {project_varname}_PyYAML
-        BcryptLayer:
-            Type: AWS::Lambda::LayerVersion
-            Properties:
-                Content:
-                    S3Bucket: !Ref UserCICDPipelineBucketNameParameter
-                    S3Key: {project_varname}/STARKLambdaLayers/bcrypt_py39.zip
-                Description: bcrypt module for Python 3.9
-                LayerName: {project_varname}_bcrypt       
         STARKApiGateway:
             Type: AWS::Serverless::HttpApi
             Properties:
