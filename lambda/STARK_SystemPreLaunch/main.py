@@ -2,17 +2,11 @@
 #   such as necessary system entries into the applicaiton's database (default user, permissions, list of modules, etc.)
 
 #Python Standard Library
-import base64
 import datetime
-import json
-import os
-import textwrap
 import time
 
 #Extra modules
-import yaml
 import boto3
-import botocore
 from crhelper import CfnResource
 
 #Private modules
