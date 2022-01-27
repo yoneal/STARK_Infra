@@ -18,6 +18,7 @@ from crhelper import CfnResource
 
 #Private modules
 import convert_friendly_to_system as converter
+import stark_scrypt as scrypt
 
 ddb = boto3.client('dynamodb')
 
