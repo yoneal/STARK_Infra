@@ -11,7 +11,6 @@ import time
 
 #Extra modules
 import yaml
-import bcrypt
 import boto3
 import botocore
 from crhelper import CfnResource
