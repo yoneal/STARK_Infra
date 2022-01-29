@@ -174,6 +174,14 @@ def create(data):
                     S3Key: {project_varname}/STARKLambdaLayers/yaml_py39.zip
                 Description: YAML module for Python 3.x
                 LayerName: {project_varname}_PyYAML
+        STARKScryptLayer:
+            Type: AWS::Lambda::LayerVersion
+            Properties:
+                Content:
+                    S3Bucket: !Ref UserCICDPipelineBucketNameParameter
+                    S3Key:  {project_varname}/STARKLambdaLayers/STARK_scrypt_py39.zip
+                Description: STARK module for working with scrypt from the Python stdlib
+                LayerName: {project_varname}_scrypt
         STARKApiGateway:
             Type: AWS::Serverless::HttpApi
             Properties:
@@ -299,6 +307,8 @@ def create(data):
                 Handler: main.lambda_handler
                 CodeUri: lambda/login
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
+                Layers:
+                    - !Ref STARKScryptLayer
                 Architectures:
                     - arm64
                 MemorySize: 1792

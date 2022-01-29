@@ -62,6 +62,14 @@ Resources:
                 S3Key: STARKLambdaLayers/STARK_friendly_to_system_name_py39.zip
             Description: STARK module for converting user-supplied, human-friendly identifiers into system-friendly entity or variable names
             LayerName: STARK_friendly_to_system_name
+    STARKScryptLayer:
+        Type: AWS::Lambda::LayerVersion
+        Properties:
+            Content:
+                S3Bucket: !Ref UserCodeGenBucketNameParameter
+                S3Key: STARKLambdaLayers/STARK_scrypt_py39.zip
+            Description: STARK module for working with scrypt from the Python stdlib
+            LayerName: STARK_scrypt
     STARKParserFunc:
         Type: AWS::Serverless::Function
         Properties:
@@ -263,6 +271,7 @@ Resources:
                 - !Ref CFCustomResourceHelperLayer
                 - !Ref PyYamlLayer
                 - !Ref STARKFriendlyToSystemNamesLayer
+                - !Ref STARKScryptLayer
             Architectures:
                 - arm64
             MemorySize: 1760
