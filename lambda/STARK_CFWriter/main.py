@@ -52,11 +52,7 @@ else:
 
 def lambda_handler(event, context):
 
-    #We create "cloud_resources" here like this so that even if the way we call this function changes, our "cloud_resources" assignments later on won't
-    #   have to change - only this line needs to be updated (e.g., change from direct lambda invoke to web api call)
-    #   If we use "event" directly, we'd end up making multiple line changes - literally every assignment we do below
     cloud_resources = event
-    print(cloud_resources)
 
     #Get Project Name
     #FIXME: Project Name is used here as unique identifier. For now it's a user-supplied string, which is unreliable
