@@ -5,11 +5,9 @@ from collections import OrderedDict
 
 def parse(data):
 
-    entities = data['entities']
- 
-    #Entities will be converted to routes by the writer. Some transformation will be needed for non-URL friendly entity names
-    parsed = { "entities": [] }
-    for entity in entities:
-        parsed['entities'].append(entity)
+    #API Gateway URL will be updated later (it will not have been created by the time the Parser runs)
+    #   The task now is to just create the section and key for it.
+    #   The System PreLaunch will take care of updating it with the API G URL value later.
 
+    parsed = { "URL": '' }
     return parsed
