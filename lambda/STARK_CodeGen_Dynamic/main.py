@@ -51,9 +51,9 @@ def create_handler(event, context):
     cloud_resources = yaml.safe_load(response['Body'].read().decode('utf-8')) 
 
 
-    entities = cloud_resources['CodeGen_Metadata']['Entities']
-    #FIXME: Now that we're using the DynamoDB models, we don't actually need the Entities metatada... consider removing it
-    models   = cloud_resources["DynamoDB"]["Models"]
+    models   = cloud_resources["Data Model"]
+    entities = []
+    for entity in models: entities.append(entity)
 
     ##########################################
     #Create code for our entity Lambdas (API endpoint backing)

@@ -59,7 +59,7 @@ def create_handler(event, context):
     cloud_resources     = yaml.safe_load(raw_cloud_resources) 
 
     #Get relevant info from cloud_resources
-    models = cloud_resources["DynamoDB"]["Models"]
+    models = cloud_resources["Data Model"]
 
     #Collect list of files to commit to project repository
     files_to_commit = []

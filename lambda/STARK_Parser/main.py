@@ -100,7 +100,7 @@ def lambda_handler(event, context):
     ###START OF INFRA LIST CREATION #####################
 
     cloud_resources = {}
-    cloud_resources = {"Project Name": project_name, "CodeGen_Metadata" : {}} 
+    cloud_resources = {"Project Name": project_name} 
 
     data = {
         'entities': entities,
