@@ -25,7 +25,7 @@ def parse(data):
             "Memory": 128,
             "Arch": "arm64",
             "Timeout": 5
-        },
+        }
     }
     for entity in entities:
         parsed[entity] = {

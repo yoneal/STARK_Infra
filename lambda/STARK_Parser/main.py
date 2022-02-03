@@ -110,7 +110,7 @@ def lambda_handler(event, context):
     }
 
     #Data Model ###
-    cloud_resources["Data Model"] = model_parser(data)
+    cloud_resources["Data Model"] = model_parser.parse(data)
 
     #S3 Bucket ###
     cloud_resources["S3 webserve"] = s3_parser.parse(data)
@@ -125,7 +125,7 @@ def lambda_handler(event, context):
     cloud_resources["Lambda"] = lambda_parser.parse(data)
 
     #Lambda Layers###
-    cloud_resources["Layers"] = lambda_parser.parse(data)
+    cloud_resources["Layers"] = layer_parser.parse(data)
 
 
     #SQS #######################

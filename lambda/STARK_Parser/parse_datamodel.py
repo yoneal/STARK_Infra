@@ -4,12 +4,9 @@ import json
 
 def parse(data):
 
-    entities        = data['entities']
-    data_model      = data['data_model']
-
-    parsed = {
-    }
-
+    entities   = data['entities']
+    data_model = data['data_model']
+    parsed     = {}
 
     for entity in entities:
         parsed[entity] = {}
