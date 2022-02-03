@@ -3,28 +3,23 @@ import base64
 import json
 
 def parse(data):
-
  
-    parsed = {
-        "stark_login": {
-            "Memory": 1790,
-            "Arch": "arm64",
-            "Timeout": 5,
-            "Layers": [
-                "STARKScryptLayer"
-            ]
+    parsed = [
+        {
+            "Name": "Local_mk5_CF_CustomResourceHelper",
+            "Package": "CF_CustomResourceHelper_py39.zip",
+            "Description": "Lambda-backed custom resource library for CloudFormation"
         },
-        "stark_logout": {
-            "Memory": 128,
-            "Arch": "arm64",
-            "Timeout": 5
+        {
+            "Name": "Local_mk5_PyYAML",
+            "Package": "yaml_py39.zip",
+            "Description": "YAML module for Python 3.x"
         },
-        "stark_sysmodules": {
-            "Memory": 128,
-            "Arch": "arm64",
-            "Timeout": 5
-        },
-    }
-
+        {
+            "Name": "Local_mk5_scrypt",
+            "Package": "STARK_scrypt_py39.zip",
+            "Description": "STARK module for working with scrypt from the Python stdlib"
+       },
+    ]
 
     return parsed
