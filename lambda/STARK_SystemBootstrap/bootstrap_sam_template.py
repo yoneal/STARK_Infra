@@ -74,7 +74,6 @@ def create(data):
     ddb_capacity_type         = cloud_resources["DynamoDB"]['Capacity Type'].upper()
     ddb_surge_protection      = cloud_resources["DynamoDB"]['Surge Protection']
     ddb_surge_protection_fifo = cloud_resources["DynamoDB"]['Surge Protection FIFO']
-    ddb_models                = cloud_resources["DynamoDB"]['Models']
     ddb_rcu_provisioned       = cloud_resources["DynamoDB"].get("RCU", 0)
     ddb_wcu_provisioned       = cloud_resources["DynamoDB"].get("WCU", 0)
     ddb_auto_scaling          = cloud_resources["DynamoDB"].get("Auto Scaling", '')
