@@ -4,6 +4,7 @@
 
 #Python Standard Library
 import base64
+from html import entities
 import json
 import os
 import textwrap
@@ -20,6 +21,7 @@ import convert_friendly_to_system as converter
 def create(data):
 
     cloud_resources = data['cloud_resources']
+    entities        = data['entities']
 
     #Get environment type - this will allow us to take different branches depending on whether we are LOCAL or PROD (or any other future valid value)
     ENV_TYPE = os.environ['STARK_ENVIRONMENT_TYPE']
@@ -58,9 +60,10 @@ def create(data):
     #Load and sanitize data here, for whatever IaC rules that govern them (e.g., S3 Bucket names must be lowercase)
 
     #S3-related data
-    s3_bucket_name    = cloud_resources["S3 webserve"]["bucket_name"].lower()
-    s3_error_document = cloud_resources["S3 webserve"]["error_document"]
-    s3_index_document = cloud_resources["S3 webserve"]["index_document"]
+    s3_bucket_name    = cloud_resources["S3 webserve"]["Bucket Name"].lower()
+    s3_error_document = cloud_resources["S3 webserve"]["Error Document"]
+    s3_index_document = cloud_resources["S3 webserve"]["Index Document"]
+
 
     #DynamoDB-related data
     ddb_table_name            = cloud_resources["DynamoDB"]['Table Name']
@@ -71,9 +74,6 @@ def create(data):
     ddb_rcu_provisioned       = cloud_resources["DynamoDB"].get("RCU", 0)
     ddb_wcu_provisioned       = cloud_resources["DynamoDB"].get("WCU", 0)
     ddb_auto_scaling          = cloud_resources["DynamoDB"].get("Auto Scaling", '')
-
-    #Lambda-related data
-    lambda_entities = cloud_resources['Lambda']['entities']
 
     #FIXME: Should this transformation be here or in the Parser?
     #Let this remain here now, but probably should be the job of the parser in the future.
@@ -225,7 +225,7 @@ def create(data):
                     ReadCapacityUnits: {ddb_rcu_provisioned}
                     WriteCapacityUnits: {ddb_wcu_provisioned}"""
 
-    for entity in lambda_entities:
+    for entity in entities:
         entity_logical_name = converter.convert_to_system_name(entity, "cf-resource")
         entity_endpoint_name = converter.convert_to_system_name(entity)
         cf_template += f"""

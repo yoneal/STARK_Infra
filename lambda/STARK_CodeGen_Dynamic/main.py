@@ -120,7 +120,7 @@ def create_handler(event, context):
         'fileContent': source_code.encode()
     })
 
-    data = { 'cloud_resources': cloud_resources }
+    data = { 'cloud_resources': cloud_resources, 'entities': entities }
     source_code = cg_sam.create(data)
     files_to_commit.append({
         'filePath': "template.yml",
