@@ -39,16 +39,11 @@ def create_handler(event, context):
 
     project_varname = converter.convert_to_system_name(project_name)
 
-    #UpdateToken = we need this as part of the Lambda deployment package path, to force CF to redeploy our Lambdas
-    update_token = event.get('ResourceProperties', {}).get('UpdateToken','')
-
     #DynamoDB table name from our CF template
     ddb_table_name = event.get('ResourceProperties', {}).get('DDBTable','')
 
-    #Bucket for our generated lambda deploymentment packages and cloud resources document
-    codegen_bucket_name = os.environ['CODEGEN_BUCKET_NAME']
-
     #Cloud resources document
+    codegen_bucket_name = os.environ['CODEGEN_BUCKET_NAME']
     response = s3.get_object(
         Bucket=codegen_bucket_name,
         Key=f'STARK_cloud_resources/{project_varname}.yaml'
@@ -56,12 +51,12 @@ def create_handler(event, context):
     cloud_resources = yaml.safe_load(response['Body'].read().decode('utf-8')) 
 
 
-    entities = cloud_resources['CodeGen_Metadata']['Entities']
-    #FIXME: Now that we're using the DynamoDB models, we don't actually need the Entities metatada... consider removing it
-    models   = cloud_resources["DynamoDB"]["Models"]
+    models   = cloud_resources["Data Model"]
+    entities = []
+    for entity in models: entities.append(entity)
 
     ##########################################
-    #Creat code for our entity Lambdas (API endpoint backing)
+    #Create code for our entity Lambdas (API endpoint backing)
     files_to_commit = []
     for entity in entities:
         entity_varname = converter.convert_to_system_name(entity) 
@@ -83,19 +78,29 @@ def create_handler(event, context):
 
     ################################################
     #Create our Lambda for the /sys_modules API endpoint
-    source_code = cg_mod.create({"Entities": entities})
+    source_code, yaml_code = cg_mod.create({"Entities": entities})
     files_to_commit.append({
         'filePath': f"lambda/sys_modules/main.py",
         'fileContent': source_code.encode()
     })
+    files_to_commit.append({
+        'filePath': f"lambda/sys_modules/modules.yml",
+        'fileContent': yaml_code.encode()
+    })
 
     ###########################################################
     #Create our Lambda for the /login and /logout API endpoints
-    source_code = cg_login.create({"DynamoDB Name": ddb_table_name})    
+    source_code, stark_scrypt = cg_login.create({"DynamoDB Name": ddb_table_name})    
     files_to_commit.append({
         'filePath': f"lambda/login/main.py",
         'fileContent': source_code.encode()
     })
+    files_to_commit.append({
+        'filePath': f"lambda/login/stark_scrypt.py",
+        'fileContent': stark_scrypt.encode()
+    })
+    
+
     source_code = cg_logout.create({"DynamoDB Name": ddb_table_name})
     files_to_commit.append({
         'filePath': f"lambda/logout/main.py",
@@ -115,10 +120,7 @@ def create_handler(event, context):
         'fileContent': source_code.encode()
     })
 
-    data = { 
-        'codegen_bucket_name': codegen_bucket_name,
-        'cloud_resources': cloud_resources
-    }
+    data = { 'cloud_resources': cloud_resources, 'entities': entities }
     source_code = cg_sam.create(data)
     files_to_commit.append({
         'filePath': "template.yml",
@@ -178,9 +180,6 @@ def create_handler(event, context):
 @helper.delete
 def no_op(_, __):
     #Nothing to do, our Lambdas will be deleted by CloudFormation
-    #I suppose we could do cleanup like emptying our deployment packages
-    #in S3, but that doesn't really matter
-
     pass
 
 

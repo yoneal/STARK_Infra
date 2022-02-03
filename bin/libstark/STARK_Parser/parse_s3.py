@@ -1,7 +1,6 @@
 #Python Standard Library
 import base64
 import json
-from collections import OrderedDict 
 
 def parse(data):
 
@@ -25,9 +24,9 @@ def parse(data):
     s3_static_bucket_name = s3_static_bucket_name.replace("_", "-")
 
     parsed =  {
-        "bucket_name": s3_static_bucket_name,
-        "error_document": "error.html",
-        "index_document": "index.html"
+        "Bucket Name": s3_static_bucket_name,
+        "Error Document": "error.html",
+        "Index Document": "index.html"
     }
 
     return parsed

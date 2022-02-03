@@ -16,7 +16,9 @@ import convert_friendly_to_system as converter
 import parse_api_gateway as api_gateway_parser
 import parse_cloudfront as cloudfront_parser
 import parse_dynamodb as dynamodb_parser
+import parse_datamodel as model_parser
 import parse_lambda as lambda_parser
+import parse_layers as layer_parser
 import parse_sqs as sqs_parser
 import parse_s3 as s3_parser
 
@@ -98,9 +100,7 @@ def lambda_handler(event, context):
     ###START OF INFRA LIST CREATION #####################
 
     cloud_resources = {}
-    cloud_resources = {"Project Name": project_name, "CodeGen_Metadata" : {}} 
-
-    cloud_resources['CodeGen_Metadata']['Entities'] = entities
+    cloud_resources = {"Project Name": project_name} 
 
     data = {
         'entities': entities,
@@ -109,17 +109,24 @@ def lambda_handler(event, context):
         'project_varname': project_varname
     }
 
+    #Data Model ###
+    cloud_resources["Data Model"] = model_parser.parse(data)
+
     #S3 Bucket ###
     cloud_resources["S3 webserve"] = s3_parser.parse(data)
 
     #API Gateway ###
     cloud_resources["API Gateway"] = api_gateway_parser.parse(data)
 
-    #Lambdas ###
+    #DynamoDB ###
+    cloud_resources["DynamoDB"] = dynamodb_parser.parse(data)
+
+    #Lambda ###
     cloud_resources["Lambda"] = lambda_parser.parse(data)
 
-    #DynamoDB #######################
-    cloud_resources["DynamoDB"] = dynamodb_parser.parse(data)
+    #Lambda Layers###
+    cloud_resources["Layers"] = layer_parser.parse(data)
+
 
     #SQS #######################
     #Disable for now, not yet implemented, just contains stub
