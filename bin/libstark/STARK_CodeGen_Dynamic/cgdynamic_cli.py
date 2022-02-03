@@ -31,14 +31,14 @@ project_basedir = os.getcwd()[:-3]
 
 def create(cloud_resources):
 
-    models = cloud_resources["DynamoDB"]["Models"]
+    models = cloud_resources["Data Model"]
     entities = []
     for entity in models:
         entities.append(entity)
 
     project_name    = cloud_resources["CodeGen Metadata"]["Project Name"]
     project_varname = converter.convert_to_system_name(project_name)
-    ddb_table_name  = cloud_resources["CodeGen Metadata"]["DDB Table Name"]
+    ddb_table_name  = cloud_resources["DynamoDB"]["Table Name"]
 
     ##########################################
     #Create code for our entity Lambdas (API endpoint backing)

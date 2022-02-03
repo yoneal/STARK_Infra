@@ -48,7 +48,6 @@ def create_handler(event, context):
     print(response)
 
 
-
 @helper.delete
 def no_op(_, __):
     pass

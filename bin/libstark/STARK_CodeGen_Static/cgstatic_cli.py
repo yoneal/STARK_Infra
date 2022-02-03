@@ -35,15 +35,15 @@ import convert_friendly_to_system as converter
 project_basedir = os.getcwd()[:-3]
 
 def create(cloud_resources, current_cloud_resources):
-    models = cloud_resources["DynamoDB"]["Models"]
+    models = cloud_resources["Data Model"]
     entities = []
     for entity in models:
         entities.append(entity)
 
-    project_name    = cloud_resources["CodeGen Metadata"]["Project Name"]
+    project_name    = cloud_resources["Project Name"]
     project_varname = converter.convert_to_system_name(project_name)
-    ddb_table_name  = cloud_resources["CodeGen Metadata"]["DDB Table Name"]
 
+    #FIXME: API G is now in our `cloud_resources`` file, update this code
     #The endpoint of our API Gateway is not saved anywhere
     #   except in the main STARK.js file, so the only thing we can do is
     #   edit that file directly and get the endpoint URL from there
@@ -54,9 +54,6 @@ def create(cloud_resources, current_cloud_resources):
             if code[0:14] == "api_endpoint_1":
                 data     = code.partition("=")
                 endpoint = data[2].strip()[1:-1] #slicing is to remove the quotes around the endpoint string
-
-
-
 
     #Collect list of files to commit to project repository
     files_to_commit = []
@@ -79,7 +76,7 @@ def create(cloud_resources, current_cloud_resources):
 
     #STARK main JS file - modify to add new models.
     #   Requires a list of the old models from existing cloud_resources
-    combined_models = current_cloud_resources["DynamoDB"]["Models"].copy()
+    combined_models = current_cloud_resources["Data Model"].copy()
     combined_models.update(models)
 
     data = { 'API Endpoint': endpoint, 'Entities': combined_models }

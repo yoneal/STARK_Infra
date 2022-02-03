@@ -56,10 +56,6 @@ def parse(construct_file):
     ###START OF INFRA LIST CREATION #####################
 
     cloud_resources = {}
-    cloud_resources['CodeGen Metadata'] = {
-        'Project Name': project_name,
-        'DDB Table Name': ddb_table_name         
-    }
 
     data = {
         'entities': entities,

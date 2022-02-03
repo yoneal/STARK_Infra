@@ -131,7 +131,7 @@ if construct_type == "module":
     #5) Updating cloud resources doc
     #FIXME: We are purposely only updating the DDB Models, because all other entries are just entity lists and
     #   are currently unused and redundant
-    current_cloud_resources["DynamoDB"]["Models"].update(cloud_resources["DynamoDB"]["Models"])
+    current_cloud_resources["Data Model"].update(cloud_resources["Data Model"])
     filename = project_basedir + "cloud_resources.yml"
     with open(filename, "wb") as f:
         f.write(yaml.dump(current_cloud_resources, sort_keys=False, encoding='utf-8'))

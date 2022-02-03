@@ -78,7 +78,7 @@ def lambda_handler(event, context):
     #Load and sanitize data here, for whatever IaC rules that govern them (e.g., S3 Bucket names must be lowercase)
 
     #DynamoDB-related data
-    ddb_table_name            = cloud_resources["DynamoDB"]['Table Name']
+    ddb_table_name = cloud_resources["DynamoDB"]['Table Name']
 
     #Update Token - this token forces CloudFormation to update the resources that do dynamic code generation,
     #               as well as forced re-deployment of Lambdas (by using this as a deployment package path/folder)
