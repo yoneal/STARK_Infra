@@ -1,7 +1,6 @@
 #Python Standard Library
 import base64
 import json
-from collections import OrderedDict 
 
 def parse(data):
 
