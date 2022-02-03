@@ -18,6 +18,7 @@ import parse_cloudfront as cloudfront_parser
 import parse_dynamodb as dynamodb_parser
 import parse_datamodel as model_parser
 import parse_lambda as lambda_parser
+import parse_layers as layer_parser
 import parse_sqs as sqs_parser
 import parse_s3 as s3_parser
 
@@ -122,6 +123,9 @@ def lambda_handler(event, context):
 
     #Lambda ###
     cloud_resources["Lambda"] = lambda_parser.parse(data)
+
+    #Lambda Layers###
+    cloud_resources["Layers"] = lambda_parser.parse(data)
 
 
     #SQS #######################
