@@ -18,25 +18,29 @@ import boto3
 import convert_friendly_to_system as converter
 
 
-def create(data):
+def create(data, cli_mode=False):
 
     cloud_resources = data['cloud_resources']
-    entities        = data['entities']
 
     #Get environment type - this will allow us to take different branches depending on whether we are LOCAL or PROD (or any other future valid value)
     ENV_TYPE = os.environ['STARK_ENVIRONMENT_TYPE']
-    if ENV_TYPE == "PROD":
+    if ENV_TYPE == "PROD" or cli_mode == True:
         default_response_headers = { "Content-Type": "application/json" }
         s3  = boto3.client('s3')
 
-        codegen_bucket_name  = os.environ['CODEGEN_BUCKET_NAME']
-        response = s3.get_object(
-            Bucket=codegen_bucket_name,
-            Key=f'STARKConfiguration/STARK_config.yml'
-        )
-        config = yaml.safe_load(response['Body'].read().decode('utf-8')) 
-        cleaner_service_token   = config['Cleaner_ARN']  
-        prelaunch_service_token = config['Prelaunch_ARN']
+        if cli_mode == True:
+            cleaner_service_token   = data['Cleaner_ARN']
+            prelaunch_service_token = data['Prelaunch_ARN']
+        else:
+            codegen_bucket_name = os.environ['CODEGEN_BUCKET_NAME']
+
+            response = s3.get_object(
+                Bucket=codegen_bucket_name,
+                Key=f'STARKConfiguration/STARK_config.yml'
+            )
+            config = yaml.safe_load(response['Body'].read().decode('utf-8'))
+            cleaner_service_token   = config['Cleaner_ARN']
+            prelaunch_service_token = config['Prelaunch_ARN']
 
     else:
         #We only have to do this because `SAM local start-api` doesn't follow CORS info from template.yml, which is bullshit
@@ -64,7 +68,6 @@ def create(data):
     s3_error_document = cloud_resources["S3 webserve"]["Error Document"]
     s3_index_document = cloud_resources["S3 webserve"]["Index Document"]
 
-
     #DynamoDB-related data
     ddb_table_name            = cloud_resources["DynamoDB"]['Table Name']
     ddb_capacity_type         = cloud_resources["DynamoDB"]['Capacity Type'].upper()
@@ -73,6 +76,9 @@ def create(data):
     ddb_rcu_provisioned       = cloud_resources["DynamoDB"].get("RCU", 0)
     ddb_wcu_provisioned       = cloud_resources["DynamoDB"].get("WCU", 0)
     ddb_auto_scaling          = cloud_resources["DynamoDB"].get("Auto Scaling", '')
+
+    #Lambda-related data
+    entities = cloud_resources['Data Model']
 
     #FIXME: Should this transformation be here or in the Parser?
     #Let this remain here now, but probably should be the job of the parser in the future.
