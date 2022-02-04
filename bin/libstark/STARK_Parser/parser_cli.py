@@ -57,7 +57,7 @@ def parse(construct_file):
     #####################################################
     ###START OF INFRA LIST CREATION #####################
 
-    cloud_resources = {}
+    cloud_resources = {"Project Name": project_name} 
 
     data = {
         'entities': entities,
@@ -73,11 +73,14 @@ def parse(construct_file):
     #API Gateway ###
     #cloud_resources["API Gateway"] = api_gateway_parser.parse(data)
 
-    #Lambdas ###
-    cloud_resources["Lambda"] = lambda_parser.parse(data)
-
     #Data Model ###
     cloud_resources["Data Model"] = model_parser.parse(data)
+
+    #DynamoDB ###
+    cloud_resources["DynamoDB"] = dynamodb_parser.parse(data)
+
+    #Lambdas ###
+    cloud_resources["Lambda"] = lambda_parser.parse(data)
 
     #SQS #######################
     #Disable for now, not yet implemented, just contains stub
