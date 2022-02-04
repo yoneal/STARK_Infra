@@ -13,7 +13,9 @@ import convert_friendly_to_system as converter
 import parse_api_gateway as api_gateway_parser
 import parse_cloudfront as cloudfront_parser
 import parse_dynamodb as dynamodb_parser
+import parse_datamodel as model_parser
 import parse_lambda as lambda_parser
+import parse_layers as layer_parser
 import parse_sqs as sqs_parser
 import parse_s3 as s3_parser
 
@@ -74,8 +76,8 @@ def parse(construct_file):
     #Lambdas ###
     cloud_resources["Lambda"] = lambda_parser.parse(data)
 
-    #DynamoDB #######################
-    cloud_resources["DynamoDB"] = dynamodb_parser.parse(data)
+    #Data Model ###
+    cloud_resources["Data Model"] = model_parser.parse(data)
 
     #SQS #######################
     #Disable for now, not yet implemented, just contains stub

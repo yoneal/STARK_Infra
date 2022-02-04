@@ -25,16 +25,7 @@ import cgstatic_html_listview as cg_listview
 import cgstatic_html_homepage as cg_homepage
 import convert_friendly_to_system as converter
 
-#FIXME:
-#   This assumes cwd is always the bin folder inside the project base directory
-#   This needs to be updated after a real way to permanently specify project base dir within STARK CLI
-#   (so it can be triggered within anywhere within the project folder hierarchy) has been implemented
-#FIXME #2:
-#   This is also defined in cgdynamic_cli - perhaps move this to stark.py and just pass it on
-#   to all Code Gen components to be more DRY
-project_basedir = os.getcwd()[:-3]
-
-def create(cloud_resources, current_cloud_resources):
+def create(cloud_resources, current_cloud_resources, project_basedir):
     models = cloud_resources["Data Model"]
     entities = []
     for entity in models:

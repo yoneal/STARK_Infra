@@ -19,24 +19,14 @@ import cgdynamic_sam_template as cg_sam
 import cgdynamic_template_conf as cg_conf
 import convert_friendly_to_system as converter
 
-
-#FIXME:
-#   This assumes cwd is always the bin folder inside the project base directory
-#   This needs to be updated after a real way to permanently specify project base dir within STARK CLI
-#   (so it can be triggered within anywhere within the project folder hierarchy) has been implemented
-#FIXME #2:
-#   This is also defined in cgstatic_cli - perhaps move this to stark.py and just pass it on
-#   to all Code Gen components to be more DRY
-project_basedir = os.getcwd()[:-3]
-
-def create(cloud_resources):
+def create(cloud_resources, project_basedir):
 
     models = cloud_resources["Data Model"]
     entities = []
     for entity in models:
         entities.append(entity)
 
-    project_name    = cloud_resources["CodeGen Metadata"]["Project Name"]
+    project_name    = cloud_resources["Project Name"]
     project_varname = converter.convert_to_system_name(project_name)
     ddb_table_name  = cloud_resources["DynamoDB"]["Table Name"]
 

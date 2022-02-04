@@ -12,8 +12,6 @@ import yaml
 #   This assumes cwd is always the bin folder inside the project base directory
 #   This needs to be updated after a real way to permanently specify project base dir within STARK CLI
 #   (so it can be triggered within anywhere within the project folder hierarchy) has been implemented
-#FIXME #2:
-#   This is also defined in cgstatic and cgdynamic_cli - make DRY by passing this instead.
 project_basedir = os.getcwd()[:-3]
 
 #FIXME - make this function an import as a file within libstark
@@ -120,13 +118,13 @@ if construct_type == "module":
     #Replace STARK_Parser folder in sys.path with STARK_CodeGen_Dynamic
     sys.path[0] = os.getcwd() + '/libstark/STARK_CodeGen_Dynamic'
     import cgdynamic_cli as cgdynamic
-    cgdynamic.create(cloud_resources)
+    cgdynamic.create(cloud_resources, project_basedir)
 
     #4) CGStatic
     #Replace CGDynamic folder in sys.path with CGStatic
     sys.path[0] = os.getcwd() + '/libstark/STARK_CodeGen_Static'
     import cgstatic_cli as cgstatic
-    cgstatic.create(cloud_resources, current_cloud_resources)
+    cgstatic.create(cloud_resources, current_cloud_resources, project_basedir)
 
     #5) Updating cloud resources doc
     #FIXME: We are purposely only updating the DDB Models, because all other entries are just entity lists and
