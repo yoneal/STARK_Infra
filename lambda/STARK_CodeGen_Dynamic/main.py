@@ -107,8 +107,8 @@ def create_handler(event, context):
         'fileContent': source_code.encode()
     })
 
-    ###########################################
-    #Create build files we need fo our pipeline:
+    ############################################
+    #Create build files we need for our pipeline:
     # - template.yml
     # - buildspec.yml
     # - template_configuration.json
