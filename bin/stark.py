@@ -22,10 +22,17 @@ def create_iac_template(cloud_resources):
     cleaner_service_token   = yml_config['Cleaner_ARN']
     prelaunch_service_token = yml_config['Prelaunch_ARN']
 
+    #FIXME: CICD Bucket should be retrieved from template_configuration.json
+    #       The one in STARK_config.yml is the CICD bucket for the main STARK infra.
+    #       This is the default for each project, but that may be overridden by the devs through
+    #           template_configuration.json, hence that's the canonical store when we need the project-specific CI/CD bucket 
+    cicd_bucket             = yml_config['CICD_Bucket_Name']
+    
     data = {
         'cloud_resources': cloud_resources,
         'Cleaner_ARN': cleaner_service_token,
         'Prelaunch_ARN': prelaunch_service_token,
+        'CICD_Bucket_Name': cicd_bucket,
     }
     cf_template = cgdynamic.create_template_from_cloud_resources(data)
 

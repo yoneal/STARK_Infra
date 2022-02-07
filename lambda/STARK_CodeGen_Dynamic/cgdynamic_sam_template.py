@@ -31,6 +31,7 @@ def create(data, cli_mode=False):
         if cli_mode == True:
             cleaner_service_token   = data['Cleaner_ARN']
             prelaunch_service_token = data['Prelaunch_ARN']
+            cicd_bucket_name        = data['CICD_Bucket_Name']
         else:
             codegen_bucket_name = os.environ['CODEGEN_BUCKET_NAME']
 
@@ -41,6 +42,7 @@ def create(data, cli_mode=False):
             config = yaml.safe_load(response['Body'].read().decode('utf-8'))
             cleaner_service_token   = config['Cleaner_ARN']
             prelaunch_service_token = config['Prelaunch_ARN']
+            cicd_bucket_name        = config['CICD_Bucket_Name']
 
     else:
         #We only have to do this because `SAM local start-api` doesn't follow CORS info from template.yml, which is bullshit
@@ -179,6 +181,14 @@ def create(data, cli_mode=False):
                     S3Key: {project_varname}/STARKLambdaLayers/yaml_py39.zip
                 Description: YAML module for Python 3.x
                 LayerName: {project_varname}_PyYAML
+        STARKFriendlyToSystemNamesLayer:
+            Type: AWS::Lambda::LayerVersion
+            Properties:
+                Content:
+                    S3Bucket: !Ref UserCICDPipelineBucketNameParameter
+                    S3Key: {project_varname}/STARKLambdaLayers/STARK_friendly_to_system_name_py39.zip
+                Description: STARK module for converting user-supplied, human-friendly identifiers into system-friendly entity or variable names
+                LayerName: {project_varname}_friendly_to_system_name
         STARKScryptLayer:
             Type: AWS::Lambda::LayerVersion
             Properties:
@@ -187,6 +197,25 @@ def create(data, cli_mode=False):
                     S3Key:  {project_varname}/STARKLambdaLayers/STARK_scrypt_py39.zip
                 Description: STARK module for working with scrypt from the Python stdlib
                 LayerName: {project_varname}_scrypt
+        STARKLayerMakerFunc:
+            Type: AWS::Serverless::Function
+            Properties:
+                Runtime: python3.9
+                Handler: main.lambda_handler
+                CodeUri: lambda/STARK_Deploy_Check
+                Environment:
+                    Variables:
+                        STARK_ENVIRONMENT_TYPE: PROD
+                        Project_Name: {project_name}
+                        CICD_Bucket_Name: {cicd_bucket_name}
+                Policies:
+                    - AmazonS3FullAccess
+                Layers:
+                    - !Ref PyYamlLayer
+                    - !Ref STARKFriendlyToSystemNamesLayer
+                Timeout: 60
+                Architectures:
+                    - arm64
         STARKApiGateway:
             Type: AWS::Serverless::HttpApi
             Properties:
