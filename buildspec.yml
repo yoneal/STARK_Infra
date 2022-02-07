@@ -22,7 +22,7 @@ phases:
       - aws s3 sync bin s3://$CODEGEN/STARKUtilities --delete
       - aws s3 cp outputtemplate.yml s3://$BUCKET/STARK_InternalInfra_DeploymentPackages/
       - aws s3 sync lambda/packaged_layers s3://$CODEGEN/STARKLambdaLayers --delete --exclude="*" --include="*.zip"
-      - aws s3 sync lambda/packaged_functions  s3://$CODEGEN/STARKLambdaFunctions --delete --exlucde="*" --include="*.zip"
+      - aws s3 sync lambda/packaged_functions  s3://$CODEGEN/STARKLambdaFunctions --delete --exclude="*" --include="*.zip"
       - aws s3 sync lambda/helpers s3://$CODEGEN/STARKLambdaHelpers --delete --exclude="*" --include="*.py"
 
 artifacts:
