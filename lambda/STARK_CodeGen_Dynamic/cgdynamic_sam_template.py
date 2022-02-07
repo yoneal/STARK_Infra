@@ -204,7 +204,7 @@ def create(data, cli_mode=False):
                 Runtime: python3.9
                 Handler: main.lambda_handler
                 CodeUri: 
-                    Bucket: {codegen_bucket_name}
+                    Bucket: {codegen_bucket_name}t
                     Key: STARKLambdaFunctions/STARK_LayerMaker.zip
                 Environment:
                     Variables:
