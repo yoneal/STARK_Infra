@@ -44,26 +44,15 @@ def lambda_handler(event, context):
     #arch = event.get('arch', '')
     #arch = os.environ.get('arch', '')
 
-    #FIXME:
-    #   For local STARK CLI, get this from cloud_resources.yml
-    #   For Lambda-based execution, get this from environment variable
     if mode == "cli":
         project_name     = yaml.load(open("../cloud_resources.yml")).get('Project Name', '')
         project_name_sys = converter.convert_to_system_name(project_name)
-    else:
-        #Lambda:
-        project_name = os.environ['PROJECT_NAME']
+        config_json      = json.load(open("../template_configuration.json"))
+        cicd_bucket      = config_json['Parameters']['UserCICDPipelineBucketNameParameter']
 
-    #FIXME:
-    #   For local STARK CLI, get this from template_configuration.json
-    #   For Lambda-based execution, get this from environment variable
-    #STARK CLI :
-    if mode == "cli":
-        config_json = json.load(open("../template_configuration.json"))
-        cicd_bucket = config_json['Parameters']['UserCICDPipelineBucketNameParameter']
     else:
-        #Lambda:
-        cicd_bucket = os.environ['CICD_BUCKET_NAME']
+        project_name = os.environ['PROJECT_NAME']
+        cicd_bucket  = os.environ['CICD_BUCKET_NAME']
 
     py_version = event.get('py_version', '')
     if py_version == '': py_version = default_py_version

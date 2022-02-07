@@ -22,8 +22,12 @@ phases:
       - aws s3 sync bin s3://$CODEGEN/STARKUtilities --delete
       - aws s3 cp outputtemplate.yml s3://$BUCKET/STARK_InternalInfra_DeploymentPackages/
       - aws s3 sync lambda/packaged_layers s3://$CODEGEN/STARKLambdaLayers --delete --exclude="*" --include="*.zip"
-      - aws s3 sync lambda/packaged_functions  s3://$CODEGEN/STARKLambdaFunctions --delete --exclude="*" --include="*.zip"
       - aws s3 sync lambda/helpers s3://$CODEGEN/STARKLambdaHelpers --delete --exclude="*" --include="*.py"
+      - comment="The following commands populate the 'packaged_functions' folder with the appropriate lambda functions"
+      - mkdir lambda/packaged_functions
+      - zip STARK_LayerMaker.zip lambda/STARK_LayerMaker/*
+      - cp STARK_LayerMaker.zip lambda/packaged_functions/.
+      - aws s3 sync lambda/packaged_functions  s3://$CODEGEN/STARKLambdaFunctions --delete --exclude="*" --include="*.zip"
 
 artifacts:
   files:
