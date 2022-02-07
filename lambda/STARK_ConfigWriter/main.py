@@ -41,6 +41,7 @@ def make_config_file(event, _):
         CGStatic_ARN: '{cg_static_arn}'
         CICD_Bucket_Name: '{cicd_bucket_name}'
         Cleaner_ARN: '{cleaner_arn}'
+        CodeGen_Bucket_Name: '{codegen_bucket_name}'
         Prelaunch_ARN: '{prelaunch_arn}'
         """
 

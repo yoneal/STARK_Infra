@@ -32,6 +32,7 @@ def create(data, cli_mode=False):
             cleaner_service_token   = data['Cleaner_ARN']
             prelaunch_service_token = data['Prelaunch_ARN']
             cicd_bucket_name        = data['CICD_Bucket_Name']
+            codegen_bucket_name     = data['CodeGen_Bucket_Name']
         else:
             codegen_bucket_name = os.environ['CODEGEN_BUCKET_NAME']
 
@@ -202,7 +203,9 @@ def create(data, cli_mode=False):
             Properties:
                 Runtime: python3.9
                 Handler: main.lambda_handler
-                CodeUri: lambda/STARK_Deploy_Check
+                CodeUri: 
+                    Bucket: {codegen_bucket_name}
+                    Key: STARKLambdaFunctions/STARK_LayerMaker.zip
                 Environment:
                     Variables:
                         STARK_ENVIRONMENT_TYPE: PROD
