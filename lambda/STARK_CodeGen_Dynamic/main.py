@@ -18,6 +18,7 @@ import cgdynamic_logout as cg_logout
 import cgdynamic_modules as cg_mod
 import cgdynamic_dynamodb as cg_ddb
 import cgdynamic_buildspec as cg_build
+import cgdynamic_authorizer as cg_auth
 import cgdynamic_sam_template as cg_sam
 import cgdynamic_template_conf as cg_conf
 import convert_friendly_to_system as converter
@@ -104,6 +105,14 @@ def create_handler(event, context):
     source_code = cg_logout.create({"DynamoDB Name": ddb_table_name})
     files_to_commit.append({
         'filePath': f"lambda/logout/main.py",
+        'fileContent': source_code.encode()
+    })
+
+    #################################################
+    #Create our Lambda Authorizer for our API Gateway
+    source_code = cg_auth.create({"DynamoDB Name": ddb_table_name})
+    files_to_commit.append({
+        'filePath': f"lambda/authorizer_default/main.py",
         'fileContent': source_code.encode()
     })
 

@@ -216,9 +216,21 @@ def create(data, cli_mode=False):
                 Layers:
                     - !Ref PyYamlLayer
                     - !Ref STARKFriendlyToSystemNamesLayer
-                Timeout: 60
                 Architectures:
                     - arm64
+                MemorySize: 128
+                Timeout: 60
+        STARKDefaultAuthorizerFunc:
+            Type: AWS::Serverless::Function
+            Properties:
+                Runtime: python3.9
+                Handler: main.lambda_handler
+                CodeUri: lambda/authorizer_default
+                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
+                Architectures:
+                    - arm64
+                MemorySize: 128
+                Timeout: 5
         STARKApiGateway:
             Type: AWS::Serverless::HttpApi
             Properties:
