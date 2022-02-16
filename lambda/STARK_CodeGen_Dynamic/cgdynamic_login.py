@@ -135,6 +135,7 @@ def create(data):
                 item['sk']         = {{'S' : "sess|info"}}
                 item['TTL']        = {{'S' : str(dt_p12)}}
                 item['sess_start'] = {{'S' : str(dt_now)}}
+                item['username']   = {{'S' : username}}
                 response = ddb.put_item(
                     TableName=ddb_table,
                     Item=item,
