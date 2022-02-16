@@ -48,6 +48,27 @@ def create(data):
                 return fetch(fetchUrl, fetchData).then( function(response) {{
                     if (!response.ok) {{
                         console.log(response)
+
+                    //Specific indicators to watch for:
+                    //401 (Unauthorized)= AWS API Gateway Authorizer error, missing Identity Source in request. Redirect to login screen
+                    //403 (Forbidden) = Identity Source (cookie) was submitted, but Authorizer determined it was invalid. Redirect to home page
+                    if (response.status == 401) {{
+                        console.log("Unauthenticated request, redirecting to Login Screen")
+                        window.location.href="index.html"
+                    }}
+                    if (response.status == 403) {{
+                        console.log("Forbidden request, redirecting to Home Page")
+                        window.location.href="home.html"
+                        //FIXME: Redirecting to home for 403 errors could cause problems during cookie expiration (default: 12hrs.
+                        //  Might be best to just immediately call logout to clear problematic session id and redirect to login?
+                        //      See if this is a real problem first, though. Currently our Authorizer really only cares about being logged in,
+                        //      and does not really do granular permissions checking (and having cached response could complicate having granular,
+                        //      per-module permissions checking there, unless these granular items also get added to Identity Sources so they are all cached
+                        //      independently.)
+                        //  If browser clears local cookies earlier than DDB TTL execution, then this won't be a problem at all, as 401 will be triggered instead of
+                        //  403. Browser clearing local cookie faster than DDB TTL execution is practically guaranteed, as TTL execution is not guaranteed real time.
+                    }}
+
                         throw Error(response.statusText);
                     }}
                     return response
