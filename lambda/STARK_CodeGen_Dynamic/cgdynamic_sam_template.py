@@ -267,7 +267,7 @@ def create(data, cli_mode=False):
                             FunctionInvokeRole: !GetAtt STARKProjectDefaultAuthorizerInvokeRole.Arn
                             Identity:
                                 Headers: 
-                                    - $request.header.cookie
+                                    - cookie
                                 ReauthorizeEvery: 300
                     DefaultAuthorizer: STARKDefaultAuthorizer
                 CorsConfiguration:
