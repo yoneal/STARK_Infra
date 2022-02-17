@@ -75,11 +75,9 @@ def create(data):
         #        "mapKey": {{"value1": "value2"}}
         #    }}
         # }}
-        # #NOTE: Remember that, unlike Cobalt (which runs purely on PHP), we have 2 environments to deal with 
-        # #     - JS and Python environments. Caching stuff through the Authorizer response is less useful if 
-        # #     it is usable only in JS but is needed by backend code (e.g., permissions). Might still be ok
-        # #     for UI code (e.g., displaying usernames / full names, module names, etc), or things that JS can
-        # #     then pass securely and safely to backend (Lambda / python).s
+        # #NOTE: Response here is sent to the integration (i.e., the Lambda function behind the API call that the Authorizer has authorized)
+        # #      and can be retrieved through: event['requestContext']['authorizer']['lambda'][$VARNAME]. Our `username` context var, e.g.:
+        # #      username = event['requestContext']['authorizer']['lambda']['username']
 
 
 
