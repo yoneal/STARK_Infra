@@ -166,6 +166,30 @@ def create(data, cli_mode=False):
                                         - 'dynamodb:Query'
                                         - 'dynamodb:UpdateItem'
                                     Resource: !Join [ ":", [ "arn:aws:dynamodb", !Ref AWS::Region, !Ref AWS::AccountId, "table/{ddb_table_name}"] ]
+        STARKProjectDefaultAuthorizerInvokeRole:
+            Type: AWS::IAM::Role
+            Properties:
+                AssumeRolePolicyDocument:
+                    Version: '2012-10-17'
+                    Statement: 
+                        - 
+                            Effect: Allow
+                            Principal:
+                                Service: 
+                                    - 'apigateway.amazonaws.com'
+                            Action: 'sts:AssumeRole'
+                Policies:
+                    - 
+                        PolicyName: PolicyForSTARKProjectDefaultAuthorizerInvokeRole
+                        PolicyDocument:
+                            Version: '2012-10-17'
+                            Statement:
+                                - 
+                                    Sid: VisualEditor0
+                                    Effect: Allow
+                                    Action:
+                                        - 'lambda:InvokeFunction'
+                                    Resource: !GetAtt STARKDefaultAuthorizerFunc.Arn
         CFCustomResourceHelperLayer:
             Type: AWS::Lambda::LayerVersion
             Properties:
@@ -234,6 +258,18 @@ def create(data, cli_mode=False):
         STARKApiGateway:
             Type: AWS::Serverless::HttpApi
             Properties:
+                Auth:
+                    Authorizers:
+                        STARKDefaultAuthorizer:
+                            AuthorizerPayloadFormatVersion: 2.0
+                            EnableSimpleResponses: True
+                            FunctionArn: !GetAtt STARKDefaultAuthorizerFunc.Arn
+                            FunctionInvokeRole: !GetAtt STARKProjectDefaultAuthorizerInvokeRole.Arn
+                            Identity:
+                                Headers: 
+                                    - $request.header.cookie
+                                ReauthorizeEvery: 300
+                    DefaultAuthorizer: STARKDefaultAuthorizer
                 CorsConfiguration:
                     AllowOrigins:
                         - !Join [ "", [ "http://{s3_bucket_name}.s3-website-", !Ref AWS::Region, ".amazonaws.com"] ]
