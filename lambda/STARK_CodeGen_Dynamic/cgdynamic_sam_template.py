@@ -388,6 +388,8 @@ def create(data, cli_mode=False):
                             Method: POST
                             ApiId:
                                 Ref: STARKApiGateway
+                            Auth:
+                                Authorizer: NONE
                 Runtime: python3.9
                 Handler: main.lambda_handler
                 CodeUri: lambda/login
