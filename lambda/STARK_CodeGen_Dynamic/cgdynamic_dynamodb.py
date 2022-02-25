@@ -175,7 +175,7 @@ def create(data):
             IndexName="STARK-ListView-Index",
             Select='ALL_ATTRIBUTES',
             ReturnConsumedCapacity='TOTAL',
-            FilterExpression='sk = :sk',
+            KeyConditionExpression='sk = :sk',
             ExpressionAttributeValues={{
                 ':sk' : {{'S' : sk}}
             }}
