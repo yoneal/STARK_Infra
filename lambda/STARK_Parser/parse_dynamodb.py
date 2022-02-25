@@ -14,7 +14,7 @@ def parse(data):
     ddb_auto_scaling          = False
     ddb_surge_protection      = False
     ddb_surge_protection_fifo = False
-    ddb_capacity_type         = "provisioned"
+    ddb_capacity_type         = "PAY_PER_REQUEST"
     ddb_rcu_provisioned       = 3
     ddb_wcu_provisioned       = 3
 
@@ -24,7 +24,7 @@ def parse(data):
             ddb_surge_protection      = data_model[key].get('ddb_surge_protection', False)
             ddb_surge_protection_fifo = data_model[key].get('ddb_surge_protection_fifo', False)
             ddb_auto_scaling          = data_model[key].get('ddb_auto_scaling', False)
-            ddb_capacity_type         = data_model[key].get('ddb_capacity_type', "provisioned")
+            ddb_capacity_type         = data_model[key].get('ddb_capacity_type', "PAY_PER_REQUEST")
             ddb_rcu_provisioned       = data_model[key].get('ddb_rcu_provisioned', 3)
             ddb_wcu_provisioned       = data_model[key].get('ddb_wcu_provisioned', 3)
 
@@ -43,7 +43,7 @@ def parse(data):
         "Surge Protection FIFO": ddb_surge_protection_fifo,
     }
 
-    if ddb_capacity_type == "provisioned":
+    if ddb_capacity_type == "PROVISIONED":
         parsed["RCU"]          = ddb_rcu_provisioned
         parsed["WCU"]          = ddb_wcu_provisioned
         parsed["Auto Scaling"] = ddb_auto_scaling
