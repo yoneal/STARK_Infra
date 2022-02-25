@@ -41,6 +41,11 @@ def create_handler(event, context):
     item['Password_Hash'] = {'S' : hashed}
     item['Last_Access']   = {'S' : str(datetime.datetime.now())}
     item['Permissions']   = {'S' : ""}
+   
+    #This special attribute is to make this record show up in the GSI "STARK-ListView-Index",
+    #   which is what the User List View module will need to query
+    item['STARK-ListView-sk'] = {'S' : "Y"}
+
     response = ddb.put_item(
         TableName=ddb_table_name,
         Item=item,

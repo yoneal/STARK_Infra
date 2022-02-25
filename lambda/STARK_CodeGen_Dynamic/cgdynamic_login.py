@@ -139,6 +139,10 @@ def create(data):
                 item['TTL']        = {{'S' : str(dt_p12)}}
                 item['sess_start'] = {{'S' : str(dt_now)}}
                 item['username']   = {{'S' : username}}
+
+                #This special attribute makes the record show up in the GSI "STARK-ListView-Index",
+                item['STARK-ListView-sk'] = {{'S' : "Y"}}
+
                 response = ddb.put_item(
                     TableName=ddb_table,
                     Item=item,

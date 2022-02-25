@@ -297,7 +297,8 @@ def create(data):
 
         item={{}}
         item['pk'] = {{'S' : pk}}
-        item['sk'] = {{'S' : sk}}"""
+        item['sk'] = {{'S' : sk}}
+        item['STARK-ListView-sk'] = {{'S' : "Y"}}"""
 
     for col, col_type in columns.items():
         col_varname = converter.convert_to_system_name(col)
