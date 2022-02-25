@@ -165,7 +165,9 @@ def create(data, cli_mode=False):
                                         - 'dynamodb:Scan'
                                         - 'dynamodb:Query'
                                         - 'dynamodb:UpdateItem'
-                                    Resource: !Join [ ":", [ "arn:aws:dynamodb", !Ref AWS::Region, !Ref AWS::AccountId, "table/{ddb_table_name}"] ]
+                                    Resource: 
+                                        - !Join [ ":", [ "arn:aws:dynamodb", !Ref AWS::Region, !Ref AWS::AccountId, "table/{ddb_table_name}"] ]
+                                        - !Join [ ":", [ "arn:aws:dynamodb", !Ref AWS::Region, !Ref AWS::AccountId, "table/{ddb_table_name}", "/index/STARK-ListView-Index", ] ]
         STARKProjectDefaultAuthorizerInvokeRole:
             Type: AWS::IAM::Role
             Properties:
@@ -296,6 +298,18 @@ def create(data, cli_mode=False):
                     -
                         AttributeName: sk
                         AttributeType: S
+                GlobalSecondaryIndexes:
+                    -
+                        IndexName: STARK-ListView-Index
+                        KeySchema:
+                            -
+                                AttributeName: sk
+                                KeyType: HASH
+                            -
+                                AttributeName: STARK-ListView-sk
+                                KeyType: RANGE
+                        Projection: 
+                            ProjectionType: ALL
                 KeySchema:
                     -
                         AttributeName: pk
