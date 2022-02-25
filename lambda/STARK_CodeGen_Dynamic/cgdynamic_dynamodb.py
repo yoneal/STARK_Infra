@@ -170,7 +170,7 @@ def create(data):
         }}
 
     def get_all(sk):
-        response = ddb.scan(
+        response = ddb.query(
             TableName=ddb_table,
             IndexName="STARK-ListView-Index",
             Select='ALL_ATTRIBUTES',
