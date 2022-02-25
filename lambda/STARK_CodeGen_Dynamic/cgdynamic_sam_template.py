@@ -309,7 +309,15 @@ def create(data, cli_mode=False):
                                 AttributeName: STARK-ListView-sk
                                 KeyType: RANGE
                         Projection: 
-                            ProjectionType: ALL
+                            ProjectionType: ALL"""
+
+    if ddb_capacity_type == "PROVISIONED":
+        cf_template += f"""
+                        ProvisionedThroughput:
+                            ReadCapacityUnits: {ddb_rcu_provisioned}
+                            WriteCapacityUnits: {ddb_wcu_provisioned}"""
+
+    cf_template += f"""
                 KeySchema:
                     -
                         AttributeName: pk

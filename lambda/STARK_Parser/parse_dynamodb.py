@@ -29,7 +29,7 @@ def parse(data):
             ddb_wcu_provisioned       = data_model[key].get('ddb_wcu_provisioned', 3)
 
     if ddb_table_name == "":
-        ddb_table_name = project_varname  + "_ddb"
+        ddb_table_name = "STARK_" + project_varname
 
     if ddb_auto_scaling:
         ddb_auto_scaling = "ENABLED"
