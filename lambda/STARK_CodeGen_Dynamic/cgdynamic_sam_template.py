@@ -298,6 +298,9 @@ def create(data, cli_mode=False):
                     -
                         AttributeName: sk
                         AttributeType: S
+                    -
+                        AttributeName: STARK-ListView-sk
+                        AttributeType: S
                 GlobalSecondaryIndexes:
                     -
                         IndexName: STARK-ListView-Index
