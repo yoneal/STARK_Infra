@@ -16,6 +16,11 @@ def create(data):
     ddb_table_name = data["DynamoDB Name"]
 
     #Convert human-friendly names to variable-friendly names
+    #FIXME: entity as passed from main.py is already entity_varname!
+    #       Possible fixes: 
+    #           - remove line below and just use `entity` everywhere,
+    #           - change `entity` to `entity_varname` in `entity = data['Entity']` above,
+    #           - pass unconverted `entity` from main.py (but it might not be a good idea to actually use unconverted `entity` as part of sk though...)
     entity_varname = converter.convert_to_system_name(entity)
     pk_varname     = converter.convert_to_system_name(pk)
 
@@ -167,12 +172,10 @@ def create(data):
     def get_all(sk):
         response = ddb.scan(
             TableName=ddb_table,
+            IndexName="STARK-ListView-Index",
             Select='ALL_ATTRIBUTES',
             ReturnConsumedCapacity='TOTAL',
-            FilterExpression='#sk = :sk',
-            ExpressionAttributeNames={{
-                '#sk' : 'sk'
-            }},
+            FilterExpression='sk = :sk',
             ExpressionAttributeValues={{
                 ':sk' : {{'S' : sk}}
             }}

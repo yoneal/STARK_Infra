@@ -130,6 +130,9 @@ def create(data):
                 #2. Create USER SESSION, with token in it
                 dt_now             = datetime.datetime.now()
                 dt_p12             = dt_now + datetime.timedelta(hours=12)
+                #FIXME: DDB TTL must be in Unix timestamp format. 
+                #       Change dt_p12 as needed.
+                #       Column must also be defined as Number (N), instead of String (S)
                 item               = {{}}
                 item['pk']         = {{'S' : sess_id}}
                 item['sk']         = {{'S' : "sess|info"}}
