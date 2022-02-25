@@ -23,6 +23,6 @@ echo -e "import sys\nfor path in sys.path:\n  if 'packages' in path: print(path)
 
 echo "Where do you want to install your lambda layers for local access? (copy-paste the full path here):"
 read -r installpath
-cp -rf ../lambda/helpers/* $installpath
+cp -rf ../lambda/helpers/* "$installpath"
 
 echo "Installed custom layers in "$installpath"!"
