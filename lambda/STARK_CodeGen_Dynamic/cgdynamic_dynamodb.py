@@ -84,7 +84,13 @@ def create(data):
     
             #Get specific request method
             method  = event.get('requestContext').get('http').get('method')
-            payload = json.loads(event.get('body')).get('{entity_varname}',"")
+
+            if event.get('isBase64Encoded') == True :
+                print("[INFO] b64decode payload...")
+                payload = json.loads(base64.b64decode(event.get('body'))).get('{entity_varname}',"")
+            else:    
+                payload = json.loads(event.get('body')).get('{entity_varname}',"")
+
             data    = {{}}
 
             if payload == "":

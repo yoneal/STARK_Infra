@@ -39,7 +39,14 @@ def create(data):
             cookies[info[0]] = info[2]
  
         method  = event.get('requestContext').get('http').get('method')
-        payload = json.loads(event.get('body')).get('Login',"")
+
+        if event.get('isBase64Encoded') == True :
+            print("[INFO] b64decode payload...")
+            payload = json.loads(base64.b64decode(event.get('body'))).get('Login',"")
+        else:    
+            payload = json.loads(event.get('body')).get('Login',"")
+
+
         data    = {{}}
         headers = {{"Content-Type": "application/json",}}
         
