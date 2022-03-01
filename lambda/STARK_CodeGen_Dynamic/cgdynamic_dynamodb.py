@@ -72,6 +72,7 @@ def create(data):
     #CONFIG
     ddb_table  = "{ddb_table_name}"
     default_sk = "{default_sk}"
+    page_limit = 10
 
     def lambda_handler(event, context):
 
@@ -180,6 +181,7 @@ def create(data):
             TableName=ddb_table,
             IndexName="STARK-ListView-Index",
             Select='ALL_ATTRIBUTES',
+            Limit=page_limit,
             ReturnConsumedCapacity='TOTAL',
             KeyConditionExpression='sk = :sk',
             ExpressionAttributeValues={{
