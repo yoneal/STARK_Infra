@@ -149,6 +149,9 @@ def create(data):
             if request_type == "all":
                 response = get_all(default_sk)
 
+            elif request_type == "report":
+                response = report(default_sk)
+
             elif request_type == "detail":
 
                 pk = event.get('queryStringParameters').get('{pk_varname}','')
@@ -175,6 +178,40 @@ def create(data):
                 "Content-Type": "application/json",
             }}
         }}
+
+    def report(sk):
+        response = ddb.query(
+            TableName=ddb_table,
+            IndexName="STARK-ListView-Index",
+            Select='ALL_ATTRIBUTES',
+            ReturnConsumedCapacity='TOTAL',
+            KeyConditionExpression='sk = :sk',
+            ExpressionAttributeValues={{
+                ':sk' : {{'S' : sk}}
+            }}
+        )
+
+        raw = response.get('Items')
+
+        #Map to expected structure
+        #FIXME: this is duplicated code, make this DRY by outsourcing the mapping to a different function.
+        items = []
+        for record in raw:
+            item = {{'Customer_ID': record['pk']['S'],
+                    'sk': record['sk']['S'],
+                    'Customer_Name': record['Customer_Name']['S'],
+                    'Gender': record['Gender']['S'],
+                    'Join_Date': record['Join_Date']['S'],
+                    'Preferred_Customer': record['Preferred_Customer']['S'],
+                    'Customer_Type': record['Customer_Type']['S'],
+                    'Remarks': record['Remarks']['S'],}}
+            items.append(item)
+
+        #Sort: this can be transformed to an actual sorting function instead of lambda (Python lambda, not AWS lambda)
+        #   to allow for sorting features like choosing which column to sort on, or applying complex sort logic that involves two or more cols.
+        items = sorted(items, key=lambda item: item['Customer_ID'])
+
+        return items
 
     def get_all(sk):
         response = ddb.query(
