@@ -135,12 +135,12 @@ def create(data):
                 #This should also be where bearer token is created when bearer token support is implemented
 
                 #2. Create USER SESSION, with token in it
-                dt_now             = datetime.datetime.now()
-                dt_p12             = dt_now + datetime.timedelta(hours=12)
+                ttl_datetime       = datetime.datetime.now() + datetime.timedelta(hours=12)
+                ttl_timestamp      = int(ttl_datetime.timestamp()) #int cast to remove microseconds
                 item               = {{}}
                 item['pk']         = {{'S' : sess_id}}
                 item['sk']         = {{'S' : "sess|info"}}
-                item['TTL']        = {{'N' : int(dt_p12.timestamp())}}
+                item['TTL']        = {{'N' : str(ttl_timestamp)}}
                 item['sess_start'] = {{'S' : str(dt_now)}}
                 item['username']   = {{'S' : username}}
 
