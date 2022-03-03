@@ -63,7 +63,7 @@ def create_handler(event, context):
         entity_varname = converter.convert_to_system_name(entity) 
         #Step 1: generate source code.
         data = {
-            "Entity": entity_varname, 
+            "Entity": entity, 
             "Columns": models[entity]["data"], 
             "PK": models[entity]["pk"], 
             "DynamoDB Name": ddb_table_name
