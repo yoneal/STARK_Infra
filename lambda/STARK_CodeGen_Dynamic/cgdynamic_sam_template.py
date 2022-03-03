@@ -291,6 +291,9 @@ def create(data, cli_mode=False):
             Properties:
                 TableName: {ddb_table_name}
                 BillingMode: {ddb_capacity_type}
+                TimeToLiveSpecification:
+                    AttributeName: TTL
+                    Enabled: True
                 AttributeDefinitions:
                     -
                         AttributeName: pk
