@@ -140,7 +140,7 @@ def create(data):
                 ttl_timestamp      = int(ttl_datetime.timestamp()) #int cast to remove microseconds
                 item               = {{}}
                 item['pk']         = {{'S' : sess_id}}
-                item['sk']         = {{'S' : "sess|info"}}
+                item['sk']         = {{'S' : "STARK|session"}}
                 item['TTL']        = {{'N' : str(ttl_timestamp)}}
                 item['sess_start'] = {{'S' : str(dt_now)}}
                 item['username']   = {{'S' : username}}
