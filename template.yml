@@ -54,6 +54,14 @@ Resources:
                 S3Key: STARKLambdaLayers/yaml_py39.zip
             Description: YAML module for Python 3.x
             LayerName: STARK_PyYAML
+    RequestslLayer:
+        Type: AWS::Lambda::LayerVersion
+        Properties:
+            Content:
+                S3Bucket: !Ref UserCodeGenBucketNameParameter
+                S3Key: STARKLambdaLayers/requests_py39.zip
+            Description: Requests module for Python 3.x
+            LayerName: STARK_Requests
     STARKFriendlyToSystemNamesLayer:
         Type: AWS::Lambda::LayerVersion
         Properties:

@@ -264,6 +264,14 @@ def create(data, cli_mode=False):
                     S3Key: {project_varname}/STARKLambdaLayers/yaml_py39.zip
                 Description: YAML module for Python 3.x
                 LayerName: {project_varname}_PyYAML
+        RequestsLayer:
+            Type: AWS::Lambda::LayerVersion
+            Properties:
+                Content:
+                    S3Bucket: !Ref UserCICDPipelineBucketNameParameter
+                    S3Key: {project_varname}/STARKLambdaLayers/requests_py39.zip
+                Description: Requests module for Python 3.x
+                LayerName: {project_varname}_Requests
         STARKFriendlyToSystemNamesLayer:
             Type: AWS::Lambda::LayerVersion
             Properties:

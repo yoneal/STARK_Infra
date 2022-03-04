@@ -15,7 +15,7 @@ else
 fi
 
 echo "Will install third-party packages..."
-pip install boto3 pyyaml crhelper
+pip install boto3 pyyaml crhelper requests
 
 echo "Will now proceed to install lambda layers for local access."
 echo "These are the detected python system paths:"
