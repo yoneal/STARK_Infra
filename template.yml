@@ -46,6 +46,14 @@ Resources:
                 S3Key: STARKLambdaLayers/CF_CustomResourceHelper_py39.zip
             Description: Lambda-backed custom resource library for CloudFormation
             LayerName: STARK_CF_CustomResourceHelper
+            CompatibleArchitectures:
+                - x86_64
+                - arm64
+            CompatibleRuntimes:
+                - python3.6
+                - python3.7
+                - python3.8
+                - python3.9
     PyYamlLayer:
         Type: AWS::Lambda::LayerVersion
         Properties:
@@ -54,6 +62,14 @@ Resources:
                 S3Key: STARKLambdaLayers/yaml_py39.zip
             Description: YAML module for Python 3.x
             LayerName: STARK_PyYAML
+            CompatibleArchitectures:
+                - x86_64
+                - arm64
+            CompatibleRuntimes:
+                - python3.6
+                - python3.7
+                - python3.8
+                - python3.9
     RequestslLayer:
         Type: AWS::Lambda::LayerVersion
         Properties:
@@ -62,6 +78,14 @@ Resources:
                 S3Key: STARKLambdaLayers/requests_py39.zip
             Description: Requests module for Python 3.x
             LayerName: STARK_Requests
+            CompatibleArchitectures:
+                - x86_64
+                - arm64
+            CompatibleRuntimes:
+                - python3.6
+                - python3.7
+                - python3.8
+                - python3.9
     STARKFriendlyToSystemNamesLayer:
         Type: AWS::Lambda::LayerVersion
         Properties:
@@ -70,6 +94,14 @@ Resources:
                 S3Key: STARKLambdaLayers/STARK_friendly_to_system_name_py39.zip
             Description: STARK module for converting user-supplied, human-friendly identifiers into system-friendly entity or variable names
             LayerName: STARK_friendly_to_system_name
+            CompatibleArchitectures:
+                - x86_64
+                - arm64
+            CompatibleRuntimes:
+                - python3.6
+                - python3.7
+                - python3.8
+                - python3.9
     STARKScryptLayer:
         Type: AWS::Lambda::LayerVersion
         Properties:
@@ -78,6 +110,14 @@ Resources:
                 S3Key: STARKLambdaLayers/STARK_scrypt_py39.zip
             Description: STARK module for working with scrypt from the Python stdlib
             LayerName: STARK_scrypt
+            CompatibleArchitectures:
+                - x86_64
+                - arm64
+            CompatibleRuntimes:
+                - python3.6
+                - python3.7
+                - python3.8
+                - python3.9
     STARKParserFunc:
         Type: AWS::Serverless::Function
         Properties:
