@@ -99,6 +99,9 @@ def create(data, cli_mode=False):
     #Initialize our template
     #This is where we can use triple-quoted f-strings + textwrap.dedent(), instead of manually placing tabs and nl, unreadable!
     #The forward slash ( \ ) is so that we don't have an empty blank line at the top of our resulting file.
+    #FIXME: instead of a RegionMap Mappings section here, can we just use pure python to handle the inconsistency in S3 website endpoints?
+    #       Perhaps the prepackaged boto3 in Lambda already has region info baked in, we can then simplify this CF template and handle the
+    #       inconsistency in S3 endpoints like we did in STARK_Deploy_Check 
     cf_template = f"""\
     AWSTemplateFormatVersion: '2010-09-09'
     Transform: AWS::Serverless-2016-10-31
