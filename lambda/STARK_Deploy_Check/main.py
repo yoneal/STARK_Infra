@@ -102,7 +102,49 @@ def lambda_handler(event, context):
             bucket_name     = response['StackResourceDetail']['PhysicalResourceId']
             response        = s3.get_bucket_location(Bucket=bucket_name)
             bucket_location = response['LocationConstraint']
-            url             = f"http://{bucket_name}.s3-website-{bucket_location}.amazonaws.com/"
+
+            #We need a map here because website endpoints use either a dash or a dot
+            #   betweeb "s3-website" and "$REGION", depending on the region, instead of just
+            #   being standard all around, so we can't do just a quick concat assuming the separator is constant :(
+            #   And in cn-northwest-1, the url ends with ".com.cn" instead of just ".com" - so even that has to be accounted for.
+            #   Just having a map of regions to endpoints is just the easiest and most comprehensive way to solve this, the tradeoff
+            #   being new regions would have to be added - to mitigate that, we can make a reasonable default (either dash or dot, ending in ".com")
+            website_endpoint_map = {
+                "us-east-2": "s3-website.us-east-2.amazonaws.com/",
+                "us-east-1": "s3-website-us-east-1.amazonaws.com/",
+                "us-west-1": "s3-website-us-west-1.amazonaws.com/",
+                "us-west-2": "s3-website-us-west-2.amazonaws.com/",
+                "af-south-1": "s3-website.af-south-1.amazonaws.com/",
+                "ap-east-1": "s3-website.ap-east-1.amazonaws.com/",
+                "ap-south-1": "s3-website.ap-south-1.amazonaws.com/",
+                "ap-northeast-3": "s3-website.ap-northeast-3.amazonaws.com/",
+                "ap-northeast-2": "s3-website.ap-northeast-2.amazonaws.com/",
+                "ap-southeast-1": "s3-website-ap-southeast-1.amazonaws.com/",
+                "ap-southeast-2": "s3-website-ap-southeast-2.amazonaws.com/",
+                "ap-northeast-1": "s3-website-ap-northeast-1.amazonaws.com/",
+                "ca-central-1": "s3-website.ca-central-1.amazonaws.com/",
+                "cn-northwest-1": "s3-website.cn-northwest-1.amazonaws.com.cn/",
+                "eu-central-1": "s3-website.eu-central-1.amazonaws.com/",
+                "eu-west-1": "s3-website-eu-west-1.amazonaws.com/",
+                "eu-west-2": "s3-website.eu-west-2.amazonaws.com/",
+                "eu-south-1": "s3-website.eu-south-1.amazonaws.com/",
+                "eu-west-3": "s3-website.eu-west-3.amazonaws.com/",
+                "eu-north-1": "s3-website.eu-north-1.amazonaws.com/",
+                "ap-southeast-3": "s3-website.ap-southeast-3.amazonaws.com/",
+                "me-south-1": "s3-website.me-south-1.amazonaws.com/",
+                "sa-east-1": "s3-website-sa-east-1.amazonaws.com/",
+                "us-gov-east-1": "s3-website.us-gov-east-1.amazonaws.com/",
+                "us-gov-west-1": "s3-website-us-gov-west-1.amazonaws.com/",
+            }
+
+            if bucket_location in website_endpoint_map:
+                website_endpoint = website_endpoint_map[bucket_location]
+                url = f"http://{bucket_name}.{website_endpoint}"
+            else:
+                #We caught a new region before our map was updated, fall back to using
+                #a dot instead of dash before the region (this seems to be the preferred separator
+                #for newer regions), and ends in just ".com"
+                url = f"http://{bucket_name}.s3-website.{bucket_location}.amazonaws.com/"
         else:
             #Tell client to keep tracking stack 2. We're still waiting for the
             #   CI/CD pipeline to update the stack from bootstrapper to main application
