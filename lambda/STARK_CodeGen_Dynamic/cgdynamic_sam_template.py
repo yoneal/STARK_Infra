@@ -110,6 +110,59 @@ def create(data, cli_mode=False):
         UserWebsiteBucketNameParameter:
             Type: String
             Description: Name for user bucket that will be used as the website bucket for the STARK Parser UI. Not yet used in template, just needed for config.
+    Mappings:
+        RegionMap:
+            us-east-2:
+                s3endpoint: "s3-website.us-east-2.amazonaws.com"
+            us-east-1:
+                s3endpoint: "s3-website-us-east-1.amazonaws.com"
+            us-west-1:
+                s3endpoint: "s3-website-us-west-1.amazonaws.com"
+            us-west-2:
+                s3endpoint: "s3-website-us-west-2.amazonaws.com"
+            af-south-1:
+                s3endpoint: "s3-website.af-south-1.amazonaws.com"
+            ap-east-1:
+                s3endpoint: "s3-website.ap-east-1.amazonaws.com"
+            ap-south-1:
+                s3endpoint: "s3-website.ap-south-1.amazonaws.com"
+            ap-northeast-3:
+                s3endpoint: "s3-website.ap-northeast-3.amazonaws.com"
+            ap-northeast-2:
+                s3endpoint: "s3-website.ap-northeast-2.amazonaws.com"
+            ap-southeast-1:
+                s3endpoint: "s3-website-ap-southeast-1.amazonaws.com"
+            ap-southeast-2:
+                s3endpoint: "s3-website-ap-southeast-2.amazonaws.com"
+            ap-northeast-1:
+                s3endpoint: "s3-website-ap-northeast-1.amazonaws.com"
+            ca-central-1:
+                s3endpoint: "s3-website.ca-central-1.amazonaws.com"
+            cn-northwest-1:
+                s3endpoint: "s3-website.cn-northwest-1.amazonaws.com.cn"
+            eu-central-1:
+                s3endpoint: "s3-website.eu-central-1.amazonaws.com"
+            eu-west-1:
+                s3endpoint: "s3-website-eu-west-1.amazonaws.com"
+            eu-west-2:
+                s3endpoint: "s3-website.eu-west-2.amazonaws.com"
+            eu-south-1:
+                s3endpoint: "s3-website.eu-south-1.amazonaws.com"
+            eu-west-3:
+                s3endpoint: "s3-website.eu-west-3.amazonaws.com"
+            eu-north-1:
+                s3endpoint: "s3-website.eu-north-1.amazonaws.com"
+            ap-southeast-3:
+                s3endpoint: "s3-website.ap-southeast-3.amazonaws.com"
+            me-south-1:
+                s3endpoint: "s3-website.me-south-1.amazonaws.com"
+            sa-east-1:
+                s3endpoint: "s3-website-sa-east-1.amazonaws.com"
+            us-gov-east-1:
+                s3endpoint: "s3-website.us-gov-east-1.amazonaws.com"
+            us-gov-west-1:
+                s3endpoint: "s3-website-us-gov-west-1.amazonaws.com"
+
     Resources:
         STARKSystemBucket:
             Type: AWS::S3::Bucket
@@ -274,7 +327,7 @@ def create(data, cli_mode=False):
                     DefaultAuthorizer: STARKDefaultAuthorizer
                 CorsConfiguration:
                     AllowOrigins:
-                        - !Join [ "", [ "http://{s3_bucket_name}.s3-website-", !Ref AWS::Region, ".amazonaws.com"] ]
+                        - !Join [ "", [ "http://{s3_bucket_name}.", !FindInMap [ RegionMap, !Ref AWS::Region, s3endpoint] ] ]
                         - http://localhost
                     AllowHeaders:
                         - "Content-Type"
