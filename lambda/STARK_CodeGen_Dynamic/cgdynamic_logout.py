@@ -71,7 +71,7 @@ def create(data):
         #Delete session information
         key       = {{}}
         key['pk'] = {{'S' : sess_id}}
-        key['sk'] = {{'S' : "sess|info"}}
+        key['sk'] = {{'S' : "STARK|session"}}
         response = ddb.delete_item(
             TableName=ddb_table,
             Key=key

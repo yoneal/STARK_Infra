@@ -94,7 +94,7 @@ def create(data):
             }},
             ExpressionAttributeValues={{
                 ':pk' : {{'S' : sess_id }},
-                ':sk' : {{'S' : "sess|info" }}
+                ':sk' : {{'S' : "STARK|session" }}
             }}
         )
 
