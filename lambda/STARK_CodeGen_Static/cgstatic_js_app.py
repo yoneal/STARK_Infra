@@ -43,8 +43,14 @@ def create(data):
                 return STARK.request('GET', fetchUrl)
             }},
 
-            list: function () {{
+            list: function (data=[]) {{
                 fetchUrl = this.api_endpoint + '?rt=all'
+
+                if (data['Next_Token']) {{
+                    next_token = encodeURIComponent(data['Next_Token'])
+                    fetchUrl = fetchUrl + '&nt=' + next_token;
+                }}
+
                 return STARK.request('GET', fetchUrl)
             }},
         }}

@@ -68,6 +68,13 @@ def create(data):
     source_code += f"""
                 }},
                 visibility: 'hidden',
+                next_token: '',
+                next_disabled: true,
+                prev_token: '',
+                prev_disabled: true,
+                page_token_map: {{1: ''}},
+                curr_page: 1
+
             }},
             methods: {{
 
@@ -159,12 +166,60 @@ def create(data):
                     }}
                 }},
 
-                list: function () {{
+               list: function (lv_token='', btn='') {{
                     spinner.show()
-                    {entity_app}.list().then( function(data) {{
-                        root.listview_table = data;
-                        console.log("DONE! Retreived list.");
+                    payload = []
+                    if (btn == 'next') {{
+                        root.curr_page++;
+                        console.log(root.curr_page);
+                        payload['Next_Token'] = lv_token;
+
+                        //When Next button is clicked, we should:
+                        // - save Next Token to new page in page_token_map
+                        // - hide Next button - it will be visible again if API call returns a new Next Token
+                        // - if new_page is > 2, assign {{new_page - 1}} token to prev_token
+                        root.prev_disabled = false;    
+                        root.next_disabled = true;
+
+                        root.page_token_map[root.curr_page] = lv_token;
+
+                        if (root.curr_page > 1) {{
+                            root.prev_token = root.page_token_map[root.curr_page - 1];
+                        }}
+                        console.log(root.page_token_map)
+                        console.log(root.prev_token)
+                    }}
+                    else if (btn == "prev") {{
+                        root.curr_page--;
+
+                        if (root.prev_token != "") {{
+                            payload['Next_Token'] = root.page_token_map[root.curr_page];
+                        }}
+
+                        if (root.curr_page > 1) {{
+                            root.prev_disabled = false
+                            root.prev_token = root.page_token_map[root.curr_page - 1]
+                        }}
+                        else {{
+                            root.prev_disabled = true
+                            root.prev_token = ""
+                        }}
+
+
+                    {entity_app}.list(payload).then( function(data) {{
+                        token = data['Next_Token'];
+                        root.listview_table = data['Items'];
+                        console.log("DONE! Retrieved list.");
                         spinner.hide()
+
+                        if (token != "null") {{
+                            root.next_disabled = false;
+                            root.next_token = token;
+                        }}
+                        else {{
+                            root.next_disabled = true;
+                        }}
+
                     }})
                     .catch(function(error) {{
                         console.log("Encountered an error! [" + error + "]")
