@@ -82,7 +82,6 @@ def create(data):
             method  = event.get('requestContext').get('http').get('method')
 
             if event.get('isBase64Encoded') == True :
-                print("[INFO] b64decode payload...")
                 payload = json.loads(base64.b64decode(event.get('body'))).get('{entity_varname}',"")
             else:    
                 payload = json.loads(event.get('body')).get('{entity_varname}',"")
@@ -142,7 +141,18 @@ def create(data):
             ####################
             #Handle GET requests
             if request_type == "all":
-                response = get_all(default_sk)
+                #check for submitted token
+                lv_token = event.get('queryStringParameters',{{}}).get('nt', None)
+                if lv_token != None:
+                    lv_token = unquote(lv_token)
+                    lv_token = json.loads(lv_token)
+        
+                items, next_token = get_all(default_sk, lv_token)
+
+                response = {{
+                    'Next_Token': json.dumps(next_token),
+                    'Items': items
+                }}
 
             elif request_type == "report":
                 response = report(default_sk)
@@ -208,18 +218,33 @@ def create(data):
 
         return items
 
-    def get_all(sk):
-        response = ddb.query(
-            TableName=ddb_table,
-            IndexName="STARK-ListView-Index",
-            Select='ALL_ATTRIBUTES',
-            Limit=page_limit,
-            ReturnConsumedCapacity='TOTAL',
-            KeyConditionExpression='sk = :sk',
-            ExpressionAttributeValues={{
-                ':sk' : {{'S' : sk}}
-            }}
-        )
+    def get_all(sk, lv_token=None):
+
+        if lv_token == None:
+            response = ddb.query(
+                TableName=ddb_table,
+                IndexName="STARK-ListView-Index",
+                Select='ALL_ATTRIBUTES',
+                Limit=page_limit,
+                ReturnConsumedCapacity='TOTAL',
+                KeyConditionExpression='sk = :sk',
+                ExpressionAttributeValues={{
+                    ':sk' : {{'S' : sk}}
+                }}
+            )
+        else:
+            response = ddb.query(
+                TableName=ddb_table,
+                IndexName="STARK-ListView-Index",
+                Select='ALL_ATTRIBUTES',
+                Limit=page_limit,
+                ExclusiveStartKey=lv_token,
+                ReturnConsumedCapacity='TOTAL',
+                KeyConditionExpression='sk = :sk',
+                ExpressionAttributeValues={{
+                    ':sk' : {{'S' : sk}}
+                }}
+            )
 
         raw = response.get('Items')
 
@@ -245,7 +270,10 @@ def create(data):
         #   to allow for sorting features like choosing which column to sort on, or applying complex sort logic that involves two or more cols.
         items = sorted(items, key=lambda item: item['{pk_varname}'])
 
-        return items
+        #Get the "next" token, pass to calling function. This enables a "next page" request later.
+        next_token = response.get('LastEvaluatedKey')
+
+        return items, next_token
 
     def get_by_pk(pk, sk):
         response = ddb.query(
