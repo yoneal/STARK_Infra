@@ -55,7 +55,7 @@ def create(data):
                         </thead>
                         <tbody>
                             <template v-for="{entity_varname} in listview_table" id="listview-table">
-                                <tr class>
+                                <tr>
                                     <td>
                                         <a :href="'{entity_varname}_edit.html?{pk_varname}=' + {entity_varname}.{pk_varname}"><img src="images/pencil2.png"></a>
                                     </td>
