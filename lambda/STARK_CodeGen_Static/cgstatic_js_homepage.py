@@ -22,7 +22,7 @@ def create(data):
                         spinner.hide();
                     }})
                     .catch(function(error) {{
-                        root.form.provisioned_resources = "Encountered an error! [" + error + "]"
+                        console.log("Encountered an error! [" + error + "]");
                     }});
                 }}
             }}
