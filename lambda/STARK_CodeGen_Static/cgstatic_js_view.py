@@ -204,7 +204,7 @@ def create(data):
                             root.prev_disabled = true
                             root.prev_token = ""
                         }}
-
+                    }}
 
                     {entity_app}.list(payload).then( function(data) {{
                         token = data['Next_Token'];
