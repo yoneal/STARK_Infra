@@ -18,7 +18,7 @@ def create(data):
                     STARK.request('GET', fetchUrl)
                     .then( function(data) {{
                         root.modules = data;
-                        console.log("DONE! Retreived list of modules.")
+                        console.log("DONE! Retrieved list of modules.")
                         spinner.hide();
                     }})
                     .catch(function(error) {{
