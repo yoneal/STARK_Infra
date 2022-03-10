@@ -28,7 +28,16 @@ def create(data):
     source_code += cg_bodyhead.create(data, "_Listview")
 
     source_code += f"""\
-            <button type="button" class="btn btn-primary mb-2" onClick="window.location.href='{entity_varname}_add.html'"> <b>+</b> Add </button>
+            <div class="row">
+                <div class="col-6">
+                    <button type="button" class="btn btn-primary mb-2" onClick="window.location.href='{entity_varname}_add.html'"> <b>+</b> Add </button>
+                </div>
+                <div class="col-6 text-right d-inline-block">        
+                    <button id="prev" type="button" class="btn btn-outline-secondary" :disabled="prev_disabled" onClick="root.list(root.prev_token, 'prev')"> < </button>
+                    <button id="next" type="button" class="btn btn-outline-secondary" :disabled="next_disabled" onClick="root.list(root.next_token, 'next')"> > </button>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col overflow-auto">
                     <table class="table  table-hover table-striped">
