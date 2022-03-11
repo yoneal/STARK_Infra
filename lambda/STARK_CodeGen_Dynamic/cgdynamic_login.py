@@ -68,7 +68,7 @@ def create(data):
                 #Auth failure
                 response={{"message": "AuthFailure"}}
             else:
-                headers['Set-Cookie'] = f"sessid={{sess_id}}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=43200; Domain=.amazonaws.com"
+                headers['Set-Cookie'] = f"sessid={{sess_id}}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=43200"
                 response={{
                     "message": "AuthSuccess"
                 }}
