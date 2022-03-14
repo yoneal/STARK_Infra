@@ -69,7 +69,7 @@ def create(data):
     #CONFIG
     ddb_table   = "{ddb_table_name}"
     default_sk  = "{default_sk}"
-    sort_fields = ["{default_sk}", ]
+    sort_fields = ["{pk_varname}", ]
     page_limit  = 10
 
     def lambda_handler(event, context):
