@@ -51,6 +51,7 @@ def create(data):
     for col in columns:
         col_varname = converter.convert_to_system_name(col)
         update_expression += f"""#{col_varname} = :{col_varname}, """
+    update_expression += f"""STARK-ListView-sk = :STARK-ListView-sk"""
     update_expression = update_expression[:-2]
 
     source_code = f"""\
@@ -66,9 +67,10 @@ def create(data):
 
     #######
     #CONFIG
-    ddb_table  = "{ddb_table_name}"
-    default_sk = "{default_sk}"
-    page_limit = 10
+    ddb_table   = "{ddb_table_name}"
+    default_sk  = "{default_sk}"
+    sort_fields = ["{default_sk}", ]
+    page_limit  = 10
 
     def lambda_handler(event, context):
 
@@ -356,6 +358,7 @@ def create(data):
                 ':{col_varname}' : {{'{col_type_id}' : {col_varname} }},"""  
 
     source_code += f"""
+                ':STARK-ListView-sk' : {{'S' : "|".join(sort_fields)}},
             }}
         )
 
@@ -367,7 +370,7 @@ def create(data):
         item={{}}
         item['pk'] = {{'S' : pk}}
         item['sk'] = {{'S' : sk}}
-        item['STARK-ListView-sk'] = {{'S' : "Y"}}"""
+        item['STARK-ListView-sk'] = {{'S' : "|".join(sort_fields)}}"""
 
     for col, col_type in columns.items():
         col_varname = converter.convert_to_system_name(col)

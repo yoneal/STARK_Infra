@@ -27,7 +27,7 @@ def create(data):
 
     #######
     #CONFIG
-    ddb_table  = "{ddb_table_name}"
+    ddb_table = "{ddb_table_name}"
 
     def lambda_handler(event, context):
 
