@@ -330,7 +330,7 @@ def create(data):
     def edit(data):                
         {dict_to_var_code}
 
-        UpdateExpressionString = "{update_expression}" 
+        UpdateExpressionString = "SET {update_expression}" 
         ExpressionAttributeNamesDict = {{"""
 
     for col in columns:
