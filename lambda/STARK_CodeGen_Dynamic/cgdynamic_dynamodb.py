@@ -113,6 +113,10 @@ def create(data):
                 data['{col_varname}'] = payload.get('{col_varname}','')"""
 
     source_code +=f"""
+            ListView_index_values = []
+            for field in sort_fields:
+                ListView_index_values.append(payload.get(field))
+            data['STARK-ListView-sk'] = "|".join(ListView_index_values)
 
             if method == "DELETE":
                 response = delete(data)
@@ -188,6 +192,9 @@ def create(data):
         }}
 
     def report(sk):
+        #FIXME: THIS IS A STUB, WILL NEED TO BE UPDATED WITH
+        #   ENHANCED LISTVIEW LOGIC LATER WHEN WE ACTUALLY IMPLEMENT REPORTING
+
         response = ddb.query(
             TableName=ddb_table,
             IndexName="STARK-ListView-Index",
@@ -214,10 +221,6 @@ def create(data):
                     'Customer_Type': record['Customer_Type']['S'],
                     'Remarks': record['Remarks']['S'],}}
             items.append(item)
-
-        #Sort: this can be transformed to an actual sorting function instead of lambda (Python lambda, not AWS lambda)
-        #   to allow for sorting features like choosing which column to sort on, or applying complex sort logic that involves two or more cols.
-        items = sorted(items, key=lambda item: item['Customer_ID'])
 
         return items
 
@@ -268,10 +271,6 @@ def create(data):
 
     source_code +=f"""}}
             items.append(item)
-
-        #Sort: this can be transformed to an actual sorting function instead of lambda (Python lambda, not AWS lambda)
-        #   to allow for sorting features like choosing which column to sort on, or applying complex sort logic that involves two or more cols.
-        items = sorted(items, key=lambda item: item['{pk_varname}'])
 
         #Get the "next" token, pass to calling function. This enables a "next page" request later.
         next_token = response.get('LastEvaluatedKey')
@@ -332,34 +331,43 @@ def create(data):
     def edit(data):                
         {dict_to_var_code}
 
-        response = ddb.update_item(
-            TableName=ddb_table,
-            Key={{
-                'pk' : {{'S' : pk}},
-                'sk' : {{'S' : sk}}
-            }},
-            UpdateExpression="SET {update_expression}",
-            ExpressionAttributeNames={{"""
+        UpdateExpressionString = "{update_expression}" 
+        ExpressionAttributeNamesDict = {{"""
 
     for col in columns:
         col_varname = converter.convert_to_system_name(col)
         source_code +=f"""
-                '#{col_varname}' : '{col_varname}',"""  
-
+            '#{col_varname}' : '{col_varname}',"""  
+ 
     source_code += f"""
-            }},
-            ExpressionAttributeValues={{"""
+        }}
+        ExpressionAttributeValuesDict = {{"""
 
     for col, col_type in columns.items():
         col_varname = converter.convert_to_system_name(col)
         col_type_id = set_type(col_type)
 
         source_code +=f"""
-                ':{col_varname}' : {{'{col_type_id}' : {col_varname} }},"""  
+            ':{col_varname}' : {{'{col_type_id}' : {col_varname} }},"""  
 
     source_code += f"""
-                ':STARK-ListView-sk' : {{'S' : "|".join(sort_fields)}},
-            }}
+        }}
+
+        #If STARK-ListView-sk is part of the data payload, it should be added to the update expression
+        if data.get('STARK-ListView-sk','') != '':
+            UpdateExpressionString += ", #STARKListViewsk = :STARKListViewsk"
+            ExpressionAttributeNamesDict['#STARKListViewsk']  = 'STARK-ListView-sk'
+            ExpressionAttributeValuesDict[':STARKListViewsk'] = {{'S' : data['STARK-ListView-sk']}}
+
+        response = ddb.update_item(
+            TableName=ddb_table,
+            Key={{
+                'pk' : {{'S' : pk}},
+                'sk' : {{'S' : sk}}
+            }},
+            UpdateExpression=UpdateExpressionString,
+            ExpressionAttributeNames=ExpressionAttributeNamesDict,
+            ExpressionAttributeValues=ExpressionAttributeValuesDict
         )
 
         return "OK"
@@ -369,8 +377,7 @@ def create(data):
 
         item={{}}
         item['pk'] = {{'S' : pk}}
-        item['sk'] = {{'S' : sk}}
-        item['STARK-ListView-sk'] = {{'S' : "|".join(sort_fields)}}"""
+        item['sk'] = {{'S' : sk}}"""
 
     for col, col_type in columns.items():
         col_varname = converter.convert_to_system_name(col)
@@ -380,6 +387,10 @@ def create(data):
         item['{col_varname}'] = {{'{col_type_id}' : {col_varname}}}"""
 
     source_code += f"""
+
+        if data.get('STARK-ListView-sk','') != '':
+            item['STARK-ListView-sk'] = {{'S' : data['STARK-ListView-sk']}}
+
         response = ddb.put_item(
             TableName=ddb_table,
             Item=item,
