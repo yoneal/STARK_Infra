@@ -51,7 +51,6 @@ def create(data):
     for col in columns:
         col_varname = converter.convert_to_system_name(col)
         update_expression += f"""#{col_varname} = :{col_varname}, """
-    update_expression += f"""STARK-ListView-sk = :STARK-ListView-sk"""
     update_expression = update_expression[:-2]
 
     source_code = f"""\
