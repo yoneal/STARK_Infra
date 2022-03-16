@@ -146,7 +146,7 @@ def create(data):
                 item['username']   = {{'S' : username}}
 
                 #This special attribute makes the record show up in the GSI "STARK-ListView-Index",
-                item['STARK-ListView-sk'] = {{'S' : "Y"}}
+                item['STARK-ListView-sk'] = {{'S' : username}}
 
                 response = ddb.put_item(
                     TableName=ddb_table,
