@@ -53,7 +53,8 @@ Document:
     pk: Document ID
     data:
         - Title: string
-        - Revision: string
+        - Revision: int
+        - Numerical Code: number
         - Description: string`,
         },
         api_key: '',

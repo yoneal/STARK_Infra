@@ -27,6 +27,12 @@ def create(data):
     elif col_type == "time":
         html_code=f"""<b-form-timepicker id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2"></b-form-timepicker>"""
 
+    elif col_type == "number":
+        html_code=f"""<input type="number" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}">"""
+
+    elif col_type == "int":
+        html_code=f"""<input type="number"  min="0" step="1" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}">"""
+
     elif col_type in [ "yes-no", "boolean" ]:
         if col_type == "yes-no":
             checked   ="Yes"
@@ -146,7 +152,6 @@ def create(data):
                                     <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                 </template>
                             </b-form-select>"""
-
 
     else:
         html_code=f"""<input type="text" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}">"""
