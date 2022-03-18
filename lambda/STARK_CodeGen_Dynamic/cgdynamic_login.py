@@ -142,8 +142,8 @@ def create(data):
                 item['pk']         = {{'S' : sess_id}}
                 item['sk']         = {{'S' : "STARK|session"}}
                 item['TTL']        = {{'N' : str(ttl_timestamp)}}
-                item['sess_start'] = {{'S' : str(dt_now)}}
-                item['username']   = {{'S' : username}}
+                item['Sess_Start'] = {{'S' : str(dt_now)}}
+                item['Username']   = {{'S' : username}}
 
                 #This special attribute makes the record show up in the GSI "STARK-ListView-Index",
                 item['STARK-ListView-sk'] = {{'S' : username}}

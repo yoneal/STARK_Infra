@@ -44,7 +44,7 @@ def create(data):
             sess_record = get_session(sess_id)
 
             #Get username from record 
-            username = sess_record['username']
+            username = sess_record['Username']
 
             #FIXME: Optional/Future - immediately check permissions here and decide if API endpoint requested is authorized
 
@@ -55,7 +55,7 @@ def create(data):
         response = {{ 
             "isAuthorized": isAuthorized,
             "context": {{
-                "username": username,
+                "Username": username,
             }} 
         }}
 
@@ -103,7 +103,7 @@ def create(data):
         for record in raw:
             item = {{'pk': record['pk']['S'],
                     'sk': record['sk']['S'],
-                    'username': record['username']['S']}}
+                    'Username': record['Username']['S']}}
 
         return item
     """
