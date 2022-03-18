@@ -114,7 +114,7 @@ def create(data):
             }},
             ExpressionAttributeValues={{
                 ':pk' : {{'S' : username }},
-                ':sk' : {{'S' : 'user|info' }}
+                ':sk' : {{'S' : 'STARK|user|info' }}
             }}
         )
         raw = response.get('Items')
