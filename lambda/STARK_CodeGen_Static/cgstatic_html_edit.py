@@ -56,7 +56,7 @@ def create(data):
                                 {html_control_code}
                             </div>"""
 
-    source_code += f"""\
+    source_code += f"""
                             <button type="button" class="btn btn-secondary" onClick="window.location.href='{entity_varname}.html'">Back</button>
                             <button type="button" class="btn btn-primary float-right" onClick="root.update()">Update</button>
                             </form>

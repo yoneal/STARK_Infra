@@ -51,7 +51,7 @@ def create(data):
                                 </div>
                             </div>"""
 
-    source_code += f"""\
+    source_code += f"""
                             <button type="button" class="btn btn-secondary" onClick="window.location.href='{entity_varname}.html'">Back</button>
                             </form>
                         </div>
