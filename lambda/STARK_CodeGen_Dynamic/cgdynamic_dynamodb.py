@@ -211,17 +211,23 @@ def create(data):
         #FIXME: this is duplicated code, make this DRY by outsourcing the mapping to a different function.
         items = []
         for record in raw:
-            item = {{'Customer_ID': record['pk']['S'],
-                    'sk': record['sk']['S'],
-                    'Customer_Name': record['Customer_Name']['S'],
-                    'Gender': record['Gender']['S'],
-                    'Join_Date': record['Join_Date']['S'],
-                    'Preferred_Customer': record['Preferred_Customer']['S'],
-                    'Customer_Type': record['Customer_Type']['S'],
-                    'Remarks': record['Remarks']['S'],}}
+            item = {{}}
+            item['{pk_varname}'] = record.get('pk', {{}}).get('S','')
+            item['sk'] = record.get('sk',{{}}).get('S','')"""
+    for col, col_type in columns.items():
+        col_varname = converter.convert_to_system_name(col)
+        col_type_id = set_type(col_type)
+
+        source_code +=f"""
+            item['{col_varname}'] = record.get('{col_varname}',{{}}).get('{col_type_id}','')"""
+
+    source_code += f"""}}
             items.append(item)
 
-        return items
+        #Get the "next" token, pass to calling function. This enables a "next page" request later.
+        next_token = response.get('LastEvaluatedKey')
+
+        return items, next_token
 
     def get_all(sk, lv_token=None):
 
@@ -257,18 +263,17 @@ def create(data):
         #FIXME: this is duplicated code, make this DRY by outsourcing the mapping to a different function.
         items = []
         for record in raw:
-            item = {{'{pk_varname}': record['pk']['S'],
-                    'sk': record['sk']['S'],"""
-
+            item = {{}}
+            item['{pk_varname}'] = record.get('pk', {{}}).get('S','')
+            item['sk'] = record.get('sk',{{}}).get('S','')"""
     for col, col_type in columns.items():
         col_varname = converter.convert_to_system_name(col)
         col_type_id = set_type(col_type)
 
         source_code +=f"""
-                    '{col_varname}': record['{col_varname}']['{col_type_id}'],"""
+            item['{col_varname}'] = record.get('{col_varname}',{{}}).get('{col_type_id}','')"""
 
-
-    source_code +=f"""}}
+    source_code += f"""}}
             items.append(item)
 
         #Get the "next" token, pass to calling function. This enables a "next page" request later.
@@ -296,16 +301,15 @@ def create(data):
         #Map to expected structure
         items = []
         for record in raw:
-            item = {{'{pk_varname}': record['pk']['S'],
-                    'sk': record['sk']['S'],"""
-
+            item = {{}}
+            item['{pk_varname}'] = record.get('pk', {{}}).get('S','')
+            item['sk'] = record.get('sk',{{}}).get('S','')"""
     for col, col_type in columns.items():
         col_varname = converter.convert_to_system_name(col)
         col_type_id = set_type(col_type)
 
         source_code +=f"""
-                    '{col_varname}': record['{col_varname}']['{col_type_id}'],"""
-
+            item['{col_varname}'] = record.get('{col_varname}',{{}}).get('{col_type_id}','')"""
 
     source_code += f"""}}
             items.append(item)
