@@ -36,7 +36,7 @@ def create_handler(event, context):
     item                  = {}
     item['pk']            = {'S' : user}
     item['sk']            = {'S' : "STARK|user|info"}
-    item['User_Type']     = {'S' : "Admin"}
+    item['Role']          = {'S' : "Super Admin"}
     item['Full_Name']     = {'S' : "The Amazing Mr. Root"}
     item['Nickname']      = {'S' : "Root"}
     item['Password_Hash'] = {'S' : hashed}
