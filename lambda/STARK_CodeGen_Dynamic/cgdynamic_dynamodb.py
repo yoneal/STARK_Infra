@@ -221,7 +221,7 @@ def create(data):
         source_code +=f"""
             item['{col_varname}'] = record.get('{col_varname}',{{}}).get('{col_type_id}','')"""
 
-    source_code += f"""}}
+    source_code += f"""
             items.append(item)
 
         #Get the "next" token, pass to calling function. This enables a "next page" request later.
@@ -273,7 +273,7 @@ def create(data):
         source_code +=f"""
             item['{col_varname}'] = record.get('{col_varname}',{{}}).get('{col_type_id}','')"""
 
-    source_code += f"""}}
+    source_code += f"""
             items.append(item)
 
         #Get the "next" token, pass to calling function. This enables a "next page" request later.
@@ -311,7 +311,7 @@ def create(data):
         source_code +=f"""
             item['{col_varname}'] = record.get('{col_varname}',{{}}).get('{col_type_id}','')"""
 
-    source_code += f"""}}
+    source_code += f"""
             items.append(item)
         #FIXME: Mapping is duplicated code, make this DRY
 
