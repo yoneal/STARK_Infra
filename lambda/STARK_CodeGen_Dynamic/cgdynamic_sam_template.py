@@ -93,7 +93,6 @@ def create(data, cli_mode=False):
     s3_access_control = "PublicRead"
 
     #Update Token - this token forces CloudFormation to update the resources that do dynamic code generation,
-    #               as well as forced re-deployment of Lambdas (by using this as a deployment package path/folder)
     update_token = str(uuid4())
 
     #Initialize our template
@@ -555,7 +554,7 @@ def create(data, cli_mode=False):
             Type: AWS::CloudFormation::CustomResource
             Properties:
                 ServiceToken: {prelaunch_service_token}
-                UpdateToken: {update_token}
+                UpdateToken: REPLACE-ME-ONLY-FOR-RELAUNCHES
                 Project: {project_name}
                 DDBTable: {ddb_table_name}
                 Remarks: Final system pre-launch tasks - things to do after the entirety of the new system's infra and code have been deployed
