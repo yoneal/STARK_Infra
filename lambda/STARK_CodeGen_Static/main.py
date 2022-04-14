@@ -112,6 +112,13 @@ def create_handler(event, context):
         #We don't want to include the "STARKWebSource/" prefix in our list of keys, hence the string slice in static_file
         add_to_commit(source_code=get_file_from_bucket(codegen_bucket_name, static_file), key=static_file[15:], files_to_commit=files_to_commit, file_path='static')
 
+    ####################################################
+    #Create static files from the source_files directory
+    #   These are HTML files for built-in STARK modules like user management, permissions, sessions...
+    #   Right now they need to be modified by the generator a bit just to replace the Project/System Name in the headers
+    builtin_module_files = []
+    create_builtin_modules(project_name, files_to_commit)
+
     ##################################################################
     #Get pre-built utilities, layers and helpers for local development
     prebuilt_utilities = []
@@ -253,3 +260,11 @@ def get_file_from_bucket(bucket_name, static_file):
 
     source_code = response['Body'].read()
     return source_code
+
+def create_builtin_modules(project_name, files_to_commit):
+    #read from the source_files directory
+    dir = "source_files"
+    html_files = os.listdir(dir)
+    for f in html_files:
+        
+
