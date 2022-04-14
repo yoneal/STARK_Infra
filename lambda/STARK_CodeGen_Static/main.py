@@ -116,8 +116,14 @@ def create_handler(event, context):
     #Create static files from the source_files directory
     #   These are HTML files for built-in STARK modules like user management, permissions, sessions...
     #   Right now they need to be modified by the generator a bit just to replace the Project/System Name in the headers
-    builtin_module_files = []
-    create_builtin_modules(project_name, files_to_commit)
+    dir = "source_files"
+    html_files = os.listdir(dir)
+    for html_file in html_files:
+        with open(dir + os.sep + html_file) as f:
+            source_code = f.read()
+            #replace all occurences of "[[STARK_PROJECT_NAME]]" with project_name
+            source_code.replace("[[STARK_PROJECT_NAME]]", project_name)
+            add_to_commit(source_code=source_code, key=html_file, files_to_commit=files_to_commit)
 
     ##################################################################
     #Get pre-built utilities, layers and helpers for local development
@@ -260,16 +266,3 @@ def get_file_from_bucket(bucket_name, static_file):
 
     source_code = response['Body'].read()
     return source_code
-
-def create_builtin_modules(project_name, files_to_commit):
-    #read from the source_files directory
-    dir = "source_files"
-    html_files = os.listdir(dir)
-    for html_file in html_files:
-        with open(dir + os.sep + html_file) as f:
-            source_code = f.read()
-            #replace all occurences of "[[STARK_PROJECT_NAME]]" with the project_name
-            source_code.replace("[[STARK_PROJECT_NAME]]", project_name)
-            add_to_commit(source_code=source_code, key=html_file, files_to_commit=files_to_commit)
-
-
