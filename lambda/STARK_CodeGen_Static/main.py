@@ -265,6 +265,11 @@ def create_builtin_modules(project_name, files_to_commit):
     #read from the source_files directory
     dir = "source_files"
     html_files = os.listdir(dir)
-    for f in html_files:
-        
+    for html_file in html_files:
+        with open(dir + os.sep + html_file) as f:
+            source_code = f.read()
+            #replace all occurences of "[[STARK_PROJECT_NAME]]" with the project_name
+            source_code.replace("[[STARK_PROJECT_NAME]]", project_name)
+            add_to_commit(source_code=source_code, key=html_file, files_to_commit=files_to_commit)
+
 
