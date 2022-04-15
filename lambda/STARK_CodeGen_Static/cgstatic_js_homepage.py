@@ -15,7 +15,9 @@ def create(data):
             }},
             methods:{{
                 get_module_list: function () {{
-                    fetchUrl = STARK.STARK_Module_url + '?rt=usermodules'
+                    //FIXME: When default permissions and module registry are implemented in PreLaunch, this should become the default endpoint for homepage modules
+                    //fetchUrl = STARK.STARK_Module_url + '?rt=usermodules'
+                    fetchUrl = STARK.sys_modules_url
                     STARK.request('GET', fetchUrl)
                     .then( function(data) {{
 
