@@ -111,7 +111,7 @@ def create(data, cli_mode=False):
             Description: Name for user bucket that will be used for the default STARK CI/CD pipeline.
         UserWebsiteBucketNameParameter:
             Type: String
-            Description: Name for user bucket that will be used as the website bucket for the STARK Parser UI. Not yet used in template, just needed for config.
+            Description: Name for user bucket that will be used as the website bucket for the project.
     Mappings:
         RegionMap:
             us-east-2:
@@ -487,6 +487,122 @@ def create(data, cli_mode=False):
                 Timeout: 5"""
     
     cf_template += f"""
+        STARKBackendApiForSTARKUser:
+            Type: AWS::Serverless::Function
+            Properties:
+                Events:
+                    STARKUserGetEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_User
+                            Method: GET
+                            ApiId:
+                                Ref: STARKApiGateway
+                Runtime: python3.9
+                Handler: main.lambda_handler
+                CodeUri: lambda/STARK_User
+                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
+                Architectures:
+                    - arm64
+                MemorySize: 128
+                Timeout: 10
+                Layers:
+                    - !Ref STARKScryptLayer
+        STARKBackendApiForSTARKModule:
+            Type: AWS::Serverless::Function
+            Properties:
+                Events:
+                    STARKModuleGetEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_Module
+                            Method: GET
+                            ApiId:
+                                Ref: STARKApiGateway
+                Runtime: python3.9
+                Handler: main.lambda_handler
+                CodeUri: lambda/STARK_Module
+                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
+                Architectures:
+                    - arm64
+                MemorySize: 128
+                Timeout: 5
+        STARKBackendApiForSTARKUserRoles:
+            Type: AWS::Serverless::Function
+            Properties:
+                Events:
+                    STARKUserRolesGetEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_User_Roles
+                            Method: GET
+                            ApiId:
+                                Ref: STARKApiGateway
+                Runtime: python3.9
+                Handler: main.lambda_handler
+                CodeUri: lambda/STARK_User_Roles
+                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
+                Architectures:
+                    - arm64
+                MemorySize: 128
+                Timeout: 5
+        STARKBackendApiForSTARKUserPermissions:
+            Type: AWS::Serverless::Function
+            Properties:
+                Events:
+                    STARKUserPermissionsGetEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_User_Permissions
+                            Method: GET
+                            ApiId:
+                                Ref: STARKApiGateway
+                Runtime: python3.9
+                Handler: main.lambda_handler
+                CodeUri: lambda/STARK_User_Permissions
+                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
+                Architectures:
+                    - arm64
+                MemorySize: 128
+                Timeout: 5
+        STARKBackendApiForSTARKUserSessions:
+            Type: AWS::Serverless::Function
+            Properties:
+                Events:
+                    STARKUserSessionsGetEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_User_Sessions
+                            Method: GET
+                            ApiId:
+                                Ref: STARKApiGateway
+                Runtime: python3.9
+                Handler: main.lambda_handler
+                CodeUri: lambda/STARK_User_Sessions
+                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
+                Architectures:
+                    - arm64
+                MemorySize: 128
+                Timeout: 5
+        STARKBackendApiForSTARKModuleGroups:
+            Type: AWS::Serverless::Function
+            Properties:
+                Events:
+                    STARKModuleGroupsGetEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_Module_Groups
+                            Method: GET
+                            ApiId:
+                                Ref: STARKApiGateway
+                Runtime: python3.9
+                Handler: main.lambda_handler
+                CodeUri: lambda/STARK_Module_Groups
+                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
+                Architectures:
+                    - arm64
+                MemorySize: 128
+                Timeout: 5
         STARKBackendApiForSysModules:
             Type: AWS::Serverless::Function
             Properties:
