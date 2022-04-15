@@ -498,6 +498,27 @@ def create(data, cli_mode=False):
                             Method: GET
                             ApiId:
                                 Ref: STARKApiGateway
+                    STARKUserPostEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_User
+                            Method: POST
+                            ApiId:
+                                Ref: STARKApiGateway
+                    STARKUserPutEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_User
+                            Method: PUT
+                            ApiId:
+                                Ref: STARKApiGateway
+                    STARKUserDeleteEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_User
+                            Method: DELETE
+                            ApiId:
+                                Ref: STARKApiGateway
                 Runtime: python3.9
                 Handler: main.lambda_handler
                 CodeUri: lambda/STARK_User
@@ -519,6 +540,27 @@ def create(data, cli_mode=False):
                             Method: GET
                             ApiId:
                                 Ref: STARKApiGateway
+                    STARKModulePostEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_Module
+                            Method: POST
+                            ApiId:
+                                Ref: STARKApiGateway
+                    STARKModulePutEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_Module
+                            Method: PUT
+                            ApiId:
+                                Ref: STARKApiGateway
+                    STARKModuleDeleteEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_Module
+                            Method: DELETE
+                            ApiId:
+                                Ref: STARKApiGateway
                 Runtime: python3.9
                 Handler: main.lambda_handler
                 CodeUri: lambda/STARK_Module
@@ -536,6 +578,27 @@ def create(data, cli_mode=False):
                         Properties:
                             Path: /STARK_User_Roles
                             Method: GET
+                            ApiId:
+                                Ref: STARKApiGateway
+                    STARKUserRolesPostEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_User_Roles
+                            Method: POST
+                            ApiId:
+                                Ref: STARKApiGateway
+                    STARKUserRolesPutEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_User_Roles
+                            Method: PUT
+                            ApiId:
+                                Ref: STARKApiGateway
+                    STARKUserRolesDeleteEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_User_Roles
+                            Method: DELETE
                             ApiId:
                                 Ref: STARKApiGateway
                 Runtime: python3.9
@@ -557,6 +620,27 @@ def create(data, cli_mode=False):
                             Method: GET
                             ApiId:
                                 Ref: STARKApiGateway
+                    STARKUserPermissionsPostEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_User_Permissions
+                            Method: POST
+                            ApiId:
+                                Ref: STARKApiGateway
+                    STARKUserPermissionsPutEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_User_Permissions
+                            Method: PUT
+                            ApiId:
+                                Ref: STARKApiGateway
+                    STARKUserPermissionsDeleteEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_User_Permissions
+                            Method: DELETE
+                            ApiId:
+                                Ref: STARKApiGateway
                 Runtime: python3.9
                 Handler: main.lambda_handler
                 CodeUri: lambda/STARK_User_Permissions
@@ -576,6 +660,27 @@ def create(data, cli_mode=False):
                             Method: GET
                             ApiId:
                                 Ref: STARKApiGateway
+                    STARKUserSessionsPostEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_User_Sessions
+                            Method: POST
+                            ApiId:
+                                Ref: STARKApiGateway
+                    STARKUserSessionsPutEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_User_Sessions
+                            Method: PUT
+                            ApiId:
+                                Ref: STARKApiGateway
+                    STARKUserSessionsDeleteEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_User_Sessions
+                            Method: DELETE
+                            ApiId:
+                                Ref: STARKApiGateway
                 Runtime: python3.9
                 Handler: main.lambda_handler
                 CodeUri: lambda/STARK_User_Sessions
@@ -593,6 +698,27 @@ def create(data, cli_mode=False):
                         Properties:
                             Path: /STARK_Module_Groups
                             Method: GET
+                            ApiId:
+                                Ref: STARKApiGateway
+                    STARKModuleGroupsPostEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_Module_Groups
+                            Method: POST
+                            ApiId:
+                                Ref: STARKApiGateway
+                    STARKModuleGroupsPutEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_Module_Groups
+                            Method: PUT
+                            ApiId:
+                                Ref: STARKApiGateway
+                    STARKModuleGroupsDeleteEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_Module_Groups
+                            Method: DELETE
                             ApiId:
                                 Ref: STARKApiGateway
                 Runtime: python3.9
