@@ -116,6 +116,22 @@ def create_handler(event, context):
         'fileContent': source_code.encode()
     })
 
+    #########################################
+    #Create Lambdas of built-in STARK modules 
+    #    (user management, permissions, etc)
+    dir = "source_files"
+    lambda_dirs = os.listdir(dir)
+    for lambda_dir in lambda_dirs:
+        source_files = os.listdir(dir + os.sep + lambda_dir)
+        for source_file in source_files:
+            with open(dir + os.sep + lambda_dir + os.sep + source_file) as f:
+                source_code = f.read().replace("[[STARK_DDB_TABLE_NAME]]", ddb_table_name)
+                files_to_commit.append({
+                    'filePath': f"lambda/{lambda_dir}/{source_file}",
+                    'fileContent': source_code.encode()
+                })
+
+
     ############################################
     #Create build files we need for our pipeline:
     # - template.yml
