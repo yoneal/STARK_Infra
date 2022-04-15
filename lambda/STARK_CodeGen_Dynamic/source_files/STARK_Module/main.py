@@ -405,7 +405,7 @@ def get_user_modules(sk, username):
     )
 
     raw = response.get('Items')
-    permissions = []
+    permission_string = ''    
     for record in raw:
         permission_string = record.get('Permissions',{}).get('S','')
     

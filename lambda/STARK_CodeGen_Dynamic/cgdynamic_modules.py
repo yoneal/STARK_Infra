@@ -94,6 +94,8 @@ def create(data):
                 image: "images/{graphic}"
                 image_alt: "{entity} graphic"
                 href: "{entity_varname}.html"
+                group: Default
+                priority: 0
 """
 
 
