@@ -50,40 +50,40 @@ def create(data):
     yaml_code = ''
     yaml_code += f"""\
             Users:
-                image: images/stark_users.svg
-                image_alt: STARK_User graphic
-                href: STARK_User.html
-                group: System Administration
+                image: "images/stark_users.svg"
+                image_alt: "STARK_User graphic"
+                href: "STARK_User.html"
+                group: "System Administration"
                 priority: 0
             System Modules:
-                image: images/stark_system_modules.svg
-                image_alt: STARK_Module graphic
-                href: STARK_Module.html
-                group: System Administration
+                image: "images/stark_system_modules.svg"
+                image_alt: "STARK_Module graphic"
+                href: "STARK_Module.html"
+                group: "System Administration"
                 priority: 0
             Module Groups:
-                image: images/stark_module_groups.svg
-                image_alt: STARK_Module_Groups graphic
-                href: STARK_Module_Groups.html
-                group: System Administration
+                image: "images/stark_module_groups.svg"
+                image_alt: "STARK_Module_Groups graphic"
+                href: "STARK_Module_Groups.html"
+                group: "System Administration"
                 priority: 0
             User Roles:
-                image: images/stark_user_roles.svg
-                image_alt: STARK_User_Roles graphic
-                href: STARK_User_Roles.html
-                group: System Administration
+                image: "images/stark_user_roles.svg"
+                image_alt: "STARK_User_Roles graphic"
+                href: "STARK_User_Roles.html"
+                group: "System Administration"
                 priority: 0
             User Permissions:
-                image: images/stark_user_permissions.svg
-                image_alt: STARK_User_Permissions graphic
-                href: STARK_User_Permissions.html
-                group: System Administration
+                image: "images/stark_user_permissions.svg"
+                image_alt: "STARK_User_Permissions graphic"
+                href: "STARK_User_Permissions.html"
+                group: "System Administration"
                 priority: 0
             User Sessions:
-                image: images/stark_user_sessions.svg
-                image_alt: STARK_User_Sessions graphic
-                href: STARK_User_Sessions.html
-                group: System Administration
+                image: "images/stark_user_sessions.svg"
+                image_alt: "STARK_User_Sessions graphic"
+                href: "STARK_User_Sessions.html"
+                group: "System Administration"
                 priority: 0
 """
     for entity in entities:
@@ -94,7 +94,7 @@ def create(data):
                 image: "images/{graphic}"
                 image_alt: "{entity} graphic"
                 href: "{entity_varname}.html"
-                group: Default
+                group: "Default"
                 priority: 0
 """
 
