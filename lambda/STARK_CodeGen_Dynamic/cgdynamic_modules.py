@@ -34,6 +34,8 @@ def create(data):
                     "image": modules_yml[module]["image"],
                     "image_alt": modules_yml[module]["image_alt"],
                     "href": modules_yml[module]["href"],
+                    "group": modules_yml[module]["group"],
+                    "priority": modules_yml[module]["priority"]
                 }}
                 modules_list.append(data)
 

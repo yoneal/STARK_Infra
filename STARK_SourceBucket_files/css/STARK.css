@@ -14,3 +14,8 @@
 .table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
   background-color: #fff8bb;
 }
+
+.collapsed > .when-open,
+.not-collapsed > .when-closed {
+  display: none;
+}
