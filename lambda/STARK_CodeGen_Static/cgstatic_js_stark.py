@@ -28,6 +28,12 @@ def create(data):
 
     #STARK-provided common methods go here
     source_code += f"""
+            'STARK_User_url':`${{api_endpoint_1}}/STARK_User`,
+            'STARK_Module_url':`${{api_endpoint_1}}/STARK_Module`,
+            'STARK_User_Roles_url':`${{api_endpoint_1}}/STARK_User_Roles`,
+            'STARK_User_Permissions_url':`${{api_endpoint_1}}/STARK_User_Permissions`,
+            'STARK_User_Sessions_url':`${{api_endpoint_1}}/STARK_User_Sessions`,
+            'STARK_Module_Groups_url':`${{api_endpoint_1}}/STARK_Module_Groups`,
             'methods_with_body': ["POST", "DELETE", "PUT"],
 
             request: function(method, fetchURL, payload='') {{
