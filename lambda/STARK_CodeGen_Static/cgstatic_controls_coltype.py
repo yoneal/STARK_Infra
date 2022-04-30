@@ -48,10 +48,10 @@ def create(data):
 
     elif isinstance(col_type, list):
         html_code=f"""<b-form-select id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}">
-                                <template v-slot:first>
-                                    <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
-                                </template>
-                            </b-form-select>"""
+                                    <template v-slot:first>
+                                        <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
+                                    </template>
+                                </b-form-select>"""
 
     elif isinstance(col_type, dict):
         #These are the complex data types that need additional settings as part of their spec
