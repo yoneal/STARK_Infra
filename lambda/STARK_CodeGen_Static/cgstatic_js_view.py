@@ -166,7 +166,7 @@ def create(data):
                     }}
                 }},
 
-               list: function (lv_token='', btn='') {{
+                list: function (lv_token='', btn='') {{
                     spinner.show()
                     payload = []
                     if (btn == 'next') {{
