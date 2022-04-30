@@ -170,7 +170,7 @@ def create(data):
                 source_code += f"""
                             root.lists.{foreign_field} = [  {{ value: root.{entity_varname}.{foreign_field}, text: root.{entity_varname}.{foreign_field} }},]"""
 
-        source_code += f"""
+    source_code += f"""
                             console.log("VIEW: Retreived module data.")
                             root.show()
                             loading_modal.hide()
