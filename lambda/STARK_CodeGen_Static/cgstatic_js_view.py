@@ -240,6 +240,7 @@ def create(data):
                 list_{foreign_entity}: function () {{
                     if (this.list_status.{foreign_field} == 'empty') {{
                         loading_modal.show();
+                        root.lists.{foreign_field} = []
 
                         //FIXME: for now, generic list() is used. Can be optimized to use a list function that only retrieves specific columns
                         {foreign_entity}_app.list().then( function(data) {{
