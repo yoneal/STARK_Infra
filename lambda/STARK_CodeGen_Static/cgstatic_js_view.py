@@ -154,7 +154,23 @@ def create(data):
 
                         {entity_app}.get(data).then( function(data) {{
                             root.{entity_varname} = data[0]; //We need 0, because API backed func always returns a list for now
-                            root.{entity_varname}.orig_{pk_varname} = root.{entity_varname}.{pk_varname};
+                            root.{entity_varname}.orig_{pk_varname} = root.{entity_varname}.{pk_varname};"""
+
+    #If there are 1:1 rel fields, we need to assign their initial value to the still-unpopulated drop-down list so that it displays 
+    #   a value even before the lazy-loading is triggered.
+    for col, col_type in cols.items():
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_one = col_type.get('has_one', '')
+            if  has_one != '':
+                #simple 1-1 relationship
+                foreign_entity  = converter.convert_to_system_name(has_one)
+                foreign_field   = converter.convert_to_system_name(col_type.get('value', foreign_entity))
+                foreign_display = converter.convert_to_system_name(col_type.get('display', foreign_field))
+
+                source_code += f"""
+                            root.lists.{foreign_field} = [  {{ value: root.{entity_varname}.{foreign_field}, text: root.{entity_varname}.{foreign_field} }},]"""
+
+        source_code += f"""
                             console.log("VIEW: Retreived module data.")
                             root.show()
                             loading_modal.hide()
