@@ -390,10 +390,3 @@ Resources:
             Remarks: This will update STARK_settings.js with the appropriate API Gateway ID
         DependsOn:
             -   STARKConfigWriterFunc
-
-Outputs:
-    STARKParserApiID:
-        Description: API Gateway HttpApi API ID
-        Value: !Ref STARKParserApi
-        Export:
-            Name: STARKParserApiID
