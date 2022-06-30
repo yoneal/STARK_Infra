@@ -66,6 +66,8 @@ def create(cloud_resources, project_basedir):
             "image": f"images/{graphic}",
             "image_alt": f"{entity} graphic",
             "href": f"{entity_varname}.html",
+            "group": "Default",
+            "priority": 0
         }
 
     files_to_commit.append({
