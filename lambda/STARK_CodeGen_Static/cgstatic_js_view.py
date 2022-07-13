@@ -36,7 +36,7 @@ def create(data):
     source_code += f"""
                 }},
                 custom_report:{{
-                    '{pk_varname}': '',"""
+                    '{pk_varname}': {{"operator": "", "value": "", "type":"S"}},"""
     for col in cols:
         col_varname = converter.convert_to_system_name(col)
         source_code += f"""
