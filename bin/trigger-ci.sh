@@ -6,5 +6,5 @@
 auto_datetime=$(date '+%Y-%m-%d %H:%M:%S')
 
 git add -A
-git commit -m "auto msg: $auto_datetime"
+git commit -m "auto msg: $auto_datetime $1"
 git push

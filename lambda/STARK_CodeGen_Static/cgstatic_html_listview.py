@@ -31,6 +31,7 @@ def create(data):
             <div class="row">
                 <div class="col-6">
                     <button type="button" class="btn btn-primary mb-2" onClick="window.location.href='{entity_varname}_add.html'"> <b>+</b> Add </button>
+                    <button type="button" class="btn btn-info mb-2" onClick="window.location.href='{entity_varname}_report.html'"> Reports </button>
                 </div>
                 <div class="col-6 text-right d-inline-block">        
                     <button id="prev" type="button" class="btn btn-outline-secondary" :disabled="prev_disabled" onClick="root.list(root.prev_token, 'prev')"> < </button>

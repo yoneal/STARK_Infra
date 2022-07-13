@@ -23,6 +23,7 @@ def create(data):
             el: "#vue-root",
             data: {{
                 listview_table: '',
+                report_fields: [],
                 {entity_varname}: {{
                     '{pk_varname}': '',
                     'sk': '',"""
@@ -34,7 +35,28 @@ def create(data):
 
     source_code += f"""
                 }},
-                lists: {{"""
+                custom_report:{{"""
+    for col in cols:
+        col_varname = converter.convert_to_system_name(col)
+        source_code += f"""
+                    '{col_varname}':  {{"operator": "", "value": "", "type":"S"}},""" 
+
+    source_code += f"""
+                    'STARK_isReport':true
+                }},
+                lists: {{
+                    'Report_Operator': [
+                        {{ value: '=', text: 'EQUAL TO (=)' }},
+                        {{ value: '<>', text: 'NOT EQUAL TO (!=)' }},
+                        {{ value: '<', text: 'LESS THAN (<)' }},
+                        {{ value: '<=', text: 'LESS THAN OR EQUAL TO (<=)' }},
+                        {{ value: '>', text: 'GREATER THAN (>)' }},
+                        {{ value: '>=', text: 'GREATER THAN OR EQUAL TO (>=)' }},
+                        {{ value: 'contains', text: 'CONTAINS (%..%)' }},
+                        {{ value: 'begins_with', text: 'BEGINS WITH (..%)' }},
+                        {{ value: 'IN', text: 'IN (value1, value2, value3, ... valueN)' }},
+                        {{ value: 'between', text: 'BETWEEN (value1, value2)' }},
+                    ],"""
 
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
@@ -73,7 +95,8 @@ def create(data):
                 prev_token: '',
                 prev_disabled: true,
                 page_token_map: {{1: ''}},
-                curr_page: 1
+                curr_page: 1,
+                showReport: false
 
             }},
             methods: {{
@@ -182,7 +205,7 @@ def create(data):
                     }}
                 }},
 
-                list: function (lv_token='', btn='') {{
+               list: function (lv_token='', btn='') {{
                     spinner.show()
                     payload = []
                     if (btn == 'next') {{
@@ -241,6 +264,45 @@ def create(data):
                         console.log("Encountered an error! [" + error + "]")
                         spinner.hide()
                     }});
+                }},
+
+                generate: function () {{
+                    let temp_show_fields = []
+                    checked_fields.forEach(element => {{
+                        let temp_index = {{'field': element, label: element.replace("_"," ")}}
+                        temp_show_fields.push(temp_index)
+                    }});
+                    root.report_fields = temp_show_fields;
+                    root.showReport = true
+                    loading_modal.show()
+                    let report_payload = {{ {entity_varname}: this.custom_report }}
+        
+                    Customer_app.report(report_payload).then( function(data) {{
+                        root.listview_table = data[0];
+                        console.log("DONE! Retrieved report.");
+                        loading_modal.hide()
+        
+                    }})
+                    .catch(function(error) {{
+                        console.log("Encountered an error! [" + error + "]")
+                        loading_modal.hide()
+                    }});
+                }},
+                checkUncheck: function (checked) {{
+                    arrCheckBoxes = document.getElementsByName('check_checkbox');
+                    for (var i = 0; i < arrCheckBoxes.length; i++)
+                    {{
+                        arrCheckBoxes[i].checked = checked;
+                    }}
+
+                    if(checked)
+                    {{
+                        checked_fields = temp_checked_fields
+                    }}
+                    else
+                    {{
+                        checked_fields = []
+                    }}
                 }},"""
 
     for col, col_type in cols.items():
@@ -278,6 +340,23 @@ def create(data):
     source_code += f"""
             }}
         }})
+
+    //for selecting individually, select all or uncheck all of checkboxes
+    var temp_checked_fields = ["""
+
+    for col in cols:
+        col_varname = converter.convert_to_system_name(col)
+        source_code += f"""'{col_varname}',"""
+    
+    source_code += f"""]"""
+    source_code += f"""
+    var checked_fields = ["""
+
+    for col in cols:
+        col_varname = converter.convert_to_system_name(col)
+        source_code += f"""'{col_varname}',"""
+    
+    source_code += f"""]
     """
 
     return textwrap.dedent(source_code)

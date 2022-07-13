@@ -100,22 +100,24 @@ def create(data):
                     }}
                 }}
             else:
-                data['pk'] = payload.get('{pk_varname}')
-                data['orig_pk'] = payload.get('orig_{pk_varname}','')
-                data['sk'] = payload.get('sk', '')
-                if data['sk'] == "":
-                    data['sk'] = default_sk"""
-
+                data['STARK_isReport'] = payload.get('STARK_isReport', False)"""
     for col, col_type in columns.items():
         col_varname = converter.convert_to_system_name(col)
         source_code +=f"""
                 data['{col_varname}'] = payload.get('{col_varname}','')"""
 
     source_code +=f"""
-            ListView_index_values = []
-            for field in sort_fields:
-                ListView_index_values.append(payload.get(field))
-            data['STARK-ListView-sk'] = "|".join(ListView_index_values)
+                if data['STARK_isReport'] == False:
+                    data['pk'] = payload.get('{pk_varname}')
+                    data['orig_pk'] = payload.get('orig_{pk_varname}','')
+                    data['sk'] = payload.get('sk', '')
+                    if data['sk'] == "":
+                        data['sk'] = default_sk
+                    #FIXME: THIS IS A STUB, MIGHT BE USED IN REPORTING
+                    ListView_index_values = []
+                    for field in sort_fields:
+                        ListView_index_values.append(payload.get(field))
+                    data['STARK-ListView-sk'] = "|".join(ListView_index_values)
 
             if method == "DELETE":
                 response = delete(data)
@@ -131,7 +133,10 @@ def create(data):
                     response   = delete(data)
 
             elif method == "POST":
-                response = add(data)
+                if data['STARK_isReport']:
+                    response = report(default_sk, data)
+                else:
+                    response = add(data)
 
             else:
                 return {{
@@ -160,9 +165,6 @@ def create(data):
                     'Items': items
                 }}
 
-            elif request_type == "report":
-                response = report(default_sk)
-
             elif request_type == "detail":
 
                 pk = event.get('queryStringParameters').get('{pk_varname}','')
@@ -190,21 +192,39 @@ def create(data):
             }}
         }}
 
-    def report(sk):
+    def report(sk, data):
         #FIXME: THIS IS A STUB, WILL NEED TO BE UPDATED WITH
         #   ENHANCED LISTVIEW LOGIC LATER WHEN WE ACTUALLY IMPLEMENT REPORTING
-
-        response = ddb.query(
-            TableName=ddb_table,
-            IndexName="STARK-ListView-Index",
-            Select='ALL_ATTRIBUTES',
-            ReturnConsumedCapacity='TOTAL',
-            KeyConditionExpression='sk = :sk',
-            ExpressionAttributeValues={{
-                ':sk' : {{'S' : sk}}
-            }}
-        )
-
+        
+        temp_string_filter = ""
+        object_expression_value = {{':sk' : {{'S' : sk}}}}
+        for key, index in data.items():
+            if key != "STARK_isReport":
+                if index['value'] != "":
+                    processed_operator_dict = (compose_operators(key, index)) 
+                    temp_string_filter += processed_operator_dict['filter_string']
+                    object_expression_value.update(processed_operator_dict['expression_values'])
+        string_filter = temp_string_filter[1:-3]
+        
+        if temp_string_filter == "":
+            response = ddb.query(
+                TableName=ddb_table,
+                IndexName="STARK-ListView-Index",
+                Select='ALL_ATTRIBUTES',
+                ReturnConsumedCapacity='TOTAL',
+                KeyConditionExpression='sk = :sk',
+                ExpressionAttributeValues=object_expression_value
+            )
+        else:
+            response = ddb.query(
+                TableName=ddb_table,
+                IndexName="STARK-ListView-Index",
+                Select='ALL_ATTRIBUTES',
+                ReturnConsumedCapacity='TOTAL',
+                FilterExpression=string_filter,
+                KeyConditionExpression='sk = :sk',
+                ExpressionAttributeValues=object_expression_value
+            )
         raw = response.get('Items')
 
         #Map to expected structure
@@ -400,6 +420,34 @@ def create(data):
         )
 
         return "OK"
+    
+    def compose_operators(key, data):
+        composed_filter_dict = {{"filter_string":"","expression_values": {{}}}}
+        if data['operator'] == "IN":
+            string_split = data['value'].split(',')
+            composed_filter_dict['filter_string'] += f" {{key}} IN "
+            temp_in_string = ""
+            in_string = ""
+            in_counter = 1
+            for in_index in string_split:
+                in_string += f" :inParam{{in_counter}}, "
+                composed_filter_dict['expression_values'][f":inParam{{in_counter}}"] = {{data['type'] : in_index.strip()}}
+                in_counter += 1
+            temp_in_string = in_string[1:-2]
+            composed_filter_dict['filter_string'] += f"({{temp_in_string}}) AND"
+        elif data['operator'] in [ "contains", "begins_with" ]:
+            composed_filter_dict['filter_string'] += f" {{data['operator']}}({{key}}, :{{key}}) AND"
+            composed_filter_dict['expression_values'][f":{{key}}"] = {{data['type'] : data['value'].strip()}}
+        elif data['operator'] == "between":
+            from_to_split = data['value'].split(',')
+            composed_filter_dict['filter_string'] += f" ({{key}} BETWEEN :from{{key}} AND :to{{key}}) AND"
+            composed_filter_dict['expression_values'][f":from{{key}}"] = {{data['type'] : from_to_split[0].strip()}}
+            composed_filter_dict['expression_values'][f":to{{key}}"] = {{data['type'] : from_to_split[1].strip()}}
+        else:
+            composed_filter_dict['filter_string'] += f" {{key}} {{data['operator']}} :{{key}} AND"
+            composed_filter_dict['expression_values'][f":{{key}}"] = {{data['type'] : data['value'].strip()}}
+
+        return composed_filter_dict
     """
 
     return textwrap.dedent(source_code)

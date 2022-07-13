@@ -23,6 +23,7 @@ import cgstatic_html_login as cg_login
 import cgstatic_html_delete as cg_delete
 import cgstatic_html_listview as cg_listview
 import cgstatic_html_homepage as cg_homepage
+import cgstatic_html_report as cg_report
 import convert_friendly_to_system as converter
 
 def create(cloud_resources, current_cloud_resources, project_basedir):
@@ -61,6 +62,7 @@ def create(cloud_resources, current_cloud_resources, project_basedir):
         add_to_commit(source_code=cg_delete.create(cgstatic_data), key=f"{entity_varname}_delete.html", files_to_commit=files_to_commit, file_path='static')
         add_to_commit(source_code=cg_view.create(cgstatic_data), key=f"{entity_varname}_view.html", files_to_commit=files_to_commit, file_path='static')
         add_to_commit(source_code=cg_listview.create(cgstatic_data), key=f"{entity_varname}.html", files_to_commit=files_to_commit, file_path='static')
+        add_to_commit(source_code=cg_report.create(cgstatic_data), key=f"{entity_varname}_report.html", files_to_commit=files_to_commit, file_path='static')
         add_to_commit(source_code=cg_js_app.create(cgstatic_data), key=f"js/{entity_varname}_app.js", files_to_commit=files_to_commit, file_path='static')
         add_to_commit(source_code=cg_js_view.create(cgstatic_data), key=f"js/{entity_varname}_view.js", files_to_commit=files_to_commit, file_path='static')
 
