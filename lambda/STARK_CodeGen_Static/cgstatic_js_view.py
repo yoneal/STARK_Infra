@@ -277,7 +277,7 @@ def create(data):
                     loading_modal.show()
                     let report_payload = {{ {entity_varname}: this.custom_report }}
         
-                    Customer_app.report(report_payload).then( function(data) {{
+                    {entity_app}.report(report_payload).then( function(data) {{
                         root.listview_table = data[0];
                         console.log("DONE! Retrieved report.");
                         loading_modal.hide()
