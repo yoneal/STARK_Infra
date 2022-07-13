@@ -44,18 +44,30 @@ def create(data):
                                         <th style="padding: 10px; min-width: 250px"> Field Name </th>
                                         <th style="padding: 10px"> Operator </th>
                                         <th style="padding: 10px"> Filter Value </th>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                             <input type="checkbox" name="check_checkbox" value="{pk_varname}" id="{pk_varname}" v-model="checked_fields">
+                                        </td>
+                                        <td>
+                                                <label for="{pk_varname}">{pk}</label>
+                                        </td>
+                                        <td>
+                                            <b-form-select id="{pk_varname}_operator" :options="lists.Report_Operator" v-model="custom_report.{pk_varname}.operator">
+                                                <template v-slot:first>
+                                                    <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
+                                                </template>
+                                            </b-form-select>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" id="{pk_varname}_filter_value" placeholder="" v-model="custom_report.{pk_varname}.value">
+                                        </td>
                                     </tr>"""
+    
+
 
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
-        html_control_code = cg_coltype.create({
-            "col": col,
-            "col_type": col_type,
-            "col_varname": col_varname,
-            "entity" : entity,
-            "entity_varname": entity_varname
-        })
-
         source_code += f"""
                                     <tr>
                                         <td>

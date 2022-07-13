@@ -100,7 +100,8 @@ def create(data):
                     }}
                 }}
             else:
-                data['STARK_isReport'] = payload.get('STARK_isReport', False)"""
+                data['STARK_isReport'] = payload.get('STARK_isReport', False)
+                data['pk'] = payload.get('{pk_varname}')"""
     for col, col_type in columns.items():
         col_varname = converter.convert_to_system_name(col)
         source_code +=f"""
@@ -108,7 +109,6 @@ def create(data):
 
     source_code +=f"""
                 if data['STARK_isReport'] == False:
-                    data['pk'] = payload.get('{pk_varname}')
                     data['orig_pk'] = payload.get('orig_{pk_varname}','')
                     data['sk'] = payload.get('sk', '')
                     if data['sk'] == "":
