@@ -35,7 +35,8 @@ def create(data):
 
     source_code += f"""
                 }},
-                custom_report:{{"""
+                custom_report:{{
+                    '{pk_varname}': {{"operator": "", "value": "", "type":"S"}},"""
     for col in cols:
         col_varname = converter.convert_to_system_name(col)
         source_code += f"""
@@ -342,7 +343,7 @@ def create(data):
         }})
 
     //for selecting individually, select all or uncheck all of checkboxes
-    var temp_checked_fields = ["""
+    var temp_checked_fields = ['{pk_varname}',"""
 
     for col in cols:
         col_varname = converter.convert_to_system_name(col)
@@ -350,7 +351,7 @@ def create(data):
     
     source_code += f"""]"""
     source_code += f"""
-    var checked_fields = ["""
+    var checked_fields = ['{pk_varname}',"""
 
     for col in cols:
         col_varname = converter.convert_to_system_name(col)
