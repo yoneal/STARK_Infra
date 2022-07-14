@@ -24,6 +24,8 @@ def create(data):
                 - BUCKET=$(cat template_configuration.json | python3 -c "import sys, json; print(json.load(sys.stdin)['Parameters']['UserCICDPipelineBucketNameParameter'])")
                 - WEBSITE=$(cat template_configuration.json | python3 -c "import sys, json; print(json.load(sys.stdin)['Parameters']['UserWebsiteBucketNameParameter'])")
                 - sed -i "s/RandomTokenFromBuildScript/$(date)/" template.yml
+                - pip install pyyaml
+                - python3 ./builder.py
                 - aws cloudformation package --template-file template.yml --s3-bucket $BUCKET --s3-prefix {project_varname} --output-template-file outputtemplate.yml
                 - aws s3 sync static s3://$WEBSITE --delete --acl public-read
                 - aws s3 sync lambda/packaged_layers s3://$BUCKET/{project_varname}/STARKLambdaLayers --delete --exclude="*" --include="*.zip"
