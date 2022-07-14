@@ -16,6 +16,7 @@
     <script src="js/STARK_loading_modal.js" defer></script>
     <script src="js/STARK_User_app.js" defer></script>
     <script src="js/STARK_User_view.js" defer></script>
+    <script src="js/STARK_User_Roles_app.js" defer></script>
     <script src="js/generic_root_get.js" defer></script>
 
     <title>[[STARK_PROJECT_NAME]] - Users</title>
@@ -75,8 +76,12 @@
                     </div>
                     <div class="form-group">
                         <label for="Role">Role</label>
-                        <input type="text" class="form-control" id="Role" placeholder="" v-model="STARK_User.Role">
-                    </div>
+                        <b-form-select id="Role" v-model="STARK_User.Role" :options="lists.Role" onmouseover="root.list_Role()" onfocus="root.list_Role()">
+                            <template v-slot:first>
+                                <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
+                            </template>
+                        </b-form-select>    
+                    </div>    
                     <div class="form-group">
                         <label for="Password_Hash">Reset Password</label>
                         <input type="password" class="form-control" id="Password_Hash" placeholder="" v-model="STARK_User.Password_Hash">

@@ -23,8 +23,11 @@ var root = new Vue({
                 { value: 'Y', text: 'Y' },
                 { value: 'N', text: 'N' },
             ],
+            'Module_Group': [
+            ],
         },
         list_status: {
+            'Module_Group': 'empty'
         },
         visibility: 'hidden',
         next_token: '',
@@ -126,6 +129,7 @@ var root = new Vue({
                         root.STARK_Module.Is_Menu_Item = "N"
                     }
                     root.STARK_Module.orig_Module_Name = root.STARK_Module.Module_Name;
+                    root.lists.Module_Group = [  { value: root.STARK_Module.Module_Group, text: root.STARK_Module.Module_Group },]
                     console.log("VIEW: Retreived module data.")
                     root.show()
                     loading_modal.hide()
@@ -196,6 +200,26 @@ var root = new Vue({
                 console.log("Encountered an error! [" + error + "]")
                 spinner.hide()
             });
+        },
+        list_Module_Group: function () {
+            if (this.list_status.Module_Group == 'empty') {
+                loading_modal.show();
+                root.lists.Module_Group = []
+ 
+                //FIXME: for now, generic list() is used. Can be optimized to use a list function that only retrieves specific columns
+                STARK_Module_Groups_app.list().then( function(data) {
+                    data['Items'].forEach(function(arrayItem) {
+                        value = arrayItem['Group_Name']
+                        text  = arrayItem['Group_Name']
+                        root.lists.Module_Group.push({ value: value, text: text })
+                    })
+                    root.list_status.Module_Group = 'populated'
+                    loading_modal.hide();
+                }).catch(function(error) {
+                    console.log("Encountered an error! [" + error + "]")
+                    loading_modal.hide();
+                });
+            }
         },
     }
 })
