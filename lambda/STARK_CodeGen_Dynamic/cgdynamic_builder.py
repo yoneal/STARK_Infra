@@ -30,6 +30,6 @@ def create():
                 #Copy entire Lambda module code (folder)
                 os.system(f"cp -R lambda/{{dependency}} lambda/{{stark_func}}")
     """
-return textwrap.dedent(source_code)
+    return textwrap.dedent(source_code)
 
 
