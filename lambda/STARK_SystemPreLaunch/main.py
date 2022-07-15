@@ -97,7 +97,7 @@ def create_handler(event, context):
         # module_grp['Priority']          = {'S' : module_group['Priority']}
         # module_grp['STARK-ListView-sk'] = {'S' : module_group}
 
-        print(module_group["sk"])
+        # print(module_group["sk"])
         print(module_group_yml[module_group]["Description"])
         print(module_grp)
     print(module_grp)
