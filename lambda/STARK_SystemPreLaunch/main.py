@@ -4,16 +4,20 @@
 #Python Standard Library
 import datetime
 import time
+import os
+
 
 #Extra modules
 import boto3
 from crhelper import CfnResource
+import yaml
 
 #Private modules
 import convert_friendly_to_system as converter
 import stark_scrypt as scrypt
 
 ddb = boto3.client('dynamodb')
+s3  = boto3.client('s3')
 
 helper = CfnResource() #We're using the AWS-provided helper library to minimize the tedious boilerplate just to signal back to CloudFormation
 
@@ -23,6 +27,21 @@ def create_handler(event, context):
     project_name    = event.get('ResourceProperties', {}).get('Project','')    
     project_varname = converter.convert_to_system_name(project_name)
     ddb_table_name = event.get('ResourceProperties', {}).get('DDBTable','')
+
+    #Cloud resources document
+    codegen_bucket_name = os.environ['CODEGEN_BUCKET_NAME']
+    response = s3.get_object(
+        Bucket=codegen_bucket_name,
+        Key=f'STARK_cloud_resources/{project_varname}.yaml'
+    )
+    cloud_resources = yaml.safe_load(response['Body'].read().decode('utf-8')) 
+
+
+    models   = cloud_resources["Data Model"]
+    entities = []
+    for entity in models: entities.append(entity)    
+    print(entity)
+    print(entity[0])
 
     #################################
     #Create default user and password
@@ -53,20 +72,7 @@ def create_handler(event, context):
     )
     print(response)
 
-    module_grps                 = {}
-    module_grps['pk']           = {'S' : "System Administration"}
-    module_grps['sk']           = {'S' : "STARK|module_group"}
-    module_grps['Description']  = {'S' : "Built-in STARK administrative features"}
-    module_grps['Icon']         = {'S' : "gears.svg"}
-    module_grps['Priority']     = {'S' : "0"}
-    module_grps['STARK-ListView-sk'] = {'S' : "System Administration"}
 
-
-    response = ddb.put_item(
-        TableName=ddb_table_name,
-        Item=module_grps,
-    )
-    print(response)
 
 
 @helper.delete
