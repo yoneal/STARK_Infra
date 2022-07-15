@@ -5,6 +5,6 @@ System Administration:
     Priority: "0"
 Default:
     sk: "STARK|module_group"
-    Description: "Built-in STARK administrative features"
+    Description: "STARK Business modules"
     Icon: "gears.svg"
     Priority: "0"
