@@ -94,7 +94,7 @@ def create_handler(event, context):
         module_grp['sk']                = {'S' : module_group_yml[module_group]["sk"]}
         module_grp['Description']       = {'S' : module_group_yml[module_group]["Description"]}
         module_grp['Icon']              = {'S' : module_group_yml[module_group]["Icon"]}
-        module_grp['Priority']          = {'S' : module_group_yml[module_group]["Priority"]}
+        module_grp['Priority']          = {'N' : module_group_yml[module_group]["Priority"]}
         module_grp['STARK-ListView-sk'] = {'S' : module_group}
 
         response = ddb.put_item(
@@ -103,7 +103,32 @@ def create_handler(event, context):
         )
         print(response)
 
-    
+    # #System Modules
+    # with open('system_modules.yml') as f:
+    #         system_modules_raw = f.read()
+    #         system_modules_yml = yaml.safe_load(system_modules_raw)
+
+    # system_modules_list = []
+    # for system_modules in system_modules_yml:
+    #     sys_modules                      = {}
+    #     sys_modules['pk']                = {'S' : system_modules}
+    #     sys_modules['sk']                = {'S' : system_modules_yml[system_modules]["sk"]}
+    #     sys_modules['Target']            = {'S' : system_modules_yml[system_modules]["Target"]}
+    #     sys_modules['Descriptive_Title'] = {'S' : system_modules_yml[system_modules]["Descriptive_Title"]}
+    #     sys_modules['Description']       = {'S' : system_modules_yml[system_modules]["Description"]}
+    #     sys_modules['Module_Group']      = {'S' : system_modules_yml[system_modules]["Module_Group"]}
+    #     sys_modules['Is_Menu_Item']      = {'S' : system_modules_yml[system_modules]["Is_Menu_Item"]}
+    #     sys_modules['Is_Enabled']        = {'S' : system_modules_yml[system_modules]["Is_Enabled"]}
+    #     sys_modules['Icon']              = {'S' : system_modules_yml[system_modules]["Icon"]}
+    #     sys_modules['Image_Alt']         = {'S' : system_modules_yml[system_modules]["Image_Alt"]}
+    #     sys_modules['Priority']          = {'S' : system_modules_yml[system_modules]["Priority"]}
+    #     sys_modules['STARK-ListView-sk'] = {'S' : system_modules}
+
+    #     response = ddb.put_item(
+    #         TableName=ddb_table_name,
+    #         Item=sys_modules,
+    #     )
+    #     print(response)
 
 @helper.delete
 def no_op(_, __):
