@@ -48,7 +48,7 @@ def create_handler(event, context):
     for entity in entities:
         for module_type in module_types:
             business_permissions = business_permissions + entity + '|' + module_type + ', '
-    
+
     business_permissions = business_permissions[:-2]
     print(business_permissions)
 
@@ -89,8 +89,14 @@ def create_handler(event, context):
 
     module_group_list = []
     for module_group in module_group_yml:
-        print(module_group)
-    print(module_group_list)
+        module_grp                  = {}
+        module_grp['pk']            = {'S' : module_group}
+        # module_grp['sk']            = {'S' : module_group}
+        # module_grp['Description']   = {'S' : module_group}
+        # module_grp['Icon']          = {'S' : module_group}
+        # module_grp['Priority']      = {'S' : module_group}
+        print(module_group['pk'])
+    print(module_grp)
 
 @helper.delete
 def no_op(_, __):
