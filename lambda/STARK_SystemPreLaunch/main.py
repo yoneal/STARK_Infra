@@ -53,6 +53,21 @@ def create_handler(event, context):
     )
     print(response)
 
+    module_grps                 = {}
+    module_grps['pk']           = {'S' : "System Administration"}
+    module_grps['sk']           = {'S' : "STARK|module_group"}
+    module_grps['Description']  = {'S' : "Built-in STARK administrative features"}
+    module_grps['Icon']         = {'S' : "gears.svg"}
+    module_grps['Priority']     = {'S' : "0"}
+    module_grps['STARK-ListView-sk'] = {'S' : "System Administration"}
+
+
+    response = ddb.put_item(
+        TableName=ddb_table_name,
+        Item=module_grps,
+    )
+    print(response)
+
 
 @helper.delete
 def no_op(_, __):
