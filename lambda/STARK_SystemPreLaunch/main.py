@@ -103,30 +103,52 @@ def create_handler(event, context):
         )
         print(response)
 
-    # #System Modules
-    # with open('system_modules.yml') as f:
-    #         system_modules_raw = f.read()
-    #         system_modules_yml = yaml.safe_load(system_modules_raw)
+    #System Modules
+    with open('system_modules.yml') as f:
+            system_modules_raw = f.read()
+            system_modules_yml = yaml.safe_load(system_modules_raw)
 
-    # system_modules_list = []
-    # for system_modules in system_modules_yml:
-    #     sys_modules                      = {}
-    #     sys_modules['pk']                = {'S' : system_modules}
-    #     sys_modules['sk']                = {'S' : system_modules_yml[system_modules]["sk"]}
-    #     sys_modules['Target']            = {'S' : system_modules_yml[system_modules]["Target"]}
-    #     sys_modules['Descriptive_Title'] = {'S' : system_modules_yml[system_modules]["Descriptive_Title"]}
-    #     sys_modules['Description']       = {'S' : system_modules_yml[system_modules]["Description"]}
-    #     sys_modules['Module_Group']      = {'S' : system_modules_yml[system_modules]["Module_Group"]}
-    #     sys_modules['Is_Menu_Item']      = {'S' : system_modules_yml[system_modules]["Is_Menu_Item"]}
-    #     sys_modules['Is_Enabled']        = {'S' : system_modules_yml[system_modules]["Is_Enabled"]}
-    #     sys_modules['Icon']              = {'S' : system_modules_yml[system_modules]["Icon"]}
-    #     sys_modules['Image_Alt']         = {'S' : system_modules_yml[system_modules]["Image_Alt"]}
-    #     sys_modules['Priority']          = {'S' : system_modules_yml[system_modules]["Priority"]}
-    #     sys_modules['STARK-ListView-sk'] = {'S' : system_modules}
+    system_modules_list = []
+    for system_modules in system_modules_yml:
+        sys_modules                      = {}
+        sys_modules['pk']                = {'S' : system_modules}
+        sys_modules['sk']                = {'S' : system_modules_yml[system_modules]["sk"]}
+        sys_modules['Target']            = {'S' : system_modules_yml[system_modules]["Target"]}
+        sys_modules['Descriptive_Title'] = {'S' : system_modules_yml[system_modules]["Descriptive_Title"]}
+        sys_modules['Description']       = {'S' : system_modules_yml[system_modules]["Description"]}
+        sys_modules['Module_Group']      = {'S' : system_modules_yml[system_modules]["Module_Group"]}
+        sys_modules['Is_Menu_Item']      = {'S' : system_modules_yml[system_modules]["Is_Menu_Item"]}
+        sys_modules['Is_Enabled']        = {'S' : system_modules_yml[system_modules]["Is_Enabled"]}
+        sys_modules['Icon']              = {'S' : system_modules_yml[system_modules]["Icon"]}
+        sys_modules['Image_Alt']         = {'S' : system_modules_yml[system_modules]["Image_Alt"]}
+        sys_modules['Priority']          = {'N' : system_modules_yml[system_modules]["Priority"]}
+        sys_modules['STARK-ListView-sk'] = {'S' : system_modules}
+
+        response = ddb.put_item(
+            TableName=ddb_table_name,
+            Item=sys_modules,
+        )
+        print(response)
+
+    # business_system_modules_list = []
+    # for business_system_modules in business_system_modules_yml:
+    #     business_sys_modules                      = {}
+    #     business_sys_modules['pk']                = {'S' : business_system_modules}
+    #     business_sys_modules['sk']                = {'S' : ""}
+    #     business_sys_modules['Target']            = {'S' : ""}
+    #     business_sys_modules['Descriptive_Title'] = {'S' : ""}
+    #     business_sys_modules['Description']       = {'S' : ""}
+    #     business_sys_modules['Module_Group']      = {'S' : ""}
+    #     business_sys_modules['Is_Menu_Item']      = {'S' : ""}
+    #     business_sys_modules['Is_Enabled']        = {'S' : ""}
+    #     business_sys_modules['Icon']              = {'S' : ""}
+    #     business_sys_modules['Image_Alt']         = {'S' : ""}
+    #     business_sys_modules['Priority']          = {'S' : ""}
+    #     business_sys_modules['STARK-ListView-sk'] = {'S' : business_system_modules}
 
     #     response = ddb.put_item(
     #         TableName=ddb_table_name,
-    #         Item=sys_modules,
+    #         Item=business_sys_modules,
     #     )
     #     print(response)
 

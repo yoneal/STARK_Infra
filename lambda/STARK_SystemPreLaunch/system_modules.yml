@@ -9,7 +9,7 @@
     Is_Enabled: "Y"
     Icon: "images/stark_users.svg"
     Image_Alt: "STARK_User graphic"
-    Priority: 0
+    Priority: "0"
 "Users|Add":
     sk: "STARK|module"
     Target: "STARK_User_add.html"
@@ -20,7 +20,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 "Users|Edit":
     sk: "STARK|module"
     Target: "STARK_User_edit.html"
@@ -31,7 +31,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 "Users|Delete":
     sk: "STARK|module"
     Target: "STARK_User_delete.html"
@@ -42,7 +42,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 "Users|Report":
     sk: "STARK|module"
     Target: "STARK_User_report.html"
@@ -53,7 +53,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 
 #System Modules
 "Sytem Modules|View":
@@ -66,7 +66,7 @@
     Is_Enabled: "Y"
     Icon: "images/stark_Sytem Modules.svg"
     Image_Alt: "STARK_Module graphic"
-    Priority: 0
+    Priority: "0"
 "Sytem Modules|Add":
     sk: "STARK|module"
     Target: "STARK_Module_add.html"
@@ -77,7 +77,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 "Sytem Modules|Edit":
     sk: "STARK|module"
     Target: "STARK_Module_edit.html"
@@ -88,7 +88,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 "Sytem Modules|Delete":
     sk: "STARK|module"
     Target: "STARK_Module_delete.html"
@@ -99,7 +99,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 "Sytem Modules|Report":
     sk: "STARK|module"
     Target: "STARK_Module_report.html"
@@ -110,7 +110,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 
 #Module Groups
 "Module Groups|View":
@@ -123,7 +123,7 @@
     Is_Enabled: "Y"
     Icon: "STARK_Module_Groups graphic"
     Image_Alt: "STARK_User graphic"
-    Priority: 0
+    Priority: "0"
 "Module Groups|Add":
     sk: "STARK|module"
     Target: "STARK_Module_Groups_add.html"
@@ -134,7 +134,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 "Module Groups|Edit":
     sk: "STARK|module"
     Target: "STARK_Module_Groups_edit.html"
@@ -145,7 +145,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 "Module Groups|Delete":
     sk: "STARK|module"
     Target: "STARK_Module_Groups_delete.html"
@@ -156,7 +156,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 "Module Groups|Report":
     sk: "STARK|module"
     Target: "STARK_Module_Groups_report.html"
@@ -167,7 +167,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 
 #User Roles
 "User Roles|View":
@@ -180,7 +180,7 @@
     Is_Enabled: "Y"
     Icon: "STARK_User_Roles graphic"
     Image_Alt: "STARK_User graphic"
-    Priority: 0
+    Priority: "0"
 "User Roles|Add":
     sk: "STARK|module"
     Target: "STARK_User_Roles_add.html"
@@ -191,7 +191,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 "User Roles|Edit":
     sk: "STARK|module"
     Target: "STARK_User_Roles_edit.html"
@@ -202,7 +202,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 "User Roles|Delete":
     sk: "STARK|module"
     Target: "STARK_User_Roles_delete.html"
@@ -213,7 +213,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 "User Roles|Report":
     sk: "STARK|module"
     Target: "STARK_User_Roles_report.html"
@@ -224,7 +224,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 
 #User Permissions
 "User Permissions|View":
@@ -237,7 +237,7 @@
     Is_Enabled: "Y"
     Icon: "STARK_User_Permissions graphic"
     Image_Alt: "STARK_User graphic"
-    Priority: 0
+    Priority: "0"
 "User Permissions|Add":
     sk: "STARK|module"
     Target: "STARK_User_Permissions_add.html"
@@ -248,7 +248,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 "User Permissions|Edit":
     sk: "STARK|module"
     Target: "STARK_User_Permissions_edit.html"
@@ -259,7 +259,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 "User Permissions|Delete":
     sk: "STARK|module"
     Target: "STARK_User_Permissions_delete.html"
@@ -270,7 +270,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 "User Permissions|Report":
     sk: "STARK|module"
     Target: "STARK_User_Permissions_report.html"
@@ -281,7 +281,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 
 # User Sessions
 "User Sessions|View":
@@ -294,7 +294,7 @@
     Is_Enabled: "Y"
     Icon: "STARK_User_Sessions graphic"
     Image_Alt: "STARK_User graphic"
-    Priority: 0
+    Priority: "0"
 "User Sessions|Add":
     sk: "STARK|module"
     Target: "STARK_User_Sessions_add.html"
@@ -305,7 +305,7 @@
     Is_Enabled: "N"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 "User Sessions|Edit":
     sk: "STARK|module"
     Target: "STARK_User_Sessions_edit.html"
@@ -316,7 +316,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 "User Sessions|Delete":
     sk: "STARK|module"
     Target: "STARK_User_Sessions_delete.html"
@@ -327,7 +327,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 "User Sessions|Report":
     sk: "STARK|module"
     Target: "STARK_User_Sessions_report.html"
@@ -338,7 +338,7 @@
     Is_Enabled: "Y"
     Icon: ""
     Image_Alt: ""
-    Priority: 0
+    Priority: "0"
 
 
 
