@@ -56,21 +56,21 @@
     Priority: "0"
 
 #System Modules
-"Sytem Modules|View":
+"System Modules|View":
     sk: "STARK|module"
     Target: "STARK_Module.html"
-    Descriptive_Title: "Sytem Modules"
+    Descriptive_Title: "System Modules"
     Description: ""
     Module_Group: "System Administration"
     Is_Menu_Item: "Y"
     Is_Enabled: "Y"
-    Icon: "images/stark_Sytem Modules.svg"
+    Icon: "images/stark_System Modules.svg"
     Image_Alt: "STARK_Module graphic"
     Priority: "0"
-"Sytem Modules|Add":
+"System Modules|Add":
     sk: "STARK|module"
     Target: "STARK_Module_add.html"
-    Descriptive_Title: "Add Sytem Modules"
+    Descriptive_Title: "Add System Modules"
     Description: ""
     Module_Group: "System Administration"
     Is_Menu_Item: "N"
@@ -78,10 +78,10 @@
     Icon: ""
     Image_Alt: ""
     Priority: "0"
-"Sytem Modules|Edit":
+"System Modules|Edit":
     sk: "STARK|module"
     Target: "STARK_Module_edit.html"
-    Descriptive_Title: "Edit Sytem Modules"
+    Descriptive_Title: "Edit System Modules"
     Description: ""
     Module_Group: "System Administration"
     Is_Menu_Item: "N"
@@ -89,10 +89,10 @@
     Icon: ""
     Image_Alt: ""
     Priority: "0"
-"Sytem Modules|Delete":
+"System Modules|Delete":
     sk: "STARK|module"
     Target: "STARK_Module_delete.html"
-    Descriptive_Title: "Delete Sytem Modules"
+    Descriptive_Title: "Delete System Modules"
     Description: ""
     Module_Group: "System Administration"
     Is_Menu_Item: "N"
@@ -100,10 +100,10 @@
     Icon: ""
     Image_Alt: ""
     Priority: "0"
-"Sytem Modules|Report":
+"System Modules|Report":
     sk: "STARK|module"
     Target: "STARK_Module_report.html"
-    Descriptive_Title: "Report Sytem Modules"
+    Descriptive_Title: "Report System Modules"
     Description: ""
     Module_Group: "System Administration"
     Is_Menu_Item: "N"

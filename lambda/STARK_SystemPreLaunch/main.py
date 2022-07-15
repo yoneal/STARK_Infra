@@ -52,6 +52,19 @@ def create_handler(event, context):
     business_permissions = business_permissions[:-2]
     print(business_permissions)
 
+    system_permissions = ''
+    with open('system_modules.yml') as f:
+        system_modules_raw = f.read()
+        system_modules_yml = yaml.safe_load(system_modules_raw)
+
+        for system_module in system_modules_yml:
+            system_permissions = system_permissions + system_module + ', '
+
+    system_permissions = system_permissions[:-2]  
+    print(system_permissions)
+
+    all_permissions = system_permissions + ', ' + business_permissions
+    
 
     #################################
     #Create default user and password
@@ -105,8 +118,8 @@ def create_handler(event, context):
 
     #System Modules
     with open('system_modules.yml') as f:
-            system_modules_raw = f.read()
-            system_modules_yml = yaml.safe_load(system_modules_raw)
+        system_modules_raw = f.read()
+        system_modules_yml = yaml.safe_load(system_modules_raw)
 
     system_modules_list = []
     for system_modules in system_modules_yml:
@@ -130,27 +143,94 @@ def create_handler(event, context):
         )
         print(response)
 
-    # business_system_modules_list = []
-    # for business_system_modules in business_system_modules_yml:
-    #     business_sys_modules                      = {}
-    #     business_sys_modules['pk']                = {'S' : business_system_modules}
-    #     business_sys_modules['sk']                = {'S' : ""}
-    #     business_sys_modules['Target']            = {'S' : ""}
-    #     business_sys_modules['Descriptive_Title'] = {'S' : ""}
-    #     business_sys_modules['Description']       = {'S' : ""}
-    #     business_sys_modules['Module_Group']      = {'S' : ""}
-    #     business_sys_modules['Is_Menu_Item']      = {'S' : ""}
-    #     business_sys_modules['Is_Enabled']        = {'S' : ""}
-    #     business_sys_modules['Icon']              = {'S' : ""}
-    #     business_sys_modules['Image_Alt']         = {'S' : ""}
-    #     business_sys_modules['Priority']          = {'S' : ""}
-    #     business_sys_modules['STARK-ListView-sk'] = {'S' : business_system_modules}
+    
+    for entity in entities:
+        for module_type in module_types:
+            pk = entity + '|' + module_type 
+            if module_type == 'View':
+                target = entity + '.html'
+                title = entity
+                is_menu_item = 'Y'
+                icon = ''
+            else:
+                target = entity + '_' + module_type + '.html'
+                title = module_type + ' ' + entity
+                is_menu_item = 'N'
+                icon = ''
 
-    #     response = ddb.put_item(
-    #         TableName=ddb_table_name,
-    #         Item=business_sys_modules,
-    #     )
-    #     print(response)
+            business_module                      = {}
+            business_module['pk']                = {'S' : pk}
+            business_module['sk']                = {'S' : "STARK|module"}
+            business_module['Target']            = {'S' : target}
+            business_module['Descriptive_Title'] = {'S' : title}
+            business_module['Description']       = {'S' : ""}
+            business_module['Module_Group']      = {'S' : "Default"}
+            business_module['Is_Menu_Item']      = {'S' : is_menu_item}
+            business_module['Is_Enabled']        = {'S' : "Y"}
+            business_module['Icon']              = {'S' : icon}
+            business_module['Image_Alt']         = {'S' : ""}
+            business_module['Priority']          = {'N' : "0"}
+            business_module['STARK-ListView-sk'] = {'S' : pk}
+
+            response = ddb.put_item(
+                TableName=ddb_table_name,
+                Item=business_module,
+            )
+            print(response)
+
+    #User Permissions
+    item                      = {}
+    item['pk']                = {'S' : "root"}
+    item['sk']                = {'S' : "STARK|user|permissions"}
+    item['Permissions']       = {'S' : all_permissions}
+    item['STARK-ListView-sk'] = {'S' : "root"}
+
+    response = ddb.put_item(
+        TableName=ddb_table_name,
+        Item=item,
+    )
+    print(response)
+
+    #User Roles
+    item                      = {}
+    item['pk']                = {'S' : "Super Admin"}
+    item['sk']                = {'S' : "STARK|role"}
+    item['Description']       = {'S' : "Super Admin, all permissions"}
+    item['Permissions']       = {'S' : all_permissions}
+    item['STARK-ListView-sk'] = {'S' : "Super Admin"}
+
+    response = ddb.put_item(
+        TableName=ddb_table_name,
+        Item=item,
+    )
+    print(response)
+
+    item                      = {}
+    item['pk']                = {'S' : "Admin"}
+    item['sk']                = {'S' : "STARK|role"}
+    item['Description']       = {'S' : "All system management permissions, no business permissions"}
+    item['Permissions']       = {'S' : system_permissions}
+    item['STARK-ListView-sk'] = {'S' : "Admin"}
+
+    response = ddb.put_item(
+        TableName=ddb_table_name,
+        Item=item,
+    )
+    print(response)
+
+    item                      = {}
+    item['pk']                = {'S' : "General User"}
+    item['sk']                = {'S' : "STARK|role"}
+    item['Description']       = {'S' : "Business permissions only"}
+    item['Permissions']       = {'S' : business_permissions}
+    item['STARK-ListView-sk'] = {'S' : "General User"}
+
+    response = ddb.put_item(
+        TableName=ddb_table_name,
+        Item=item,
+    )
+    print(response)
+
 
 @helper.delete
 def no_op(_, __):
