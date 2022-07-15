@@ -315,6 +315,7 @@ Resources:
                 - AWSLambdaBasicExecutionRole
                 - AWSCodeCommitFullAccess
                 - AmazonDynamoDBFullAccess
+                - AmazonS3FullAccess
             Layers:
                 - !Ref CFCustomResourceHelperLayer
                 - !Ref PyYamlLayer
