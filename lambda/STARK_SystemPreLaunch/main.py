@@ -89,13 +89,17 @@ def create_handler(event, context):
 
     module_group_list = []
     for module_group in module_group_yml:
-        module_grp                  = {}
-        module_grp['pk']            = {'S' : module_group}
-        # module_grp['sk']            = {'S' : module_group}
-        # module_grp['Description']   = {'S' : module_group}
-        # module_grp['Icon']          = {'S' : module_group}
-        # module_grp['Priority']      = {'S' : module_group}
-        print(module_group['pk'])
+        module_grp                      = {}
+        module_grp['pk']                = {'S' : module_group}
+        # module_grp['sk']                = {'S' : module_group_yml[module_group]["sk"]}
+        # module_grp['Description']       = {'S' : module_group['Description']}
+        # module_grp['Icon']              = {'S' : module_group['Icon']}
+        # module_grp['Priority']          = {'S' : module_group['Priority']}
+        # module_grp['STARK-ListView-sk'] = {'S' : module_group}
+
+        print(module_group["sk"])
+        print(module_group_yml[module_group]["Description"])
+        print(module_grp)
     print(module_grp)
 
 @helper.delete
