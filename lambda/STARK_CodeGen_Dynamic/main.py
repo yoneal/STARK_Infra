@@ -16,6 +16,7 @@ from crhelper import CfnResource
 import cgdynamic_login as cg_login
 import cgdynamic_logout as cg_logout
 import cgdynamic_modules as cg_mod
+import cgdynamic_builder as cg_builder
 import cgdynamic_dynamodb as cg_ddb
 import cgdynamic_buildspec as cg_build
 import cgdynamic_authorizer as cg_auth
@@ -137,6 +138,7 @@ def create_handler(event, context):
     # - template.yml
     # - buildspec.yml
     # - template_configuration.json
+    # - builder.py
     data = { 'project_varname': project_varname }
 
     source_code = cg_build.create(data)
@@ -159,6 +161,12 @@ def create_handler(event, context):
     source_code = cg_conf.create(data)
     files_to_commit.append({
         'filePath': "template_configuration.json",
+        'fileContent': source_code.encode()
+    })
+    
+    source_code = cg_builder.create()
+    files_to_commit.append({
+        'filePath': "builder.py",
         'fileContent': source_code.encode()
     })
    

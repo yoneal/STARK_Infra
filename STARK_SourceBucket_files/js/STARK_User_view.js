@@ -11,8 +11,11 @@ var root = new Vue({
             'Role': '',
         },
         lists: {
+            'Role': [
+            ],
         },
         list_status: {
+            'Role': 'empty'
         },
         visibility: 'hidden',
         next_token: '',
@@ -102,6 +105,7 @@ var root = new Vue({
                 STARK_User_app.get(data).then( function(data) {
                     root.STARK_User = data[0]; //We need 0, because API backed func always returns a list for now
                     root.STARK_User.orig_Username = root.STARK_User.Username;
+                    root.lists.Role = [  { value: root.STARK_User.Role, text: root.STARK_User.Role },]
                     console.log("VIEW: Retreived module data.")
                     root.show()
                     loading_modal.hide()
@@ -172,6 +176,26 @@ var root = new Vue({
                 console.log("Encountered an error! [" + error + "]")
                 spinner.hide()
             });
+        },
+        list_Role: function () {
+            if (this.list_status.Role == 'empty') {
+                loading_modal.show();
+                root.lists.Role = []
+ 
+                //FIXME: for now, generic list() is used. Can be optimized to use a list function that only retrieves specific columns
+                STARK_User_Roles_app.list().then( function(data) {
+                    data['Items'].forEach(function(arrayItem) {
+                        value = arrayItem['Role_Name']
+                        text  = arrayItem['Role_Name']
+                        root.lists.Role.push({ value: value, text: text })
+                    })
+                    root.list_status.Role = 'populated'
+                    loading_modal.hide();
+                }).catch(function(error) {
+                    console.log("Encountered an error! [" + error + "]")
+                    loading_modal.hide();
+                });
+            }
         },
     }
 })

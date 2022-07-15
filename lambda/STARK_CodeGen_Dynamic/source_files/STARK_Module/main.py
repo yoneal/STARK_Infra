@@ -353,7 +353,7 @@ def add(data):
     Module_Group = str(data.get('Module_Group', ''))
     Is_Menu_Item = str(data.get('Is_Menu_Item', ''))
     Icon = str(data.get('Icon', ''))
-    Priority = int(data.get('Priority', ''))
+    Priority = str(data.get('Priority', ''))
 
     if Is_Menu_Item == 'Y':
         Is_Menu_Item = True
@@ -405,7 +405,7 @@ def get_user_modules(sk, username):
     )
 
     raw = response.get('Items')
-    permission_string = ''    
+    permissions = []
     for record in raw:
         permission_string = record.get('Permissions',{}).get('S','')
     

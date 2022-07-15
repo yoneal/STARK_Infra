@@ -25,6 +25,39 @@ def parse(data):
             "Memory": 128,
             "Arch": "arm64",
             "Timeout": 5
+        },
+        "STARK_User": {
+            "Memory": 128,
+            "Arch": "arm64",
+            "Timeout": 5,
+            "Layers": [
+                "STARKScryptLayer"
+            ]
+        },
+        "STARK_Module": {
+            "Memory": 128,
+            "Arch": "arm64",
+            "Timeout": 5
+        },
+        "STARK_User_Roles": {
+            "Memory": 128,
+            "Arch": "arm64",
+            "Timeout": 5
+        },
+        "STARK_User_Permissions": {
+            "Memory": 128,
+            "Arch": "arm64",
+            "Timeout": 5
+        },
+        "STARK_User_Sessions": {
+            "Memory": 128,
+            "Arch": "arm64",
+            "Timeout": 5
+        },
+        "STARK_Module_Groups": {
+            "Memory": 128,
+            "Arch": "arm64",
+            "Timeout": 5
         }
     }
     for entity in entities:
