@@ -40,15 +40,15 @@ def create_handler(event, context):
     models   = cloud_resources["Data Model"]
     entities = []
     for entity in models: entities.append(entity)    
-    print(entities)
-    print(entities[0])
+    # print(entities)
+    # print(entities[0])
 
     business_permissions = ''
     module_types = ['Add', 'Edit', 'Delete', 'View', 'Report']
     for entity in entities:
         for module_type in module_types:
             business_permissions = business_permissions + entity + '|' + module_type + ', '
-
+    
     business_permissions = business_permissions[:-2]
     print(business_permissions)
 
@@ -82,8 +82,15 @@ def create_handler(event, context):
     )
     print(response)
 
+    #Module Group
+    with open('module_group.yml') as f:
+            module_group_raw = f.read()
+            module_group_yml = yaml.safe_load(module_group_raw)
 
-
+    module_group_list = []
+    for module_group in module_group_yml:
+        print(module_group)
+    print(module_group_list)
 
 @helper.delete
 def no_op(_, __):
