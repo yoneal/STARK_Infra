@@ -99,9 +99,11 @@ def create_handler(event, context):
 
         response = ddb.put_item(
             TableName=ddb_table_name,
-            Item=item,
+            Item=module_grp,
         )
         print(response)
+
+    
 
 @helper.delete
 def no_op(_, __):
