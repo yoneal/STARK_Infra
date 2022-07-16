@@ -1,18 +1,150 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: STARK infra for the parser and code generator
+Description: Initialize your STARK dev infra by creating the CI/CD pipeline
 Parameters:
     UserCICDPipelineBucketNameParameter:
         Type: String
         Description: Name for user bucket that will be used for the default STARK CI/CD pipeline.
-    UserCodeGenBucketNameParameter:
+    GeneratedServicesNameParameter:
         Type: String
-        Description: Name for user bucket that will hold static files and deployment packages created by STARK
-    UserWebsiteBucketNameParameter:
+        Description: String appended to generated service of STARK Infrastructure
+    ExistingCodeCommitRepoParameter:
         Type: String
-        Description: Name for user bucket that will be used as the website bucket for the STARK Parser UI. Not yet used in template, just needed for config.
+        Description: Name of an existing code commit repository for Stark Infrastructure
 Resources:
-    STARKCloudFormationDeployServiceRole:
+    STARKCodeBuildServiceRole:
+        Type: AWS::IAM::Role
+        Properties:
+            AssumeRolePolicyDocument:
+                Version: '2012-10-17'
+                Statement: 
+                    - 
+                        Effect: Allow
+                        Principal:
+                           Service: 
+                              - 'codebuild.amazonaws.com'
+                        Action: 'sts:AssumeRole'
+            ManagedPolicyArns:
+                - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
+            Policies:
+                - PolicyName: PolicyForSTARKCodeBuildServiceRole
+                  PolicyDocument:
+                      Version: "2012-10-17"
+                      Statement:
+                          - 
+                              Effect: Allow
+                              Action:
+                                  - 'logs:CreateLogGroup'
+                                  - 'logs:CreateLogStream'  
+                                  - 'logs:PutLogEvents'
+                                  - 's3:PutObject'
+                                  - 's3:GetObject'
+                                  - 's3:GetObjectVersion'
+                                  - 's3:GetBucketAcl'
+                                  - 's3:GetBucketLocation'
+                                  - 'codebuild:CreateReportGroup'
+                                  - 'codebuild:CreateReport'
+                                  - 'codebuild:UpdateReport'
+                                  - 'codebuild:BatchPutTestCases'
+                              Resource: '*'
+    STARKCodePipelineServiceRole:
+        Type: AWS::IAM::Role
+        Properties:
+            AssumeRolePolicyDocument:
+                Version: '2012-10-17'
+                Statement: 
+                    - 
+                        Effect: Allow
+                        Principal:
+                           Service: 
+                              - 'codepipeline.amazonaws.com'
+                        Action: 'sts:AssumeRole'
+            Policies:
+                - 
+                    PolicyName: PolicyForSTARKCodePipelineServiceRole
+                    PolicyDocument:
+                        Version: '2012-10-17'
+                        Statement:
+                            - 
+                                Sid: VisualEditor0
+                                Effect: Allow
+                                Action:
+                                    - 'opsworks:DescribeStacks'
+                                    - 'rds:*'
+                                    - 'devicefarm:GetRun'
+                                    - 'cloudformation:CreateChangeSet'
+                                    - 'autoscaling:*'
+                                    - 'codebuild:BatchGetBuilds'
+                                    - 'devicefarm:ScheduleRun'
+                                    - 'servicecatalog:ListProvisioningArtifacts'
+                                    - 'devicefarm:ListDevicePools'
+                                    - 'cloudformation:UpdateStack'
+                                    - 'servicecatalog:DescribeProvisioningArtifact'
+                                    - 'cloudformation:DescribeChangeSet'
+                                    - 'cloudformation:ExecuteChangeSet'
+                                    - 'devicefarm:ListProjects'
+                                    - 'sns:*'
+                                    - 'lambda:ListFunctions'
+                                    - 'lambda:InvokeFunction'
+                                    - 'codedeploy:RegisterApplicationRevision'
+                                    - 'opsworks:DescribeDeployments'
+                                    - 'devicefarm:CreateUpload'
+                                    - 'cloudformation:*'
+                                    - 'cloudformation:DescribeStacks'
+                                    - 'codecommit:GetUploadArchiveStatus'
+                                    - 'cloudwatch:*'
+                                    - 'cloudformation:DeleteStack'
+                                    - 'opsworks:DescribeInstances'
+                                    - 'ecs:*'
+                                    - 'ecr:DescribeImages'
+                                    - 'ec2:*'
+                                    - 'codebuild:StartBuild'
+                                    - 'cloudformation:ValidateTemplate'
+                                    - 'opsworks:DescribeApps'
+                                    - 'opsworks:UpdateStack'
+                                    - 'codedeploy:CreateDeployment'
+                                    - 'codedeploy:GetApplicationRevision'
+                                    - 'codedeploy:GetDeploymentConfig'
+                                    - 'sqs:*'
+                                    - 'servicecatalog:CreateProvisioningArtifact'
+                                    - 'cloudformation:DeleteChangeSet'
+                                    - 'codecommit:GetCommit'
+                                    - 'servicecatalog:DeleteProvisioningArtifact'
+                                    - 'codedeploy:GetApplication'
+                                    - 'cloudformation:SetStackPolicy'
+                                    - 'codecommit:UploadArchive'
+                                    - 's3:*'
+                                    - 'elasticloadbalancing:*'
+                                    - 'codecommit:CancelUploadArchive'
+                                    - 'devicefarm:GetUpload'
+                                    - 'elasticbeanstalk:*'
+                                    - 'opsworks:UpdateApp'
+                                    - 'opsworks:CreateDeployment'
+                                    - 'cloudformation:CreateStack'
+                                    - 'ssm:*'
+                                    - 'codecommit:GetBranch'
+                                    - 'servicecatalog:UpdateProduct'
+                                    - 'codedeploy:GetDeployment'
+                                    - 'opsworks:DescribeCommands'
+                                Resource: '*'
+                            - 
+                                Sid: VisualEditor1
+                                Effect: Allow
+                                Action: 'iam:PassRole'
+                                Resource: '*'
+                                Condition:
+                                    StringEqualsIfExists:
+                                        iam:PassedToService:
+                                        - 'cloudformation.amazonaws.com'
+                                        - 'elasticbeanstalk.amazonaws.com'
+                                        - 'ec2.amazonaws.com'
+                                        - 'ecs-tasks.amazonaws.com'
+                            -
+                                Sid: VisualEditor2
+                                Effect: Allow
+                                Action: 'codestar-connections:UseConnection'
+                                Resource: '*'
+    STARKCodePipelineDeployServiceRole:
         Type: AWS::IAM::Role
         Properties:
             AssumeRolePolicyDocument:
@@ -25,368 +157,127 @@ Resources:
                               - 'cloudformation.amazonaws.com'
                         Action: 'sts:AssumeRole'
             ManagedPolicyArns:
-                - 'arn:aws:iam::aws:policy/AdministratorAccess'
-    STARKParserApi:
-        Type: AWS::Serverless::HttpApi
-        Properties:
-            CorsConfiguration:
-                AllowOrigins:
-                    - "*"
-                AllowHeaders:
-                    - "*"
-                AllowMethods:
-                    - "*"
-                MaxAge: 200
-                AllowCredentials: False
-    CFCustomResourceHelperLayer:
-        Type: AWS::Lambda::LayerVersion
-        Properties:
-            Content:
-                S3Bucket: !Ref UserCodeGenBucketNameParameter
-                S3Key: STARKLambdaLayers/CF_CustomResourceHelper_py39.zip
-            Description: Lambda-backed custom resource library for CloudFormation
-            LayerName: STARK_CF_CustomResourceHelper
-            CompatibleArchitectures:
-                - x86_64
-                - arm64
-            CompatibleRuntimes:
-                - python3.6
-                - python3.7
-                - python3.8
-                - python3.9
-    PyYamlLayer:
-        Type: AWS::Lambda::LayerVersion
-        Properties:
-            Content:
-                S3Bucket: !Ref UserCodeGenBucketNameParameter
-                S3Key: STARKLambdaLayers/yaml_py39.zip
-            Description: YAML module for Python 3.x
-            LayerName: STARK_PyYAML
-            CompatibleArchitectures:
-                - x86_64
-                - arm64
-            CompatibleRuntimes:
-                - python3.6
-                - python3.7
-                - python3.8
-                - python3.9
-    RequestslLayer:
-        Type: AWS::Lambda::LayerVersion
-        Properties:
-            Content:
-                S3Bucket: !Ref UserCodeGenBucketNameParameter
-                S3Key: STARKLambdaLayers/requests_py39.zip
-            Description: Requests module for Python 3.x
-            LayerName: STARK_Requests
-            CompatibleArchitectures:
-                - x86_64
-                - arm64
-            CompatibleRuntimes:
-                - python3.6
-                - python3.7
-                - python3.8
-                - python3.9
-    STARKFriendlyToSystemNamesLayer:
-        Type: AWS::Lambda::LayerVersion
-        Properties:
-            Content:
-                S3Bucket: !Ref UserCodeGenBucketNameParameter
-                S3Key: STARKLambdaLayers/STARK_friendly_to_system_name_py39.zip
-            Description: STARK module for converting user-supplied, human-friendly identifiers into system-friendly entity or variable names
-            LayerName: STARK_friendly_to_system_name
-            CompatibleArchitectures:
-                - x86_64
-                - arm64
-            CompatibleRuntimes:
-                - python3.6
-                - python3.7
-                - python3.8
-                - python3.9
-    STARKScryptLayer:
-        Type: AWS::Lambda::LayerVersion
-        Properties:
-            Content:
-                S3Bucket: !Ref UserCodeGenBucketNameParameter
-                S3Key: STARKLambdaLayers/STARK_scrypt_py39.zip
-            Description: STARK module for working with scrypt from the Python stdlib
-            LayerName: STARK_scrypt
-            CompatibleArchitectures:
-                - x86_64
-                - arm64
-            CompatibleRuntimes:
-                - python3.6
-                - python3.7
-                - python3.8
-                - python3.9
-    STARKParserFunc:
-        Type: AWS::Serverless::Function
-        Properties:
-            Events:
-                ParserPostEvent:
-                    Type: HttpApi
-                    Properties:
-                        Path: /parser
-                        Method: POST
-                        ApiId:
-                            Ref: STARKParserApi
-            Runtime: python3.9
-            Handler: main.lambda_handler
-            CodeUri: lambda/STARK_Parser
-            Environment:
-                Variables:
-                    STARK_ENVIRONMENT_TYPE: PROD
-                    CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
+                - 'arn:aws:iam::aws:policy/AWSLambdaExecute'
             Policies:
-                - AmazonS3ReadOnlyAccess
-                - AWSLambda_FullAccess
-            Layers:
-                - !Ref PyYamlLayer
-                - !Ref STARKFriendlyToSystemNamesLayer
-            Timeout: 60 
-            Architectures:
-                - arm64
-    STARKCFWriterFunc:
-        Type: AWS::Serverless::Function
+                - 
+                    PolicyName: PolicyForSTARKCodePipelineDeployServiceRole
+                    PolicyDocument:
+                        Version: '2012-10-17'
+                        Statement:
+                            - 
+                                Sid: VisualEditor0
+                                Effect: Allow
+                                Action:
+                                    - 'iam:GetRole'
+                                    - 'apigateway:*'
+                                    - 'iam:CreateRole'
+                                    - 'iam:DeleteRole'
+                                    - 'iam:AttachRolePolicy'
+                                    - 'cloudformation:CreateChangeSet'
+                                    - 's3:GetBucketVersioning'
+                                    - 'iam:PutRolePolicy'
+                                    - 's3:GetObject'
+                                    - 'iam:PassRole'
+                                    - 'iam:DetachRolePolicy'
+                                    - 'iam:DeleteRolePolicy'
+                                    - 'ssm:*'
+                                    - 'codedeploy:*'
+                                    - 'lambda:*'
+                                    - 's3:GetObjectVersion'
+                                Resource: '*'
+    STARKBuildProject:
+        Type: AWS::CodeBuild::Project
         Properties:
-            Runtime: python3.9
-            Handler: main.lambda_handler
-            CodeUri: lambda/STARK_CFWriter
+            Name: !Join [ "", ["STARK_Infra_build_", !Ref GeneratedServicesNameParameter] ]
+            Artifacts:
+                Type: CODEPIPELINE  
+            Description: Default Build Project for the STARK CI/CD Pipeline
             Environment:
-                Variables:
-                    STARK_ENVIRONMENT_TYPE: PROD
-                    CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
-            Policies:
-                - AmazonS3FullAccess
-                - AWSLambdaBasicExecutionRole
-            Layers:
-                - !Ref PyYamlLayer
-                - !Ref STARKFriendlyToSystemNamesLayer
-            Timeout: 60
-            Architectures:
-                - arm64
-    STARKDeployFunc:
-        Type: AWS::Serverless::Function
+                ComputeType: BUILD_GENERAL1_SMALL
+                Image: "aws/codebuild/standard:4.0"
+                Type: LINUX_CONTAINER
+            ServiceRole: !GetAtt STARKCodeBuildServiceRole.Arn
+            Source:
+                Type: CODEPIPELINE
+    STARKCICDPipeline:
+        Type: AWS::CodePipeline::Pipeline
         Properties:
-            Events:
-                ParserPostEvent:
-                    Type: HttpApi
-                    Properties:
-                        Path: /deploy
-                        Method: POST
-                        ApiId:
-                            Ref: STARKParserApi
-            Runtime: python3.9
-            Handler: main.lambda_handler
-            CodeUri: lambda/STARK_Deploy
-            Environment:
-                Variables:
-                    STARK_ENVIRONMENT_TYPE: PROD
-                    CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
-            Policies:
-                - AWSLambda_FullAccess
-                - AWSCloudFormationFullAccess
-                - IAMFullAccess
-                - AmazonS3ReadOnlyAccess
-            Layers:
-                - !Ref PyYamlLayer
-                - !Ref STARKFriendlyToSystemNamesLayer
-            Timeout: 600
-            Architectures:
-                - arm64
-    STARKDeployCheckFunc:
-        Type: AWS::Serverless::Function
-        Properties:
-            Events:
-                ParserPostEvent:
-                    Type: HttpApi
-                    Properties:
-                        Path: /deploy_check
-                        Method: POST
-                        ApiId:
-                            Ref: STARKParserApi
-            Runtime: python3.9
-            Handler: main.lambda_handler
-            CodeUri: lambda/STARK_Deploy_Check
-            Environment:
-                Variables:
-                    STARK_ENVIRONMENT_TYPE: PROD
-            Policies:
-                - AWSLambda_FullAccess
-                - AWSCloudFormationFullAccess
-                - AmazonS3ReadOnlyAccess
-            Layers:
-                - !Ref PyYamlLayer
-                - !Ref STARKFriendlyToSystemNamesLayer
-            Timeout: 600
-            Architectures:
-                - arm64
-    STARKCodeGenStaticWriter:
-        Type: AWS::Serverless::Function
-        Properties:
-            Runtime: python3.9
-            Handler: main.lambda_handler
-            CodeUri: lambda/STARK_CodeGen_Static
-            Environment:
-                Variables:
-                    STARK_ENVIRONMENT_TYPE: PROD
-                    CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
-            Policies:
-                - AmazonS3FullAccess
-                - AWSLambdaBasicExecutionRole
-                - ReadOnlyAccess
-                - AWSCodeCommitFullAccess
-            Layers:
-                - !Ref CFCustomResourceHelperLayer
-                - !Ref PyYamlLayer
-                - !Ref STARKFriendlyToSystemNamesLayer
-            Timeout: 60
-            Architectures:
-                - arm64
-    STARKCodeGenDynamicWriter:
-        Type: AWS::Serverless::Function
-        Properties:
-            Runtime: python3.9
-            Handler: main.lambda_handler
-            CodeUri: lambda/STARK_CodeGen_Dynamic
-            Environment:
-                Variables:
-                    STARK_ENVIRONMENT_TYPE: PROD
-                    CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
-            Policies:
-                - AmazonS3FullAccess
-                - AWSLambda_FullAccess 
-                - AWSCodeCommitFullAccess
-            Layers:
-                - !Ref CFCustomResourceHelperLayer
-                - !Ref PyYamlLayer
-                - !Ref STARKFriendlyToSystemNamesLayer
-            Timeout: 60
-            Architectures:
-                - arm64
-    STARKBucketCleanerFunc:
-        Type: AWS::Serverless::Function
-        Properties:
-            Runtime: python3.9
-            Handler: main.lambda_handler
-            CodeUri: lambda/STARK_WebsiteBucketCleaner
-            Environment:
-                Variables:
-                    STARK_ENVIRONMENT_TYPE: PROD
-            Policies:
-                - AmazonS3FullAccess
-                - AWSLambdaBasicExecutionRole
-            Layers:
-                - !Ref CFCustomResourceHelperLayer
-            Timeout: 60
-            Architectures:
-                - arm64
-    STARKSystemBootstrap:
-        Type: AWS::Serverless::Function
-        Properties:
-            Runtime: python3.9
-            Handler: main.lambda_handler
-            CodeUri: lambda/STARK_SystemBootstrap
-            Environment:
-                Variables:
-                    STARK_ENVIRONMENT_TYPE: PROD
-                    CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
-            Policies:
-                - AmazonS3FullAccess
-                - AWSLambdaBasicExecutionRole
-                - AWSCodeCommitFullAccess
-            Layers:
-                - !Ref CFCustomResourceHelperLayer
-                - !Ref PyYamlLayer
-                - !Ref STARKFriendlyToSystemNamesLayer
-            Timeout: 60
-            Architectures:
-                - arm64
-    STARKSystemPreLaunch:
-        Type: AWS::Serverless::Function
-        Properties:
-            Runtime: python3.9
-            Handler: main.lambda_handler
-            CodeUri: lambda/STARK_SystemPreLaunch
-            Environment:
-                Variables:
-                    STARK_ENVIRONMENT_TYPE: PROD
-                    CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
-            Policies:
-                - AWSLambdaBasicExecutionRole
-                - AWSCodeCommitFullAccess
-                - AmazonDynamoDBFullAccess
-            Layers:
-                - !Ref CFCustomResourceHelperLayer
-                - !Ref PyYamlLayer
-                - !Ref STARKFriendlyToSystemNamesLayer
-                - !Ref STARKScryptLayer
-            Architectures:
-                - arm64
-            MemorySize: 1760
-            Timeout: 60
-    STARKWebsiteUpdaterFunc:
-        Type: AWS::Serverless::Function
-        Properties:
-            Runtime: python3.9
-            Handler: main.lambda_handler
-            CodeUri: lambda/STARK_WebsiteUpdater
-            Environment:
-                Variables:
-                    STARK_ENVIRONMENT_TYPE: PROD
-                    CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
-                    WEBSITE_BUCKET_NAME: !Ref UserWebsiteBucketNameParameter
-                    API_GATEWAY_ID: !Ref STARKParserApi
-            Policies:
-                - AmazonS3FullAccess
-                - AWSLambdaBasicExecutionRole
-                - ReadOnlyAccess
-            Layers:
-                - !Ref CFCustomResourceHelperLayer
-            Timeout: 60
-            Architectures:
-                - arm64
-    STARKWebsiteUpdaterRun:
-        Type: AWS::CloudFormation::CustomResource
-        Properties:
-            ServiceToken: !GetAtt STARKWebsiteUpdaterFunc.Arn
-            ApiGatewayId: !Ref STARKParserApi
-            UpdateToken: RandomTokenFromBuildScript
-            Remarks: This will update STARK_settings.js with the appropriate API Gateway ID
-        DependsOn:
-            -   STARKParserApi
-            -   STARKWebsiteUpdaterFunc
-    STARKConfigWriterFunc:
-        Type: AWS::Serverless::Function
-        Properties:
-            Runtime: python3.9
-            Handler: main.lambda_handler
-            CodeUri: lambda/STARK_ConfigWriter
-            Environment:
-                Variables:
-                    STARK_ENVIRONMENT_TYPE: PROD
-                    CODEGEN_BUCKET_NAME: !Ref UserCodeGenBucketNameParameter
-                    CICD_BUCKET_NAME: !Ref UserCICDPipelineBucketNameParameter
-                    API_GATEWAY_ID: !Ref STARKParserApi
-                    CLEANER_ARN: !GetAtt STARKBucketCleanerFunc.Arn
-                    CF_WRITER_ARN: !GetAtt STARKCFWriterFunc.Arn
-                    CG_DYNAMIC_ARN: !GetAtt STARKCodeGenDynamicWriter.Arn
-                    CG_STATIC_ARN: !GetAtt STARKCodeGenStaticWriter.Arn
-                    CF_DEPLOY_ROLE_ARN: !GetAtt STARKCloudFormationDeployServiceRole.Arn
-                    SYSTEM_BOOTSTRAP_ARN: !GetAtt STARKSystemBootstrap.Arn
-                    SYSTEM_PRELAUNCH_ARN: !GetAtt STARKSystemPreLaunch.Arn
-            Policies:
-                - AmazonS3FullAccess
-                - AWSLambdaBasicExecutionRole
-            Layers:
-                - !Ref CFCustomResourceHelperLayer
-            Timeout: 60
-            Architectures:
-                - arm64
-    STARKConfigWriterRun:
-        Type: AWS::CloudFormation::CustomResource
-        Properties:
-            ServiceToken: !GetAtt STARKConfigWriterFunc.Arn
-            UpdateToken: RandomTokenFromBuildScript
-            Remarks: This will update STARK_settings.js with the appropriate API Gateway ID
-        DependsOn:
-            -   STARKConfigWriterFunc
+            Name: !Join [ "", ["STARK_Infra_pipeline_",!Ref GeneratedServicesNameParameter] ]
+            ArtifactStore: 
+                Type: S3
+                Location: !Ref UserCICDPipelineBucketNameParameter
+            RoleArn: !GetAtt STARKCodePipelineServiceRole.Arn
+            Stages:
+                -
+                    Name: Source
+                    Actions:
+                        -
+                            Name: SourceAction
+                            RunOrder: 1
+                            ActionTypeId:
+                                Category: Source
+                                Owner: AWS
+                                Provider: CodeCommit
+                                Version: '1'
+                            Configuration:
+                                RepositoryName: !Ref ExistingCodeCommitRepoParameter
+                                PollForSourceChanges: 'true'
+                                BranchName: master
+                            InputArtifacts: []
+                            OutputArtifacts:
+                                - Name: SourceArtifact
+                -
+                    Name: Build
+                    Actions:
+                        -
+                            Name: BuildAction
+                            RunOrder: 2
+                            ActionTypeId:
+                                Category: Build
+                                Owner: AWS
+                                Provider: CodeBuild
+                                Version: '1'
+                            Configuration:
+                                ProjectName: !Ref STARKBuildProject
+                            InputArtifacts:
+                                - Name: SourceArtifact
+                            OutputArtifacts:
+                                - Name: BuildArtifact
+                -
+                    Name: Deploy
+                    Actions:
+                        -
+                            Name: ChangeSetReplace
+                            RunOrder: 3
+                            ActionTypeId:
+                                Category: Deploy
+                                Owner: AWS
+                                Provider: CloudFormation
+                                Version: '1'
+                            Configuration:
+                                ActionMode: CHANGE_SET_REPLACE
+                                StackName: !Join [ "", ["stark-cicd-pipeline-", !Ref GeneratedServicesNameParameter] ]
+                                Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
+                                ChangeSetName: !Join [ "", ["stark-cicd-pipeline-changeset-", !Ref GeneratedServicesNameParameter] ]
+                                TemplatePath: "BuildArtifact::outputtemplate.yml"
+                                TemplateConfiguration: "BuildArtifact::template_configuration.json"
+                                RoleArn: !GetAtt STARKCodePipelineDeployServiceRole.Arn
+                            InputArtifacts:
+                                - Name: BuildArtifact
+                            OutputArtifacts: []
+                        -
+                            Name: ExecuteChangeSet
+                            RunOrder: 4
+                            ActionTypeId:
+                                Category: Deploy
+                                Owner: AWS
+                                Provider: CloudFormation
+                                Version: '1'
+                            Configuration:
+                                ActionMode: CHANGE_SET_EXECUTE
+                                StackName: !Join [ "", ["stark-cicd-pipeline-", !Ref GeneratedServicesNameParameter] ]
+                                Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
+                                ChangeSetName: !Join [ "", ["stark-cicd-pipeline-changeset-", !Ref GeneratedServicesNameParameter] ]
+                            InputArtifacts:
+                                - Name: BuildArtifact
+                            OutputArtifacts: []
