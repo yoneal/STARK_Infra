@@ -73,7 +73,7 @@ def create_handler(event, context):
 
         #Step 2: Add source code to our commit list to the project repo
         files_to_commit.append({
-            'filePath': f"lambda/{entity_varname}/main.py",
+            'filePath': f"lambda/{entity_varname}/{entity_varname}.py",
             'fileContent': source_code.encode()
         })
 
@@ -82,7 +82,7 @@ def create_handler(event, context):
     #Create our Lambda for the /sys_modules API endpoint
     source_code, yaml_code = cg_mod.create({"Entities": entities})
     files_to_commit.append({
-        'filePath': f"lambda/sys_modules/main.py",
+        'filePath': f"lambda/sys_modules/sys_modules.py",
         'fileContent': source_code.encode()
     })
     files_to_commit.append({
@@ -94,7 +94,7 @@ def create_handler(event, context):
     #Create our Lambda for the /login and /logout API endpoints
     source_code, stark_scrypt = cg_login.create({"DynamoDB Name": ddb_table_name})    
     files_to_commit.append({
-        'filePath': f"lambda/login/main.py",
+        'filePath': f"lambda/login/login.py",
         'fileContent': source_code.encode()
     })
     files_to_commit.append({
@@ -105,7 +105,7 @@ def create_handler(event, context):
 
     source_code = cg_logout.create({"DynamoDB Name": ddb_table_name})
     files_to_commit.append({
-        'filePath': f"lambda/logout/main.py",
+        'filePath': f"lambda/logout/logout.py",
         'fileContent': source_code.encode()
     })
 
@@ -113,7 +113,7 @@ def create_handler(event, context):
     #Create our Lambda Authorizer for our API Gateway
     source_code = cg_auth.create({"DynamoDB Name": ddb_table_name})
     files_to_commit.append({
-        'filePath': f"lambda/authorizer_default/main.py",
+        'filePath': f"lambda/authorizer_default/authorizer_default.py",
         'fileContent': source_code.encode()
     })
 
@@ -131,6 +131,21 @@ def create_handler(event, context):
                     'filePath': f"lambda/{lambda_dir}/{source_file}",
                     'fileContent': source_code.encode()
                 })
+        #Dependencies: We don't have transparent dependency management here using cloud_resources.yml, 
+        #so the code gen needs to do it manually
+        if lambda_dir == "STARK_User":
+            #STARK_User needs STARK_User_Permissions and STARK_User_Roles
+            dependencies = ["STARK_User_Permissions", "STARK_User_Roles"]
+            for dependency_dir in dependencies:
+                source_files = os.listdir(dir + os.sep + dependency_dir)
+                for source_file in source_files:
+                    with open(dir + os.sep + dependency_dir + os.sep + source_file) as f:
+                        source_code = f.read().replace("[[STARK_DDB_TABLE_NAME]]", ddb_table_name)
+                        files_to_commit.append({
+                            'filePath': f"lambda/{lambda_dir}/{dependency_dir}/{source_file}",
+                            'fileContent': source_code.encode()
+                        })
+
 
 
     ############################################

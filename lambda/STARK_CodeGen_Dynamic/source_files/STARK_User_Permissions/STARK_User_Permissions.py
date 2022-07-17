@@ -1,5 +1,6 @@
 #Python Standard Library
 import base64
+from email.policy import default
 import json
 from urllib.parse import unquote
 
@@ -11,8 +12,9 @@ ddb = boto3.client('dynamodb')
 #######
 #CONFIG
 ddb_table   = "[[STARK_DDB_TABLE_NAME]]"
-default_sk  = "STARK|role"
-sort_fields = ["Role_Name", ]
+pk_field    = "Username"
+default_sk  = "STARK|user|permissions"
+sort_fields = ["Username", ]
 page_limit  = 10
 
 def lambda_handler(event, context):
@@ -28,9 +30,9 @@ def lambda_handler(event, context):
         method  = event.get('requestContext').get('http').get('method')
 
         if event.get('isBase64Encoded') == True :
-            payload = json.loads(base64.b64decode(event.get('body'))).get('STARK_User_Roles',"")
+            payload = json.loads(base64.b64decode(event.get('body'))).get('STARK_User_Permissions',"")
         else:    
-            payload = json.loads(event.get('body')).get('STARK_User_Roles',"")
+            payload = json.loads(event.get('body')).get('STARK_User_Permissions',"")
 
         data    = {}
 
@@ -44,12 +46,11 @@ def lambda_handler(event, context):
                 }
             }
         else:
-            data['pk'] = payload.get('Role_Name')
-            data['orig_pk'] = payload.get('orig_Role_Name','')
+            data['pk'] = payload.get('Username')
+            data['orig_pk'] = payload.get('orig_Username','')
             data['sk'] = payload.get('sk', '')
             if data['sk'] == "":
                 data['sk'] = default_sk
-            data['Description'] = payload.get('Description','')
             data['Permissions'] = payload.get('Permissions','')
         ListView_index_values = []
         for field in sort_fields:
@@ -104,7 +105,7 @@ def lambda_handler(event, context):
 
         elif request_type == "detail":
 
-            pk = event.get('queryStringParameters').get('Role_Name','')
+            pk = event.get('queryStringParameters').get('Username','')
             sk = event.get('queryStringParameters').get('sk','')
             if sk == "":
                 sk = default_sk
@@ -129,7 +130,7 @@ def lambda_handler(event, context):
         }
     }
 
-def report(sk):
+def report(sk=default_sk):
     #FIXME: THIS IS A STUB, WILL NEED TO BE UPDATED WITH
     #   ENHANCED LISTVIEW LOGIC LATER WHEN WE ACTUALLY IMPLEMENT REPORTING
 
@@ -151,15 +152,14 @@ def report(sk):
     items = []
     for record in raw:
         item = {}
-        item['Role_Name'] = record.get('pk', {}).get('S','')
+        item['Username'] = record.get('pk', {}).get('S','')
         item['sk'] = record.get('sk',{}).get('S','')
-        item['Description'] = record.get('Description',{}).get('S','')
         item['Permissions'] = record.get('Permissions',{}).get('S','')
         items.append(item)
 
     return items
 
-def get_all(sk, lv_token=None):
+def get_all(sk=default_sk, lv_token=None):
 
     if lv_token == None:
         response = ddb.query(
@@ -194,9 +194,8 @@ def get_all(sk, lv_token=None):
     items = []
     for record in raw:
         item = {}
-        item['Role_Name'] = record.get('pk', {}).get('S','')
+        item['Username'] = record.get('pk', {}).get('S','')
         item['sk'] = record.get('sk',{}).get('S','')
-        item['Description'] = record.get('Description',{}).get('S','')
         item['Permissions'] = record.get('Permissions',{}).get('S','')
         items.append(item)
 
@@ -205,7 +204,7 @@ def get_all(sk, lv_token=None):
 
     return items, next_token
 
-def get_by_pk(pk, sk):
+def get_by_pk(pk, sk=default_sk):
     response = ddb.query(
         TableName=ddb_table,
         Select='ALL_ATTRIBUTES',
@@ -226,9 +225,8 @@ def get_by_pk(pk, sk):
     items = []
     for record in raw:
         item = {}
-        item['Role_Name'] = record.get('pk', {}).get('S','')
+        item['Username'] = record.get('pk', {}).get('S','')
         item['sk'] = record.get('sk',{}).get('S','')
-        item['Description'] = record.get('Description',{}).get('S','')
         item['Permissions'] = record.get('Permissions',{}).get('S','')
         items.append(item)
     #FIXME: Mapping is duplicated code, make this DRY
@@ -238,6 +236,7 @@ def get_by_pk(pk, sk):
 def delete(data):
     pk = data.get('pk','')
     sk = data.get('sk','')
+    if sk == '': sk = default_sk
 
     response = ddb.delete_item(
         TableName=ddb_table,
@@ -252,24 +251,24 @@ def delete(data):
 def edit(data):                
     pk = data.get('pk', '')
     sk = data.get('sk', '')
-    Description = str(data.get('Description', ''))
+    if sk == '': sk = default_sk
     Permissions = str(data.get('Permissions', ''))
 
-    UpdateExpressionString = "SET #Description = :Description, #Permissions = :Permissions" 
+    UpdateExpressionString = "SET #Permissions = :Permissions" 
     ExpressionAttributeNamesDict = {
-        '#Description' : 'Description',
         '#Permissions' : 'Permissions',
     }
     ExpressionAttributeValuesDict = {
-        ':Description' : {'S' : Description },
         ':Permissions' : {'S' : Permissions },
     }
 
-    #If STARK-ListView-sk is part of the data payload, it should be added to the update expression
-    if data.get('STARK-ListView-sk','') != '':
-        UpdateExpressionString += ", #STARKListViewsk = :STARKListViewsk"
-        ExpressionAttributeNamesDict['#STARKListViewsk']  = 'STARK-ListView-sk'
-        ExpressionAttributeValuesDict[':STARKListViewsk'] = {'S' : data['STARK-ListView-sk']}
+    STARK_ListView_sk = data.get('STARK-ListView-sk','')
+    if STARK_ListView_sk == '':
+        STARK_ListView_sk = create_listview_index_value(data)
+
+    UpdateExpressionString += ", #STARKListViewsk = :STARKListViewsk"
+    ExpressionAttributeNamesDict['#STARKListViewsk']  = 'STARK-ListView-sk'
+    ExpressionAttributeValuesDict[':STARKListViewsk'] = {'S' : data['STARK-ListView-sk']}
 
     response = ddb.update_item(
         TableName=ddb_table,
@@ -287,16 +286,17 @@ def edit(data):
 def add(data):
     pk = data.get('pk', '')
     sk = data.get('sk', '')
-    Description = str(data.get('Description', ''))
+    if sk == '': sk = default_sk
     Permissions = str(data.get('Permissions', ''))
 
     item={}
     item['pk'] = {'S' : pk}
     item['sk'] = {'S' : sk}
-    item['Description'] = {'S' : Description}
     item['Permissions'] = {'S' : Permissions}
 
-    if data.get('STARK-ListView-sk','') != '':
+    if data.get('STARK-ListView-sk','') == '':
+        item['STARK-ListView-sk'] = {'S' : create_listview_index_value(data)}
+    else:
         item['STARK-ListView-sk'] = {'S' : data['STARK-ListView-sk']}
 
     response = ddb.put_item(
@@ -305,3 +305,41 @@ def add(data):
     )
 
     return "OK"
+
+def compose_operators(key, data):
+    composed_filter_dict = {"filter_string":"","expression_values": {}}
+    if data['operator'] == "IN":
+        string_split = data['value'].split(',')
+        composed_filter_dict['filter_string'] += f" {key} IN "
+        temp_in_string = ""
+        in_string = ""
+        in_counter = 1
+        for in_index in string_split:
+            in_string += f" :inParam{in_counter}, "
+            composed_filter_dict['expression_values'][f":inParam{in_counter}"] = {data['type'] : in_index.strip()}
+            in_counter += 1
+        temp_in_string = in_string[1:-2]
+        composed_filter_dict['filter_string'] += f"({temp_in_string}) AND"
+    elif data['operator'] in [ "contains", "begins_with" ]:
+        composed_filter_dict['filter_string'] += f" {data['operator']}({key}, :{key}) AND"
+        composed_filter_dict['expression_values'][f":{key}"] = {data['type'] : data['value'].strip()}
+    elif data['operator'] == "between":
+        from_to_split = data['value'].split(',')
+        composed_filter_dict['filter_string'] += f" ({key} BETWEEN :from{key} AND :to{key}) AND"
+        composed_filter_dict['expression_values'][f":from{key}"] = {data['type'] : from_to_split[0].strip()}
+        composed_filter_dict['expression_values'][f":to{key}"] = {data['type'] : from_to_split[1].strip()}
+    else:
+        composed_filter_dict['filter_string'] += f" {key} {data['operator']} :{key} AND"
+        composed_filter_dict['expression_values'][f":{key}"] = {data['type'] : data['value'].strip()}
+
+    return composed_filter_dict
+
+def create_listview_index_value(data):
+    ListView_index_values = []
+    for field in sort_fields:
+        if field == pk_field:
+            ListView_index_values.append(data['pk'])
+        else:
+            ListView_index_values.append(data.get(field))
+    STARK_ListView_sk = "|".join(ListView_index_values)
+    return STARK_ListView_sk

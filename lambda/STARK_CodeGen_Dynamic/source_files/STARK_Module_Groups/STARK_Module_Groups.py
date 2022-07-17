@@ -5,15 +5,15 @@ from urllib.parse import unquote
 
 #Extra modules
 import boto3
-import stark_scrypt as scrypt
 
 ddb = boto3.client('dynamodb')
 
 #######
 #CONFIG
 ddb_table   = "[[STARK_DDB_TABLE_NAME]]"
-default_sk  = "STARK|user|info"
-sort_fields = ["Username", ]
+pk_field    = "Group_Name"
+default_sk  = "STARK|module_group"
+sort_fields = ["Group_Name", ]
 page_limit  = 10
 
 def lambda_handler(event, context):
@@ -29,9 +29,9 @@ def lambda_handler(event, context):
         method  = event.get('requestContext').get('http').get('method')
 
         if event.get('isBase64Encoded') == True :
-            payload = json.loads(base64.b64decode(event.get('body'))).get('STARK_User',"")
+            payload = json.loads(base64.b64decode(event.get('body'))).get('STARK_Module_Groups',"")
         else:    
-            payload = json.loads(event.get('body')).get('STARK_User',"")
+            payload = json.loads(event.get('body')).get('STARK_Module_Groups',"")
 
         data    = {}
 
@@ -45,15 +45,14 @@ def lambda_handler(event, context):
                 }
             }
         else:
-            data['pk'] = payload.get('Username')
-            data['orig_pk'] = payload.get('orig_Username','')
+            data['pk'] = payload.get('Group_Name')
+            data['orig_pk'] = payload.get('orig_Group_Name','')
             data['sk'] = payload.get('sk', '')
             if data['sk'] == "":
                 data['sk'] = default_sk
-            data['Full_Name'] = payload.get('Full_Name','')
-            data['Nickname'] = payload.get('Nickname','')
-            data['Password_Hash'] = payload.get('Password_Hash','')
-            data['Role'] = payload.get('Role','')
+            data['Description'] = payload.get('Description','')
+            data['Icon'] = payload.get('Icon','')
+            data['Priority'] = payload.get('Priority','')
         ListView_index_values = []
         for field in sort_fields:
             ListView_index_values.append(payload.get(field))
@@ -107,7 +106,7 @@ def lambda_handler(event, context):
 
         elif request_type == "detail":
 
-            pk = event.get('queryStringParameters').get('Username','')
+            pk = event.get('queryStringParameters').get('Group_Name','')
             sk = event.get('queryStringParameters').get('sk','')
             if sk == "":
                 sk = default_sk
@@ -132,7 +131,7 @@ def lambda_handler(event, context):
         }
     }
 
-def report(sk):
+def report(sk=default_sk):
     #FIXME: THIS IS A STUB, WILL NEED TO BE UPDATED WITH
     #   ENHANCED LISTVIEW LOGIC LATER WHEN WE ACTUALLY IMPLEMENT REPORTING
 
@@ -154,17 +153,16 @@ def report(sk):
     items = []
     for record in raw:
         item = {}
-        item['Username'] = record.get('pk', {}).get('S','')
+        item['Group_Name'] = record.get('pk', {}).get('S','')
         item['sk'] = record.get('sk',{}).get('S','')
-        item['Full_Name'] = record.get('Full_Name',{}).get('S','')
-        item['Nickname'] = record.get('Nickname',{}).get('S','')
-        item['Password_Hash'] = record.get('Password_Hash',{}).get('S','')
-        item['Role'] = record.get('Role',{}).get('S','')
+        item['Description'] = record.get('Description',{}).get('S','')
+        item['Icon'] = record.get('Icon',{}).get('S','')
+        item['Priority'] = record.get('Priority',{}).get('N','')
         items.append(item)
 
     return items
 
-def get_all(sk, lv_token=None):
+def get_all(sk=default_sk, lv_token=None):
 
     if lv_token == None:
         response = ddb.query(
@@ -199,23 +197,19 @@ def get_all(sk, lv_token=None):
     items = []
     for record in raw:
         item = {}
-        item['Username'] = record.get('pk', {}).get('S','')
+        item['Group_Name'] = record.get('pk', {}).get('S','')
         item['sk'] = record.get('sk',{}).get('S','')
-        item['Full_Name'] = record.get('Full_Name',{}).get('S','')
-        item['Nickname'] = record.get('Nickname',{}).get('S','')
-        item['Role'] = record.get('Role',{}).get('S','')
-
+        item['Description'] = record.get('Description',{}).get('S','')
+        item['Icon'] = record.get('Icon',{}).get('S','')
+        item['Priority'] = record.get('Priority',{}).get('N','')
         items.append(item)
-    #NOTE: We explicitly left out the password hash. Since this is the generic "get all records" function, there's really no
-    #   legitimate reason to get something as sensitive as the passwordh hash. Functionality that actually has to mass list
-    #   users alongside their password hashes will have to use a function specifically made for that. Safety first.
 
     #Get the "next" token, pass to calling function. This enables a "next page" request later.
     next_token = response.get('LastEvaluatedKey')
 
     return items, next_token
 
-def get_by_pk(pk, sk):
+def get_by_pk(pk, sk=default_sk):
     response = ddb.query(
         TableName=ddb_table,
         Select='ALL_ATTRIBUTES',
@@ -232,25 +226,24 @@ def get_by_pk(pk, sk):
 
     raw = response.get('Items')
 
-    #FIXME: Mapping is duplicated code, make this DRY
     #Map to expected structure
     items = []
     for record in raw:
         item = {}
-        item['Username'] = record.get('pk', {}).get('S','')
+        item['Group_Name'] = record.get('pk', {}).get('S','')
         item['sk'] = record.get('sk',{}).get('S','')
-        item['Full_Name'] = record.get('Full_Name',{}).get('S','')
-        item['Nickname'] = record.get('Nickname',{}).get('S','')
-        item['Role'] = record.get('Role',{}).get('S','')
+        item['Description'] = record.get('Description',{}).get('S','')
+        item['Icon'] = record.get('Icon',{}).get('S','')
+        item['Priority'] = record.get('Priority',{}).get('N','')
         items.append(item)
-    #NOTE: We explicitly left out the password hash. Functionality that requires the user record along with the password hash should use 
-    #       a specialized function instead of the generic "get" function.
+    #FIXME: Mapping is duplicated code, make this DRY
 
     return items
 
 def delete(data):
     pk = data.get('pk','')
     sk = data.get('sk','')
+    if sk == '': sk = default_sk
 
     response = ddb.delete_item(
         TableName=ddb_table,
@@ -265,34 +258,30 @@ def delete(data):
 def edit(data):                
     pk = data.get('pk', '')
     sk = data.get('sk', '')
-    Full_Name = str(data.get('Full_Name', ''))
-    Nickname = str(data.get('Nickname', ''))
-    Password_Hash = str(data.get('Password_Hash', ''))
-    Role = str(data.get('Role', ''))
+    if sk == '': sk = default_sk
+    Description = str(data.get('Description', ''))
+    Icon = str(data.get('Icon', ''))
+    Priority = str(data.get('Priority', ''))
 
-    UpdateExpressionString = "SET #Full_Name = :Full_Name, #Nickname = :Nickname, #Role = :Role" 
+    UpdateExpressionString = "SET #Description = :Description, #Icon = :Icon, #Priority = :Priority" 
     ExpressionAttributeNamesDict = {
-        '#Full_Name' : 'Full_Name',
-        '#Nickname' : 'Nickname',
-        '#Role' : 'Role',
+        '#Description' : 'Description',
+        '#Icon' : 'Icon',
+        '#Priority' : 'Priority',
     }
     ExpressionAttributeValuesDict = {
-        ':Full_Name' : {'S' : Full_Name },
-        ':Nickname' : {'S' : Nickname },
-        ':Role' : {'S' : Role },
+        ':Description' : {'S' : Description },
+        ':Icon' : {'S' : Icon },
+        ':Priority' : {'N' : Priority },
     }
 
-    #If Password_Hash is not an empty string, this means it's a password reset request.
-    if Password_Hash != '':
-        UpdateExpressionString += ", #Password_Hash = :Password_Hash"
-        ExpressionAttributeNamesDict['#Password_Hash'] = 'Password_Hash'
-        ExpressionAttributeValuesDict[':Password_Hash'] = {'S': scrypt.create_hash(Password_Hash)}
+    STARK_ListView_sk = data.get('STARK-ListView-sk','')
+    if STARK_ListView_sk == '':
+        STARK_ListView_sk = create_listview_index_value(data)
 
-    #If STARK-ListView-sk is part of the data payload, it should be added to the update expression
-    if data.get('STARK-ListView-sk','') != '':
-        UpdateExpressionString += ", #STARKListViewsk = :STARKListViewsk"
-        ExpressionAttributeNamesDict['#STARKListViewsk']  = 'STARK-ListView-sk'
-        ExpressionAttributeValuesDict[':STARKListViewsk'] = {'S' : data['STARK-ListView-sk']}
+    UpdateExpressionString += ", #STARKListViewsk = :STARKListViewsk"
+    ExpressionAttributeNamesDict['#STARKListViewsk']  = 'STARK-ListView-sk'
+    ExpressionAttributeValuesDict[':STARKListViewsk'] = {'S' : data['STARK-ListView-sk']}
 
     response = ddb.update_item(
         TableName=ddb_table,
@@ -310,25 +299,63 @@ def edit(data):
 def add(data):
     pk = data.get('pk', '')
     sk = data.get('sk', '')
-    Full_Name = str(data.get('Full_Name', ''))
-    Nickname = str(data.get('Nickname', ''))
-    Password_Hash = str(data.get('Password_Hash', ''))
-    Role = str(data.get('Role', ''))
+    if sk == '': sk = default_sk
+    Description = str(data.get('Description', ''))
+    Icon = str(data.get('Icon', ''))
+    Priority = str(data.get('Priority', ''))
 
     item={}
     item['pk'] = {'S' : pk}
     item['sk'] = {'S' : sk}
-    item['Full_Name'] = {'S' : Full_Name}
-    item['Nickname'] = {'S' : Nickname}
-    item['Password_Hash'] = {'S' : scrypt.create_hash(Password_Hash)}
-    item['Role'] = {'S' : Role}
+    item['Description'] = {'S' : Description}
+    item['Icon'] = {'S' : Icon}
+    item['Priority'] = {'N' : Priority}
 
-    if data.get('STARK-ListView-sk','') != '':
+    if data.get('STARK-ListView-sk','') == '':
+        item['STARK-ListView-sk'] = {'S' : create_listview_index_value(data)}
+    else:
         item['STARK-ListView-sk'] = {'S' : data['STARK-ListView-sk']}
-
     response = ddb.put_item(
         TableName=ddb_table,
         Item=item,
     )
 
     return "OK"
+
+def compose_operators(key, data):
+    composed_filter_dict = {"filter_string":"","expression_values": {}}
+    if data['operator'] == "IN":
+        string_split = data['value'].split(',')
+        composed_filter_dict['filter_string'] += f" {key} IN "
+        temp_in_string = ""
+        in_string = ""
+        in_counter = 1
+        for in_index in string_split:
+            in_string += f" :inParam{in_counter}, "
+            composed_filter_dict['expression_values'][f":inParam{in_counter}"] = {data['type'] : in_index.strip()}
+            in_counter += 1
+        temp_in_string = in_string[1:-2]
+        composed_filter_dict['filter_string'] += f"({temp_in_string}) AND"
+    elif data['operator'] in [ "contains", "begins_with" ]:
+        composed_filter_dict['filter_string'] += f" {data['operator']}({key}, :{key}) AND"
+        composed_filter_dict['expression_values'][f":{key}"] = {data['type'] : data['value'].strip()}
+    elif data['operator'] == "between":
+        from_to_split = data['value'].split(',')
+        composed_filter_dict['filter_string'] += f" ({key} BETWEEN :from{key} AND :to{key}) AND"
+        composed_filter_dict['expression_values'][f":from{key}"] = {data['type'] : from_to_split[0].strip()}
+        composed_filter_dict['expression_values'][f":to{key}"] = {data['type'] : from_to_split[1].strip()}
+    else:
+        composed_filter_dict['filter_string'] += f" {key} {data['operator']} :{key} AND"
+        composed_filter_dict['expression_values'][f":{key}"] = {data['type'] : data['value'].strip()}
+
+    return composed_filter_dict
+
+def create_listview_index_value(data):
+    ListView_index_values = []
+    for field in sort_fields:
+        if field == pk_field:
+            ListView_index_values.append(data['pk'])
+        else:
+            ListView_index_values.append(data.get(field))
+    STARK_ListView_sk = "|".join(ListView_index_values)
+    return STARK_ListView_sk
