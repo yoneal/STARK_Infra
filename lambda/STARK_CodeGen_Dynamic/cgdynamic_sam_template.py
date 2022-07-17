@@ -331,7 +331,7 @@ def create(data, cli_mode=False):
             Type: AWS::Serverless::Function
             Properties:
                 Runtime: python3.9
-                Handler: main.lambda_handler
+                Handler: LayerMaker.lambda_handler
                 CodeUri: 
                     Bucket: {codegen_bucket_name}
                     Key: STARKLambdaFunctions/STARK_LayerMaker.zip
@@ -353,7 +353,7 @@ def create(data, cli_mode=False):
             Type: AWS::Serverless::Function
             Properties:
                 Runtime: python3.9
-                Handler: main.lambda_handler
+                Handler: authorizer_default.lambda_handler
                 CodeUri: lambda/authorizer_default
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
                 Architectures:
@@ -478,7 +478,7 @@ def create(data, cli_mode=False):
                             ApiId:
                                 Ref: STARKApiGateway
                 Runtime: python3.9
-                Handler: main.lambda_handler
+                Handler: {entity_endpoint_name}.lambda_handler
                 CodeUri: lambda/{entity_endpoint_name}
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
                 Architectures:
@@ -520,7 +520,7 @@ def create(data, cli_mode=False):
                             ApiId:
                                 Ref: STARKApiGateway
                 Runtime: python3.9
-                Handler: main.lambda_handler
+                Handler: STARK_User.lambda_handler
                 CodeUri: lambda/STARK_User
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
                 Architectures:
@@ -562,7 +562,7 @@ def create(data, cli_mode=False):
                             ApiId:
                                 Ref: STARKApiGateway
                 Runtime: python3.9
-                Handler: main.lambda_handler
+                Handler: STARK_Module.lambda_handler
                 CodeUri: lambda/STARK_Module
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
                 Architectures:
@@ -602,7 +602,7 @@ def create(data, cli_mode=False):
                             ApiId:
                                 Ref: STARKApiGateway
                 Runtime: python3.9
-                Handler: main.lambda_handler
+                Handler: STARK_User_Roles.lambda_handler
                 CodeUri: lambda/STARK_User_Roles
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
                 Architectures:
@@ -642,7 +642,7 @@ def create(data, cli_mode=False):
                             ApiId:
                                 Ref: STARKApiGateway
                 Runtime: python3.9
-                Handler: main.lambda_handler
+                Handler: STARK_User_Permissions.lambda_handler
                 CodeUri: lambda/STARK_User_Permissions
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
                 Architectures:
@@ -682,7 +682,7 @@ def create(data, cli_mode=False):
                             ApiId:
                                 Ref: STARKApiGateway
                 Runtime: python3.9
-                Handler: main.lambda_handler
+                Handler: STARK_User_Sessions.lambda_handler
                 CodeUri: lambda/STARK_User_Sessions
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
                 Architectures:
@@ -722,7 +722,7 @@ def create(data, cli_mode=False):
                             ApiId:
                                 Ref: STARKApiGateway
                 Runtime: python3.9
-                Handler: main.lambda_handler
+                Handler: STARK_Module_Groups.lambda_handler
                 CodeUri: lambda/STARK_Module_Groups
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
                 Architectures:
@@ -741,7 +741,7 @@ def create(data, cli_mode=False):
                             ApiId:
                                 Ref: STARKApiGateway
                 Runtime: python3.9
-                Handler: main.lambda_handler
+                Handler: sys_modules.lambda_handler
                 CodeUri: lambda/sys_modules
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
                 Architectures:
@@ -764,7 +764,7 @@ def create(data, cli_mode=False):
                             Auth:
                                 Authorizer: NONE
                 Runtime: python3.9
-                Handler: main.lambda_handler
+                Handler: login.lambda_handler
                 CodeUri: lambda/login
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
                 Layers:
@@ -785,7 +785,7 @@ def create(data, cli_mode=False):
                             ApiId:
                                 Ref: STARKApiGateway
                 Runtime: python3.9
-                Handler: main.lambda_handler
+                Handler: logout.lambda_handler
                 CodeUri: lambda/logout
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
                 Architectures:
