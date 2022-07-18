@@ -14,6 +14,7 @@ def create(data):
     entity         = data["Entity"]
     columns        = data["Columns"]
     ddb_table_name = data["DynamoDB Name"]
+    bucket_name    = data['Bucket Name']
 
     #Convert human-friendly names to variable-friendly names
     entity_varname = converter.convert_to_system_name(entity)
@@ -62,8 +63,13 @@ def create(data):
 
     #Extra modules
     import boto3
+    import csv
+    import uuid
+    from io import StringIO
+    import os
 
     ddb = boto3.client('dynamodb')
+    s3 = boto3.client("s3")
 
     #######
     #CONFIG
@@ -71,6 +77,8 @@ def create(data):
     pk_field    = "{pk_varname}"
     default_sk  = "{default_sk}"
     sort_fields = ["{pk_varname}", ]
+    bucket_name = "{bucket_name}"
+    region_name = os.environ['AWS_REGION']
     page_limit  = 10
 
     def lambda_handler(event, context):
@@ -231,25 +239,12 @@ def create(data):
 
         #Map to expected structure
         #FIXME: this is duplicated code, make this DRY by outsourcing the mapping to a different function.
-        items = []
-        for record in raw:
-            item = {{}}
-            item['{pk_varname}'] = record.get('pk', {{}}).get('S','')
-            item['sk'] = record.get('sk',{{}}).get('S','')"""
-    for col, col_type in columns.items():
-        col_varname = converter.convert_to_system_name(col)
-        col_type_id = set_type(col_type)
-
-        source_code +=f"""
-            item['{col_varname}'] = record.get('{col_varname}',{{}}).get('{col_type_id}','')"""
-
-    source_code += f"""
-            items.append(item)
-
+        items = map_results(raw)
+        csv_filename = generate_csv(items)
         #Get the "next" token, pass to calling function. This enables a "next page" request later.
         next_token = response.get('LastEvaluatedKey')
 
-        return items, next_token
+        return items, next_token, csv_filename
 
     def get_all(sk=default_sk, lv_token=None):
 
@@ -283,20 +278,7 @@ def create(data):
 
         #Map to expected structure
         #FIXME: this is duplicated code, make this DRY by outsourcing the mapping to a different function.
-        items = []
-        for record in raw:
-            item = {{}}
-            item['{pk_varname}'] = record.get('pk', {{}}).get('S','')
-            item['sk'] = record.get('sk',{{}}).get('S','')"""
-    for col, col_type in columns.items():
-        col_varname = converter.convert_to_system_name(col)
-        col_type_id = set_type(col_type)
-
-        source_code +=f"""
-            item['{col_varname}'] = record.get('{col_varname}',{{}}).get('{col_type_id}','')"""
-
-    source_code += f"""
-            items.append(item)
+        items = map_results(raw)
 
         #Get the "next" token, pass to calling function. This enables a "next page" request later.
         next_token = response.get('LastEvaluatedKey')
@@ -321,21 +303,7 @@ def create(data):
         raw = response.get('Items')
 
         #Map to expected structure
-        items = []
-        for record in raw:
-            item = {{}}
-            item['{pk_varname}'] = record.get('pk', {{}}).get('S','')
-            item['sk'] = record.get('sk',{{}}).get('S','')"""
-    for col, col_type in columns.items():
-        col_varname = converter.convert_to_system_name(col)
-        col_type_id = set_type(col_type)
-
-        source_code +=f"""
-            item['{col_varname}'] = record.get('{col_varname}',{{}}).get('{col_type_id}','')"""
-
-    source_code += f"""
-            items.append(item)
-        #FIXME: Mapping is duplicated code, make this DRY
+        items = map_results(raw)
 
         return items
 
@@ -460,7 +428,46 @@ def create(data):
                 ListView_index_values.append(data.get(field))
         STARK_ListView_sk = "|".join(ListView_index_values)
         return STARK_ListView_sk
+    
+    def map_results(raw_response):
+        items = []
+        for record in raw_response:
+            item = {{}}
+            item['{pk_varname}'] = record.get('pk', {{}}).get('S','')
+            item['sk'] = record.get('sk',{{}}).get('S','')"""
+    for col, col_type in columns.items():
+        col_varname = converter.convert_to_system_name(col)
+        col_type_id = set_type(col_type)
 
+        source_code +=f"""
+            item['{col_varname}'] = record.get('{col_varname}',{{}}).get('{col_type_id}','')"""
+
+    source_code += f"""
+            items.append(item)
+        return items
+
+    def generate_csv(mapped_results = []): 
+        csv_header = ['{pk_varname}', """
+    for col in columns:
+        col_varname = converter.convert_to_system_name(col)
+        source_code += f"'{col_varname}', "    
+    source_code += f"""]
+
+        file_buff = StringIO()
+        writer = csv.DictWriter(file_buff, fieldnames=csv_header)
+        writer.writeheader()
+        for rows in mapped_results:
+            rows.pop("sk")
+            writer.writerow(rows)
+        filename = f"{{str(uuid.uuid4())}}.csv"
+        test = s3.put_object(
+            ACL='public-read',
+            Body= file_buff.getvalue(),
+            Bucket=bucket_name,
+            Key='tmp/'+filename
+        )
+        
+        return bucket_name+".s3."+ region_name + ".amazonaws.com/tmp/" +filename    
     """
 
     return textwrap.dedent(source_code)

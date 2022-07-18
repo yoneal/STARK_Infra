@@ -67,8 +67,9 @@ def create_handler(event, context):
             "Entity": entity, 
             "Columns": models[entity]["data"], 
             "PK": models[entity]["pk"], 
-            "DynamoDB Name": ddb_table_name
-        }
+            "DynamoDB Name": ddb_table_name,
+            "Bucket Name": website_bucket
+            }
         source_code = cg_ddb.create(data)
 
         #Step 2: Add source code to our commit list to the project repo

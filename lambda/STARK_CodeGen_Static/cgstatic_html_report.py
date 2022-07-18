@@ -101,8 +101,10 @@ def create(data):
     source_code += f"""
             <div class="container" v-if="showReport">
                 <div class="row">
-                    <div class="col-6 text-left d-inline-block">        
-                        <button id="prev" type="button" class="btn btn-outline-secondary" onClick="root.showReport = false"> BACK </button>
+                    <div class="col-6 text-left d-inline-block">
+                        <button id="prev" type="button" class="btn btn-secondary mb-2" onClick="root.showReport = false"> Back </button>
+                        <button type="button" class="btn btn-primary mb-2" onClick="root.download_csv()"> Export as CSV</button>
+                        <button id="refresh" type="button" class="btn btn-success mb-2"> Refresh </button>
                     </div>
                     <div class="col-6">
                     </div>

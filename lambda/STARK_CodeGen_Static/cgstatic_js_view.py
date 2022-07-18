@@ -97,7 +97,8 @@ def create(data):
                 prev_disabled: true,
                 page_token_map: {{1: ''}},
                 curr_page: 1,
-                showReport: false
+                showReport: false,
+                temp_csv_link: ""
 
             }},
             methods: {{
@@ -280,6 +281,7 @@ def create(data):
         
                     {entity_app}.report(report_payload).then( function(data) {{
                         root.listview_table = data[0];
+                        root.temp_csv_link = data[2]
                         console.log("DONE! Retrieved report.");
                         loading_modal.hide()
         
@@ -288,6 +290,10 @@ def create(data):
                         console.log("Encountered an error! [" + error + "]")
                         loading_modal.hide()
                     }});
+                }},
+                download_csv() {{
+                    let link = "https://" + root.temp_csv_link
+                    window.location.href = link
                 }},
                 checkUncheck: function (checked) {{
                     arrCheckBoxes = document.getElementsByName('check_checkbox');
