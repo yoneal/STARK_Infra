@@ -121,8 +121,8 @@
     Module_Group: "System Administration"
     Is_Menu_Item: "Y"
     Is_Enabled: "Y"
-    Icon: "STARK_Module_Groups graphic"
-    Image_Alt: "STARK_User graphic"
+    Icon: "images/stark_module_groups.svg"
+    Image_Alt: "STARK_Module_Groups graphic"
     Priority: "0"
 "Module Groups|Add":
     sk: "STARK|module"
@@ -178,8 +178,8 @@
     Module_Group: "System Administration"
     Is_Menu_Item: "Y"
     Is_Enabled: "Y"
-    Icon: "STARK_User_Roles graphic"
-    Image_Alt: "STARK_User graphic"
+    Icon: "images/stark_user_roles.svg"
+    Image_Alt: "STARK_User_Roles graphic"
     Priority: "0"
 "User Roles|Add":
     sk: "STARK|module"
@@ -235,8 +235,8 @@
     Module_Group: "System Administration"
     Is_Menu_Item: "Y"
     Is_Enabled: "Y"
-    Icon: "STARK_User_Permissions graphic"
-    Image_Alt: "STARK_User graphic"
+    Icon: "images/stark_user_permissions.svg"
+    Image_Alt: "STARK_User_Permissions graphic"
     Priority: "0"
 "User Permissions|Add":
     sk: "STARK|module"
@@ -292,8 +292,8 @@
     Module_Group: "System Administration"
     Is_Menu_Item: "Y"
     Is_Enabled: "Y"
-    Icon: "STARK_User_Sessions graphic"
-    Image_Alt: "STARK_User graphic"
+    Icon: "images/stark_user_sessions.svg"
+    Image_Alt: "STARK_User_Sessions graphic"
     Priority: "0"
 "User Sessions|Add":
     sk: "STARK|module"
