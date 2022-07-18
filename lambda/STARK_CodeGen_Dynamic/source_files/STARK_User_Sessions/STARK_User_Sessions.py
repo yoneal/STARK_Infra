@@ -11,6 +11,7 @@ ddb = boto3.client('dynamodb')
 #######
 #CONFIG
 ddb_table   = "[[STARK_DDB_TABLE_NAME]]"
+pk_field    = "Session_ID"
 default_sk  = "STARK|session"
 sort_fields = ["Session_ID", ]
 page_limit  = 10
@@ -131,7 +132,7 @@ def lambda_handler(event, context):
         }
     }
 
-def report(sk):
+def report(sk=default_sk):
     #FIXME: THIS IS A STUB, WILL NEED TO BE UPDATED WITH
     #   ENHANCED LISTVIEW LOGIC LATER WHEN WE ACTUALLY IMPLEMENT REPORTING
 
@@ -163,7 +164,7 @@ def report(sk):
 
     return items
 
-def get_all(sk, lv_token=None):
+def get_all(sk=default_sk, lv_token=None):
 
     if lv_token == None:
         response = ddb.query(
@@ -213,7 +214,7 @@ def get_all(sk, lv_token=None):
 
     return items, next_token
 
-def get_by_pk(pk, sk):
+def get_by_pk(pk, sk=default_sk):
     response = ddb.query(
         TableName=ddb_table,
         Select='ALL_ATTRIBUTES',
@@ -249,6 +250,7 @@ def get_by_pk(pk, sk):
 def delete(data):
     pk = data.get('pk','')
     sk = data.get('sk','')
+    if sk == '': sk = default_sk
 
     response = ddb.delete_item(
         TableName=ddb_table,
@@ -265,6 +267,7 @@ def edit(data):
     #       If there's really no legitimate use for this, will eventually be deleted completely.
     # pk = data.get('pk', '')
     # sk = data.get('sk', '')
+    # if sk == '': sk = default_sk
     # Username = str(data.get('Username', ''))
     # Sess_Start = str(data.get('Sess_Start', ''))
     # TTL = str(data.get('TTL', ''))
@@ -284,11 +287,13 @@ def edit(data):
     #     ':Permissions' : {'S' : Permissions },
     # }
 
-    # #If STARK-ListView-sk is part of the data payload, it should be added to the update expression
-    # if data.get('STARK-ListView-sk','') != '':
-    #     UpdateExpressionString += ", #STARKListViewsk = :STARKListViewsk"
-    #     ExpressionAttributeNamesDict['#STARKListViewsk']  = 'STARK-ListView-sk'
-    #     ExpressionAttributeValuesDict[':STARKListViewsk'] = {'S' : data['STARK-ListView-sk']}
+    # STARK_ListView_sk = data.get('STARK-ListView-sk','')
+    # if STARK_ListView_sk == '':
+    #     STARK_ListView_sk = create_listview_index_value(data)
+
+    # UpdateExpressionString += ", #STARKListViewsk = :STARKListViewsk"
+    # ExpressionAttributeNamesDict['#STARKListViewsk']  = 'STARK-ListView-sk'
+    # ExpressionAttributeValuesDict[':STARKListViewsk'] = {'S' : data['STARK-ListView-sk']}
 
     # response = ddb.update_item(
     #     TableName=ddb_table,
@@ -306,6 +311,7 @@ def edit(data):
 def add(data):
     pk = data.get('pk', '')
     sk = data.get('sk', '')
+    if sk == '': sk = default_sk
     Username = str(data.get('Username', ''))
     Sess_Start = str(data.get('Sess_Start', ''))
     TTL = str(data.get('TTL', ''))
@@ -319,7 +325,9 @@ def add(data):
     item['TTL'] = {'N' : TTL}
     item['Permissions'] = {'S' : Permissions}
 
-    if data.get('STARK-ListView-sk','') != '':
+    if data.get('STARK-ListView-sk','') == '':
+        item['STARK-ListView-sk'] = {'S' : create_listview_index_value(data)}
+    else:
         item['STARK-ListView-sk'] = {'S' : data['STARK-ListView-sk']}
 
     response = ddb.put_item(
@@ -328,3 +336,41 @@ def add(data):
     )
 
     return "OK"
+
+def compose_operators(key, data):
+    composed_filter_dict = {"filter_string":"","expression_values": {}}
+    if data['operator'] == "IN":
+        string_split = data['value'].split(',')
+        composed_filter_dict['filter_string'] += f" {key} IN "
+        temp_in_string = ""
+        in_string = ""
+        in_counter = 1
+        for in_index in string_split:
+            in_string += f" :inParam{in_counter}, "
+            composed_filter_dict['expression_values'][f":inParam{in_counter}"] = {data['type'] : in_index.strip()}
+            in_counter += 1
+        temp_in_string = in_string[1:-2]
+        composed_filter_dict['filter_string'] += f"({temp_in_string}) AND"
+    elif data['operator'] in [ "contains", "begins_with" ]:
+        composed_filter_dict['filter_string'] += f" {data['operator']}({key}, :{key}) AND"
+        composed_filter_dict['expression_values'][f":{key}"] = {data['type'] : data['value'].strip()}
+    elif data['operator'] == "between":
+        from_to_split = data['value'].split(',')
+        composed_filter_dict['filter_string'] += f" ({key} BETWEEN :from{key} AND :to{key}) AND"
+        composed_filter_dict['expression_values'][f":from{key}"] = {data['type'] : from_to_split[0].strip()}
+        composed_filter_dict['expression_values'][f":to{key}"] = {data['type'] : from_to_split[1].strip()}
+    else:
+        composed_filter_dict['filter_string'] += f" {key} {data['operator']} :{key} AND"
+        composed_filter_dict['expression_values'][f":{key}"] = {data['type'] : data['value'].strip()}
+
+    return composed_filter_dict
+
+def create_listview_index_value(data):
+    ListView_index_values = []
+    for field in sort_fields:
+        if field == pk_field:
+            ListView_index_values.append(data['pk'])
+        else:
+            ListView_index_values.append(data.get(field))
+    STARK_ListView_sk = "|".join(ListView_index_values)
+    return STARK_ListView_sk
