@@ -166,7 +166,7 @@ def create_handler(event, context):
             business_module['Description']       = {'S' : ""}
             business_module['Module_Group']      = {'S' : "Default"}
             business_module['Is_Menu_Item']      = {'S' : is_menu_item}
-            business_module['Is_Enabled']        = {'S' : "Y"}
+            business_module['Is_Enabled']        = {'S' : True}
             business_module['Icon']              = {'S' : icon}
             business_module['Image_Alt']         = {'S' : ""}
             business_module['Priority']          = {'N' : "0"}
