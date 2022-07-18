@@ -64,7 +64,7 @@
     Module_Group: "System Administration"
     Is_Menu_Item: "Y"
     Is_Enabled: "Y"
-    Icon: "images/stark_System Modules.svg"
+    Icon: "images/stark_system_modules.svg"
     Image_Alt: "STARK_Module graphic"
     Priority: "0"
 "System Modules|Add":
