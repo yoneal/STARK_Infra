@@ -5,8 +5,8 @@
     Descriptive_Title: "Users"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "Y"
-    Is_Enabled: "Y"
+    Is_Menu_Item: True
+    Is_Enabled: True
     Icon: "images/stark_users.svg"
     Image_Alt: "STARK_User graphic"
     Priority: "0"
@@ -16,8 +16,8 @@
     Descriptive_Title: "Add Users"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -27,8 +27,8 @@
     Descriptive_Title: "Edit Users"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -38,8 +38,8 @@
     Descriptive_Title: "Delete Users"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -49,8 +49,8 @@
     Descriptive_Title: "Report Users"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -62,8 +62,8 @@
     Descriptive_Title: "System Modules"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "Y"
-    Is_Enabled: "Y"
+    Is_Menu_Item: True
+    Is_Enabled: True
     Icon: "images/stark_system_modules.svg"
     Image_Alt: "STARK_Module graphic"
     Priority: "0"
@@ -73,8 +73,8 @@
     Descriptive_Title: "Add System Modules"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -84,8 +84,8 @@
     Descriptive_Title: "Edit System Modules"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -95,8 +95,8 @@
     Descriptive_Title: "Delete System Modules"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -106,8 +106,8 @@
     Descriptive_Title: "Report System Modules"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -119,8 +119,8 @@
     Descriptive_Title: "Module Groups"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "Y"
-    Is_Enabled: "Y"
+    Is_Menu_Item: True
+    Is_Enabled: True
     Icon: "images/stark_module_groups.svg"
     Image_Alt: "STARK_Module_Groups graphic"
     Priority: "0"
@@ -130,8 +130,8 @@
     Descriptive_Title: "Add Module Groups"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -141,8 +141,8 @@
     Descriptive_Title: "Edit Module Groups"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -152,8 +152,8 @@
     Descriptive_Title: "Delete Module Groups"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -163,8 +163,8 @@
     Descriptive_Title: "Report Module Groups"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -176,8 +176,8 @@
     Descriptive_Title: "User Roles"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "Y"
-    Is_Enabled: "Y"
+    Is_Menu_Item: True
+    Is_Enabled: True
     Icon: "images/stark_user_roles.svg"
     Image_Alt: "STARK_User_Roles graphic"
     Priority: "0"
@@ -187,8 +187,8 @@
     Descriptive_Title: "Add User Roles"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -198,8 +198,8 @@
     Descriptive_Title: "Edit User Roles"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -209,8 +209,8 @@
     Descriptive_Title: "Delete User Roles"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -220,8 +220,8 @@
     Descriptive_Title: "Report User Roles"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -233,8 +233,8 @@
     Descriptive_Title: "User Permissions"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "Y"
-    Is_Enabled: "Y"
+    Is_Menu_Item: True
+    Is_Enabled: True
     Icon: "images/stark_user_permissions.svg"
     Image_Alt: "STARK_User_Permissions graphic"
     Priority: "0"
@@ -244,8 +244,8 @@
     Descriptive_Title: "Add User Permissions"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -255,8 +255,8 @@
     Descriptive_Title: "Edit User Permissions"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -266,8 +266,8 @@
     Descriptive_Title: "Delete User Permissions"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -277,8 +277,8 @@
     Descriptive_Title: "Report User Permissions"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -290,8 +290,8 @@
     Descriptive_Title: "User Sessions"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "Y"
-    Is_Enabled: "Y"
+    Is_Menu_Item: True
+    Is_Enabled: True
     Icon: "images/stark_user_sessions.svg"
     Image_Alt: "STARK_User_Sessions graphic"
     Priority: "0"
@@ -301,8 +301,8 @@
     Descriptive_Title: "Add User Sessions"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "N"
+    Is_Menu_Item: False
+    Is_Enabled: False
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -312,8 +312,8 @@
     Descriptive_Title: "Edit User Sessions"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -323,8 +323,8 @@
     Descriptive_Title: "Delete User Sessions"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"
@@ -334,8 +334,8 @@
     Descriptive_Title: "Report User Sessions"
     Description: ""
     Module_Group: "System Administration"
-    Is_Menu_Item: "N"
-    Is_Enabled: "Y"
+    Is_Menu_Item: False
+    Is_Enabled: True
     Icon: ""
     Image_Alt: ""
     Priority: "0"

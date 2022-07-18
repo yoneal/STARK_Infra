@@ -130,8 +130,8 @@ def create_handler(event, context):
         sys_modules['Descriptive_Title'] = {'S' : system_modules_yml[system_modules]["Descriptive_Title"]}
         sys_modules['Description']       = {'S' : system_modules_yml[system_modules]["Description"]}
         sys_modules['Module_Group']      = {'S' : system_modules_yml[system_modules]["Module_Group"]}
-        sys_modules['Is_Menu_Item']      = {'S' : system_modules_yml[system_modules]["Is_Menu_Item"]}
-        sys_modules['Is_Enabled']        = {'S' : system_modules_yml[system_modules]["Is_Enabled"]}
+        sys_modules['Is_Menu_Item']      = {'BOOL' : system_modules_yml[system_modules]["Is_Menu_Item"]}
+        sys_modules['Is_Enabled']        = {'BOOL' : system_modules_yml[system_modules]["Is_Enabled"]}
         sys_modules['Icon']              = {'S' : system_modules_yml[system_modules]["Icon"]}
         sys_modules['Image_Alt']         = {'S' : system_modules_yml[system_modules]["Image_Alt"]}
         sys_modules['Priority']          = {'N' : system_modules_yml[system_modules]["Priority"]}
