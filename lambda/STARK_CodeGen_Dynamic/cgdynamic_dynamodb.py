@@ -467,7 +467,7 @@ def create(data):
             Key='tmp/'+filename
         )
         
-        return bucket_name+".s3."+ environ_region + ".amazonaws.com/tmp/" +filename    
+        return bucket_name+".s3."+ region_name + ".amazonaws.com/tmp/" +filename    
     """
 
     return textwrap.dedent(source_code)
