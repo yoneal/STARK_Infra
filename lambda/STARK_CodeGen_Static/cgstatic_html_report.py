@@ -103,8 +103,8 @@ def create(data):
                 <div class="row">
                     <div class="col-6 text-left d-inline-block">
                         <button id="prev" type="button" class="btn btn-outline-secondary mb-2" onClick="root.showReport = false"> BACK </button>
-                        <button id="refresh" type="button" class="btn btn-success mb-2"> REFRESH </button>
                         <button type="button" class="btn btn-primary mb-2" onClick="root.download_csv()"> Export as CSV</button>
+                        <button id="refresh" type="button" class="btn btn-success mb-2"> REFRESH </button>
                     </div>
                     <div class="col-6">
                     </div>
