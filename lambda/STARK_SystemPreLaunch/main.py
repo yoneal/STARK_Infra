@@ -152,12 +152,12 @@ def create_handler(event, context):
                 target = entity + '.html'
                 title = entity
                 is_menu_item = True
-                icon = ''
             else:
                 target = entity + '_' + module_type + '.html'
                 title = module_type + ' ' + entity
                 is_menu_item = False
-                icon = ''
+                
+            icon = 'images/' + suggest_graphic(entity)
 
             business_module                      = {}
             business_module['pk']                = {'S' : pk}
@@ -168,7 +168,7 @@ def create_handler(event, context):
             business_module['Module_Group']      = {'S' : "Default"}
             business_module['Is_Menu_Item']      = {'BOOL' : is_menu_item}
             business_module['Is_Enabled']        = {'BOOL' : True}
-            business_module['Icon']              = {'S' : suggest_graphic(entity)}
+            business_module['Icon']              = {'S' : icon}
             business_module['Image_Alt']         = {'S' : ""}
             business_module['Priority']          = {'N' : "0"}
             business_module['STARK-ListView-sk'] = {'S' : pk}
