@@ -291,6 +291,10 @@ def create(data):
                         loading_modal.hide()
                     }});
                 }},
+                download_csv() {{
+                    let link = "https://" + root.temp_csv_link
+                    window.location.href = link
+                }},
                 checkUncheck: function (checked) {{
                     arrCheckBoxes = document.getElementsByName('check_checkbox');
                     for (var i = 0; i < arrCheckBoxes.length; i++)
