@@ -150,12 +150,12 @@ def create_handler(event, context):
             if module_type == 'View':
                 target = entity + '.html'
                 title = entity
-                is_menu_item = 'Y'
+                is_menu_item = True
                 icon = ''
             else:
                 target = entity + '_' + module_type + '.html'
                 title = module_type + ' ' + entity
-                is_menu_item = 'N'
+                is_menu_item = False
                 icon = ''
 
             business_module                      = {}
