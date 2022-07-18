@@ -447,10 +447,10 @@ def create(data):
         return items
 
     def generate_csv(mapped_results = []): 
-        csv_header = ["""
+        csv_header = ['{pk_varname}', """
     for col in columns:
         col_varname = converter.convert_to_system_name(col)
-        source_code += f"'{col_varname}',"    
+        source_code += f"'{col_varname}', "    
     source_code += f"""]
 
         file_buff = StringIO()
