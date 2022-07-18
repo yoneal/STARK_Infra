@@ -220,6 +220,8 @@ def create(data, cli_mode=False):
                                         - 'dynamodb:Scan'
                                         - 'dynamodb:Query'
                                         - 'dynamodb:UpdateItem'
+                                        - 's3:PutObject',
+                                        - 's3:PutObjectAcl'
                                     Resource: 
                                         - !Join [ ":", [ "arn:aws:dynamodb", !Ref AWS::Region, !Ref AWS::AccountId, "table/{ddb_table_name}"] ]
                                         - !Join [ ":", [ "arn:aws:dynamodb", !Ref AWS::Region, !Ref AWS::AccountId, "table/{ddb_table_name}/index/STARK-ListView-Index", ] ]
