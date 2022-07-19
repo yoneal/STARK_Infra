@@ -64,17 +64,12 @@ def lambda_handler(event, context):
         elif method == "PUT":
 
             #We can't update DDB PK, so if PK is different, we need to do ADD + DELETE
-            params = {
-                        'orig_pk' : data['orig_pk'],
-                        'pk'      : data['pk']
-            }
             if data['orig_pk'] == data['pk']:
                 response = edit(data)
             else:
                 response   = add(data)
                 data['pk'] = data['orig_pk']
                 response   = delete(data)
-            response   = cascade_pk_change_to_child(params)
         elif method == "POST":
             response = add(data)
 
@@ -292,6 +287,7 @@ def edit(data):
         ExpressionAttributeValues=ExpressionAttributeValuesDict
     )
 
+    response = cascade_pk_change_to_child(data)
     return "OK"
 
 def add(data):
@@ -315,6 +311,9 @@ def add(data):
         TableName=ddb_table,
         Item=item,
     )
+
+    data['orig_pk'] = pk
+    response = cascade_pk_change_to_child(data)
 
     return "OK"
 
