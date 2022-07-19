@@ -148,12 +148,13 @@ def create_handler(event, context):
     for entity in entities:
         for module_type in module_types:
             pk = entity + '|' + module_type 
+            entity_varname = converter.convert_to_system_name(entity)
             if module_type == 'View':
-                target = entity + '.html'
+                target = entity_varname + '.html'
                 title = entity
                 is_menu_item = True
             else:
-                target = entity + '_' + module_type + '.html'
+                target = entity_varname + '_' + module_type + '.html'
                 title = module_type + ' ' + entity
                 is_menu_item = False
                 
