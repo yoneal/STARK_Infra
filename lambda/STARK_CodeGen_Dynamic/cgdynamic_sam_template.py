@@ -612,6 +612,8 @@ def create(data, cli_mode=False):
                     - arm64
                 MemorySize: 128
                 Timeout: 5
+                Layers:
+                    - !Ref STARKScryptLayer
         STARKBackendApiForSTARKUserPermissions:
             Type: AWS::Serverless::Function
             Properties:

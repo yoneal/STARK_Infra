@@ -1,12 +1,11 @@
 #Python Standard Library
 import base64
+from email.policy import default
 import json
-import sys
 from urllib.parse import unquote
 
 #Extra modules
 import boto3
-import stark_scrypt as scrypt
 
 ddb = boto3.client('dynamodb')
 
@@ -14,7 +13,7 @@ ddb = boto3.client('dynamodb')
 #CONFIG
 ddb_table   = "[[STARK_DDB_TABLE_NAME]]"
 pk_field    = "Username"
-default_sk  = "STARK|user|info"
+default_sk  = "STARK|user|permissions"
 sort_fields = ["Username", ]
 page_limit  = 10
 
@@ -31,9 +30,9 @@ def lambda_handler(event, context):
         method  = event.get('requestContext').get('http').get('method')
 
         if event.get('isBase64Encoded') == True :
-            payload = json.loads(base64.b64decode(event.get('body'))).get('STARK_User',"")
+            payload = json.loads(base64.b64decode(event.get('body'))).get('STARK_User_Permissions',"")
         else:    
-            payload = json.loads(event.get('body')).get('STARK_User',"")
+            payload = json.loads(event.get('body')).get('STARK_User_Permissions',"")
 
         data    = {}
 
@@ -52,10 +51,7 @@ def lambda_handler(event, context):
             data['sk'] = payload.get('sk', '')
             if data['sk'] == "":
                 data['sk'] = default_sk
-            data['Full_Name'] = payload.get('Full_Name','')
-            data['Nickname'] = payload.get('Nickname','')
-            data['Password_Hash'] = payload.get('Password_Hash','')
-            data['Role'] = payload.get('Role','')
+            data['Permissions'] = payload.get('Permissions','')
         ListView_index_values = []
         for field in sort_fields:
             ListView_index_values.append(payload.get(field))
@@ -158,10 +154,7 @@ def report(sk=default_sk):
         item = {}
         item['Username'] = record.get('pk', {}).get('S','')
         item['sk'] = record.get('sk',{}).get('S','')
-        item['Full_Name'] = record.get('Full_Name',{}).get('S','')
-        item['Nickname'] = record.get('Nickname',{}).get('S','')
-        item['Password_Hash'] = record.get('Password_Hash',{}).get('S','')
-        item['Role'] = record.get('Role',{}).get('S','')
+        item['Permissions'] = record.get('Permissions',{}).get('S','')
         items.append(item)
 
     return items
@@ -203,14 +196,8 @@ def get_all(sk=default_sk, lv_token=None):
         item = {}
         item['Username'] = record.get('pk', {}).get('S','')
         item['sk'] = record.get('sk',{}).get('S','')
-        item['Full_Name'] = record.get('Full_Name',{}).get('S','')
-        item['Nickname'] = record.get('Nickname',{}).get('S','')
-        item['Role'] = record.get('Role',{}).get('S','')
-
+        item['Permissions'] = record.get('Permissions',{}).get('S','')
         items.append(item)
-    #NOTE: We explicitly left out the password hash. Since this is the generic "get all records" function, there's really no
-    #   legitimate reason to get something as sensitive as the passwordh hash. Functionality that actually has to mass list
-    #   users alongside their password hashes will have to use a function specifically made for that. Safety first.
 
     #Get the "next" token, pass to calling function. This enables a "next page" request later.
     next_token = response.get('LastEvaluatedKey')
@@ -234,19 +221,15 @@ def get_by_pk(pk, sk=default_sk):
 
     raw = response.get('Items')
 
-    #FIXME: Mapping is duplicated code, make this DRY
     #Map to expected structure
     items = []
     for record in raw:
         item = {}
         item['Username'] = record.get('pk', {}).get('S','')
         item['sk'] = record.get('sk',{}).get('S','')
-        item['Full_Name'] = record.get('Full_Name',{}).get('S','')
-        item['Nickname'] = record.get('Nickname',{}).get('S','')
-        item['Role'] = record.get('Role',{}).get('S','')
+        item['Permissions'] = record.get('Permissions',{}).get('S','')
         items.append(item)
-    #NOTE: We explicitly left out the password hash. Functionality that requires the user record along with the password hash should use 
-    #       a specialized function instead of the generic "get" function.
+    #FIXME: Mapping is duplicated code, make this DRY
 
     return items
 
@@ -269,28 +252,15 @@ def edit(data):
     pk = data.get('pk', '')
     sk = data.get('sk', '')
     if sk == '': sk = default_sk
-    Full_Name = str(data.get('Full_Name', ''))
-    Nickname = str(data.get('Nickname', ''))
-    Password_Hash = str(data.get('Password_Hash', ''))
-    Role = str(data.get('Role', ''))
+    Permissions = str(data.get('Permissions', ''))
 
-    UpdateExpressionString = "SET #Full_Name = :Full_Name, #Nickname = :Nickname, #Role = :Role" 
+    UpdateExpressionString = "SET #Permissions = :Permissions" 
     ExpressionAttributeNamesDict = {
-        '#Full_Name' : 'Full_Name',
-        '#Nickname' : 'Nickname',
-        '#Role' : 'Role',
+        '#Permissions' : 'Permissions',
     }
     ExpressionAttributeValuesDict = {
-        ':Full_Name' : {'S' : Full_Name },
-        ':Nickname' : {'S' : Nickname },
-        ':Role' : {'S' : Role },
+        ':Permissions' : {'S' : Permissions },
     }
-
-    #If Password_Hash is not an empty string, this means it's a password reset request.
-    if Password_Hash != '':
-        UpdateExpressionString += ", #Password_Hash = :Password_Hash"
-        ExpressionAttributeNamesDict['#Password_Hash'] = 'Password_Hash'
-        ExpressionAttributeValuesDict[':Password_Hash'] = {'S': scrypt.create_hash(Password_Hash)}
 
     STARK_ListView_sk = data.get('STARK-ListView-sk','')
     if STARK_ListView_sk == '':
@@ -311,37 +281,28 @@ def edit(data):
         ExpressionAttributeValues=ExpressionAttributeValuesDict
     )
 
-    assign_role_permissions({'Username': pk, 'Role': Role })
-
     return "OK"
 
 def add(data):
     pk = data.get('pk', '')
     sk = data.get('sk', '')
     if sk == '': sk = default_sk
-    Full_Name = str(data.get('Full_Name', ''))
-    Nickname = str(data.get('Nickname', ''))
-    Password_Hash = str(data.get('Password_Hash', ''))
-    Role = str(data.get('Role', ''))
+    Permissions = str(data.get('Permissions', ''))
 
     item={}
     item['pk'] = {'S' : pk}
     item['sk'] = {'S' : sk}
-    item['Full_Name'] = {'S' : Full_Name}
-    item['Nickname'] = {'S' : Nickname}
-    item['Password_Hash'] = {'S' : scrypt.create_hash(Password_Hash)}
-    item['Role'] = {'S' : Role}
+    item['Permissions'] = {'S' : Permissions}
 
     if data.get('STARK-ListView-sk','') == '':
         item['STARK-ListView-sk'] = {'S' : create_listview_index_value(data)}
     else:
         item['STARK-ListView-sk'] = {'S' : data['STARK-ListView-sk']}
+
     response = ddb.put_item(
         TableName=ddb_table,
         Item=item,
     )
-
-    assign_role_permissions({'Username': pk, 'Role': Role })
 
     return "OK"
 
@@ -382,57 +343,3 @@ def create_listview_index_value(data):
             ListView_index_values.append(data.get(field))
     STARK_ListView_sk = "|".join(ListView_index_values)
     return STARK_ListView_sk
-
-def assign_role_permissions(data):
-    username  = data['Username']
-    role_name = data['Role']
- 
-    from os import getcwd 
-    STARK_folder = getcwd() + '/STARK_User_Roles'
-    sys.path = [STARK_folder] + sys.path
-    import STARK_User_Roles as user_roles
-
-    response = user_roles.get_by_pk(role_name)
-    permissions = response[0]['Permissions']
-    
-    sys.path[0] = getcwd() + '/STARK_User_Permissions'
-    import STARK_User_Permissions as user_permissions
-    data = {
-        'pk': username,
-        'Permissions': permissions
-    }
-    response = user_permissions.add(data)
-
-    return "OK"
-
-def get_all_by_old_parent_value(old_pk_val, sk = default_sk):
-    
-    string_filter = " #Role = :old_parent_value"
-    object_expression_value = {':sk' : {'S' : sk},
-                                ':old_parent_value': {'S' : old_pk_val}}
-    ExpressionAttributeNamesDict = {
-        '#Role' : 'Role',
-    }
-    response = ddb.query(
-        TableName=ddb_table,
-        IndexName="STARK-ListView-Index",
-        Select='ALL_ATTRIBUTES',
-        ReturnConsumedCapacity='TOTAL',
-        FilterExpression=string_filter,
-        KeyConditionExpression='sk = :sk',
-        ExpressionAttributeValues=object_expression_value,
-        ExpressionAttributeNames=ExpressionAttributeNamesDict
-    )
-    raw = response.get('Items')
-    items = []
-    for record in raw:
-        item = {}
-        item['pk'] = record.get('pk', {}).get('S','')
-        item['sk'] = record.get('sk',{}).get('S','')
-        item['Full_Name'] = record.get('Full_Name',{}).get('S','')
-        item['Nickname'] = record.get('Nickname',{}).get('S','')
-        item['Role'] = record.get('Role',{}).get('S','')
-        item['STARK-ListView-sk'] = record.get('STARK-ListView-sk',{}).get('S','')
-        items.append(item)
-
-    return items

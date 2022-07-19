@@ -1,21 +1,20 @@
 #Python Standard Library
 import base64
+from email.policy import default
 import json
-import sys
 from urllib.parse import unquote
 
 #Extra modules
 import boto3
-import stark_scrypt as scrypt
 
 ddb = boto3.client('dynamodb')
 
 #######
 #CONFIG
-ddb_table   = "[[STARK_DDB_TABLE_NAME]]"
-pk_field    = "Username"
-default_sk  = "STARK|user|info"
-sort_fields = ["Username", ]
+ddb_table   = "STARK_CSV_Export_6"
+pk_field    = "Module_Name"
+default_sk  = "STARK|module"
+sort_fields = ["Module_Name", ]
 page_limit  = 10
 
 def lambda_handler(event, context):
@@ -31,9 +30,9 @@ def lambda_handler(event, context):
         method  = event.get('requestContext').get('http').get('method')
 
         if event.get('isBase64Encoded') == True :
-            payload = json.loads(base64.b64decode(event.get('body'))).get('STARK_User',"")
+            payload = json.loads(base64.b64decode(event.get('body'))).get('STARK_Module',"")
         else:    
-            payload = json.loads(event.get('body')).get('STARK_User',"")
+            payload = json.loads(event.get('body')).get('STARK_Module',"")
 
         data    = {}
 
@@ -47,15 +46,19 @@ def lambda_handler(event, context):
                 }
             }
         else:
-            data['pk'] = payload.get('Username')
-            data['orig_pk'] = payload.get('orig_Username','')
+            data['pk'] = payload.get('Module_Name')
+            data['orig_pk'] = payload.get('orig_Module_Name','')
             data['sk'] = payload.get('sk', '')
             if data['sk'] == "":
                 data['sk'] = default_sk
-            data['Full_Name'] = payload.get('Full_Name','')
-            data['Nickname'] = payload.get('Nickname','')
-            data['Password_Hash'] = payload.get('Password_Hash','')
-            data['Role'] = payload.get('Role','')
+            data['Descriptive_Title'] = payload.get('Descriptive_Title','')
+            data['Target'] = payload.get('Target','')
+            data['Description'] = payload.get('Description','')
+            data['Module_Group'] = payload.get('Module_Group','')
+            data['Is_Menu_Item'] = payload.get('Is_Menu_Item','')
+            data['Is_Enabled'] = payload.get('Is_Enabled','')
+            data['Icon'] = payload.get('Icon','')
+            data['Priority'] = payload.get('Priority','')
         ListView_index_values = []
         for field in sort_fields:
             ListView_index_values.append(payload.get(field))
@@ -109,12 +112,20 @@ def lambda_handler(event, context):
 
         elif request_type == "detail":
 
-            pk = event.get('queryStringParameters').get('Username','')
+            pk = event.get('queryStringParameters').get('Module_Name','')
             sk = event.get('queryStringParameters').get('sk','')
             if sk == "":
                 sk = default_sk
 
             response = get_by_pk(pk, sk)
+
+        elif request_type == "usermodules":
+            #FIXME: Getting the username should be a STARK Core framework utility. Only here for now for MVP implem, to not hold up more urgent dependent features
+            #FIXME: When framework-ized, getting the requestContext should be at the beginning of the handler, and will exit if handler needs the Username and is not present (i.e., not properly authorized)
+            #FIXME: Make sure for this framework-ized implementation that it will still work when Framework components call each other directly through the STARK registry instead of through API Gateway.
+            username = event.get('requestContext', {}).get('authorizer', {}).get('lambda', {}).get('Username','')
+            response = get_user_modules(username, default_sk)
+
         else:
             return {
                 "isBase64Encoded": False,
@@ -156,12 +167,16 @@ def report(sk=default_sk):
     items = []
     for record in raw:
         item = {}
-        item['Username'] = record.get('pk', {}).get('S','')
+        item['Module_Name'] = record.get('pk', {}).get('S','')
         item['sk'] = record.get('sk',{}).get('S','')
-        item['Full_Name'] = record.get('Full_Name',{}).get('S','')
-        item['Nickname'] = record.get('Nickname',{}).get('S','')
-        item['Password_Hash'] = record.get('Password_Hash',{}).get('S','')
-        item['Role'] = record.get('Role',{}).get('S','')
+        item['Descriptive_Title'] = record.get('Descriptive_Title',{}).get('S','')
+        item['Target'] = record.get('Target',{}).get('S','')
+        item['Description'] = record.get('Description',{}).get('S','')
+        item['Module_Group'] = record.get('Module_Group',{}).get('S','')
+        item['Is_Menu_Item'] = record.get('Is_Menu_Item',{}).get('BOOL','')
+        item['Is_Enabled'] = record.get('Is_Enabled',{}).get('BOOL','')
+        item['Icon'] = record.get('Icon',{}).get('S','')
+        item['Priority'] = record.get('Priority',{}).get('N','')
         items.append(item)
 
     return items
@@ -201,23 +216,24 @@ def get_all(sk=default_sk, lv_token=None):
     items = []
     for record in raw:
         item = {}
-        item['Username'] = record.get('pk', {}).get('S','')
+        item['Module_Name'] = record.get('pk', {}).get('S','')
         item['sk'] = record.get('sk',{}).get('S','')
-        item['Full_Name'] = record.get('Full_Name',{}).get('S','')
-        item['Nickname'] = record.get('Nickname',{}).get('S','')
-        item['Role'] = record.get('Role',{}).get('S','')
-
+        item['Descriptive_Title'] = record.get('Descriptive_Title',{}).get('S','')
+        item['Target'] = record.get('Target',{}).get('S','')
+        item['Description'] = record.get('Description',{}).get('S','')
+        item['Module_Group'] = record.get('Module_Group',{}).get('S','')
+        item['Is_Menu_Item'] = record.get('Is_Menu_Item',{}).get('BOOL','')
+        item['Is_Enabled'] = record.get('Is_Enabled',{}).get('BOOL','')
+        item['Icon'] = record.get('Icon',{}).get('S','')
+        item['Priority'] = record.get('Priority',{}).get('N','')
         items.append(item)
-    #NOTE: We explicitly left out the password hash. Since this is the generic "get all records" function, there's really no
-    #   legitimate reason to get something as sensitive as the passwordh hash. Functionality that actually has to mass list
-    #   users alongside their password hashes will have to use a function specifically made for that. Safety first.
 
     #Get the "next" token, pass to calling function. This enables a "next page" request later.
     next_token = response.get('LastEvaluatedKey')
 
     return items, next_token
 
-def get_by_pk(pk, sk=default_sk):
+def get_by_pk(pk, sk=default):
     response = ddb.query(
         TableName=ddb_table,
         Select='ALL_ATTRIBUTES',
@@ -234,19 +250,22 @@ def get_by_pk(pk, sk=default_sk):
 
     raw = response.get('Items')
 
-    #FIXME: Mapping is duplicated code, make this DRY
     #Map to expected structure
     items = []
     for record in raw:
         item = {}
-        item['Username'] = record.get('pk', {}).get('S','')
+        item['Module_Name'] = record.get('pk', {}).get('S','')
         item['sk'] = record.get('sk',{}).get('S','')
-        item['Full_Name'] = record.get('Full_Name',{}).get('S','')
-        item['Nickname'] = record.get('Nickname',{}).get('S','')
-        item['Role'] = record.get('Role',{}).get('S','')
+        item['Descriptive_Title'] = record.get('Descriptive_Title',{}).get('S','')
+        item['Target'] = record.get('Target',{}).get('S','')
+        item['Description'] = record.get('Description',{}).get('S','')
+        item['Module_Group'] = record.get('Module_Group',{}).get('S','')
+        item['Is_Menu_Item'] = record.get('Is_Menu_Item',{}).get('BOOL','')
+        item['Is_Enabled'] = record.get('Is_Enabled',{}).get('BOOL','')
+        item['Icon'] = record.get('Icon',{}).get('S','')
+        item['Priority'] = record.get('Priority',{}).get('N','')
         items.append(item)
-    #NOTE: We explicitly left out the password hash. Functionality that requires the user record along with the password hash should use 
-    #       a specialized function instead of the generic "get" function.
+    #FIXME: Mapping is duplicated code, make this DRY
 
     return items
 
@@ -269,28 +288,46 @@ def edit(data):
     pk = data.get('pk', '')
     sk = data.get('sk', '')
     if sk == '': sk = default_sk
-    Full_Name = str(data.get('Full_Name', ''))
-    Nickname = str(data.get('Nickname', ''))
-    Password_Hash = str(data.get('Password_Hash', ''))
-    Role = str(data.get('Role', ''))
+    Descriptive_Title = str(data.get('Descriptive_Title', ''))
+    Target = str(data.get('Target', ''))
+    Description = str(data.get('Description', ''))
+    Module_Group = str(data.get('Module_Group', ''))
+    Is_Menu_Item = str(data.get('Is_Menu_Item', ''))
+    Is_Enabled = str(data.get('Is_Enabled', ''))
+    Icon = str(data.get('Icon', ''))
+    Priority = str(data.get('Priority', ''))
 
-    UpdateExpressionString = "SET #Full_Name = :Full_Name, #Nickname = :Nickname, #Role = :Role" 
+    if Is_Menu_Item == 'Y':
+        Is_Menu_Item = True
+    else:
+        Is_Menu_Item = False
+    Is_Enabled = str(data.get('Is_Enabled', ''))
+    if Is_Enabled == 'Y':
+        Is_Enabled = True
+    else:
+        Is_Enabled = False
+
+    UpdateExpressionString = "SET #Descriptive_Title = :Descriptive_Title, #Target = :Target, #Description = :Description, #Module_Group = :Module_Group, #Is_Menu_Item = :Is_Menu_Item, #Is_Enabled = :Is_Enabled, #Icon = :Icon, #Priority = :Priority" 
     ExpressionAttributeNamesDict = {
-        '#Full_Name' : 'Full_Name',
-        '#Nickname' : 'Nickname',
-        '#Role' : 'Role',
+        '#Descriptive_Title' : 'Descriptive_Title',
+        '#Target' : 'Target',
+        '#Description' : 'Description',
+        '#Module_Group' : 'Module_Group',
+        '#Is_Menu_Item' : 'Is_Menu_Item',
+        '#Is_Enabled' : 'Is_Enabled',
+        '#Icon' : 'Icon',
+        '#Priority' : 'Priority',
     }
     ExpressionAttributeValuesDict = {
-        ':Full_Name' : {'S' : Full_Name },
-        ':Nickname' : {'S' : Nickname },
-        ':Role' : {'S' : Role },
+        ':Descriptive_Title' : {'S' : Descriptive_Title },
+        ':Target' : {'S' : Target },
+        ':Description' : {'S' : Description },
+        ':Module_Group' : {'S' : Module_Group },
+        ':Is_Menu_Item' : {'BOOL' : Is_Menu_Item },
+        ':Is_Enabled' : {'BOOL' : Is_Enabled },
+        ':Icon' : {'S' : Icon },
+        ':Priority' : {'N' : Priority },
     }
-
-    #If Password_Hash is not an empty string, this means it's a password reset request.
-    if Password_Hash != '':
-        UpdateExpressionString += ", #Password_Hash = :Password_Hash"
-        ExpressionAttributeNamesDict['#Password_Hash'] = 'Password_Hash'
-        ExpressionAttributeValuesDict[':Password_Hash'] = {'S': scrypt.create_hash(Password_Hash)}
 
     STARK_ListView_sk = data.get('STARK-ListView-sk','')
     if STARK_ListView_sk == '':
@@ -311,39 +348,126 @@ def edit(data):
         ExpressionAttributeValues=ExpressionAttributeValuesDict
     )
 
-    assign_role_permissions({'Username': pk, 'Role': Role })
-
     return "OK"
 
 def add(data):
     pk = data.get('pk', '')
     sk = data.get('sk', '')
     if sk == '': sk = default_sk
-    Full_Name = str(data.get('Full_Name', ''))
-    Nickname = str(data.get('Nickname', ''))
-    Password_Hash = str(data.get('Password_Hash', ''))
-    Role = str(data.get('Role', ''))
+    Descriptive_Title = str(data.get('Descriptive_Title', ''))
+    Target = str(data.get('Target', ''))
+    Description = str(data.get('Description', ''))
+    Module_Group = str(data.get('Module_Group', ''))
+    Is_Menu_Item = str(data.get('Is_Menu_Item', ''))
+    Icon = str(data.get('Icon', ''))
+    Priority = str(data.get('Priority', ''))
+
+    if Is_Menu_Item == 'Y':
+        Is_Menu_Item = True
+    else:
+        Is_Menu_Item = False
+    Is_Enabled = str(data.get('Is_Enabled', ''))
+    if Is_Enabled == 'Y':
+        Is_Enabled = True
+    else:
+        Is_Enabled = False
+
 
     item={}
     item['pk'] = {'S' : pk}
     item['sk'] = {'S' : sk}
-    item['Full_Name'] = {'S' : Full_Name}
-    item['Nickname'] = {'S' : Nickname}
-    item['Password_Hash'] = {'S' : scrypt.create_hash(Password_Hash)}
-    item['Role'] = {'S' : Role}
+    item['Descriptive_Title'] = {'S' : Descriptive_Title}
+    item['Target'] = {'S' : Target}
+    item['Description'] = {'S' : Description}
+    item['Module_Group'] = {'S' : Module_Group}
+    item['Is_Menu_Item'] = {'BOOL' : Is_Menu_Item}
+    item['Is_Enabled'] = {'BOOL' : Is_Enabled}
+    item['Icon'] = {'S' : Icon}
+    item['Priority'] = {'N' : Priority}
 
     if data.get('STARK-ListView-sk','') == '':
         item['STARK-ListView-sk'] = {'S' : create_listview_index_value(data)}
     else:
         item['STARK-ListView-sk'] = {'S' : data['STARK-ListView-sk']}
+
     response = ddb.put_item(
         TableName=ddb_table,
         Item=item,
     )
 
-    assign_role_permissions({'Username': pk, 'Role': Role })
-
     return "OK"
+
+def get_user_modules(username, sk=default_sk):
+    ########################
+    #1.GET USER PERMISSIONS
+    #FIXME: Getting user permissions should be a STARK Core framework utility, only here for now for urgent MVP implementation,
+    #       to not hold up related features that need implementation ASAP
+    response = ddb.query(
+        TableName=ddb_table,
+        Select='ALL_ATTRIBUTES',
+        ReturnConsumedCapacity='TOTAL',
+        KeyConditionExpression='pk = :pk and sk = :sk',
+        ExpressionAttributeValues={
+            ':pk' : {'S' : username},
+            ':sk' : {'S' : "STARK|user|permissions"}
+        }
+    )
+
+    raw = response.get('Items')
+    permissions = []
+    for record in raw:
+        permission_string = record.get('Permissions',{}).get('S','')
+    
+    #Split permission_string by the delimeter (comma+space / ", ")
+    permissions_list = permission_string.split(", ")
+
+    ##################################
+    #GET SYSTEM MODULES (ENABLED ONLY)
+    response = ddb.query(
+        TableName=ddb_table,
+        IndexName="STARK-ListView-Index",
+        Select='ALL_ATTRIBUTES',
+        ReturnConsumedCapacity='TOTAL',
+        KeyConditionExpression='sk = :sk',
+        ExpressionAttributeValues={
+            ':sk' : {'S' : sk}
+        }
+    )
+
+    raw = response.get('Items')
+
+    items = []
+    for record in raw:
+        # item = {}
+        # item['Module_Name'] = record.get('pk', {}).get('S','')
+        # item['sk'] = record.get('sk',{}).get('S','')
+        # item['Descriptive_Title'] = record.get('Descriptive_Title',{}).get('S','')
+        # item['Target'] = record.get('Target',{}).get('S','')
+        # item['Description'] = record.get('Description',{}).get('S','')
+        # item['Module_Group'] = record.get('Module_Group',{}).get('S','')
+        # item['Is_Menu_Item'] = record.get('Is_Menu_Item',{}).get('S','')
+        # item['Is_Enabled'] = record.get('Is_Enabled',{}).get('S','')
+        # item['Icon'] = record.get('Icon',{}).get('S','')
+        # item['Priority'] = record.get('Priority',{}).get('N','')
+
+        #FIXME: If the mapping code above has become DRY, this code should probably be refactored
+        #   so that it makes use of the mapping code abstraction results. (i.e., trigger mapping code, then assign values here
+        #   using the friendlier reference instead of "record.get...")
+
+        if record.get('Is_Enabled',{}).get('BOOL','') == True:
+            if record.get('Is_Menu_Item',{}).get('BOOL','') == True:
+                if record.get('pk', {}).get('S','') in permissions_list:
+                    #Only modules that are ENABLED, are MENU ITEMS, and are found in the user's permissions list are registered
+                    item = {}
+                    item['title'] = record.get('Descriptive_Title',{}).get('S','')
+                    item['image'] = record.get('Icon',{}).get('S','')
+                    #item['image_alt'] = record.get #FIXME: This isn't in the system modules model, because it wasn't in Cobalt as well... add please.
+                    item['href'] = record.get('Target',{}).get('S','')
+                    item['group'] = record.get('Module_Group',{}).get('S','')
+                    item['priority'] = record.get('Priority',{}).get('N','')
+                    items.append(item)
+
+    return items
 
 def compose_operators(key, data):
     composed_filter_dict = {"filter_string":"","expression_values": {}}
@@ -383,35 +507,13 @@ def create_listview_index_value(data):
     STARK_ListView_sk = "|".join(ListView_index_values)
     return STARK_ListView_sk
 
-def assign_role_permissions(data):
-    username  = data['Username']
-    role_name = data['Role']
- 
-    from os import getcwd 
-    STARK_folder = getcwd() + '/STARK_User_Roles'
-    sys.path = [STARK_folder] + sys.path
-    import STARK_User_Roles as user_roles
-
-    response = user_roles.get_by_pk(role_name)
-    permissions = response[0]['Permissions']
-    
-    sys.path[0] = getcwd() + '/STARK_User_Permissions'
-    import STARK_User_Permissions as user_permissions
-    data = {
-        'pk': username,
-        'Permissions': permissions
-    }
-    response = user_permissions.add(data)
-
-    return "OK"
-
 def get_all_by_old_parent_value(old_pk_val, sk = default_sk):
     
-    string_filter = " #Role = :old_parent_value"
+    string_filter = " #attribute = :old_parent_value"
     object_expression_value = {':sk' : {'S' : sk},
                                 ':old_parent_value': {'S' : old_pk_val}}
     ExpressionAttributeNamesDict = {
-        '#Role' : 'Role',
+        '#attribute' : 'Module_Group',
     }
     response = ddb.query(
         TableName=ddb_table,
@@ -429,9 +531,14 @@ def get_all_by_old_parent_value(old_pk_val, sk = default_sk):
         item = {}
         item['pk'] = record.get('pk', {}).get('S','')
         item['sk'] = record.get('sk',{}).get('S','')
-        item['Full_Name'] = record.get('Full_Name',{}).get('S','')
-        item['Nickname'] = record.get('Nickname',{}).get('S','')
-        item['Role'] = record.get('Role',{}).get('S','')
+        item['Descriptive_Title'] = record.get('Descriptive_Title',{}).get('S','')
+        item['Target'] = record.get('Target',{}).get('S','')
+        item['Description'] = record.get('Description',{}).get('S','')
+        item['Module_Group'] = record.get('Module_Group',{}).get('S','')
+        item['Is_Menu_Item'] = record.get('Is_Menu_Item',{}).get('BOOL','')
+        item['Is_Enabled'] = record.get('Is_Enabled',{}).get('BOOL','')
+        item['Icon'] = record.get('Icon',{}).get('S','')
+        item['Priority'] = record.get('Priority',{}).get('N','')
         item['STARK-ListView-sk'] = record.get('STARK-ListView-sk',{}).get('S','')
         items.append(item)
 

@@ -1,6 +1,7 @@
 #Python Standard Library
 import base64
 import json
+import sys
 from urllib.parse import unquote
 
 #Extra modules
@@ -64,12 +65,17 @@ def lambda_handler(event, context):
         elif method == "PUT":
 
             #We can't update DDB PK, so if PK is different, we need to do ADD + DELETE
+            params = {
+                        'orig_pk' : data['orig_pk'],
+                        'pk'      : data['pk']
+            }
             if data['orig_pk'] == data['pk']:
                 response = edit(data)
             else:
                 response   = add(data)
                 data['pk'] = data['orig_pk']
                 response   = delete(data)
+            response   = cascade_pk_change_to_child(params)
 
         elif method == "POST":
             response = add(data)
@@ -359,3 +365,19 @@ def create_listview_index_value(data):
             ListView_index_values.append(data.get(field))
     STARK_ListView_sk = "|".join(ListView_index_values)
     return STARK_ListView_sk
+
+def cascade_pk_change_to_child(params):
+    from os import getcwd 
+    STARK_folder = getcwd() + '/STARK_Module'
+    sys.path = [STARK_folder] + sys.path
+    import STARK_Module as stark_module
+
+    #fetch all records from child using old pk value
+    response = stark_module.get_all_by_old_parent_value(params['orig_pk'])
+
+    #loop through response and update each record
+    for record in response:
+        record['Module_Group'] = params['pk']
+        stark_module.edit(record)
+
+    return "OK"
