@@ -26,24 +26,29 @@ def create(data):
 
                         grouping = []
                         grouping_ctr = 0
-                        for (const key in data) {{
+                        
+                        for (const key in data['items']) {{
+                            data['items'].sort((a, b) => b.priority - a.priority)
                             console.log(data[key]['group'])
-                            group = data[key]['group']
+                            
+                            group = data['items'][key]['group']
                             if ( group in grouping ) {{
                                 //Skip
                             }}
                             else {{
+                                                                                                            
                                 grouping[group] = grouping_ctr
                                 grouped_modules[grouping_ctr] = {{
                                     "group_name": group,
+                                    "priority": module_grp['Priority'],								   
                                     "modules": []
                                 }}
                                 grouping_ctr++
                             }}
 
-                            grouped_modules[grouping[group]]["modules"].push(data[key])
+                            grouped_modules[grouping[group]]["modules"].push(data['items'][key])
                         }}
-
+                        grouped_modules.sort((a, b) => b.priority - a.priority)
                         console.log(grouped_modules)
                         console.log(data)
                         console.log(typeof(data))

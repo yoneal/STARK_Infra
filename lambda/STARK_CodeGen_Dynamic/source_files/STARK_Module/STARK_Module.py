@@ -3,7 +3,8 @@ import base64
 from email.policy import default
 import json
 from urllib.parse import unquote
-
+import sys
+		  
 #Extra modules
 import boto3
 
@@ -467,7 +468,16 @@ def get_user_modules(username, sk=default_sk):
                     item['priority'] = record.get('Priority',{}).get('N','')
                     items.append(item)
 
-    return items
+    from os import getcwd 
+    STARK_folder = getcwd() + '/STARK_Module_Groups'
+    sys.path = [STARK_folder] + sys.path
+    import STARK_Module_Groups as module_groups
+    module_grps = module_groups.get_module_groups(username)
+
+    return {
+        'items': items,
+        'module_grps': module_grps
+    }
 
 def compose_operators(key, data):
     composed_filter_dict = {"filter_string":"","expression_values": {}}

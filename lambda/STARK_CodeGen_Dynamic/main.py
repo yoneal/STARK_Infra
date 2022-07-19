@@ -145,6 +145,19 @@ def create_handler(event, context):
                             'filePath': f"lambda/{lambda_dir}/{dependency_dir}/{source_file}",
                             'fileContent': source_code.encode()
                         })
+                        
+        if lambda_dir == "STARK_Modules":
+            #STARK_Modules needs STARK_Module_Groups
+            dependencies = ["STARK_Module_Groups"]
+            for dependency_dir in dependencies:
+                source_files = os.listdir(dir + os.sep + dependency_dir)
+                for source_file in source_files:
+                    with open(dir + os.sep + dependency_dir + os.sep + source_file) as f:
+                        source_code = f.read().replace("[[STARK_DDB_TABLE_NAME]]", ddb_table_name)
+                        files_to_commit.append({
+                            'filePath': f"lambda/{lambda_dir}/{dependency_dir}/{source_file}",
+                            'fileContent': source_code.encode()
+                        })
 
 
 
