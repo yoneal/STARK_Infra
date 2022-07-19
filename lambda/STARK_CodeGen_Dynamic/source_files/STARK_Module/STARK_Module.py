@@ -506,3 +506,40 @@ def create_listview_index_value(data):
             ListView_index_values.append(data.get(field))
     STARK_ListView_sk = "|".join(ListView_index_values)
     return STARK_ListView_sk
+
+def get_all_by_old_parent_value(old_pk_val, sk = default_sk):
+    
+    string_filter = " #Role = :old_parent_value"
+    object_expression_value = {':sk' : {'S' : sk},
+                                ':old_parent_value': {'S' : old_pk_val}}
+    ExpressionAttributeNamesDict = {
+        '#Role' : 'Role',
+    }
+    response = ddb.query(
+        TableName=ddb_table,
+        IndexName="STARK-ListView-Index",
+        Select='ALL_ATTRIBUTES',
+        ReturnConsumedCapacity='TOTAL',
+        FilterExpression=string_filter,
+        KeyConditionExpression='sk = :sk',
+        ExpressionAttributeValues=object_expression_value,
+        ExpressionAttributeNames=ExpressionAttributeNamesDict
+    )
+    raw = response.get('Items')
+    items = []
+    for record in raw:
+        item = {}
+        item['pk'] = record.get('pk', {}).get('S','')
+        item['sk'] = record.get('sk',{}).get('S','')
+        item['Descriptive_Title'] = record.get('Descriptive_Title',{}).get('S','')
+        item['Target'] = record.get('Target',{}).get('S','')
+        item['Description'] = record.get('Description',{}).get('S','')
+        item['Module_Group'] = record.get('Module_Group',{}).get('S','')
+        item['Is_Menu_Item'] = record.get('Is_Menu_Item',{}).get('BOOL','')
+        item['Is_Enabled'] = record.get('Is_Enabled',{}).get('BOOL','')
+        item['Icon'] = record.get('Icon',{}).get('S','')
+        item['Priority'] = record.get('Priority',{}).get('N','')
+        item['STARK-ListView-sk'] = record.get('STARK-ListView-sk',{}).get('S','')
+        items.append(item)
+
+    return items
