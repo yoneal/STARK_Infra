@@ -53,7 +53,7 @@ def create(data):
     for col in columns:
         col_varname = converter.convert_to_system_name(col)
         update_expression += f"""#{col_varname} = :{col_varname}, """
-    update_expression += ", #STARKListViewsk = :STARKListViewsk"
+    update_expression += " #STARKListViewsk = :STARKListViewsk"
 
     source_code = f"""\
     #Python Standard Library
