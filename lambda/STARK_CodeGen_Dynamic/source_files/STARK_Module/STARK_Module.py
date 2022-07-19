@@ -509,11 +509,11 @@ def create_listview_index_value(data):
 
 def get_all_by_old_parent_value(old_pk_val, sk = default_sk):
     
-    string_filter = " #Role = :old_parent_value"
+    string_filter = " #attribute = :old_parent_value"
     object_expression_value = {':sk' : {'S' : sk},
                                 ':old_parent_value': {'S' : old_pk_val}}
     ExpressionAttributeNamesDict = {
-        '#Role' : 'Role',
+        '#attribute' : 'Module_Group',
     }
     response = ddb.query(
         TableName=ddb_table,
