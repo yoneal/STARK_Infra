@@ -68,7 +68,7 @@ def lambda_handler(event, context):
             if data['orig_pk'] == data['pk']:
                 response = edit(data)
             else:
-                response   = add(data)
+                response   = add(data, method)
                 data['pk'] = data['orig_pk']
                 response   = delete(data)
 
@@ -299,7 +299,7 @@ def edit(data):
 
     return "OK"
 
-def add(data):
+def add(data, method='POST'):
     pk = data.get('pk', '')
     sk = data.get('sk', '')
     if sk == '': sk = default_sk
@@ -322,7 +322,8 @@ def add(data):
         TableName=ddb_table,
         Item=item,
     )
-    data['orig_pk'] = pk
+    if method == 'POST':
+        data['orig_pk'] = pk
     response = cascade_pk_change_to_child(data)
 
     return "OK"
