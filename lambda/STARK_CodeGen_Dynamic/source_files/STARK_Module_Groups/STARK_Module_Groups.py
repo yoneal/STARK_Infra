@@ -366,52 +366,37 @@ def create_listview_index_value(data):
     STARK_ListView_sk = "|".join(ListView_index_values)
     return STARK_ListView_sk
 
-def get_module_groups(username, sk=default_sk):
-
-    response = ddb.query(
-        TableName=ddb_table,
-        Select='ALL_ATTRIBUTES',
-        ReturnConsumedCapacity='TOTAL',
-        KeyConditionExpression='pk = :pk and sk = :sk',
-        ExpressionAttributeValues={
-            ':pk' : {'S' : username},
-            ':sk' : {'S' : "STARK|user|permissions"}
-        }
-    )
-
-    raw = response.get('Items')
-    permissions = []
-    for record in raw:
-        permission_string = record.get('Permissions',{}).get('S','')
-    
-    #Split permission_string by the delimeter (comma+space / ", ")
-    permissions_list = permission_string.split(", ")
-
+def get_module_groups(groups, sk=default_sk):
     ##################################
-    #GET SYSTEM MODULES (ENABLED ONLY)
+    #GET MODULE GROUPS 
     response = ddb.query(
         TableName=ddb_table,
         IndexName="STARK-ListView-Index",
         Select='ALL_ATTRIBUTES',
         ReturnConsumedCapacity='TOTAL',
-        KeyConditionExpression='sk = :sk',
+        KeyConditionExpression="#sk = :sk",
+        ExpressionAttributeNames={
+            '#sk' : 'sk'
+        },
         ExpressionAttributeValues={
-            ':sk' : {'S' : sk}
+            ':sk'  : {'S' : sk }
         }
     )
-
+    
     raw = response.get('Items')
-
+    
     items = []
     for record in raw:
-        print(record)
-        item = {}
-        item['Module_Name'] = record.get('pk', {}).get('S','')
-        item['sk'] = record.get('sk',{}).get('S','')
-        item['Description'] = record.get('Description',{}).get('S','')
-        item['Icon'] = record.get('Icon',{}).get('S','')
-        item['Priority'] = record.get('Priority',{}).get('N','')
-        items.append(item)
+        group_name = record.get('pk', {}).get('S','')
+        if group_name in groups:
+            item = {}
+            item['Group_Name'] = record.get('pk', {}).get('S','')
+            item['sk'] = record.get('sk',{}).get('S','')
+            item['Description'] = record.get('Description',{}).get('S','')
+            item['Icon'] = record.get('Icon',{}).get('S','')
+            item['Priority'] = record.get('Priority',{}).get('N','')
+            items.append(item)
+
     return items
     
 def cascade_pk_change_to_child(params):

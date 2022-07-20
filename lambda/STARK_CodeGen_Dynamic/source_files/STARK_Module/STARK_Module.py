@@ -398,6 +398,19 @@ def add(data):
 
     return "OK"
 
+def unique(list1):
+ 
+    # initialize a null list
+    unique_list = []
+ 
+    # traverse for all elements
+    for x in list1:
+        # check if exists in unique_list or not
+        if x not in unique_list:
+            unique_list.append(x)
+    
+    return unique_list
+
 def get_user_modules(username, sk=default_sk):
     ########################
     #1.GET USER PERMISSIONS
@@ -438,23 +451,8 @@ def get_user_modules(username, sk=default_sk):
     raw = response.get('Items')
 
     items = []
+    grps = []
     for record in raw:
-        # item = {}
-        # item['Module_Name'] = record.get('pk', {}).get('S','')
-        # item['sk'] = record.get('sk',{}).get('S','')
-        # item['Descriptive_Title'] = record.get('Descriptive_Title',{}).get('S','')
-        # item['Target'] = record.get('Target',{}).get('S','')
-        # item['Description'] = record.get('Description',{}).get('S','')
-        # item['Module_Group'] = record.get('Module_Group',{}).get('S','')
-        # item['Is_Menu_Item'] = record.get('Is_Menu_Item',{}).get('S','')
-        # item['Is_Enabled'] = record.get('Is_Enabled',{}).get('S','')
-        # item['Icon'] = record.get('Icon',{}).get('S','')
-        # item['Priority'] = record.get('Priority',{}).get('N','')
-
-        #FIXME: If the mapping code above has become DRY, this code should probably be refactored
-        #   so that it makes use of the mapping code abstraction results. (i.e., trigger mapping code, then assign values here
-        #   using the friendlier reference instead of "record.get...")
-        grp_name = []
         if record.get('Is_Enabled',{}).get('BOOL','') == True:
             if record.get('Is_Menu_Item',{}).get('BOOL','') == True:
                 if record.get('pk', {}).get('S','') in permissions_list:
@@ -466,13 +464,16 @@ def get_user_modules(username, sk=default_sk):
                     item['href'] = record.get('Target',{}).get('S','')
                     item['group'] = record.get('Module_Group',{}).get('S','')
                     item['priority'] = record.get('Priority',{}).get('N','')
+                    grps.append(item['group'])
                     items.append(item)
     
+    grps = unique(grps) 
+
     from os import getcwd 
     STARK_folder = getcwd() + '/STARK_Module_Groups'
     sys.path = [STARK_folder] + sys.path
     import STARK_Module_Groups as module_groups
-    module_grps = module_groups.get_module_groups(username)
+    module_grps = module_groups.get_module_groups(grps)
 
     return {
         'items': items,
