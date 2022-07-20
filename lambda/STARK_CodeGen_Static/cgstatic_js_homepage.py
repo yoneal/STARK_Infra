@@ -20,37 +20,37 @@ def create(data):
                     //fetchUrl = STARK.sys_modules_url
                     STARK.request('GET', fetchUrl)
                     .then( function(data) {{
-                                const grouped_modules = []
+                        const grouped_modules = []
 
-                                grouping = []
-                                grouping_ctr = 0
-                                
-                                for (const key in data['items']) {{
-                                    data['items'].sort((a, b) => b.priority - a.priority)
-                                    
-                                    group = data['items'][key]['group']
-                                    if ( group in grouping ) {{
-                                        //Skip
-                                    }}
-                                    else {{
-                                        module_grp = data['module_grps'].find(element=>element.Group_Name == group)
-                                        grouping[group] = grouping_ctr
-                                        grouped_modules[grouping_ctr] = {{
-                                            "group_name": group,
-                                            "priority": module_grp['Priority'],
-                                            "modules": []
-                                        }}
-                                        grouping_ctr++
-                                    }}
-                                    grouped_modules[grouping[group]]["modules"].push(data['items'][key])
+                        grouping = []
+                        grouping_ctr = 0
+                        
+                        for (const key in data['items']) {{
+                            data['items'].sort((a, b) => b.priority - a.priority)
+                            
+                            group = data['items'][key]['group']
+                            if ( group in grouping ) {{
+                                //Skip
+                            }}
+                            else {{
+                                module_grp = data['module_grps'].find(element=>element.Group_Name == group)
+                                grouping[group] = grouping_ctr
+                                grouped_modules[grouping_ctr] = {{
+                                    "group_name": group,
+                                    "priority": module_grp['Priority'],
+                                    "modules": []
                                 }}
-                                grouped_modules.sort((a, b) => b.priority - a.priority)
-                                console.log(grouped_modules)
-                                
-                                root.modules = grouped_modules;
-                                console.log("DONE! Retrieved list of modules.")
-                                spinner.hide();
-                            }})                    
+                                grouping_ctr++
+                            }}
+                            grouped_modules[grouping[group]]["modules"].push(data['items'][key])
+                        }}
+                        grouped_modules.sort((a, b) => b.priority - a.priority)
+                        console.log(grouped_modules)
+                        
+                        root.modules = grouped_modules;
+                        console.log("DONE! Retrieved list of modules.")
+                        spinner.hide();
+                    }})                    
                     .catch(function(error) {{
                         console.log("Encountered an error! [" + error + "]");
                     }});
