@@ -298,15 +298,15 @@ def edit(data):
     Icon = str(data.get('Icon', ''))
     Priority = str(data.get('Priority', ''))
 
-    if Is_Menu_Item == 'Y':
-        Is_Menu_Item = True
-    else:
-        Is_Menu_Item = False
-    Is_Enabled = str(data.get('Is_Enabled', ''))
-    if Is_Enabled == 'Y':
-        Is_Enabled = True
-    else:
-        Is_Enabled = False
+    # if Is_Menu_Item == 'Y':
+    #     Is_Menu_Item = True
+    # else:
+    #     Is_Menu_Item = False
+    # Is_Enabled = str(data.get('Is_Enabled', ''))
+    # if Is_Enabled == 'Y':
+    #     Is_Enabled = True
+    # else:
+    #     Is_Enabled = False
 
     UpdateExpressionString = "SET #Descriptive_Title = :Descriptive_Title, #Target = :Target, #Description = :Description, #Module_Group = :Module_Group, #Is_Menu_Item = :Is_Menu_Item, #Is_Enabled = :Is_Enabled, #Icon = :Icon, #Priority = :Priority" 
     ExpressionAttributeNamesDict = {
