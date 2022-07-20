@@ -404,3 +404,35 @@ def assign_role_permissions(data):
     response = user_permissions.add(data)
 
     return "OK"
+
+def get_all_by_old_parent_value(old_pk_val, sk = default_sk):
+    
+    string_filter = " #Role = :old_parent_value"
+    object_expression_value = {':sk' : {'S' : sk},
+                                ':old_parent_value': {'S' : old_pk_val}}
+    ExpressionAttributeNamesDict = {
+        '#Role' : 'Role',
+    }
+    response = ddb.query(
+        TableName=ddb_table,
+        IndexName="STARK-ListView-Index",
+        Select='ALL_ATTRIBUTES',
+        ReturnConsumedCapacity='TOTAL',
+        FilterExpression=string_filter,
+        KeyConditionExpression='sk = :sk',
+        ExpressionAttributeValues=object_expression_value,
+        ExpressionAttributeNames=ExpressionAttributeNamesDict
+    )
+    raw = response.get('Items')
+    items = []
+    for record in raw:
+        item = {}
+        item['pk'] = record.get('pk', {}).get('S','')
+        item['sk'] = record.get('sk',{}).get('S','')
+        item['Full_Name'] = record.get('Full_Name',{}).get('S','')
+        item['Nickname'] = record.get('Nickname',{}).get('S','')
+        item['Role'] = record.get('Role',{}).get('S','')
+        item['STARK-ListView-sk'] = record.get('STARK-ListView-sk',{}).get('S','')
+        items.append(item)
+
+    return items

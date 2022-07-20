@@ -220,9 +220,12 @@ def create(data, cli_mode=False):
                                         - 'dynamodb:Scan'
                                         - 'dynamodb:Query'
                                         - 'dynamodb:UpdateItem'
+                                        - 's3:PutObject'
+                                        - 's3:PutObjectAcl'
                                     Resource: 
                                         - !Join [ ":", [ "arn:aws:dynamodb", !Ref AWS::Region, !Ref AWS::AccountId, "table/{ddb_table_name}"] ]
                                         - !Join [ ":", [ "arn:aws:dynamodb", !Ref AWS::Region, !Ref AWS::AccountId, "table/{ddb_table_name}/index/STARK-ListView-Index", ] ]
+                                        - !Join [ "",  [ "arn:aws:s3:::", "{s3_bucket_name}", "/tmp/*"] ]
         STARKProjectDefaultAuthorizerInvokeRole:
             Type: AWS::IAM::Role
             Properties:
@@ -609,6 +612,8 @@ def create(data, cli_mode=False):
                     - arm64
                 MemorySize: 128
                 Timeout: 5
+                Layers:
+                    - !Ref STARKScryptLayer
         STARKBackendApiForSTARKUserPermissions:
             Type: AWS::Serverless::Function
             Properties:
