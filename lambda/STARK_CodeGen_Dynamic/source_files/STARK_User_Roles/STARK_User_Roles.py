@@ -1,6 +1,7 @@
 #Python Standard Library
 import base64
 import json
+import sys
 from urllib.parse import unquote
 
 #Extra modules
@@ -66,10 +67,9 @@ def lambda_handler(event, context):
             if data['orig_pk'] == data['pk']:
                 response = edit(data)
             else:
-                response   = add(data)
+                response   = add(data, method)
                 data['pk'] = data['orig_pk']
                 response   = delete(data)
-
         elif method == "POST":
             response = add(data)
 
@@ -287,9 +287,10 @@ def edit(data):
         ExpressionAttributeValues=ExpressionAttributeValuesDict
     )
 
+    response = cascade_pk_change_to_child(data)
     return "OK"
 
-def add(data):
+def add(data, method ='POST'):
     pk = data.get('pk', '')
     sk = data.get('sk', '')
     if sk == '': sk = default_sk
@@ -310,6 +311,9 @@ def add(data):
         TableName=ddb_table,
         Item=item,
     )
+    if method == 'POST':
+        data['orig_pk'] = pk
+    response = cascade_pk_change_to_child(data)
 
     return "OK"
 
@@ -350,3 +354,19 @@ def create_listview_index_value(data):
             ListView_index_values.append(data.get(field))
     STARK_ListView_sk = "|".join(ListView_index_values)
     return STARK_ListView_sk
+
+def cascade_pk_change_to_child(params):
+    from os import getcwd 
+    STARK_folder = getcwd() + '/STARK_User'
+    sys.path = [STARK_folder] + sys.path
+    import STARK_User as user
+
+    #fetch all records from child using old pk value
+    response = user.get_all_by_old_parent_value(params['orig_pk'])
+
+    #loop through response and update each record
+    for record in response:
+        record['Role'] = params['pk']
+        user.edit(record)
+
+    return "OK"

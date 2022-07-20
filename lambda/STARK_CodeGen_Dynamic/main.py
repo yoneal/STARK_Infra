@@ -67,8 +67,9 @@ def create_handler(event, context):
             "Entity": entity, 
             "Columns": models[entity]["data"], 
             "PK": models[entity]["pk"], 
-            "DynamoDB Name": ddb_table_name
-        }
+            "DynamoDB Name": ddb_table_name,
+            "Bucket Name": website_bucket
+            }
         source_code = cg_ddb.create(data)
 
         #Step 2: Add source code to our commit list to the project repo
@@ -133,10 +134,14 @@ def create_handler(event, context):
                 })
         #Dependencies: We don't have transparent dependency management here using cloud_resources.yml, 
         #so the code gen needs to do it manually
-        if lambda_dir == "STARK_User":
+        if lambda_dir in ["STARK_User", "STARK_User_Roles", "STARK_Module_Groups"]:
             #STARK_User needs STARK_User_Permissions and STARK_User_Roles
-            dependencies = ["STARK_User_Permissions", "STARK_User_Roles"]
-            for dependency_dir in dependencies:
+            dependencies = {
+                "STARK_User"          : {"STARK_User_Permissions", "STARK_User_Roles"},
+                "STARK_User_Roles"    : {"STARK_User_Permissions", "STARK_User"},
+                "STARK_Module_Groups" : {"STARK_Module"},
+            }
+            for dependency_dir in dependencies[lambda_dir]:
                 source_files = os.listdir(dir + os.sep + dependency_dir)
                 for source_file in source_files:
                     with open(dir + os.sep + dependency_dir + os.sep + source_file) as f:
