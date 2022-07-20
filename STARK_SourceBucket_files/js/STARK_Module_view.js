@@ -16,12 +16,12 @@ var root = new Vue({
         },
         lists: {
             'Is_Menu_Item': [
-                { value: True, text: 'Y' },
-                { value: False, text: 'N' },
+                { value: true, text: 'Y' },
+                { value: false, text: 'N' },
             ],
             'Is_Enabled': [
-                { value: True, text: 'Y' },
-                { value: False, text: 'N' },
+                { value: true, text: 'Y' },
+                { value: false, text: 'N' },
             ],
             'Module_Group': [
             ],
