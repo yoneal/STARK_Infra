@@ -293,8 +293,8 @@ def edit(data):
     Target = str(data.get('Target', ''))
     Description = str(data.get('Description', ''))
     Module_Group = str(data.get('Module_Group', ''))
-    Is_Menu_Item = str(data.get('Is_Menu_Item', ''))
-    Is_Enabled = str(data.get('Is_Enabled', ''))
+    Is_Menu_Item = data.get('Is_Menu_Item', False)
+    Is_Enabled = data.get('Is_Enabled', False)
     Icon = str(data.get('Icon', ''))
     Priority = str(data.get('Priority', ''))
 
@@ -359,19 +359,20 @@ def add(data):
     Target = str(data.get('Target', ''))
     Description = str(data.get('Description', ''))
     Module_Group = str(data.get('Module_Group', ''))
-    Is_Menu_Item = str(data.get('Is_Menu_Item', ''))
+    Is_Menu_Item = data.get('Is_Menu_Item', False)
+    Is_Enabled = data.get('Is_Enabled', False)
     Icon = str(data.get('Icon', ''))
     Priority = str(data.get('Priority', ''))
 
-    if Is_Menu_Item == 'Y':
-        Is_Menu_Item = True
-    else:
-        Is_Menu_Item = False
-    Is_Enabled = str(data.get('Is_Enabled', ''))
-    if Is_Enabled == 'Y':
-        Is_Enabled = True
-    else:
-        Is_Enabled = False
+    # if Is_Menu_Item == 'Y':
+    #     Is_Menu_Item = True
+    # else:
+    #     Is_Menu_Item = False
+    # 
+    # if Is_Enabled == 'Y':
+    #     Is_Enabled = True
+    # else:
+    #     Is_Enabled = False
 
 
     item={}
