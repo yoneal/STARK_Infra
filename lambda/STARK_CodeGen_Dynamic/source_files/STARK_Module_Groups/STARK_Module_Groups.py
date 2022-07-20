@@ -366,6 +366,39 @@ def create_listview_index_value(data):
     STARK_ListView_sk = "|".join(ListView_index_values)
     return STARK_ListView_sk
 
+def get_module_groups(groups, sk=default_sk):
+    ##################################
+    #GET MODULE GROUPS 
+    response = ddb.query(
+        TableName=ddb_table,
+        IndexName="STARK-ListView-Index",
+        Select='ALL_ATTRIBUTES',
+        ReturnConsumedCapacity='TOTAL',
+        KeyConditionExpression="#sk = :sk",
+        ExpressionAttributeNames={
+            '#sk' : 'sk'
+        },
+        ExpressionAttributeValues={
+            ':sk'  : {'S' : sk }
+        }
+    )
+    
+    raw = response.get('Items')
+    
+    items = []
+    for record in raw:
+        group_name = record.get('pk', {}).get('S','')
+        if group_name in groups:
+            item = {}
+            item['Group_Name'] = record.get('pk', {}).get('S','')
+            item['sk'] = record.get('sk',{}).get('S','')
+            item['Description'] = record.get('Description',{}).get('S','')
+            item['Icon'] = record.get('Icon',{}).get('S','')
+            item['Priority'] = record.get('Priority',{}).get('N','')
+            items.append(item)
+
+    return items
+    
 def cascade_pk_change_to_child(params):
     from os import getcwd 
     STARK_folder = getcwd() + '/STARK_Module'

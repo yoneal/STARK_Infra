@@ -3,7 +3,8 @@ import base64
 from email.policy import default
 import json
 from urllib.parse import unquote
-
+import sys
+		  
 #Extra modules
 import boto3
 
@@ -292,20 +293,20 @@ def edit(data):
     Target = str(data.get('Target', ''))
     Description = str(data.get('Description', ''))
     Module_Group = str(data.get('Module_Group', ''))
-    Is_Menu_Item = str(data.get('Is_Menu_Item', ''))
-    Is_Enabled = str(data.get('Is_Enabled', ''))
+    Is_Menu_Item = data.get('Is_Menu_Item', False)
+    Is_Enabled = data.get('Is_Enabled', False)
     Icon = str(data.get('Icon', ''))
     Priority = str(data.get('Priority', ''))
 
-    if Is_Menu_Item == 'Y':
-        Is_Menu_Item = True
-    else:
-        Is_Menu_Item = False
-    Is_Enabled = str(data.get('Is_Enabled', ''))
-    if Is_Enabled == 'Y':
-        Is_Enabled = True
-    else:
-        Is_Enabled = False
+    # if Is_Menu_Item == 'Y':
+    #     Is_Menu_Item = True
+    # else:
+    #     Is_Menu_Item = False
+    # Is_Enabled = str(data.get('Is_Enabled', ''))
+    # if Is_Enabled == 'Y':
+    #     Is_Enabled = True
+    # else:
+    #     Is_Enabled = False
 
     UpdateExpressionString = "SET #Descriptive_Title = :Descriptive_Title, #Target = :Target, #Description = :Description, #Module_Group = :Module_Group, #Is_Menu_Item = :Is_Menu_Item, #Is_Enabled = :Is_Enabled, #Icon = :Icon, #Priority = :Priority" 
     ExpressionAttributeNamesDict = {
@@ -358,19 +359,20 @@ def add(data):
     Target = str(data.get('Target', ''))
     Description = str(data.get('Description', ''))
     Module_Group = str(data.get('Module_Group', ''))
-    Is_Menu_Item = str(data.get('Is_Menu_Item', ''))
+    Is_Menu_Item = data.get('Is_Menu_Item', False)
+    Is_Enabled = data.get('Is_Enabled', False)
     Icon = str(data.get('Icon', ''))
     Priority = str(data.get('Priority', ''))
 
-    if Is_Menu_Item == 'Y':
-        Is_Menu_Item = True
-    else:
-        Is_Menu_Item = False
-    Is_Enabled = str(data.get('Is_Enabled', ''))
-    if Is_Enabled == 'Y':
-        Is_Enabled = True
-    else:
-        Is_Enabled = False
+    # if Is_Menu_Item == 'Y':
+    #     Is_Menu_Item = True
+    # else:
+    #     Is_Menu_Item = False
+    # 
+    # if Is_Enabled == 'Y':
+    #     Is_Enabled = True
+    # else:
+    #     Is_Enabled = False
 
 
     item={}
@@ -396,6 +398,19 @@ def add(data):
     )
 
     return "OK"
+
+def unique(list1):
+ 
+    # initialize a null list
+    unique_list = []
+ 
+    # traverse for all elements
+    for x in list1:
+        # check if exists in unique_list or not
+        if x not in unique_list:
+            unique_list.append(x)
+    
+    return unique_list
 
 def get_user_modules(username, sk=default_sk):
     ########################
@@ -437,23 +452,8 @@ def get_user_modules(username, sk=default_sk):
     raw = response.get('Items')
 
     items = []
+    grps = []
     for record in raw:
-        # item = {}
-        # item['Module_Name'] = record.get('pk', {}).get('S','')
-        # item['sk'] = record.get('sk',{}).get('S','')
-        # item['Descriptive_Title'] = record.get('Descriptive_Title',{}).get('S','')
-        # item['Target'] = record.get('Target',{}).get('S','')
-        # item['Description'] = record.get('Description',{}).get('S','')
-        # item['Module_Group'] = record.get('Module_Group',{}).get('S','')
-        # item['Is_Menu_Item'] = record.get('Is_Menu_Item',{}).get('S','')
-        # item['Is_Enabled'] = record.get('Is_Enabled',{}).get('S','')
-        # item['Icon'] = record.get('Icon',{}).get('S','')
-        # item['Priority'] = record.get('Priority',{}).get('N','')
-
-        #FIXME: If the mapping code above has become DRY, this code should probably be refactored
-        #   so that it makes use of the mapping code abstraction results. (i.e., trigger mapping code, then assign values here
-        #   using the friendlier reference instead of "record.get...")
-
         if record.get('Is_Enabled',{}).get('BOOL','') == True:
             if record.get('Is_Menu_Item',{}).get('BOOL','') == True:
                 if record.get('pk', {}).get('S','') in permissions_list:
@@ -465,9 +465,21 @@ def get_user_modules(username, sk=default_sk):
                     item['href'] = record.get('Target',{}).get('S','')
                     item['group'] = record.get('Module_Group',{}).get('S','')
                     item['priority'] = record.get('Priority',{}).get('N','')
+                    grps.append(item['group'])
                     items.append(item)
+    
+    grps = unique(grps) 
 
-    return items
+    from os import getcwd 
+    STARK_folder = getcwd() + '/STARK_Module_Groups'
+    sys.path = [STARK_folder] + sys.path
+    import STARK_Module_Groups as module_groups
+    module_grps = module_groups.get_module_groups(grps)
+
+    return {
+        'items': items,
+        'module_grps': module_grps
+    }
 
 def compose_operators(key, data):
     composed_filter_dict = {"filter_string":"","expression_values": {}}

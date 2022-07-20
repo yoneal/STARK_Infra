@@ -5,6 +5,7 @@
 import datetime
 import time
 import os
+from random import randint
 
 
 #Extra modules
@@ -130,8 +131,8 @@ def create_handler(event, context):
         sys_modules['Descriptive_Title'] = {'S' : system_modules_yml[system_modules]["Descriptive_Title"]}
         sys_modules['Description']       = {'S' : system_modules_yml[system_modules]["Description"]}
         sys_modules['Module_Group']      = {'S' : system_modules_yml[system_modules]["Module_Group"]}
-        sys_modules['Is_Menu_Item']      = {'S' : system_modules_yml[system_modules]["Is_Menu_Item"]}
-        sys_modules['Is_Enabled']        = {'S' : system_modules_yml[system_modules]["Is_Enabled"]}
+        sys_modules['Is_Menu_Item']      = {'BOOL' : system_modules_yml[system_modules]["Is_Menu_Item"]}
+        sys_modules['Is_Enabled']        = {'BOOL' : system_modules_yml[system_modules]["Is_Enabled"]}
         sys_modules['Icon']              = {'S' : system_modules_yml[system_modules]["Icon"]}
         sys_modules['Image_Alt']         = {'S' : system_modules_yml[system_modules]["Image_Alt"]}
         sys_modules['Priority']          = {'N' : system_modules_yml[system_modules]["Priority"]}
@@ -147,16 +148,17 @@ def create_handler(event, context):
     for entity in entities:
         for module_type in module_types:
             pk = entity + '|' + module_type 
+            entity_varname = converter.convert_to_system_name(entity)
             if module_type == 'View':
-                target = entity + '.html'
+                target = entity_varname + '.html'
                 title = entity
-                is_menu_item = 'Y'
-                icon = ''
+                is_menu_item = True
             else:
-                target = entity + '_' + module_type + '.html'
+                target = entity_varname + '_' + module_type + '.html'
                 title = module_type + ' ' + entity
-                is_menu_item = 'N'
-                icon = ''
+                is_menu_item = False
+                
+            icon = 'images/' + suggest_graphic(entity)
 
             business_module                      = {}
             business_module['pk']                = {'S' : pk}
@@ -165,8 +167,8 @@ def create_handler(event, context):
             business_module['Descriptive_Title'] = {'S' : title}
             business_module['Description']       = {'S' : ""}
             business_module['Module_Group']      = {'S' : "Default"}
-            business_module['Is_Menu_Item']      = {'S' : is_menu_item}
-            business_module['Is_Enabled']        = {'S' : "Y"}
+            business_module['Is_Menu_Item']      = {'BOOL' : is_menu_item}
+            business_module['Is_Enabled']        = {'BOOL' : True}
             business_module['Icon']              = {'S' : icon}
             business_module['Image_Alt']         = {'S' : ""}
             business_module['Priority']          = {'N' : "0"}
@@ -239,3 +241,87 @@ def no_op(_, __):
 
 def lambda_handler(event, context):
     helper(event, context)
+
+def suggest_graphic(entity_name):
+    #FIXME: When STARK data modeling grammar is finalized, it should include a way for
+    #   devs to include a type hint for the entity (e.g., "people") to guide the parser
+    #   towards choosing a more appropriate default graphic.
+    #   Should also include a way to directly specify the desired image name (e.g. "user.png")
+
+    extension = "svg"
+
+    default_icon_map = {
+        "award": [f"award.{extension}"],
+        "archive": [f"archive.{extension}"],
+        "book": [f"book.{extension}"],
+        "commerce": [f"shopping-bag.{extension}", f"shopping-cart.{extension}"],
+        "config": [f"gear.{extension}", f"sliders.{extension}"],
+        "data": [f"pie-chart.{extension}"],
+        "document": [f"file-text.{extension}", f"folder.{extension}"],
+        "event": [f"calendar.{extension}"],
+        "item": [f"box.{extension}",f"package.{extension}"],
+        "location": [f"map.{extension}", f"map-pin.{extension}"],
+        "logistics": [f"truck.{extension}"],
+        "person": [f"user.{extension}", f"users.{extension}"],
+        "sales": [f"dollar.{extension}", f"credit-card.{extension}"],
+        "tasks": [f"clipboard.{extension}"],
+        "travel": [f"briefcase.{extension}"],
+        "type": [f"tag.{extension}"],
+    }
+
+    abstract_icons = [ f"square.{extension}", f"triangle.{extension}", f"circle.{extension}", f"hexagon.{extension}", f"star.{extension}"]
+
+    #The order of these types matter. Types that come first take precedence.
+    entity_type_map = {
+        "type": ["type", "category", "categories", "tag", "price"],
+        "tasks": ["task", "to do", "todo", "to-do", "list"],
+        "data": ["data", "report"],
+        "award": ["award", "prize"],
+        "archive": ["archive", "storage", "warehouse"],
+        "book": ["book"],
+        "commerce": ["order", "shop"],
+        "config": ["config", "configuration", "settings", "option"],
+        "document": ["document", "file", "form",],
+        "event": ["event", "meeting", "date", "call", "conference"],
+        "item": ["item", "package", "inventory"],
+        "location": ["address", "place", "location", "country", "countries", "city", "cities", "branch", "office"],
+        "logistics": ["delivery", "deliveries", "vehicle", "fleet", "shipment"],
+        "person": ["customer", "agent", "employee", "student", "teacher", "person", "people", "human"],
+        "sales": ["sale", "sale", "purchase", "money", "finance"],
+        "travel": ["travel"],
+    }
+
+    suggested_type = ''
+    entity_name = entity_name.lower()
+    for type in entity_type_map:
+        #First, try a naive match
+        if entity_name in entity_type_map[type]:
+            suggested_type = type
+
+        #If no match, see if we can match by attempting to turn name to singular
+        if suggested_type == '':
+            if entity_name[-1] == "s":
+                singular_name = entity_name[0:-1]
+                if singular_name in entity_type_map[type]:
+                    suggested_type = type
+
+        #If no match, see if we can substr the type map entries into entity name
+        if suggested_type == '':
+            for keyword in entity_type_map[type]:
+                if keyword in entity_name:
+                    suggested_type = type
+
+
+    #If still no match, abstract icons will be assigned to this entity
+    if suggested_type == '':
+        suggested_type = 'abstract'
+
+    print(suggested_type)
+    if suggested_type == 'abstract':
+        limit = len(abstract_icons) - 1
+        suggested_icon = abstract_icons[randint(0, limit)]
+    else:
+        limit = len(default_icon_map[suggested_type]) - 1
+        suggested_icon = default_icon_map[suggested_type][randint(0, limit)]
+
+    return suggested_icon

@@ -16,12 +16,12 @@ var root = new Vue({
         },
         lists: {
             'Is_Menu_Item': [
-                { value: 'Y', text: 'Y' },
-                { value: 'N', text: 'N' },
+                { value: true, text: 'Y' },
+                { value: false, text: 'N' },
             ],
             'Is_Enabled': [
-                { value: 'Y', text: 'Y' },
-                { value: 'N', text: 'N' },
+                { value: true, text: 'Y' },
+                { value: false, text: 'N' },
             ],
             'Module_Group': [
             ],
@@ -116,18 +116,18 @@ var root = new Vue({
 
                 STARK_Module_app.get(data).then( function(data) {
                     root.STARK_Module = data[0]; //We need 0, because API backed func always returns a list for now
-                    if(root.STARK_Module.Is_Enabled == true) {
-                        root.STARK_Module.Is_Enabled = "Y"
-                    }
-                    else {
-                        root.STARK_Module.Is_Enabled = "N"
-                    }
-                    if(root.STARK_Module.Is_Menu_Item == true) {
-                        root.STARK_Module.Is_Menu_Item = "Y"
-                    }
-                    else {
-                        root.STARK_Module.Is_Menu_Item = "N"
-                    }
+                    // if(root.STARK_Module.Is_Enabled == true) {
+                    //     root.STARK_Module.Is_Enabled = "Y"
+                    // }
+                    // else {
+                    //     root.STARK_Module.Is_Enabled = "N"
+                    // }
+                    // if(root.STARK_Module.Is_Menu_Item == true) {
+                    //     root.STARK_Module.Is_Menu_Item = "Y"
+                    // }
+                    // else {
+                    //     root.STARK_Module.Is_Menu_Item = "N"
+                    // }
                     root.STARK_Module.orig_Module_Name = root.STARK_Module.Module_Name;
                     root.lists.Module_Group = [  { value: root.STARK_Module.Module_Group, text: root.STARK_Module.Module_Group },]
                     console.log("VIEW: Retreived module data.")
