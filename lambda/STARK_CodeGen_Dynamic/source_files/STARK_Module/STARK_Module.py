@@ -454,7 +454,7 @@ def get_user_modules(username, sk=default_sk):
         #FIXME: If the mapping code above has become DRY, this code should probably be refactored
         #   so that it makes use of the mapping code abstraction results. (i.e., trigger mapping code, then assign values here
         #   using the friendlier reference instead of "record.get...")
-
+        grp_name = []
         if record.get('Is_Enabled',{}).get('BOOL','') == True:
             if record.get('Is_Menu_Item',{}).get('BOOL','') == True:
                 if record.get('pk', {}).get('S','') in permissions_list:
@@ -467,7 +467,7 @@ def get_user_modules(username, sk=default_sk):
                     item['group'] = record.get('Module_Group',{}).get('S','')
                     item['priority'] = record.get('Priority',{}).get('N','')
                     items.append(item)
-
+    
     from os import getcwd 
     STARK_folder = getcwd() + '/STARK_Module_Groups'
     sys.path = [STARK_folder] + sys.path

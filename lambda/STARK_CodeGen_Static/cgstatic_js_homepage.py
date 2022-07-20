@@ -21,7 +21,7 @@ def create(data):
                     STARK.request('GET', fetchUrl)
                     .then( function(data) {{
 
-                        console.log(typeof(data))
+                        # console.log(typeof(data))
                         const grouped_modules = []
 
                         grouping = []
@@ -29,7 +29,7 @@ def create(data):
                         
                         for (const key in data['items']) {{
                             data['items'].sort((a, b) => b.priority - a.priority)
-                            console.log(data[key]['group'])
+                            # console.log(data[key]['group'])
                             
                             group = data['items'][key]['group']
                             if ( group in grouping ) {{
