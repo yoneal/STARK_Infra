@@ -366,7 +366,6 @@ def create_listview_index_value(data):
     STARK_ListView_sk = "|".join(ListView_index_values)
     return STARK_ListView_sk
 
-<<<<<<< HEAD
 def get_module_groups(username, sk=default_sk):
 
     response = ddb.query(
@@ -414,7 +413,6 @@ def get_module_groups(username, sk=default_sk):
         item['Priority'] = record.get('Priority',{}).get('N','')
         items.append(item)
     return items
-=======
 def cascade_pk_change_to_child(params):
     from os import getcwd 
     STARK_folder = getcwd() + '/STARK_Module'
@@ -430,4 +428,3 @@ def cascade_pk_change_to_child(params):
         stark_module.edit(record)
 
     return "OK"
->>>>>>> master
