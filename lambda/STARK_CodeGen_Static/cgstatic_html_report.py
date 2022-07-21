@@ -40,7 +40,7 @@ def create(data):
                                             <div class="alert alert-danger alert-dismissible fade show" v-if="showError">
                                                 <strong>Error!</strong> Put operator/s on:
                                                 <template v-for="column in no_operator" id="no_operator">
-                                                    <tr scope="col"> - {{ column }}</tr>
+                                                    <tr scope="col"> - {{{{ column }}}}</tr>
                                                 </template>
                                             </div>
                                     </table>
