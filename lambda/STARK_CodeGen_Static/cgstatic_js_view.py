@@ -304,7 +304,7 @@ def create(data):
                         let temp_index = {{'field': element, label: element.replace("_"," ")}}
                         temp_show_fields.push(temp_index)
                     }});
-                    root.report_fields = temp_show_fields;
+                    root.STARK_report_fields = temp_show_fields;
                     root.formValidation();
                     loading_modal.show()
                     this.custom_report['STARK_report_fields'] = root.STARK_report_fields
