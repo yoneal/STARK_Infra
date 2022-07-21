@@ -23,7 +23,7 @@ def create(data):
             el: "#vue-root",
             data: {{
                 listview_table: '',
-                report_fields: [],
+                STARK_report_fields: [],
                 {entity_varname}: {{
                     '{pk_varname}': '',
                     'sk': '',"""
@@ -44,6 +44,7 @@ def create(data):
 
     source_code += f"""
                     'STARK_isReport':true
+                    'STARK_report_fields':[]
                 }},
                 lists: {{
                     'Report_Operator': [
@@ -274,9 +275,10 @@ def create(data):
                         let temp_index = {{'field': element, label: element.replace("_"," ")}}
                         temp_show_fields.push(temp_index)
                     }});
-                    root.report_fields = temp_show_fields;
+                    root.STARK_report_fields = temp_show_fields;
                     root.showReport = true
                     loading_modal.show()
+                    this.custom_report['STARK_report_fields'] = root.STARK_report_fields
                     let report_payload = {{ {entity_varname}: this.custom_report }}
         
                     {entity_app}.report(report_payload).then( function(data) {{
@@ -284,6 +286,7 @@ def create(data):
                         root.temp_csv_link = data[2]
                         console.log("DONE! Retrieved report.");
                         loading_modal.hide()
+                        root.showReport = true
         
                     }})
                     .catch(function(error) {{
