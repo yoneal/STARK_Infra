@@ -43,7 +43,7 @@ def create(data):
                     '{col_varname}':  {{"operator": "", "value": "", "type":"S"}},""" 
 
     source_code += f"""
-                    'STARK_isReport':true
+                    'STARK_isReport':true,
                     'STARK_report_fields':[]
                 }},
                 lists: {{
