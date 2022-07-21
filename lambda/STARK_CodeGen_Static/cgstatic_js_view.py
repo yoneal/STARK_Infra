@@ -47,6 +47,7 @@ def create(data):
                 }},
                 lists: {{
                     'Report_Operator': [
+                        {{ value: '', text: '' }},
                         {{ value: '=', text: 'EQUAL TO (=)' }},
                         {{ value: '<>', text: 'NOT EQUAL TO (!=)' }},
                         {{ value: '<', text: 'LESS THAN (<)' }},
@@ -303,27 +304,24 @@ def create(data):
                         temp_show_fields.push(temp_index)
                     }});
                     root.report_fields = temp_show_fields;
-                    root.showReport = true
-
+                    
                     root.formValidation();
 
-                    if(root.showReport){{
-                        loading_modal.show()
-                        
-                        let report_payload = {{ {entity_varname}: this.custom_report }}
-            
-                        {entity_app}.report(report_payload).then( function(data) {{
-                            root.listview_table = data[0];
-                            root.temp_csv_link = data[2]
-                            console.log("DONE! Retrieved report.");
-                            loading_modal.hide()
-            
-                        }})
-                        .catch(function(error) {{
-                            console.log("Encountered an error! [" + error + "]")
-                            loading_modal.hide()
-                        }});
-                    }}
+                    loading_modal.show()
+                    let report_payload = {{ {entity_varname}: this.custom_report }}
+        
+                    {entity_app}.report(report_payload).then( function(data) {{
+                        root.showReport = true
+                        root.listview_table = data[0];
+                        root.temp_csv_link = data[2]
+                        console.log("DONE! Retrieved report.");
+                        loading_modal.hide()
+        
+                    }})
+                    .catch(function(error) {{
+                        console.log("Encountered an error! [" + error + "]")
+                        loading_modal.hide()
+                    }});
                 }},
                 download_csv() {{
                     let link = "https://" + root.temp_csv_link
