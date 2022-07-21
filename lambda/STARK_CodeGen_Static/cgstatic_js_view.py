@@ -277,18 +277,17 @@ def create(data):
 
                 formValidation: function () {{
                     root.error_message = ""
-                    root.authFailure   = false
-                    root.authTry       = true
                     let no_operator = []
+                    let isValid = true;
+                    root.showError = false
                     for (element in root.custom_report) {{
                         if(root.custom_report[element].value != '' && root.custom_report[element].operator == '')
                         {{
-                            root.showReport = false
                             root.showError = true
                             //fetch all error
                             if(root.custom_report[element].operator == '')
                             {{
-                                // console.log(element);
+                                isValid = false
                                 no_operator.push(element)
                             }}
                         }}
@@ -296,6 +295,7 @@ def create(data):
                     root.no_operator = no_operator;
                     //display error
                     root.error_message = "Put operator/s on: " + no_operator ;
+                    return isValid
                 }},
 
                 generate: function () {{
@@ -305,23 +305,24 @@ def create(data):
                         temp_show_fields.push(temp_index)
                     }});
                     root.STARK_report_fields = temp_show_fields;
-                    root.formValidation();
-                    loading_modal.show()
                     this.custom_report['STARK_report_fields'] = root.STARK_report_fields
                     let report_payload = {{ {entity_varname}: this.custom_report }}
-        
-                    {entity_app}.report(report_payload).then( function(data) {{
-                        root.listview_table = data[0];
-                        root.temp_csv_link = data[2]
-                        console.log("DONE! Retrieved report.");
-                        loading_modal.hide()
-                        root.showReport = true
-        
-                    }})
-                    .catch(function(error) {{
-                        console.log("Encountered an error! [" + error + "]")
-                        loading_modal.hide()
-                    }});
+                    if(root.formValidation())
+                    {{
+                        loading_modal.show()
+                        {entity_app}.report(report_payload).then( function(data) {{
+                            root.listview_table = data[0];
+                            root.temp_csv_link = data[2]
+                            console.log("DONE! Retrieved report.");
+                            loading_modal.hide()
+                            root.showReport = true
+            
+                        }})
+                        .catch(function(error) {{
+                            console.log("Encountered an error! [" + error + "]")
+                            loading_modal.hide()
+                        }});
+                    }}
                 }},
                 download_csv() {{
                     let link = "https://" + root.temp_csv_link
