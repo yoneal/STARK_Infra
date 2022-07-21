@@ -34,6 +34,17 @@ def create(data):
                     <div class="col">
                         <div class="my-auto">
                             <form class="border p-3">
+                                <div>
+                                    <table class="table table-bordered">
+                                                
+                                            <div class="alert alert-danger alert-dismissible fade show" v-if="showError">
+                                                <strong>Error!</strong> Put operator/s on:
+                                                <template v-for="column in no_operator" id="no_operator">
+                                                    <tr scope="col"> - {{ column }}</tr>
+                                                </template>
+                                            </div>
+                                    </table>
+                                </div>
                                 <table class="table table-bordered">
                                     <tr>
                                         <th style="padding: 10px">
@@ -102,7 +113,7 @@ def create(data):
             <div class="container" v-if="showReport">
                 <div class="row">
                     <div class="col-6 text-left d-inline-block">
-                        <button id="prev" type="button" class="btn btn-secondary mb-2" onClick="root.showReport = false"> Back </button>
+                        <button id="prev" type="button" class="btn btn-secondary mb-2" onClick="root.showReport = false, root.showError = false"> Back </button>
                         <button type="button" class="btn btn-primary mb-2" onClick="root.download_csv()" :disabled="listview_table.length < 1"> Export as CSV</button>
                         <button id="refresh" type="button" class="btn btn-success mb-2" onClick="root.generate()" :disabled="listview_table.length < 1"> Refresh </button>
                     </div>

@@ -98,7 +98,12 @@ def create(data):
                 page_token_map: {{1: ''}},
                 curr_page: 1,
                 showReport: false,
-                temp_csv_link: ""
+                temp_csv_link: "",
+                showError: false,
+                no_operator: [],
+                error_message: '',
+                authFailure: false,
+                authTry: false
 
             }},
             methods: {{
@@ -268,6 +273,29 @@ def create(data):
                     }});
                 }},
 
+                formValidation: function () {{
+                    root.error_message = ""
+                    root.authFailure   = false
+                    root.authTry       = true
+                    let no_operator = []
+                    for (element in root.custom_report) {{
+                        if(root.custom_report[element].value != '' && root.custom_report[element].operator == '')
+                        {{
+                            root.showReport = false
+                            root.showError = true
+                            //fetch all error
+                            if(root.custom_report[element].operator == '')
+                            {{
+                                // console.log(element);
+                                no_operator.push(element)
+                            }}
+                        }}
+                    }}
+                    root.no_operator = no_operator;
+                    //display error
+                    root.error_message = "Put operator/s on: " + no_operator ;
+                }},
+
                 generate: function () {{
                     let temp_show_fields = []
                     checked_fields.forEach(element => {{
@@ -276,20 +304,26 @@ def create(data):
                     }});
                     root.report_fields = temp_show_fields;
                     root.showReport = true
-                    loading_modal.show()
-                    let report_payload = {{ {entity_varname}: this.custom_report }}
-        
-                    {entity_app}.report(report_payload).then( function(data) {{
-                        root.listview_table = data[0];
-                        root.temp_csv_link = data[2]
-                        console.log("DONE! Retrieved report.");
-                        loading_modal.hide()
-        
-                    }})
-                    .catch(function(error) {{
-                        console.log("Encountered an error! [" + error + "]")
-                        loading_modal.hide()
-                    }});
+
+                    root.formValidation();
+
+                    if(root.showReport){{
+                        loading_modal.show()
+                        
+                        let report_payload = {{ {entity_varname}: this.custom_report }}
+            
+                        {entity_app}.report(report_payload).then( function(data) {{
+                            root.listview_table = data[0];
+                            root.temp_csv_link = data[2]
+                            console.log("DONE! Retrieved report.");
+                            loading_modal.hide()
+            
+                        }})
+                        .catch(function(error) {{
+                            console.log("Encountered an error! [" + error + "]")
+                            loading_modal.hide()
+                        }});
+                    }}
                 }},
                 download_csv() {{
                     let link = "https://" + root.temp_csv_link
