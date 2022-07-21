@@ -167,7 +167,7 @@ def create(data):
                     response   = delete(data)
 
             elif method == "POST":
-                if data['STARK_isReport']:
+                if 'STARK_isReport' in data:
                     response = report(data, default_sk)
                 else:
                     response = add(data)
