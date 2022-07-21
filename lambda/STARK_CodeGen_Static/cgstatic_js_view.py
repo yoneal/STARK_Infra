@@ -47,6 +47,7 @@ def create(data):
                 }},
                 lists: {{
                     'Report_Operator': [
+                        {{ value: '', text: '' }},
                         {{ value: '=', text: 'EQUAL TO (=)' }},
                         {{ value: '<>', text: 'NOT EQUAL TO (!=)' }},
                         {{ value: '<', text: 'LESS THAN (<)' }},
@@ -98,7 +99,12 @@ def create(data):
                 page_token_map: {{1: ''}},
                 curr_page: 1,
                 showReport: false,
-                temp_csv_link: ""
+                temp_csv_link: "",
+                showError: false,
+                no_operator: [],
+                error_message: '',
+                authFailure: false,
+                authTry: false
 
             }},
             methods: {{
@@ -268,6 +274,29 @@ def create(data):
                     }});
                 }},
 
+                formValidation: function () {{
+                    root.error_message = ""
+                    root.authFailure   = false
+                    root.authTry       = true
+                    let no_operator = []
+                    for (element in root.custom_report) {{
+                        if(root.custom_report[element].value != '' && root.custom_report[element].operator == '')
+                        {{
+                            root.showReport = false
+                            root.showError = true
+                            //fetch all error
+                            if(root.custom_report[element].operator == '')
+                            {{
+                                // console.log(element);
+                                no_operator.push(element)
+                            }}
+                        }}
+                    }}
+                    root.no_operator = no_operator;
+                    //display error
+                    root.error_message = "Put operator/s on: " + no_operator ;
+                }},
+
                 generate: function () {{
                     let temp_show_fields = []
                     checked_fields.forEach(element => {{
@@ -275,11 +304,14 @@ def create(data):
                         temp_show_fields.push(temp_index)
                     }});
                     root.report_fields = temp_show_fields;
-                    root.showReport = true
+                    
+                    root.formValidation();
+
                     loading_modal.show()
                     let report_payload = {{ {entity_varname}: this.custom_report }}
         
                     {entity_app}.report(report_payload).then( function(data) {{
+                        root.showReport = true
                         root.listview_table = data[0];
                         root.temp_csv_link = data[2]
                         console.log("DONE! Retrieved report.");
