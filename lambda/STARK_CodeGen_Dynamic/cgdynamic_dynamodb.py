@@ -16,7 +16,7 @@ def create(data):
     ddb_table_name = data["DynamoDB Name"]
     bucket_name    = data['Bucket Name']
     relationships  = data["Relationships"]
-    print(relationships)
+    
     #Convert human-friendly names to variable-friendly names
     entity_varname = converter.convert_to_system_name(entity)
     pk_varname     = converter.convert_to_system_name(pk)
@@ -74,13 +74,14 @@ def create(data):
 
     #######
     #CONFIG
-    ddb_table   = "{ddb_table_name}"
-    pk_field    = "{pk_varname}"
-    default_sk  = "{default_sk}"
-    sort_fields = ["{pk_varname}", ]
-    bucket_name = "{bucket_name}"
-    region_name = os.environ['AWS_REGION']
-    page_limit  = 10
+    ddb_table     = "{ddb_table_name}"
+    pk_field      = "{pk_varname}"
+    default_sk    = "{default_sk}"
+    sort_fields   = ["{pk_varname}", ]
+    bucket_name   = "{bucket_name}"
+    relationships = {relationships}
+    region_name   = os.environ['AWS_REGION']
+    page_limit    = 10
 
     def lambda_handler(event, context):
 
