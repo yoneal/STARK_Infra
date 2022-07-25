@@ -54,6 +54,7 @@ def create_handler(event, context):
 
 
     models   = cloud_resources["Data Model"]
+    relationships = get_relationship(models)
     entities = []
     for entity in models: entities.append(entity)
 
@@ -68,7 +69,8 @@ def create_handler(event, context):
             "Columns": models[entity]["data"], 
             "PK": models[entity]["pk"], 
             "DynamoDB Name": ddb_table_name,
-            "Bucket Name": website_bucket
+            "Bucket Name": website_bucket,
+            "Relationships": relationships
             }
         source_code = cg_ddb.create(data)
 
@@ -237,3 +239,23 @@ def no_op(_, __):
 
 def lambda_handler(event, context):
     helper(event, context)
+
+def get_relationship(data, parent_entity_name=""):
+    rel_list = []
+    for entity, attributes in data.items():
+        if type(attributes) is dict:
+            cols = attributes['data']
+            for col, types in cols.items():
+                if type(types) is dict:
+                    for data in types:
+                        if data == 'has_one':
+                            if parent_entity_name == "":
+                                rel={'parent' : col, 'child' : entity}
+                                rel_list.append(rel)
+                            else:
+                                if col == parent_entity_name:
+                                    rel={'parent' : col, 'child' : entity}
+                                    rel_list.append(rel)
+                                    
+
+    return rel_list

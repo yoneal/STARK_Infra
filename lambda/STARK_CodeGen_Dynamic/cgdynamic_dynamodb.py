@@ -15,7 +15,8 @@ def create(data):
     columns        = data["Columns"]
     ddb_table_name = data["DynamoDB Name"]
     bucket_name    = data['Bucket Name']
-
+    relationships  = data["Relationships"]
+    print(relationships)
     #Convert human-friendly names to variable-friendly names
     entity_varname = converter.convert_to_system_name(entity)
     pk_varname     = converter.convert_to_system_name(pk)
