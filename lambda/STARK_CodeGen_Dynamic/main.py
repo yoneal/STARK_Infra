@@ -23,6 +23,7 @@ import cgdynamic_authorizer as cg_auth
 import cgdynamic_sam_template as cg_sam
 import cgdynamic_template_conf as cg_conf
 import convert_friendly_to_system as converter
+import get_relationship as get_rel
 
 s3  = boto3.client('s3')
 lmb = boto3.client('lambda')
@@ -69,7 +70,7 @@ def create_handler(event, context):
             "PK": models[entity]["pk"], 
             "DynamoDB Name": ddb_table_name,
             "Bucket Name": website_bucket,
-            "Relationships": get_relationship(models, entity)
+            "Relationships": get_rel.get_relationship(models, entity)
             }
         source_code = cg_ddb.create(data)
 
@@ -238,23 +239,3 @@ def no_op(_, __):
 
 def lambda_handler(event, context):
     helper(event, context)
-
-def get_relationship(data, parent_entity_name=""):
-    rel_list = []
-    for entity, attributes in data.items():
-        if type(attributes) is dict:
-            cols = attributes['data']
-            for col, types in cols.items():
-                if type(types) is dict:
-                    for data in types:
-                        if data == 'has_one':
-                            if parent_entity_name == "":
-                                rel={'parent' : col, 'child' : entity, 'attribute': types['has_one']}
-                                rel_list.append(rel)
-                            else:
-                                if col == parent_entity_name:
-                                    rel={'parent' : col, 'child' : entity, 'attribute': types['has_one']}
-                                    rel_list.append(rel)
-                                    
-
-    return rel_list
