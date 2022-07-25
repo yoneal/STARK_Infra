@@ -240,7 +240,10 @@ def create(data):
 
         #Map to expected structure
         #FIXME: this is duplicated code, make this DRY by outsourcing the mapping to a different function.
-        items = map_results(raw)
+        items = []
+        for record in raw:
+            items.append(map_results(record))
+
         csv_filename = generate_csv(items)
         #Get the "next" token, pass to calling function. This enables a "next page" request later.
         next_token = response.get('LastEvaluatedKey')
@@ -279,7 +282,9 @@ def create(data):
 
         #Map to expected structure
         #FIXME: this is duplicated code, make this DRY by outsourcing the mapping to a different function.
-        items = map_results(raw)
+        items = []
+        for record in raw:
+            items.append(map_results(record))
 
         #Get the "next" token, pass to calling function. This enables a "next page" request later.
         next_token = response.get('LastEvaluatedKey')
@@ -304,7 +309,9 @@ def create(data):
         raw = response.get('Items')
 
         #Map to expected structure
-        items = map_results(raw)
+        items = []
+        for record in raw:
+            items.append(map_results(record))
 
         return items
 
@@ -430,22 +437,19 @@ def create(data):
         STARK_ListView_sk = "|".join(ListView_index_values)
         return STARK_ListView_sk
     
-    def map_results(raw_response):
-        items = []
-        for record in raw_response:
-            item = {{}}
-            item['{pk_varname}'] = record.get('pk', {{}}).get('S','')
-            item['sk'] = record.get('sk',{{}}).get('S','')"""
+    def map_results(record):
+        item = {{}}
+        item['{pk_varname}'] = record.get('pk', {{}}).get('S','')
+        item['sk'] = record.get('sk',{{}}).get('S','')"""
     for col, col_type in columns.items():
         col_varname = converter.convert_to_system_name(col)
         col_type_id = set_type(col_type)
 
         source_code +=f"""
-            item['{col_varname}'] = record.get('{col_varname}',{{}}).get('{col_type_id}','')"""
+        item['{col_varname}'] = record.get('{col_varname}',{{}}).get('{col_type_id}','')"""
 
     source_code += f"""
-            items.append(item)
-        return items
+        return item
 
     def generate_csv(mapped_results = []): 
         csv_header = ['{pk_varname}', """
@@ -468,7 +472,36 @@ def create(data):
             Key='tmp/'+filename
         )
         
-        return bucket_name+".s3."+ region_name + ".amazonaws.com/tmp/" +filename    
+        return bucket_name+".s3."+ region_name + ".amazonaws.com/tmp/" +filename
+
+    def get_all_by_old_parent_value(old_pk_val, attribute, sk = default_sk):
+    
+        string_filter = " #Attribute = :old_parent_value"
+        object_expression_value = {{':sk' : {{'S' : sk}},
+                                    ':old_parent_value': {{'S' : old_pk_val}}}}
+        ExpressionAttributeNamesDict = {{
+            '#Attribute' : attribute,
+        }}
+        response = ddb.query(
+            TableName=ddb_table,
+            IndexName="STARK-ListView-Index",
+            Select='ALL_ATTRIBUTES',
+            ReturnConsumedCapacity='TOTAL',
+            FilterExpression=string_filter,
+            KeyConditionExpression='sk = :sk',
+            ExpressionAttributeValues=object_expression_value,
+            ExpressionAttributeNames=ExpressionAttributeNamesDict
+        )
+        raw = response.get('Items')
+        items = []
+        for record in raw:
+            item = map_results(record)
+            #add pk as literal 'pk' value
+            #and STARK-ListView-Sk
+            item['pk'] = record.get('pk', {{}}).get('S','')
+            item['STARK-ListView-sk'] = record.get('STARK-ListView-sk',{{}}).get('S','')
+            items.append(item)
+        return items
     """
 
     return textwrap.dedent(source_code)

@@ -250,11 +250,11 @@ def get_relationship(data, parent_entity_name=""):
                     for data in types:
                         if data == 'has_one':
                             if parent_entity_name == "":
-                                rel={'parent' : col, 'child' : entity}
+                                rel={'parent' : col, 'child' : entity, 'attribute': types['has_one']}
                                 rel_list.append(rel)
                             else:
                                 if col == parent_entity_name:
-                                    rel={'parent' : col, 'child' : entity}
+                                    rel={'parent' : col, 'child' : entity, 'attribute': types['has_one']}
                                     rel_list.append(rel)
                                     
 
