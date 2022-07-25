@@ -54,7 +54,6 @@ def create_handler(event, context):
 
 
     models   = cloud_resources["Data Model"]
-    relationships = get_relationship(models)
     entities = []
     for entity in models: entities.append(entity)
 
@@ -70,7 +69,7 @@ def create_handler(event, context):
             "PK": models[entity]["pk"], 
             "DynamoDB Name": ddb_table_name,
             "Bucket Name": website_bucket,
-            "Relationships": relationships
+            "Relationships": get_relationship(models, entity_varname)
             }
         source_code = cg_ddb.create(data)
 
