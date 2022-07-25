@@ -28,7 +28,7 @@ def create():
 
             for dependency in func_def['Dependencies']:
                 #Copy entire Lambda module code (folder)
-                os.system(f"cp -R lambda/{{dependency}} lambda/{{stark_func}}")
+                os.system(f"cp -R lambda_src/{{dependency}} lambda/{{stark_func}}")
     """
     return textwrap.dedent(source_code)
 
