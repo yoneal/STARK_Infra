@@ -60,6 +60,8 @@ def create(data):
     #Python Standard Library
     import base64
     import json
+    import sys
+    import importlib
     from urllib.parse import unquote
 
     #Extra modules
@@ -392,6 +394,13 @@ def create(data):
             ExpressionAttributeNames=ExpressionAttributeNamesDict,
             ExpressionAttributeValues=ExpressionAttributeValuesDict
         )
+        """
+    if len(relationships) > 0:
+        source_code += f"""
+        for relation in relationships:
+            cascade_pk_change_to_child(data, relation['parent'], relation['child'], relation['attribute'])
+        """
+    source_code += f"""
 
         return "OK"
 
@@ -421,7 +430,16 @@ def create(data):
             TableName=ddb_table,
             Item=item,
         )
+        """
+    if len(relationships) > 0:
+        source_code += f"""
+        if method == 'POST':
+            data['orig_pk'] = pk
 
+        for relation in relationships:
+            cascade_pk_change_to_child(data, relation['parent'], relation['child'], relation['attribute'])
+        """
+    source_code += f"""
         return "OK"
     
     def compose_operators(key, data):
@@ -535,6 +553,25 @@ def create(data):
             item['STARK-ListView-sk'] = record.get('STARK-ListView-sk',{{}}).get('S','')
             items.append(item)
         return items
+        """
+    if len(relationships) > 0:
+        source_code += f"""    
+    def cascade_pk_change_to_child(params, parent_entity_name, child_entity_name, attribute):
+        from os import getcwd 
+        STARK_folder = getcwd() + f"/{{child_entity_name}}"
+        sys.path = [STARK_folder] + sys.path
+
+        temp_import = importlib.import_module(child_entity_name)
+
+        #fetch all records from child using old pk value
+        response = temp_import.get_all_by_old_parent_value(params['orig_pk'])
+
+        #loop through response and update each record
+        for record in response:
+            record[attribute] = params['pk']
+            temp_import.edit(record)
+
+        return "OK"
     """
 
     return textwrap.dedent(source_code)

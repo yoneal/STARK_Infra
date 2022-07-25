@@ -106,11 +106,12 @@ def lambda_handler(event, context):
         'entities': entities,
         'data_model': data_model,
         'project_name': project_name,
-        'project_varname': project_varname
+        'project_varname': project_varname,
     }
 
     #Data Model ###
     cloud_resources["Data Model"] = model_parser.parse(data)
+    print(cloud_resources["Data Model"])
 
     #S3 Bucket ###
     cloud_resources["S3 webserve"] = s3_parser.parse(data)
@@ -122,7 +123,7 @@ def lambda_handler(event, context):
     cloud_resources["DynamoDB"] = dynamodb_parser.parse(data)
 
     #Lambda ###
-    cloud_resources["Lambda"] = lambda_parser.parse(data)
+    cloud_resources["Lambda"] = lambda_parser.parse(data, get_relationship(cloud_resources["Data Model"]))
 
     #Lambda Layers###
     cloud_resources["Layers"] = layer_parser.parse(data)
@@ -169,3 +170,24 @@ def lambda_handler(event, context):
         "body": json.dumps("Success"),
         "headers": default_response_headers
     }
+
+#for testing only, will be converted to package layers
+def get_relationship(data, parent_entity_name=""):
+    rel_list = []
+    for entity, attributes in data.items():
+        if type(attributes) is dict:
+            cols = attributes['data']
+            for col, types in cols.items():
+                if type(types) is dict:
+                    for data in types:
+                        if data == 'has_one':
+                            if parent_entity_name == "":
+                                rel={'parent' : col, 'child' : entity, 'attribute': types['has_one']}
+                                rel_list.append(rel)
+                            else:
+                                if col == parent_entity_name:
+                                    rel={'parent' : col, 'child' : entity, 'attribute': types['has_one']}
+                                    rel_list.append(rel)
+                                    
+
+    return rel_list

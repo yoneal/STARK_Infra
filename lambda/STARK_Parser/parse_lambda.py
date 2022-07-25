@@ -2,7 +2,7 @@
 import base64
 import json
 
-def parse(data):
+def parse(data, relationship = []):
 
     entities = data['entities']
  
@@ -61,10 +61,15 @@ def parse(data):
         }
     }
     for entity in entities:
+        dependencies = []
+        for relation in relationship:
+            if entity == relation['parent']:
+                dependencies.append(relation['child'])
         parsed[entity] = {
             "Memory": 128,
             "Arch": "arm64",
-            "Timeout": 5
+            "Timeout": 5,
+            "Dependency": dependencies
         }
 
 
