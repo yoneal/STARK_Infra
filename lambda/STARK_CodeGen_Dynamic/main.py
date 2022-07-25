@@ -69,7 +69,7 @@ def create_handler(event, context):
             "PK": models[entity]["pk"], 
             "DynamoDB Name": ddb_table_name,
             "Bucket Name": website_bucket,
-            "Relationships": get_relationship(models, entity_varname)
+            "Relationships": get_relationship(models, entity)
             }
         source_code = cg_ddb.create(data)
 
