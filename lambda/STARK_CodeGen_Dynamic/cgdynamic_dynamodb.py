@@ -111,7 +111,7 @@ def create(data):
                     }}
                 }}
             else:
-                data['STARK_isReport'] = payload.get('STARK_isReport', False)
+                isInvalidPayload = False
                 data['pk'] = payload.get('{pk_varname}')"""
     for col, col_type in columns.items():
         col_varname = converter.convert_to_system_name(col)
@@ -119,7 +119,7 @@ def create(data):
                 data['{col_varname}'] = payload.get('{col_varname}','')"""
 
     source_code +=f"""
-                if data['STARK_isReport'] == False:
+                if payload.get('STARK_isReport', False) == False:
                     data['orig_pk'] = payload.get('orig_{pk_varname}','')
                     data['sk'] = payload.get('sk', '')
                     if data['sk'] == "":
@@ -129,6 +129,30 @@ def create(data):
                     for field in sort_fields:
                         ListView_index_values.append(payload.get(field))
                     data['STARK-ListView-sk'] = "|".join(ListView_index_values)
+                else:
+                    #FIXME: Reporting payload processing:
+                    # - identifying filter fields
+                    # - operators validator
+                    temp = payload.get('STARK_report_fields',[])
+                    temp_report_fields = []
+                    for index in temp:
+                        temp_report_fields.append(index['field'])
+                    for index, attributes in data.items():
+                        if attributes['value'] != "":
+                            if attributes['operator'] == "":
+                                isInvalidPayload = True
+                    data['STARK_report_fields'] = temp_report_fields
+                    data['STARK_isReport'] = payload.get('STARK_isReport', False)
+
+                if isInvalidPayload:
+                    return {{
+                        "isBase64Encoded": False,
+                        "statusCode": 400,
+                        "body": json.dumps("Missing operators"),
+                        "headers": {{
+                            "Content-Type": "application/json",
+                        }}
+                    }}
 
             if method == "DELETE":
                 response = delete(data)
@@ -144,7 +168,7 @@ def create(data):
                     response   = delete(data)
 
             elif method == "POST":
-                if data['STARK_isReport']:
+                if 'STARK_isReport' in data:
                     response = report(data, default_sk)
                 else:
                     response = add(data)
@@ -210,7 +234,7 @@ def create(data):
         temp_string_filter = ""
         object_expression_value = {{':sk' : {{'S' : sk}}}}
         for key, index in data.items():
-            if key != "STARK_isReport":
+            if key not in ["STARK_isReport", "STARK_report_fields"]:
                 if index['value'] != "":
                     processed_operator_dict = (compose_operators(key, index)) 
                     temp_string_filter += processed_operator_dict['filter_string']
@@ -244,7 +268,7 @@ def create(data):
         for record in raw:
             items.append(map_results(record))
 
-        csv_filename = generate_csv(items)
+        csv_filename = generate_csv(items, data['STARK_report_fields'])
         #Get the "next" token, pass to calling function. This enables a "next page" request later.
         next_token = response.get('LastEvaluatedKey')
 
@@ -451,18 +475,26 @@ def create(data):
     source_code += f"""
         return item
 
-    def generate_csv(mapped_results = []): 
-        csv_header = ['{pk_varname}', """
+    def generate_csv(mapped_results = [], display_fields=[]): 
+        diff_list = []
+        master_fields = ['{pk_varname}', """
     for col in columns:
         col_varname = converter.convert_to_system_name(col)
         source_code += f"'{col_varname}', "    
     source_code += f"""]
+        if len(display_fields) > 0:
+            csv_header = display_fields
+            diff_list = list(set(master_fields) - set(display_fields))
+        else:
+            csv_header = master_fields
 
         file_buff = StringIO()
         writer = csv.DictWriter(file_buff, fieldnames=csv_header)
         writer.writeheader()
         for rows in mapped_results:
             rows.pop("sk")
+            for index in diff_list:
+                rows.pop(index)
             writer.writerow(rows)
         filename = f"{{str(uuid.uuid4())}}.csv"
         test = s3.put_object(

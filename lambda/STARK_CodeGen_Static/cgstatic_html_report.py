@@ -126,7 +126,7 @@ def create(data):
                         <table class="table  table-hover table-striped">
                             <thead class="thead-dark">
                                 <tr>
-                                    <template v-for="column in report_fields" id="report_fields">
+                                    <template v-for="column in STARK_report_fields" id="STARK_report_fields">
                                         <th scope="col">{{{{column.label}}}}</th>
                                     </template>"""
     source_code += f"""         
@@ -135,7 +135,7 @@ def create(data):
                             <tbody>
                                 <template v-for="{entity_varname} in listview_table" id="listview-table">
                                     <tr>
-                                        <template v-for="column in report_fields">
+                                        <template v-for="column in STARK_report_fields">
                                             <td>{{{{ {entity_varname}[column.field] }}}}</td>
                                         </template>"""
     source_code += f"""             
