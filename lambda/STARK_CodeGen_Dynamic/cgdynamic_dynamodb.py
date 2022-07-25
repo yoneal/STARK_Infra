@@ -166,7 +166,7 @@ def create(data):
                 if data['orig_pk'] == data['pk']:
                     response = edit(data)
                 else:
-                    response   = add(data)
+                    response   = add(data, method)
                     data['pk'] = data['orig_pk']
                     response   = delete(data)
 
@@ -404,7 +404,7 @@ def create(data):
 
         return "OK"
 
-    def add(data):
+    def add(data, method='POST'):
         {dict_to_var_code}
 
         item={{}}
@@ -564,7 +564,7 @@ def create(data):
         temp_import = importlib.import_module(child_entity_name)
 
         #fetch all records from child using old pk value
-        response = temp_import.get_all_by_old_parent_value(params['orig_pk'])
+        response = temp_import.get_all_by_old_parent_value(params['orig_pk'], attribute)
 
         #loop through response and update each record
         for record in response:

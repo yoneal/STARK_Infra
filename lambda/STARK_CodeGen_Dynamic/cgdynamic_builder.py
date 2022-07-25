@@ -8,6 +8,7 @@ import textwrap
 def create():
     source_code = f"""\
     import os
+    import convert_friendly_to_system as converter
 
     import yaml
     print("Hello World! Starting YAML read...")
@@ -21,14 +22,16 @@ def create():
         func_def = resources_yml['Lambda'][stark_func]
         print (stark_func)
         print (func_def)
+        escaped_destination =  converter.convert_to_system_name(stark_func)
         
         #Check if there is a dependency specified
         if "Dependencies" in func_def:
             print (f"Depends on: {{func_def['Dependencies']}}")
 
             for dependency in func_def['Dependencies']:
-                #Copy entire Lambda module code (folder)
-                os.system(f"cp -R lambda/{{dependency}} lambda/{{stark_func}}")
+                #Copy entire Lambda module code (folder)    
+                escaped_dependency =  converter.convert_to_system_name(dependency)
+                os.system(f"cp -R lambda/{{escaped_dependency}} lambda/{{escaped_destination}}")
     """
     return textwrap.dedent(source_code)
 
