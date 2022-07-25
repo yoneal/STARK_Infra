@@ -29,7 +29,7 @@ def create():
 
             for dependency in func_def['Dependencies']:
                 #Copy entire Lambda module code (folder)    
-                escaped_dependency =  stark_func.replace(" ", "_")
+                escaped_dependency =  dependency.replace(" ", "_")
                 print(escaped_destination)
                 print(escaped_dependency)
                 os.system(f"cp -R lambda_src/{{escaped_dependency}} lambda/{{escaped_destination}}")
