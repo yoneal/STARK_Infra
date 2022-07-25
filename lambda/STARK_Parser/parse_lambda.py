@@ -69,7 +69,7 @@ def parse(data, relationship = []):
             "Memory": 128,
             "Arch": "arm64",
             "Timeout": 5,
-            "Dependency": dependencies
+            "Dependencies": dependencies
         }
 
 
