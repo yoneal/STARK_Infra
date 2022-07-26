@@ -34,8 +34,6 @@ def create():
             for dependency in func_def['Dependencies']:
                 #Copy entire Lambda module code (folder)    
                 dependency_varname =  converter.convert_to_system_name(dependency)
-                print(escaped_destination)
-                print(escaped_dependency)
                 os.system(f"cp -R lambda_src/{{dependency_varname}} lambda/{{destination_varname}}")
     """
     return textwrap.dedent(source_code)
