@@ -64,13 +64,20 @@ def create_handler(event, context):
     for entity in entities:
         entity_varname = converter.convert_to_system_name(entity) 
         #Step 1: generate source code.
+        #Step 1.1: extract relationship
+        relationships = get_rel.get_relationship(models, entity)
+        for index in relationships:
+            index['parent']    = converter.convert_to_system_name(index['parent'])
+            index['child']     = converter.convert_to_system_name(index['child'])
+            index['attribute'] = converter.convert_to_system_name(index['attribute'])
+        print(relationships)
         data = {
             "Entity": entity, 
             "Columns": models[entity]["data"], 
             "PK": models[entity]["pk"], 
             "DynamoDB Name": ddb_table_name,
             "Bucket Name": website_bucket,
-            "Relationships": get_rel.get_relationship(models, entity)
+            "Relationships": relationships
             }
         source_code = cg_ddb.create(data)
 
