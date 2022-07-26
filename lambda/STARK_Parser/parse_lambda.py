@@ -49,7 +49,11 @@ def parse(data, relationship = []):
         "STARK_User_Roles": {
             "Memory": 128,
             "Arch": "arm64",
-            "Timeout": 5
+            "Timeout": 5,
+            "Dependencies": [
+                "STARK_User",
+                "STARK_User_Permissions",
+            ]
         },
         "STARK_User_Permissions": {
             "Memory": 128,
