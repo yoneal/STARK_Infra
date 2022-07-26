@@ -32,12 +32,19 @@ def parse(data, relationship = []):
             "Timeout": 5,
             "Layers": [
                 "STARKScryptLayer"
+            ],
+            "Dependencies": [
+                "STARK_User_Roles",
+                "STARK_User_Permissions",
             ]
         },
         "STARK_Module": {
             "Memory": 128,
             "Arch": "arm64",
-            "Timeout": 5
+            "Timeout": 5,
+            "Dependencies": [
+                "STARK_Module_Groups"
+            ]
         },
         "STARK_User_Roles": {
             "Memory": 128,
@@ -57,7 +64,10 @@ def parse(data, relationship = []):
         "STARK_Module_Groups": {
             "Memory": 128,
             "Arch": "arm64",
-            "Timeout": 5
+            "Timeout": 5,
+            "Dependencies": [
+                "STARK_Module"
+            ]
         }
     }
     for entity in entities:

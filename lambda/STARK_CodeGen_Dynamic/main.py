@@ -134,26 +134,6 @@ def create_handler(event, context):
                     'filePath': f"lambda/{lambda_dir}/{source_file}",
                     'fileContent': source_code.encode()
                 })
-        #Dependencies: We don't have transparent dependency management here using cloud_resources.yml, 
-        #so the code gen needs to do it manually
-        if lambda_dir in ["STARK_User", "STARK_User_Roles", "STARK_Module_Groups", "STARK_Module"]:
-            #STARK_User needs STARK_User_Permissions and STARK_User_Roles
-            dependencies = {
-                "STARK_User"          : {"STARK_User_Permissions", "STARK_User_Roles"},
-                "STARK_User_Roles"    : {"STARK_User_Permissions", "STARK_User"},
-                "STARK_Module_Groups" : {"STARK_Module"},
-                "STARK_Module"        : {"STARK_Module_Groups"}
-            }
-            for dependency_dir in dependencies[lambda_dir]:
-                source_files = os.listdir(dir + os.sep + dependency_dir)
-                for source_file in source_files:
-                    with open(dir + os.sep + dependency_dir + os.sep + source_file) as f:
-                        source_code = f.read().replace("[[STARK_DDB_TABLE_NAME]]", ddb_table_name)
-                        files_to_commit.append({
-                            'filePath': f"lambda/{lambda_dir}/{dependency_dir}/{source_file}",
-                            'fileContent': source_code.encode()
-                        })
-
     ############################################
     #Create build files we need for our pipeline:
     # - template.yml
