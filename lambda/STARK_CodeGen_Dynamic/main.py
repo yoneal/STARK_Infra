@@ -23,6 +23,7 @@ import cgdynamic_authorizer as cg_auth
 import cgdynamic_sam_template as cg_sam
 import cgdynamic_template_conf as cg_conf
 import convert_friendly_to_system as converter
+import get_relationship as get_rel
 
 s3  = boto3.client('s3')
 lmb = boto3.client('lambda')
@@ -63,12 +64,20 @@ def create_handler(event, context):
     for entity in entities:
         entity_varname = converter.convert_to_system_name(entity) 
         #Step 1: generate source code.
+        #Step 1.1: extract relationship
+        relationships = get_rel.get_relationship(models, entity)
+        for index in relationships:
+            index['parent']    = converter.convert_to_system_name(index['parent'])
+            index['child']     = converter.convert_to_system_name(index['child'])
+            index['attribute'] = converter.convert_to_system_name(index['attribute'])
+        print(relationships)
         data = {
             "Entity": entity, 
             "Columns": models[entity]["data"], 
             "PK": models[entity]["pk"], 
             "DynamoDB Name": ddb_table_name,
-            "Bucket Name": website_bucket
+            "Bucket Name": website_bucket,
+            "Relationships": relationships
             }
         source_code = cg_ddb.create(data)
 
@@ -132,26 +141,6 @@ def create_handler(event, context):
                     'filePath': f"lambda/{lambda_dir}/{source_file}",
                     'fileContent': source_code.encode()
                 })
-        #Dependencies: We don't have transparent dependency management here using cloud_resources.yml, 
-        #so the code gen needs to do it manually
-        if lambda_dir in ["STARK_User", "STARK_User_Roles", "STARK_Module_Groups", "STARK_Module"]:
-            #STARK_User needs STARK_User_Permissions and STARK_User_Roles
-            dependencies = {
-                "STARK_User"          : {"STARK_User_Permissions", "STARK_User_Roles"},
-                "STARK_User_Roles"    : {"STARK_User_Permissions", "STARK_User"},
-                "STARK_Module_Groups" : {"STARK_Module"},
-                "STARK_Module"        : {"STARK_Module_Groups"}
-            }
-            for dependency_dir in dependencies[lambda_dir]:
-                source_files = os.listdir(dir + os.sep + dependency_dir)
-                for source_file in source_files:
-                    with open(dir + os.sep + dependency_dir + os.sep + source_file) as f:
-                        source_code = f.read().replace("[[STARK_DDB_TABLE_NAME]]", ddb_table_name)
-                        files_to_commit.append({
-                            'filePath': f"lambda/{lambda_dir}/{dependency_dir}/{source_file}",
-                            'fileContent': source_code.encode()
-                        })
-
     ############################################
     #Create build files we need for our pipeline:
     # - template.yml

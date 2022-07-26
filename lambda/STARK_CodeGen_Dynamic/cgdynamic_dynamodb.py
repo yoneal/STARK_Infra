@@ -15,7 +15,8 @@ def create(data):
     columns        = data["Columns"]
     ddb_table_name = data["DynamoDB Name"]
     bucket_name    = data['Bucket Name']
-
+    relationships  = data["Relationships"]
+    
     #Convert human-friendly names to variable-friendly names
     entity_varname = converter.convert_to_system_name(entity)
     pk_varname     = converter.convert_to_system_name(pk)
@@ -59,6 +60,8 @@ def create(data):
     #Python Standard Library
     import base64
     import json
+    import sys
+    import importlib
     from urllib.parse import unquote
 
     #Extra modules
@@ -73,13 +76,14 @@ def create(data):
 
     #######
     #CONFIG
-    ddb_table   = "{ddb_table_name}"
-    pk_field    = "{pk_varname}"
-    default_sk  = "{default_sk}"
-    sort_fields = ["{pk_varname}", ]
-    bucket_name = "{bucket_name}"
-    region_name = os.environ['AWS_REGION']
-    page_limit  = 10
+    ddb_table     = "{ddb_table_name}"
+    pk_field      = "{pk_varname}"
+    default_sk    = "{default_sk}"
+    sort_fields   = ["{pk_varname}", ]
+    bucket_name   = "{bucket_name}"
+    relationships = {relationships}
+    region_name   = os.environ['AWS_REGION']
+    page_limit    = 10
 
     def lambda_handler(event, context):
 
@@ -110,7 +114,7 @@ def create(data):
                     }}
                 }}
             else:
-                data['STARK_isReport'] = payload.get('STARK_isReport', False)
+                isInvalidPayload = False
                 data['pk'] = payload.get('{pk_varname}')"""
     for col, col_type in columns.items():
         col_varname = converter.convert_to_system_name(col)
@@ -118,7 +122,7 @@ def create(data):
                 data['{col_varname}'] = payload.get('{col_varname}','')"""
 
     source_code +=f"""
-                if data['STARK_isReport'] == False:
+                if payload.get('STARK_isReport', False) == False:
                     data['orig_pk'] = payload.get('orig_{pk_varname}','')
                     data['sk'] = payload.get('sk', '')
                     if data['sk'] == "":
@@ -128,6 +132,30 @@ def create(data):
                     for field in sort_fields:
                         ListView_index_values.append(payload.get(field))
                     data['STARK-ListView-sk'] = "|".join(ListView_index_values)
+                else:
+                    #FIXME: Reporting payload processing:
+                    # - identifying filter fields
+                    # - operators validator
+                    temp = payload.get('STARK_report_fields',[])
+                    temp_report_fields = []
+                    for index in temp:
+                        temp_report_fields.append(index['field'])
+                    for index, attributes in data.items():
+                        if attributes['value'] != "":
+                            if attributes['operator'] == "":
+                                isInvalidPayload = True
+                    data['STARK_report_fields'] = temp_report_fields
+                    data['STARK_isReport'] = payload.get('STARK_isReport', False)
+
+                if isInvalidPayload:
+                    return {{
+                        "isBase64Encoded": False,
+                        "statusCode": 400,
+                        "body": json.dumps("Missing operators"),
+                        "headers": {{
+                            "Content-Type": "application/json",
+                        }}
+                    }}
 
             if method == "DELETE":
                 response = delete(data)
@@ -138,12 +166,12 @@ def create(data):
                 if data['orig_pk'] == data['pk']:
                     response = edit(data)
                 else:
-                    response   = add(data)
+                    response   = add(data, method)
                     data['pk'] = data['orig_pk']
                     response   = delete(data)
 
             elif method == "POST":
-                if data['STARK_isReport']:
+                if 'STARK_isReport' in data:
                     response = report(data, default_sk)
                 else:
                     response = add(data)
@@ -209,7 +237,7 @@ def create(data):
         temp_string_filter = ""
         object_expression_value = {{':sk' : {{'S' : sk}}}}
         for key, index in data.items():
-            if key != "STARK_isReport":
+            if key not in ["STARK_isReport", "STARK_report_fields"]:
                 if index['value'] != "":
                     processed_operator_dict = (compose_operators(key, index)) 
                     temp_string_filter += processed_operator_dict['filter_string']
@@ -239,8 +267,11 @@ def create(data):
 
         #Map to expected structure
         #FIXME: this is duplicated code, make this DRY by outsourcing the mapping to a different function.
-        items = map_results(raw)
-        csv_filename = generate_csv(items)
+        items = []
+        for record in raw:
+            items.append(map_results(record))
+
+        csv_filename = generate_csv(items, data['STARK_report_fields'])
         #Get the "next" token, pass to calling function. This enables a "next page" request later.
         next_token = response.get('LastEvaluatedKey')
 
@@ -278,7 +309,9 @@ def create(data):
 
         #Map to expected structure
         #FIXME: this is duplicated code, make this DRY by outsourcing the mapping to a different function.
-        items = map_results(raw)
+        items = []
+        for record in raw:
+            items.append(map_results(record))
 
         #Get the "next" token, pass to calling function. This enables a "next page" request later.
         next_token = response.get('LastEvaluatedKey')
@@ -303,7 +336,9 @@ def create(data):
         raw = response.get('Items')
 
         #Map to expected structure
-        items = map_results(raw)
+        items = []
+        for record in raw:
+            items.append(map_results(record))
 
         return items
 
@@ -359,10 +394,17 @@ def create(data):
             ExpressionAttributeNames=ExpressionAttributeNamesDict,
             ExpressionAttributeValues=ExpressionAttributeValuesDict
         )
+        """
+    if len(relationships) > 0:
+        source_code += f"""
+        for relation in relationships:
+            cascade_pk_change_to_child(data, relation['parent'], relation['child'], relation['attribute'])
+        """
+    source_code += f"""
 
         return "OK"
 
-    def add(data):
+    def add(data, method='POST'):
         {dict_to_var_code}
 
         item={{}}
@@ -388,7 +430,16 @@ def create(data):
             TableName=ddb_table,
             Item=item,
         )
+        """
+    if len(relationships) > 0:
+        source_code += f"""
+        if method == 'POST':
+            data['orig_pk'] = pk
 
+        for relation in relationships:
+            cascade_pk_change_to_child(data, relation['parent'], relation['child'], relation['attribute'])
+        """
+    source_code += f"""
         return "OK"
     
     def compose_operators(key, data):
@@ -429,35 +480,40 @@ def create(data):
         STARK_ListView_sk = "|".join(ListView_index_values)
         return STARK_ListView_sk
     
-    def map_results(raw_response):
-        items = []
-        for record in raw_response:
-            item = {{}}
-            item['{pk_varname}'] = record.get('pk', {{}}).get('S','')
-            item['sk'] = record.get('sk',{{}}).get('S','')"""
+    def map_results(record):
+        item = {{}}
+        item['{pk_varname}'] = record.get('pk', {{}}).get('S','')
+        item['sk'] = record.get('sk',{{}}).get('S','')"""
     for col, col_type in columns.items():
         col_varname = converter.convert_to_system_name(col)
         col_type_id = set_type(col_type)
 
         source_code +=f"""
-            item['{col_varname}'] = record.get('{col_varname}',{{}}).get('{col_type_id}','')"""
+        item['{col_varname}'] = record.get('{col_varname}',{{}}).get('{col_type_id}','')"""
 
     source_code += f"""
-            items.append(item)
-        return items
+        return item
 
-    def generate_csv(mapped_results = []): 
-        csv_header = ['{pk_varname}', """
+    def generate_csv(mapped_results = [], display_fields=[]): 
+        diff_list = []
+        master_fields = ['{pk_varname}', """
     for col in columns:
         col_varname = converter.convert_to_system_name(col)
         source_code += f"'{col_varname}', "    
     source_code += f"""]
+        if len(display_fields) > 0:
+            csv_header = display_fields
+            diff_list = list(set(master_fields) - set(display_fields))
+        else:
+            csv_header = master_fields
 
         file_buff = StringIO()
         writer = csv.DictWriter(file_buff, fieldnames=csv_header)
         writer.writeheader()
         for rows in mapped_results:
             rows.pop("sk")
+            for index in diff_list:
+                rows.pop(index)
             writer.writerow(rows)
         filename = f"{{str(uuid.uuid4())}}.csv"
         test = s3.put_object(
@@ -467,7 +523,55 @@ def create(data):
             Key='tmp/'+filename
         )
         
-        return bucket_name+".s3."+ region_name + ".amazonaws.com/tmp/" +filename    
+        return bucket_name+".s3."+ region_name + ".amazonaws.com/tmp/" +filename
+
+    def get_all_by_old_parent_value(old_pk_val, attribute, sk = default_sk):
+    
+        string_filter = " #Attribute = :old_parent_value"
+        object_expression_value = {{':sk' : {{'S' : sk}},
+                                    ':old_parent_value': {{'S' : old_pk_val}}}}
+        ExpressionAttributeNamesDict = {{
+            '#Attribute' : attribute,
+        }}
+        response = ddb.query(
+            TableName=ddb_table,
+            IndexName="STARK-ListView-Index",
+            Select='ALL_ATTRIBUTES',
+            ReturnConsumedCapacity='TOTAL',
+            FilterExpression=string_filter,
+            KeyConditionExpression='sk = :sk',
+            ExpressionAttributeValues=object_expression_value,
+            ExpressionAttributeNames=ExpressionAttributeNamesDict
+        )
+        raw = response.get('Items')
+        items = []
+        for record in raw:
+            item = map_results(record)
+            #add pk as literal 'pk' value
+            #and STARK-ListView-Sk
+            item['pk'] = record.get('pk', {{}}).get('S','')
+            item['STARK-ListView-sk'] = record.get('STARK-ListView-sk',{{}}).get('S','')
+            items.append(item)
+        return items
+        """
+    if len(relationships) > 0:
+        source_code += f"""    
+    def cascade_pk_change_to_child(params, parent_entity_name, child_entity_name, attribute):
+        from os import getcwd 
+        STARK_folder = getcwd() + f"/{{child_entity_name}}"
+        sys.path = [STARK_folder] + sys.path
+
+        temp_import = importlib.import_module(child_entity_name)
+
+        #fetch all records from child using old pk value
+        response = temp_import.get_all_by_old_parent_value(params['orig_pk'], attribute)
+
+        #loop through response and update each record
+        for record in response:
+            record[attribute] = params['pk']
+            temp_import.edit(record)
+
+        return "OK"
     """
 
     return textwrap.dedent(source_code)

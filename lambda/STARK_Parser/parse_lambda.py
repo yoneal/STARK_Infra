@@ -2,7 +2,7 @@
 import base64
 import json
 
-def parse(data):
+def parse(data, relationship = []):
 
     entities = data['entities']
  
@@ -32,17 +32,28 @@ def parse(data):
             "Timeout": 5,
             "Layers": [
                 "STARKScryptLayer"
+            ],
+            "Dependencies": [
+                "STARK_User_Roles",
+                "STARK_User_Permissions",
             ]
         },
         "STARK_Module": {
             "Memory": 128,
             "Arch": "arm64",
-            "Timeout": 5
+            "Timeout": 5,
+            "Dependencies": [
+                "STARK_Module_Groups"
+            ]
         },
         "STARK_User_Roles": {
             "Memory": 128,
             "Arch": "arm64",
-            "Timeout": 5
+            "Timeout": 5,
+            "Dependencies": [
+                "STARK_User",
+                "STARK_User_Permissions",
+            ]
         },
         "STARK_User_Permissions": {
             "Memory": 128,
@@ -57,14 +68,22 @@ def parse(data):
         "STARK_Module_Groups": {
             "Memory": 128,
             "Arch": "arm64",
-            "Timeout": 5
+            "Timeout": 5,
+            "Dependencies": [
+                "STARK_Module"
+            ]
         }
     }
     for entity in entities:
+        dependencies = []
+        for relation in relationship:
+            if entity == relation['parent']:
+                dependencies.append(relation['child'])
         parsed[entity] = {
             "Memory": 128,
             "Arch": "arm64",
-            "Timeout": 5
+            "Timeout": 5,
+            "Dependencies": dependencies
         }
 
 
