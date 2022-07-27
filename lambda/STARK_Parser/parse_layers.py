@@ -20,6 +20,11 @@ def parse(data):
             "Package": "STARK_scrypt_py39.zip",
             "Description": "STARK module for working with scrypt from the Python stdlib"
        },
+        {
+            "Name": "Local_mk5_Fpdf2",
+            "Package": "fpdf2_py39.zip",
+            "Description": "PDF Generator module for Python"
+       },
     ]
 
     return parsed
