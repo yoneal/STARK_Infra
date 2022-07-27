@@ -505,7 +505,7 @@ def create(data, cli_mode=False):
                 MemorySize: 128
                 Timeout: 5
                 Layers:
-                    - !Ref Fpdf2lLayer"""
+                    - !Ref Fpdf2Layer"""
     
     cf_template += f"""
         STARKBackendApiForSTARKUser:
