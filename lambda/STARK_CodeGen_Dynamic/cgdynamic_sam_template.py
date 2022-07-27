@@ -303,7 +303,7 @@ def create(data, cli_mode=False):
             Properties:
                 Content:
                     S3Bucket: !Ref UserCICDPipelineBucketNameParameter
-                    S3Key: {project_varname}/STARKLambdaLayers/Fpdf2_py39.zip
+                    S3Key: {project_varname}/STARKLambdaLayers/fpdf2_py39.zip
                 Description: Fpdf2 module for Python 3.x
                 LayerName: {project_varname}_Fpdf2
                 CompatibleArchitectures:
