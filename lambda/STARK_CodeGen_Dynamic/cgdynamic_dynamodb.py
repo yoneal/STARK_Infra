@@ -70,6 +70,7 @@ def create(data):
     import uuid
     from io import StringIO
     import os
+    from fpdf import FPDF
 
     ddb = boto3.client('dynamodb')
     s3 = boto3.client("s3")
