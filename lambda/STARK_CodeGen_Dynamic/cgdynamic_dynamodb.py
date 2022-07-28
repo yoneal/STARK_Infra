@@ -271,7 +271,7 @@ def create(data):
         for record in raw:
             items.append(map_results(record))
 
-        csv_filename = generate_csv(items, data['STARK_report_fields'])
+        csv_filename = generate_reports(items, data['STARK_report_fields'])
         #Get the "next" token, pass to calling function. This enables a "next page" request later.
         next_token = response.get('LastEvaluatedKey')
 
@@ -494,7 +494,7 @@ def create(data):
     source_code += f"""
         return item
 
-    def generate_csv(mapped_results = [], display_fields=[]): 
+    def generate_reports(mapped_results = [], display_fields=[]): 
         diff_list = []
         master_fields = ['{pk_varname}', """
     for col in columns:
@@ -515,15 +515,22 @@ def create(data):
             for index in diff_list:
                 rows.pop(index)
             writer.writerow(rows)
-        filename = f"{{str(uuid.uuid4())}}.csv"
+        filename = f"{{str(uuid.uuid4())}}"
+        csv_file = f"{{filename}}.csv"
+        pdf_file = f"{{filename}}.pdf"
         test = s3.put_object(
             ACL='public-read',
             Body= file_buff.getvalue(),
             Bucket=bucket_name,
-            Key='tmp/'+filename
+            Key='tmp/'+csv_file
         )
-        
-        return bucket_name+".s3."+ region_name + ".amazonaws.com/tmp/" +filename
+
+        create_pdf(mapped_results, csv_header, pdf_file)
+
+        csv_bucket_key = bucket_name+".s3."+ region_name + ".amazonaws.com/tmp/" +csv_file
+        pdf_bucket_key = bucket_name+".s3."+ region_name + ".amazonaws.com/tmp/" +pdf_file
+
+    return csv_bucket_key, pdf_bucket_key
 
     def get_all_by_old_parent_value(old_pk_val, attribute, sk = default_sk):
     
@@ -553,6 +560,47 @@ def create(data):
             item['STARK-ListView-sk'] = record.get('STARK-ListView-sk',{{}}).get('S','')
             items.append(item)
         return items
+
+    def create_pdf(data_to_tuple, master_fields, pdf_filename):
+        #FIXME: PDF GENERATOR: can be outsourced to a layer, for refining 
+        row_list = []
+        for key in data_to_tuple:
+            column_list = []
+            for index in master_fields:
+                column_list.append(key[index])
+            row_list.append(tuple(column_list))
+
+        header_tuple = tuple(master_fields) 
+        data_tuple = tuple(row_list)
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Times", size=10)
+        line_height = pdf.font_size * 2.5
+        col_width = pdf.epw / len(master_fields)  # distribute content evenly
+        
+        render_table_header(pdf, header_tuple,  col_width, line_height) 
+        for row in data_tuple:
+            if pdf.will_page_break(line_height):
+                render_table_header()
+            for datum in row:
+                pdf.multi_cell(col_width, line_height, datum, border=1,
+                        new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
+            pdf.ln(line_height)
+
+        test = s3.put_object(
+            ACL='public-read',
+            Body= pdf.output(),
+            Bucket=bucket_name,
+            Key='tmp/'+pdf_filename
+        )
+
+    def render_table_header(pdf, header_tuple, col_width, line_height):
+        pdf.set_font(style="B")  # enabling bold text
+        for col_name in header_tuple:
+            pdf.multi_cell(col_width, line_height, col_name, border=1, align='C',
+                    new_x="RIGHT", new_y="TOP",max_line_height=pdf.font_size)
+        pdf.ln(line_height)
+        pdf.set_font(style="")  # disabling bold text
         """
     if len(relationships) > 0:
         source_code += f"""    
