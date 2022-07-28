@@ -313,8 +313,8 @@ def create(data):
                         loading_modal.show()
                         {entity_app}.report(report_payload).then( function(data) {{
                             root.listview_table = data[0];
-                            root.temp_csv_link = data[2];
-                            root.temp_pdf_link = data[3];
+                            root.temp_csv_link = data[2][0];
+                            root.temp_pdf_link = data[2][1];
                             console.log("DONE! Retrieved report.");
                             loading_modal.hide()
                             root.showReport = true

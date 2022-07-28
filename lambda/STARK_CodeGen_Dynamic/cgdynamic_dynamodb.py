@@ -272,11 +272,11 @@ def create(data):
         for record in raw:
             items.append(map_results(record))
 
-        csv_filename = generate_reports(items, data['STARK_report_fields'])
+        report_filenames = generate_reports(items, data['STARK_report_fields'])
         #Get the "next" token, pass to calling function. This enables a "next page" request later.
         next_token = response.get('LastEvaluatedKey')
 
-        return items, next_token, csv_filename
+        return items, next_token, report_filenames
 
     def get_all(sk=default_sk, lv_token=None):
 
@@ -531,7 +531,7 @@ def create(data):
         csv_bucket_key = bucket_name+".s3."+ region_name + ".amazonaws.com/tmp/" +csv_file
         pdf_bucket_key = bucket_name+".s3."+ region_name + ".amazonaws.com/tmp/" +pdf_file
 
-    return csv_bucket_key, pdf_bucket_key
+        return csv_bucket_key, pdf_bucket_key
 
     def get_all_by_old_parent_value(old_pk_val, attribute, sk = default_sk):
     
