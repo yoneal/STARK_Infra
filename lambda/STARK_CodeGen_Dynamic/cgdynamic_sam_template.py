@@ -298,6 +298,22 @@ def create(data, cli_mode=False):
                     - python3.7
                     - python3.8
                     - python3.9
+        Fpdf2Layer:
+            Type: AWS::Lambda::LayerVersion
+            Properties:
+                Content:
+                    S3Bucket: !Ref UserCICDPipelineBucketNameParameter
+                    S3Key: {project_varname}/STARKLambdaLayers/fpdf2_py39.zip
+                Description: Fpdf2 module for Python 3.x
+                LayerName: {project_varname}_Fpdf2
+                CompatibleArchitectures:
+                    - x86_64
+                    - arm64
+                CompatibleRuntimes:
+                    - python3.6
+                    - python3.7
+                    - python3.8
+                    - python3.9
         STARKFriendlyToSystemNamesLayer:
             Type: AWS::Lambda::LayerVersion
             Properties:
@@ -487,7 +503,9 @@ def create(data, cli_mode=False):
                 Architectures:
                     - arm64
                 MemorySize: 128
-                Timeout: 5"""
+                Timeout: 5
+                Layers:
+                    - !Ref Fpdf2Layer"""
     
     cf_template += f"""
         STARKBackendApiForSTARKUser:
