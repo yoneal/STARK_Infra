@@ -327,7 +327,7 @@ def create(data):
                     }}
                 }},
                 download_report(file_type = "csv") {{
-                    let link = "https://" + file_type == "csv" ? root.temp_csv_link : root.temp_pdf_link
+                    let link = "https://" + (file_type == "csv" ? root.temp_csv_link : root.temp_pdf_link)
                     window.location.href = link
                 }},
                 checkUncheck: function (checked) {{
