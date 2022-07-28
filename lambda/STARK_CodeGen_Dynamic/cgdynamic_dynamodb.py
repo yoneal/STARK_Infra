@@ -497,7 +497,7 @@ def create(data):
 
     def generate_reports(mapped_results = [], display_fields=[]): 
         diff_list = []
-        master_fields = ['{pk_varname}', """
+        master_fields = ['{pk}', """
     for col in columns:
         source_code += f"'{col}', "    
     source_code += f"""]
