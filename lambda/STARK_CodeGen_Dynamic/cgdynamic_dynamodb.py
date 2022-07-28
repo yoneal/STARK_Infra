@@ -507,10 +507,17 @@ def create(data):
         else:
             csv_header = master_fields
 
+        report_list = []
+        for key in mapped_results:
+            temp_dict = {{}}
+            for index, value in key.items():
+                temp_dict[index.replace("_"," ")] = value
+        report_list.append(temp_dict)
+
         file_buff = StringIO()
         writer = csv.DictWriter(file_buff, fieldnames=csv_header)
         writer.writeheader()
-        for rows in mapped_results:
+        for rows in report_list:
             rows.pop("sk")
             for index in diff_list:
                 rows.pop(index)
@@ -525,7 +532,7 @@ def create(data):
             Key='tmp/'+csv_file
         )
 
-        create_pdf(mapped_results, csv_header, pdf_file)
+        create_pdf(report_list, csv_header, pdf_file)
 
         csv_bucket_key = bucket_name+".s3."+ region_name + ".amazonaws.com/tmp/" +csv_file
         pdf_bucket_key = bucket_name+".s3."+ region_name + ".amazonaws.com/tmp/" +pdf_file
