@@ -512,7 +512,7 @@ def create(data):
             temp_dict = {{}}
             for index, value in key.items():
                 temp_dict[index.replace("_"," ")] = value
-        report_list.append(temp_dict)
+            report_list.append(temp_dict)
 
         file_buff = StringIO()
         writer = csv.DictWriter(file_buff, fieldnames=csv_header)
