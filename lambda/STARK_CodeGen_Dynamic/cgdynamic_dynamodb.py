@@ -140,7 +140,7 @@ def create(data):
                     temp = payload.get('STARK_report_fields',[])
                     temp_report_fields = []
                     for index in temp:
-                        temp_report_fields.append(index['field'])
+                        temp_report_fields.append(index['label'])
                     for index, attributes in data.items():
                         if attributes['value'] != "":
                             if attributes['operator'] == "":
@@ -499,8 +499,7 @@ def create(data):
         diff_list = []
         master_fields = ['{pk_varname}', """
     for col in columns:
-        col_varname = converter.convert_to_system_name(col)
-        source_code += f"'{col_varname}', "    
+        source_code += f"'{col}', "    
     source_code += f"""]
         if len(display_fields) > 0:
             csv_header = display_fields
