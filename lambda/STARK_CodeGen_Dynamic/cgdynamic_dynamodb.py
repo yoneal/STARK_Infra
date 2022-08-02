@@ -276,7 +276,7 @@ def create(data):
         for record in raw:
             items.append(map_results(record))
 
-        report_filenames = generate_reports(items, data['STARK_report_fields'])
+        report_filenames = generate_reports(items, data['STARK_report_fields'], report_param_dict)
         #Get the "next" token, pass to calling function. This enables a "next page" request later.
         next_token = response.get('LastEvaluatedKey')
 
