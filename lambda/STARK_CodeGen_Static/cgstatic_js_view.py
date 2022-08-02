@@ -37,10 +37,11 @@ def create(data):
                 }},
                 custom_report:{{
                     '{pk_varname}': {{"operator": "", "value": "", "type":"S"}},"""
-    for col in cols:
+    for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
+        col_type_id = set_type(col_type)
         source_code += f"""
-                    '{col_varname}':  {{"operator": "", "value": "", "type":"S"}},""" 
+                    '{col_varname}':  {{"operator": "", "value": "", "type":"{col_type_id}"}},""" 
 
     source_code += f"""
                     'STARK_isReport':true,
@@ -402,3 +403,22 @@ def create(data):
     """
 
     return textwrap.dedent(source_code)
+
+
+def set_type(col_type):
+
+    #Default is 'S'. Defined here so we don't need duplicate Else statements below
+    col_type_id = 'S'
+
+    if isinstance(col_type, dict):
+        #special/complex types
+        if col_type["type"] in [ "int-spinner", "decimal-spinner" ]:
+            col_type_id = 'N'
+        
+        if col_type["type"] in [ "tags", "multiple choice" ]:
+            col_type_id = 'SS'
+    
+    elif col_type in [ "int", "number" ]:
+        col_type_id = 'N'
+
+    return col_type_id
