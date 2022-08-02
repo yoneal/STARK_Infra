@@ -643,7 +643,7 @@ def create(data):
         #Report Parameters
         newline_print_counter = 1
         pdf.set_font("Times", size=12, style="B")
-        pdf.multi_cell(0,line_height, "Report Params:", 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
+        pdf.multi_cell(0,line_height, "Report Parameters:", 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
         pdf.ln(pdf.font_size *1.5)
         pdf.set_font("Times", size=10)
         for key, value in report_params.items():
