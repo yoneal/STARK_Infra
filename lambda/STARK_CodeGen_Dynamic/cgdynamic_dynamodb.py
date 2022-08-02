@@ -465,7 +465,7 @@ def create(data):
         elif data['operator'] in [ "contains", "begins_with" ]:
             composed_filter_dict['filter_string'] += f" {{data['operator']}}({{key}}, :{{key}}) AND"
             composed_filter_dict['expression_values'][f":{{key}}"] = {{data['type'] : data['value'].strip()}}
-            composed_filter_dict['report_params'] = {{key : f"{{data['operator'].capitalize().replace('_', '')}} {{data['value']}}"}}
+            composed_filter_dict['report_params'] = {{key : f"{{data['operator'].capitalize().replace('_', ' ')}} {{data['value']}}"}}
         elif data['operator'] == "between":
             from_to_split = data['value'].split(',')
             composed_filter_dict['filter_string'] += f" ({{key}} BETWEEN :from{{key}} AND :to{{key}}) AND"
@@ -477,17 +477,17 @@ def create(data):
             composed_filter_dict['expression_values'][f":{{key}}"] = {{data['type'] : data['value'].strip()}}
             operator_string_equivalent = ""
             if data['operator'] == '=':
-                operator_string_equivalent = 'Is equal to '
+                operator_string_equivalent = 'Is equal to'
             elif data['operator'] == '>':
-                operator_string_equivalent = 'Is greater than '
+                operator_string_equivalent = 'Is greater than'
             elif data['operator'] == '>=':
-                operator_string_equivalent = 'Is greater than or equal to '
+                operator_string_equivalent = 'Is greater than or equal to'
             elif data['operator'] == '<':
-                operator_string_equivalent = 'Is less than '
+                operator_string_equivalent = 'Is less than'
             elif data['operator'] == '<=':
-                operator_string_equivalent = 'Is greater than or equal to '
+                operator_string_equivalent = 'Is greater than or equal to'
             elif data['operator'] == '<=':
-                operator_string_equivalent = 'Is not equal to '
+                operator_string_equivalent = 'Is not equal to'
             else:
                 operator_string_equivalent = 'Invalid operator'
             composed_filter_dict['report_params'] = {{key : f" {{operator_string_equivalent}} {{data['value'].strip()}}" }}
