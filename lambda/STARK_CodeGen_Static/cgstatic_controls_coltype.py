@@ -53,7 +53,7 @@ def create(data):
                                     </template>
                                 </b-form-select>"""
     elif col_type == "file-upload":
-        html_code=f"""<b-form-file v-model="STARK_upload_elements.{col_varname}.file" placeholder="STARK_upload_elements.{col_varname}.file" drop-placeholder="Drop file here..." @input="s3upload('{col_varname}')" ></b-form-file>      
+        html_code=f"""<b-form-file v-model="STARK_upload_elements.{col_varname}.file" :placeholder="STARK_upload_elements.{col_varname}.file" drop-placeholder="Drop file here..." @input="s3upload('{col_varname}')" ></b-form-file>      
                             <b-progress :value="STARK_upload_elements.{col_varname}.progress_bar_val" :max="100" class="mt-2"></b-progress>"""
 
     elif isinstance(col_type, dict):
