@@ -205,9 +205,11 @@ def create(data):
     for col, col_element in cols.items():
         col_varname = converter.convert_to_system_name(col)
         if col_element == 'file-upload':
-            source_code += f"""root.Document.STARK_uploaded_s3_keys['{col_varname}'] = root.Document.STARK_uploaded_s3_keys.{col_varname}.S 
+            source_code += f"""
+                            root.Document.STARK_uploaded_s3_keys['{col_varname}'] = root.Document.STARK_uploaded_s3_keys.{col_varname}.S 
                             root.STARK_upload_elements['{col_varname}'].file = root.Document.{col_varname}
-                            root.STARK_upload_elements['{col_varname}'].progress_bar_val = 100"""
+                            root.STARK_upload_elements['{col_varname}'].progress_bar_val = 100
+                            """
 
     #If there are 1:1 rel fields, we need to assign their initial value to the still-unpopulated drop-down list so that it displays 
     #   a value even before the lazy-loading is triggered.
