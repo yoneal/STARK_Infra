@@ -29,8 +29,7 @@ def create(data):
                 STARK_report_fields: [],
                 {entity_varname}: {{
                     '{pk_varname}': '',
-                    'sk': '',
-                    'STARK_uploaded_s3_keys':{{}}"""
+                    'sk': '',"""
 
     for col in cols:
         col_varname = converter.convert_to_system_name(col)
@@ -38,6 +37,7 @@ def create(data):
                     '{col_varname}': '',""" 
 
     source_code += f"""
+                    'STARK_uploaded_s3_keys':{{}}
                 }},
                 custom_report:{{
                     '{pk_varname}': {{"operator": "", "value": "", "type":"S"}},"""
