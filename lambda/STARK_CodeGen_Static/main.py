@@ -98,7 +98,8 @@ def create_handler(event, context):
     add_to_commit(source_code=cg_login.create(homepage_data), key=f"index.html", files_to_commit=files_to_commit, file_path='static')
     add_to_commit(source_code=cg_js_login.create(homepage_data), key=f"js/login.js", files_to_commit=files_to_commit, file_path='static')
     add_to_commit(source_code=cg_css_login.create(homepage_data), key=f"css/login.css", files_to_commit=files_to_commit, file_path='static')
-    add_to_commit(source_code="tmp test file", key=f"tmp/test.txt", files_to_commit=files_to_commit, file_path='')
+    add_to_commit(source_code="Temporary files", key=f"tmp/README.txt", files_to_commit=files_to_commit, file_path='')
+    add_to_commit(source_code="Uploaded files", key=f"uploaded_files/README.txt", files_to_commit=files_to_commit, file_path='')
 
     ##########################################
     #Add cloud resources document to our files
