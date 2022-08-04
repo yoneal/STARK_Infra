@@ -3,6 +3,7 @@
 
 #Python Standard Library
 import textwrap
+import os
 
 #Private modules
 import cgstatic_controls_coltype as cg_coltype
@@ -13,6 +14,8 @@ def create(data):
     entity = data["Entity"]
     cols   = data["Columns"]
     pk     = data['PK']
+    bucket_name = data['Bucket Name'] #temporary: remove once s3 credentials for file upload is solved
+    region_name   = os.environ['AWS_REGION'] #temporary: remove once s3 credentials for file upload is solved
 
     entity_varname = converter.convert_to_system_name(entity)
     entity_app     = entity_varname + '_app'
@@ -26,7 +29,8 @@ def create(data):
                 STARK_report_fields: [],
                 {entity_varname}: {{
                     '{pk_varname}': '',
-                    'sk': '',"""
+                    'sk': '',
+                    'STARK_uploaded_s3_keys':{{}}"""
 
     for col in cols:
         col_varname = converter.convert_to_system_name(col)
@@ -107,7 +111,16 @@ def create(data):
                 no_operator: [],
                 error_message: '',
                 authFailure: false,
-                authTry: false
+                authTry: false,
+                STARK_upload_elements: {{"""
+                #  "file1": {{"file": '', "progress_bar_val": 0}} 
+    for col, col_element in cols.items():
+        col_varname = converter.convert_to_system_name(col)
+        if isinstance(col_element, str) and col_element == 'file-upload':
+            source_code += f"""
+                        "{col_varname}": {{"file": '', "progress_bar_val": 0}},
+            """
+    source_code += f"""}},
 
             }},
             methods: {{
@@ -189,6 +202,12 @@ def create(data):
                         {entity_app}.get(data).then( function(data) {{
                             root.{entity_varname} = data[0]; //We need 0, because API backed func always returns a list for now
                             root.{entity_varname}.orig_{pk_varname} = root.{entity_varname}.{pk_varname};"""
+    for col, col_element in cols.items():
+        col_varname = converter.convert_to_system_name(col)
+        if col_element == 'file-upload':
+            source_code += f"""root.Document.STARK_uploaded_s3_keys['{col_varname}'] = root.Document.STARK_uploaded_s3_keys.{col_varname}.S 
+                            root.STARK_upload_elements['{col_varname}'].file = root.Document.{col_varname}
+                            root.STARK_upload_elements['{col_varname}'].progress_bar_val = 100"""
 
     #If there are 1:1 rel fields, we need to assign their initial value to the still-unpopulated drop-down list so that it displays 
     #   a value even before the lazy-loading is triggered.
@@ -346,6 +365,55 @@ def create(data):
                     {{
                         checked_fields = []
                     }}
+                }},
+                process_upload_file(file_upload_element) {{
+                    var upload_object = null
+                    var uuid = ""
+                    var ext = ""
+                    var file = root.STARK_upload_elements[file_upload_element].file;
+                    if(root.Document.STARK_uploaded_s3_keys[file_upload_element] == '')
+                    {{
+                        uuid = create_UUID()
+                        ext = file.name.split('.').pop()
+                    }}
+                    else
+                    {{
+                        var s3_key = root.Document.STARK_uploaded_s3_keys[file_upload_element]
+                        uuid = s3_key.split('.').shift()
+                        ext = file.name.split('.').pop()
+                    }}
+                    
+                    if(file)
+                    {{
+                        upload_object = {{
+                            'file_body' : file,
+                            'filename'  : file.name,
+                            's3_key'    : uuid + '.' + ext
+                        }}
+                        return upload_object
+                    }}
+                }},
+                s3upload: function(file_upload_element) {{
+
+                    root.STARK_upload_elements[file_upload_element].progress_bar_val = 0
+                    var upload_object = root.process_upload_file(file_upload_element)
+        
+                    root.Document[file_upload_element] = upload_object['filename']
+                    var filePath = 'tmp/' + upload_object['s3_key'];
+                    root.Document.STARK_uploaded_s3_keys[file_upload_element] = upload_object['s3_key']
+                    s3.upload({{
+                        Key: filePath,
+                        Body: upload_object['file_body'],
+                        ACL: 'public-read'
+                        }}, function(err, data) {{
+                            console.log(data)
+                        if(err) {{
+                            console.log(err)
+                        }}
+                        }}).on('httpUploadProgress', function (progress) {{
+                        root.STARK_upload_elements[file_upload_element].progress_bar_val = parseInt((progress.loaded * 100) / progress.total);
+                    }});
+                    
                 }},"""
 
     for col, col_type in cols.items():
@@ -400,7 +468,18 @@ def create(data):
         source_code += f"""'{col_varname}',"""
     
     source_code += f"""]
-    """
+    
+    //Bucket Configurations
+    var bucketName = '{bucket_name}';
+    var bucketRegion = '{region_name}';
+    var credentials = get_s3_credential_keys()
+    var s3 = new AWS.S3({{
+        params: {{Bucket: bucketName}},
+        region: bucketRegion,
+        apiVersion: '2006-03-01',
+        accessKeyId: credentials['access_key_id'],
+        secretAccessKey: credentials['secret_access_key'],
+    }});"""
 
     return textwrap.dedent(source_code)
 
