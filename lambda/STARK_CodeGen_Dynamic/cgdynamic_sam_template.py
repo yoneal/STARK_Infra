@@ -170,6 +170,16 @@ def create(data, cli_mode=False):
             Type: AWS::S3::Bucket
             Properties:
                 AccessControl: {s3_access_control}
+                CorsConfiguration:
+                    CorsRules:
+                        - AllowedHeaders:
+                            - '*'
+                          AllowedMethods:
+                            - PUT
+                          AllowedOrigins:
+                            - '*'
+                          ExposedHeaders:
+                            - ETag
                 BucketName: !Ref UserWebsiteBucketNameParameter
                 VersioningConfiguration:
                     Status: {s3_versioning}
