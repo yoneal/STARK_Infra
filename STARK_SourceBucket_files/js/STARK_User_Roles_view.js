@@ -9,8 +9,11 @@ var root = new Vue({
             'Permissions': '',
         },
         lists: {
+            'Permissions': [
+            ],
         },
         list_status: {
+            'Permissions': 'empty',
         },
         visibility: 'hidden',
         next_token: '',
@@ -18,7 +21,9 @@ var root = new Vue({
         prev_token: '',
         prev_disabled: true,
         page_token_map: {1: ''},
-        curr_page: 1
+        curr_page: 1,
+        PermissionsVal: [] // Array reference
+
 
     },
     methods: {
@@ -35,6 +40,7 @@ var root = new Vue({
             loading_modal.show()
             console.log("VIEW: Inserting!")
 
+			this.STARK_User_Roles.Permissions = this.PermissionsVal.join(', ')																  
             let data = { STARK_User_Roles: this.STARK_User_Roles }
 
             STARK_User_Roles_app.add(data).then( function(data) {
@@ -69,6 +75,7 @@ var root = new Vue({
             loading_modal.show()
             console.log("VIEW: Updating!")
 
+			this.STARK_User_Roles.Permissions = this.PermissionsVal.join(', ')																  
             let data = { STARK_User_Roles: this.STARK_User_Roles }
 
             STARK_User_Roles_app.update(data).then( function(data) {
@@ -100,6 +107,8 @@ var root = new Vue({
                 STARK_User_Roles_app.get(data).then( function(data) {
                     root.STARK_User_Roles = data[0]; //We need 0, because API backed func always returns a list for now
                     root.STARK_User_Roles.orig_Role_Name = root.STARK_User_Roles.Role_Name;
+					permission_list = root.STARK_User_Roles.Permissions 
+                    root.PermissionsVal = permission_list.split(",")													
                     console.log("VIEW: Retreived module data.")
                     root.show()
                     loading_modal.hide()
@@ -171,5 +180,37 @@ var root = new Vue({
                 spinner.hide()
             });
         },
+
+		list_Permissions: function () {
+            if (this.list_status.Permissions == 'empty') {
+                loading_modal.show();
+                root.lists.Permissions = []
+
+                //FIXME: for now, generic list() is used. Can be optimized to use a list function that only retrieves specific columns
+                STARK_Module_app.get_module().then( function(data) {
+                    
+                    data.forEach(function(arrayItem) {
+                        value = arrayItem['Module_Name']
+                        // console.log(value.sort())
+                        text  = arrayItem['Module_Name']
+                        root.lists.Permissions.push({ value: value, text: text })  
+                          
+                        root.list_status.Permissions = 'populated'
+                    })
+                    // console.log(root.lists.Permissions.sort(function(a,b){ return b[2] < a[2] ? 1 : 1; }))  
+                    // console.log(root.list_status.Permissions)
+                    loading_modal.hide();
+                }).catch(function(error) {
+                    console.log("Encountered an error! [" + error + "]")
+                    loading_modal.hide();
+                });
+            }
+        }
+    },
+    computed: {
+        availableOptions() {
+            // this.list_Permissions()
+            return this.lists.Permissions.filter(data => !(this.PermissionsVal.includes(data.value)))
+        },							   
     }
 })

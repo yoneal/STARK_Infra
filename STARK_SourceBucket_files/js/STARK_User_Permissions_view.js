@@ -8,9 +8,13 @@ var root = new Vue({
             'Permissions': '',
         },
         lists: {
+            'Permissions': [
+            ],
         },
         list_status: {
+            'Permissions': 'empty',								   
         },
+		PermissionsVal: [],									  
         visibility: 'hidden',
         next_token: '',
         next_disabled: true,
@@ -31,10 +35,14 @@ var root = new Vue({
         },
 
         add: function () {
+													   
+            this.STARK_User_Permissions.Permissions = this.PermissionsVal.join(', ')																					
+			
             loading_modal.show()
             console.log("VIEW: Inserting!")
 
             let data = { STARK_User_Permissions: this.STARK_User_Permissions }
+			
 
             STARK_User_Permissions_app.add(data).then( function(data) {
                 console.log("VIEW: INSERTING DONE!");
@@ -68,6 +76,7 @@ var root = new Vue({
             loading_modal.show()
             console.log("VIEW: Updating!")
 
+			this.STARK_User_Permissions.Permissions = this.PermissionsVal.join(', ')																		
             let data = { STARK_User_Permissions: this.STARK_User_Permissions }
 
             STARK_User_Permissions_app.update(data).then( function(data) {
@@ -99,6 +108,8 @@ var root = new Vue({
                 STARK_User_Permissions_app.get(data).then( function(data) {
                     root.STARK_User_Permissions = data[0]; //We need 0, because API backed func always returns a list for now
                     root.STARK_User_Permissions.orig_Username = root.STARK_User_Permissions.Username;
+					permission_list = root.STARK_User_Permissions.Permissions 
+                    root.PermissionsVal = permission_list.split(",")																
                     console.log("VIEW: Retreived module data.")
                     root.show()
                     loading_modal.hide()
@@ -169,6 +180,37 @@ var root = new Vue({
                 console.log("Encountered an error! [" + error + "]")
                 spinner.hide()
             });
+        },
+
+        list_Permissions: function () {
+            if (this.list_status.Permissions == 'empty') {
+                loading_modal.show();
+                root.lists.Permissions = []
+
+                //FIXME: for now, generic list() is used. Can be optimized to use a list function that only retrieves specific columns
+                STARK_Module_app.get_module().then( function(data) {
+                    
+                    data.forEach(function(arrayItem) {
+                        value = arrayItem['Module_Name']
+                        text  = arrayItem['Module_Name']
+                        root.lists.Permissions.push({ value: value, text: text })  
+                        // console.log(root.lists.Permissions)    
+                        root.list_status.Permissions = 'populated'
+                    })
+
+                    console.log(root.list_status.Permissions)
+                    loading_modal.hide();
+                }).catch(function(error) {
+                    console.log("Encountered an error! [" + error + "]")
+                    loading_modal.hide();
+                });
+            }
+        }
+    },
+    computed: {
+        availableOptions() {
+            // this.list_Permissions()
+            return this.lists.Permissions.filter(data => !(this.PermissionsVal.includes(data.value)))
         },
     }
 })

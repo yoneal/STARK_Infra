@@ -110,6 +110,9 @@ def lambda_handler(event, context):
 
         elif request_type == "report":
             response = report(default_sk)
+        
+        elif request_type == "get_module":
+            response = get_module_names(default_sk)
 
         elif request_type == "detail":
 
@@ -552,6 +555,29 @@ def get_all_by_old_parent_value(old_pk_val, sk = default_sk):
         item['Icon'] = record.get('Icon',{}).get('S','')
         item['Priority'] = record.get('Priority',{}).get('N','')
         item['STARK-ListView-sk'] = record.get('STARK-ListView-sk',{}).get('S','')
+        items.append(item)
+
+    return items
+
+def get_module_names(sk = default_sk):
+    response = ddb.query(
+        TableName=ddb_table,
+        IndexName="STARK-ListView-Index",
+        ReturnConsumedCapacity='TOTAL',
+        KeyConditionExpression='sk = :sk',
+        ExpressionAttributeValues={
+            ':sk' : {'S' : sk}
+        }
+    )
+
+    raw = response.get('Items')
+
+    #Map to expected structure
+    #FIXME: this is duplicated code, make this DRY by outsourcing the mapping to a different function.
+    items = []
+    for record in raw:
+        item = {}
+        item['Module_Name'] = record.get('pk', {}).get('S','')
         items.append(item)
 
     return items
