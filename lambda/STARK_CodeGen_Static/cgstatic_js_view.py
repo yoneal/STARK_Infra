@@ -371,7 +371,7 @@ def create(data):
                     var uuid = ""
                     var ext = ""
                     var file = root.STARK_upload_elements[file_upload_element].file;
-                    if(root.Document.STARK_uploaded_s3_keys[file_upload_element] == '')
+                    if(typeof root.Document.STARK_uploaded_s3_keys[file_upload_element] == 'undefined')
                     {{
                         uuid = create_UUID()
                         ext = file.name.split('.').pop()

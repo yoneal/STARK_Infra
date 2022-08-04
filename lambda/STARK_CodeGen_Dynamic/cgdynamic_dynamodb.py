@@ -22,6 +22,7 @@ def create(data):
     pk_varname     = converter.convert_to_system_name(pk)
 
     default_sk     = entity_varname + "|info"
+    with_upload    = False
  
     #Create the column dict we'll use in the code as a declaration
     col_dict = '{ "pk": pk, "sk": sk, '
@@ -37,7 +38,13 @@ def create(data):
         if sk == '': sk = default_sk"""
     for col, col_type in columns.items():
         col_varname = converter.convert_to_system_name(col)
-
+        
+        #check for file upload
+        if col == 'Attachments':
+            print(col_type)
+        if col_type == 'file-upload':
+            with_upload = True
+        
         col_type_id = set_type(col_type)
 
         if col_type_id in ['S', 'N']: 
@@ -55,6 +62,8 @@ def create(data):
         col_varname = converter.convert_to_system_name(col)
         update_expression += f"""#{col_varname} = :{col_varname}, """
     update_expression += " #STARKListViewsk = :STARKListViewsk"
+    if with_upload:
+        update_expression += ", #STARK_uploaded_s3_keys = :STARK_uploaded_s3_keys"
 
     source_code = f"""\
     #Python Standard Library
@@ -74,6 +83,7 @@ def create(data):
 
     ddb = boto3.client('dynamodb')
     s3 = boto3.client("s3")
+    s3_res = boto3.resource('s3')
 
     #######
     #CONFIG
@@ -123,6 +133,7 @@ def create(data):
                 data['{col_varname}'] = payload.get('{col_varname}','')"""
 
     source_code +=f"""
+                data['STARK_uploaded_s3_keys'] = payload.get('STARK_uploaded_s3_keys',{{}})
                 if payload.get('STARK_isReport', False) == False:
                     data['orig_pk'] = payload.get('orig_{pk_varname}','')
                     data['sk'] = payload.get('sk', '')
@@ -245,8 +256,6 @@ def create(data):
                     temp_string_filter += processed_operator_and_parameter_dict['filter_string']
                     object_expression_value.update(processed_operator_and_parameter_dict['expression_values'])
                     report_param_dict.update(processed_operator_and_parameter_dict['report_params'])
-                else:
-                    report_param_dict.update({{key: "All"}})
         string_filter = temp_string_filter[1:-3]
         
         if temp_string_filter == "":
@@ -363,8 +372,21 @@ def create(data):
         return "OK"
 
     def edit(data):                
-        {dict_to_var_code}
+        {dict_to_var_code}"""
 
+    if with_upload:
+        source_code += f"""
+        temp_s3_keys = data.get('STARK_uploaded_s3_keys', {{}}) 
+        STARK_uploaded_s3_keys = {{}}
+        for key, items in temp_s3_keys.items():
+            STARK_uploaded_s3_keys[key] = {{ 'S' : items }}
+            copy_source = {{
+                'Bucket': bucket_name,
+                'Key': 'tmp/' + items
+            }}
+        s3_res.meta.client.copy(copy_source, bucket_name, 'uploaded_files/' + items)
+        """
+    source_code += f"""
         UpdateExpressionString = "SET {update_expression}" 
         ExpressionAttributeNamesDict = {{"""
 
@@ -372,7 +394,10 @@ def create(data):
         col_varname = converter.convert_to_system_name(col)
         source_code +=f"""
             '#{col_varname}' : '{col_varname}',"""  
- 
+    
+    if with_upload:
+        source_code += f"""
+            '#STARK_uploaded_s3_keys': 'STARK_uploaded_s3_keys',"""
     source_code += f"""
             '#STARKListViewsk' : 'STARK-ListView-sk'
         }}
@@ -385,6 +410,9 @@ def create(data):
         source_code +=f"""
             ':{col_varname}' : {{'{col_type_id}' : {col_varname} }},"""  
 
+    if with_upload:
+        source_code += f"""
+            ':STARK_uploaded_s3_keys': {{'M': STARK_uploaded_s3_keys }},"""
     source_code += f"""
             ':STARKListViewsk' : {{'S' : data['STARK-ListView-sk']}}
         }}
@@ -410,8 +438,21 @@ def create(data):
         return "OK"
 
     def add(data, method='POST'):
-        {dict_to_var_code}
+        {dict_to_var_code}"""
 
+    if with_upload:
+        source_code += f"""
+        temp_s3_keys = data.get('STARK_uploaded_s3_keys', {{}}) 
+        STARK_uploaded_s3_keys = {{}}
+        for key, items in temp_s3_keys.items():
+            STARK_uploaded_s3_keys[key] = {{ 'S' : items }}
+            copy_source = {{
+                'Bucket': bucket_name,
+                'Key': 'tmp/' + items
+            }}
+        s3_res.meta.client.copy(copy_source, bucket_name, 'uploaded_files/' + items)
+        """
+    source_code += f"""
         item={{}}
         item['pk'] = {{'S' : pk}}
         item['sk'] = {{'S' : sk}}"""
@@ -422,6 +463,10 @@ def create(data):
 
         source_code +=f"""
         item['{col_varname}'] = {{'{col_type_id}' : {col_varname}}}"""
+
+    if with_upload:
+        source_code += f"""
+        item['STARK_uploaded_s3_keys'] = {{'M' : STARK_uploaded_s3_keys}}"""
 
     source_code += f"""
 
@@ -515,6 +560,9 @@ def create(data):
         source_code +=f"""
         item['{col_varname}'] = record.get('{col_varname}',{{}}).get('{col_type_id}','')"""
 
+    if with_upload:
+        source_code += f"""
+        item['STARK_uploaded_s3_keys'] = record.get('STARK_uploaded_s3_keys',{{}}).get('M',{{}})"""
     source_code += f"""
         return item
 
