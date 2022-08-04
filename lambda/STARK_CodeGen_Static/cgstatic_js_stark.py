@@ -114,7 +114,7 @@ def create(data):
         }}
         
         function get_s3_credential_keys(){{
-            return {{'access_key_id': 'AKIA6MFCCK4GF7UQVV7B', 'secret_access_key': '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'}}
+            return {{'access_key_id': '', 'secret_access_key': ''}}
         }}"""
 
     return textwrap.dedent(source_code)
