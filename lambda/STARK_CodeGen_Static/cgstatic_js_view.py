@@ -204,9 +204,9 @@ def create(data):
         col_varname = converter.convert_to_system_name(col)
         if col_type == 'file-upload':
             source_code += f"""
-                            root.Document.STARK_uploaded_s3_keys['{col_varname}'] = root.Document.STARK_uploaded_s3_keys.{col_varname}.S 
-                            root.STARK_upload_elements['{col_varname}'].file = root.Document.{col_varname}
-                            root.STARK_upload_elements['{col_varname}'].progress_bar_val = 100
+                            root.{entity_varname}.STARK_uploaded_s3_keys['{col_varname}'] = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.STARK_uploaded_s3_keys.{col_varname}.S : ""
+                            root.STARK_upload_elements['{col_varname}'].file              = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.{col_varname} : ""
+                            root.STARK_upload_elements['{col_varname}'].progress_bar_val  = root.{entity_varname}.{col_varname} != "" ? 100 : 0
                             """
 
     #If there are 1:1 rel fields, we need to assign their initial value to the still-unpopulated drop-down list so that it displays 
@@ -371,14 +371,14 @@ def create(data):
                     var uuid = ""
                     var ext = ""
                     var file = root.STARK_upload_elements[file_upload_element].file;
-                    if(typeof root.Document.STARK_uploaded_s3_keys[file_upload_element] == 'undefined')
+                    if(typeof root.{entity_varname}.STARK_uploaded_s3_keys[file_upload_element] == 'undefined')
                     {{
                         uuid = create_UUID()
                         ext = file.name.split('.').pop()
                     }}
                     else
                     {{
-                        var s3_key = root.Document.STARK_uploaded_s3_keys[file_upload_element]
+                        var s3_key = root.{entity_varname}.STARK_uploaded_s3_keys[file_upload_element]
                         uuid = s3_key.split('.').shift()
                         ext = file.name.split('.').pop()
                     }}
@@ -398,9 +398,9 @@ def create(data):
                     root.STARK_upload_elements[file_upload_element].progress_bar_val = 0
                     var upload_object = root.process_upload_file(file_upload_element)
         
-                    root.Document[file_upload_element] = upload_object['filename']
+                    root.{entity_varname}[file_upload_element] = upload_object['filename']
                     var filePath = 'tmp/' + upload_object['s3_key'];
-                    root.Document.STARK_uploaded_s3_keys[file_upload_element] = upload_object['s3_key']
+                    root.{entity_varname}.STARK_uploaded_s3_keys[file_upload_element] = upload_object['s3_key']
                     s3.upload({{
                         Key: filePath,
                         Body: upload_object['file_body'],
