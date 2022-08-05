@@ -169,7 +169,7 @@ def create(data):
                     #default has many ux
                     #multi-select pill
                     html_code=f"""
-                            <b-form-group label="Tagged input using dropdown" label-for="tags-with-dropdown">
+                            <b-form-group label-for="tags-with-dropdown">
                                 <b-form-tags id="tags-with-dropdown" v-model="multi_select_values.{foreign_entity}" no-outer-focus class="mb-2">
                                     <template v-slot="{{ tags, disabled, addTag, removeTag }}">
                                         <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">

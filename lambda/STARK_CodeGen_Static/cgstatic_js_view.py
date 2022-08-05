@@ -516,7 +516,8 @@ def create(data):
                     return 'There are no tags matching your search criteria'
                     }}
                     return ''
-                }}
+                }}"""
+    source_code += f"""
             }}    
         }})
 
