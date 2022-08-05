@@ -145,6 +145,7 @@ def create(data):
 
         elif col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
+            has_many = col_type.get('has_many', '')
 
             if  has_one != '':
                 #simple 1-1 relationship
@@ -155,6 +156,49 @@ def create(data):
                                     <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                 </template>
                             </b-form-select>"""
+
+            if  has_many != '':
+                # 1-M relationship
+                foreign_entity  = converter.convert_to_system_name(has_many)
+                has_many_ux = col_type.get('has_many_ux', '')
+
+                if has_many_ux == 'something':
+                    #FIXME: placeholder for other design of has many
+                    placeholder = "replace me with actual element design"
+                else:
+                    #default has many ux
+                    #multi-select pill
+                    html_code=f"""
+                            <b-form-group label="Tagged input using dropdown" label-for="tags-with-dropdown">
+                                <b-form-tags id="tags-with-dropdown" v-model="multi_select_values.{foreign_entity}" no-outer-focus class="mb-2">
+                                    <template v-slot="{{ tags, disabled, addTag, removeTag }}">
+                                        <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
+                                            <li v-for="tag in tags" :key="tag" class="list-inline-item">
+                                                <b-form-tag @remove="removeTag(tag)" :title="tag" :disabled="disabled" variant="info" >{{{{ tag }}}}</b-form-tag>
+                                            </li>
+                                        </ul>
+                                        <b-dropdown size="sm" variant="outline-secondary" block menu-class="w-50" no-flip ref="{foreign_entity}" >
+                                            <template #button-content>
+                                                <b-icon icon="tag-fill"></b-icon> Choose {has_many.lower()}s
+                                            </template>
+                                            <b-dropdown-form @submit.stop.prevent="() => {{}}">
+                                                <b-form-group label="Search {has_many.lower()}s" label-for="tag-search-input" label-cols-md="auto" class="mb-2" label-size="sm" :description="{foreign_entity}_search_desc" :disabled="disabled" >
+                                                    <b-form-input v-model="search" id="tag-search-input" type="search" size="sm" autocomplete="off"></b-form-input>
+                                                </b-form-group>
+                                            </b-dropdown-form>
+                                            <b-dropdown-divider></b-dropdown-divider>
+                                            <b-dropdown-item-button  v-for="option in {foreign_entity}" :key="option" @click="onOptionClick({{ option, addTag }},'{foreign_entity}')">
+                                                {{{{ option }}}}
+                                            </b-dropdown-item-button>
+                                            <b-dropdown-text v-if="{foreign_entity}.length === 0">
+                                                There are no {has_many.lower()}s available to select
+                                            </b-dropdown-text>
+                                        </b-dropdown>
+                                    </template>
+                                </b-form-tags>
+                            </b-form-group>"""
+            
+            
 
     else:
         html_code=f"""<input type="text" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}">"""
@@ -180,7 +224,7 @@ def create_list(data):
     if isinstance(col_type, list) or ( 
         isinstance(col_type, dict) and col_type["type"] in [ "multiple choice", "radio button", "radio bar"] 
     ) or ( 
-        isinstance(col_type, dict) and col_type["type"] == "relationship" and col_type.get('has_one','') != ''
+        isinstance(col_type, dict) and col_type["type"] == "relationship" and (col_type.get('has_one','') != '' or col_type.get('has_many','') != '')
     ) or (
         isinstance(col_type, dict) and col_type["type"] == "tags" and col_type.get('values','') != '' 
     ):
