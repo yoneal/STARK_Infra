@@ -384,7 +384,7 @@ def create(data):
                 'Bucket': bucket_name,
                 'Key': 'tmp/' + items
             }}
-        s3_res.meta.client.copy(copy_source, bucket_name, 'uploaded_files/' + items)
+            s3_res.meta.client.copy(copy_source, bucket_name, 'uploaded_files/' + items)
         """
     source_code += f"""
         UpdateExpressionString = "SET {update_expression}" 
@@ -450,7 +450,7 @@ def create(data):
                 'Bucket': bucket_name,
                 'Key': 'tmp/' + items
             }}
-        s3_res.meta.client.copy(copy_source, bucket_name, 'uploaded_files/' + items)
+            s3_res.meta.client.copy(copy_source, bucket_name, 'uploaded_files/' + items)
         """
     source_code += f"""
         item={{}}
