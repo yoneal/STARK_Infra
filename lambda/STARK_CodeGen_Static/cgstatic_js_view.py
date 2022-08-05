@@ -113,13 +113,11 @@ def create(data):
                 authFailure: false,
                 authTry: false,
                 STARK_upload_elements: {{"""
-                #  "file1": {{"file": '', "progress_bar_val": 0}} 
-    for col, col_element in cols.items():
+    for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
-        if isinstance(col_element, str) and col_element == 'file-upload':
+        if isinstance(col_type, str) and col_type == 'file-upload':
             source_code += f"""
-                        "{col_varname}": {{"file": '', "progress_bar_val": 0}},
-            """
+                        "{col_varname}": {{"file": '', "progress_bar_val": 0}},"""
     source_code += f"""}},
 
             }},
@@ -202,9 +200,9 @@ def create(data):
                         {entity_app}.get(data).then( function(data) {{
                             root.{entity_varname} = data[0]; //We need 0, because API backed func always returns a list for now
                             root.{entity_varname}.orig_{pk_varname} = root.{entity_varname}.{pk_varname};"""
-    for col, col_element in cols.items():
+    for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
-        if col_element == 'file-upload':
+        if col_type == 'file-upload':
             source_code += f"""
                             root.Document.STARK_uploaded_s3_keys['{col_varname}'] = root.Document.STARK_uploaded_s3_keys.{col_varname}.S 
                             root.STARK_upload_elements['{col_varname}'].file = root.Document.{col_varname}
