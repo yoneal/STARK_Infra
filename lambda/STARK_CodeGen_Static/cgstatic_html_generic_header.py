@@ -36,6 +36,7 @@ def create(data, special="none"):
             <script src="js/STARK.js" defer></script>
             <script src="js/STARK_spinner.js" defer></script>
             <script src="js/STARK_loading_modal.js" defer></script>
+            <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.24.min.js"></script>
 """
 
     if special == "HomePage":

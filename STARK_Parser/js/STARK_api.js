@@ -55,7 +55,8 @@ Document:
         - Title: string
         - Revision: int
         - Numerical Code: number
-        - Description: string`,
+        - Description: string
+        - Attachments: file-upload`,
         },
         api_key: '',
         current_stack: 0,
