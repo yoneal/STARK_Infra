@@ -177,13 +177,13 @@ def create(data):
                                                 <b-form-tag @remove="removeTag(tag)" :title="tag" :disabled="disabled" variant="info" >{{{{ tag }}}}</b-form-tag>
                                             </li>
                                         </ul>
-                                        <b-dropdown size="sm" variant="outline-secondary" block menu-class="w-50" no-flip ref="{foreign_entity}" >
+                                        <b-dropdown size="sm" variant="outline-secondary" block menu-class="w-50" no-flip ref="{foreign_entity}" onmouseover="root.list_{foreign_entity}()" onfocus="root.list_{foreign_entity}()">
                                             <template #button-content>
                                                 <b-icon icon="tag-fill"></b-icon> Choose {has_many.lower()}s
                                             </template>
                                             <b-dropdown-form @submit.stop.prevent="() => {{}}">
                                                 <b-form-group label="Search {has_many.lower()}s" label-for="tag-search-input" label-cols-md="auto" class="mb-2" label-size="sm" :description="{foreign_entity}_search_desc" :disabled="disabled" >
-                                                    <b-form-input v-model="search" id="tag-search-input" type="search" size="sm" autocomplete="off"></b-form-input>
+                                                    <b-form-input v-model="search.{foreign_entity}" id="tag-search-input" type="search" size="sm" autocomplete="off"></b-form-input>
                                                 </b-form-group>
                                             </b-dropdown-form>
                                             <b-dropdown-divider></b-dropdown-divider>

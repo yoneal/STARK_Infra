@@ -111,7 +111,7 @@ def create(data):
 
     source_code += f"""
 
-                }}
+                }},
                 visibility: 'hidden',
                 next_token: '',
                 next_disabled: true,
@@ -134,7 +134,7 @@ def create(data):
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_many = col_type.get('has_many', '')
             search_string += f"""
-                {col_varname}_search: '',"""
+                {col_varname}: '',"""
 
         if isinstance(col_type, str) and col_type == 'file-upload':
             source_code += f"""
@@ -445,12 +445,18 @@ def create(data):
                         root.STARK_upload_elements[file_upload_element].progress_bar_val = parseInt((progress.loaded * 100) / progress.total);
                     }});
                     
+                }},
+                onOptionClick({{ option, addTag }}, reference) {{
+                    addTag(option)
+                    this.search[reference] = ''
+                    this.$refs[reference].show(true)
                 }},"""
 
     for col, col_type in cols.items():
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
-            if  has_one != '':
+            has_many = col_type.get('has_many', '')
+            if  has_one != '' or has_many != '':
                 #simple 1-1 relationship
                 foreign_entity  = converter.convert_to_system_name(has_one)
                 foreign_field   = converter.convert_to_system_name(col_type.get('value', foreign_entity))
@@ -466,54 +472,52 @@ def create(data):
                         {foreign_entity}_app.list().then( function(data) {{
                             data['Items'].forEach(function(arrayItem) {{
                                 value = arrayItem['{foreign_field}']
-                                text  = arrayItem['{foreign_display}']
-                                root.lists.{foreign_field}.push({{ value: value, text: text }})
-                            }})
+                                text  = arrayItem['{foreign_display}']"""
+                if has_one != '': 
+                    source_code += f"""            
+                                root.lists.{foreign_field}.push({{ value: value, text: text }})"""
+                if has_many != '': 
+                    source_code += f"""            
+                                root.lists.{foreign_field}.push({{ value }})"""
+                source_code += f""" }})
                             root.list_status.{foreign_field} = 'populated'
                             loading_modal.hide();
                         }}).catch(function(error) {{
                             console.log("Encountered an error! [" + error + "]")
                             loading_modal.hide();
                         }});
-                    }},
-                    onOptionClick({{ option, addTag }}, reference) {{
-                        addTag(option)
-                        this.search[reference] = ''
-                        this.$refs[reference].show(true)
                     }}
-                }},
-                computed: {{"""
+                }}"""
+    source_code += f"""
+            }},
+            computed: {{"""
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_many = col_type.get('has_many', '')
             if has_many != "":
                 source_code += f"""
-                
-                    {col_varname}_criteria() {{
-                        return this.search['{col_varname}'].trim().toLowerCase()
-                    }},
-                    {col_varname}() {{
-                        const {col_varname}_criteria = this.{col_varname}_criteria
-                        // Filter out already selected options
-                        const options = this.lists.{col_varname}.filter(opt => this.multi_select_values.{col_varname}.indexOf(opt) === -1)
-                        if ({col_varname}_criteria) {{
-                        // Show only options that match {col_varname}_criteria
-                        return options.filter(opt => opt.toLowerCase().indexOf({col_varname}_criteria) > -1);
-                        }}
-                        // Show all options available
-                        return options
-                    }},
-                    {col_varname}_search_desc() {{
-                        if (this.{col_varname}_criteria && this.{col_varname}.length === 0) {{
-                        return 'There are no tags matching your search criteria'
-                        }}
-                        return ''
+                {col_varname}_criteria() {{
+                    return this.search['{col_varname}'].trim().toLowerCase()
+                }},
+                {col_varname}() {{
+                    const {col_varname}_criteria = this.{col_varname}_criteria
+                    // Filter out already selected options
+                    const options = this.lists.{col_varname}.filter(opt => this.multi_select_values.{col_varname}.indexOf(opt) === -1)
+                    if ({col_varname}_criteria) {{
+                    // Show only options that match {col_varname}_criteria
+                    return options.filter(opt => opt.toLowerCase().indexOf({col_varname}_criteria) > -1);
                     }}
-                    """
-    source_code += f"""
+                    // Show all options available
+                    return options
+                }},
+                {col_varname}_search_desc() {{
+                    if (this.{col_varname}_criteria && this.{col_varname}.length === 0) {{
+                    return 'There are no tags matching your search criteria'
+                    }}
+                    return ''
                 }}
-            }}
+            }}    
         }})
 
     //for selecting individually, select all or uncheck all of checkboxes
