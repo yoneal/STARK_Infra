@@ -86,7 +86,8 @@ def create(data):
     for col, col_type in cols.items():
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
-            if  has_one != '':
+            has_many = col_type.get('has_many', '')
+            if  has_one != '' or has_many != '':
                 #simple 1-1 relationship
                 col_varname = converter.convert_to_system_name(col)
 
