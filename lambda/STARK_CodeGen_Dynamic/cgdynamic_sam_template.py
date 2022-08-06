@@ -202,6 +202,8 @@ def create(data, cli_mode=False):
                                 - 's3:GetObjectAcl'
                             Resource: 
                                 - !Join [ "",  [ "arn:aws:s3:::", "{s3_bucket_name}", "/uploaded_files/*"] ]
+            DependsOn:
+                -   STARKSystemBucket
         STARKBucketCleaner:
             Type: AWS::CloudFormation::CustomResource
             Properties:

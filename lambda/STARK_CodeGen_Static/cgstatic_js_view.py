@@ -164,7 +164,8 @@ def create(data):
             if has_many != "":
                 source_code += f"""
                     this.{entity_varname}.{col_varname} = root.multi_select_values.{col_varname}.join(', ')"""
-            source_code += f"""
+    
+    source_code += f"""
 
                     let data = {{ {entity_varname}: this.{entity_varname} }}
 
