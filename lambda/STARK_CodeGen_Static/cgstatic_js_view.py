@@ -457,8 +457,8 @@ def create(data):
             has_one = col_type.get('has_one', '')
             has_many = col_type.get('has_many', '')
             if  has_one != '' or has_many != '':
-                #simple 1-1 relationship
-                foreign_entity  = converter.convert_to_system_name(has_one)
+                relationship = has_one if has_one != '' else has_many
+                foreign_entity  = converter.convert_to_system_name(relationship)
                 foreign_field   = converter.convert_to_system_name(col_type.get('value', foreign_entity))
                 foreign_display = converter.convert_to_system_name(col_type.get('display', foreign_field))
 
