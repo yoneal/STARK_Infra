@@ -18,8 +18,11 @@ def get(data):
         if col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
             has_many = col_type.get('has_many', '')
-            if has_one != '' or has_many != '':
+            if has_one != '':
                 related_entities.append(has_one)
+            elif has_many != '':
+                related_entities.append(has_many)
+
                       
 
     return related_entities
