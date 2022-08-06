@@ -135,7 +135,7 @@ def create(data):
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_many = col_type.get('has_many', '')
             search_string += f"""
-                {col_varname}: '',"""
+                    {col_varname}: '',"""
 
         if isinstance(col_type, str) and col_type == 'file-upload':
             source_code += f"""
@@ -200,8 +200,16 @@ def create(data):
 
                 update: function () {{
                     loading_modal.show()
-                    console.log("VIEW: Updating!")
-
+                    console.log("VIEW: Updating!")"""
+    for col, col_type in cols.items():
+        col_varname = converter.convert_to_system_name(col)
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_many = col_type.get('has_many', '')
+            if has_many != "":
+                source_code += f"""
+                    this.{entity_varname}.{col_varname} = root.multi_select_values.{col_varname}.join(', ')"""
+    
+    source_code += f"""
                     let data = {{ {entity_varname}: this.{entity_varname} }}
 
                     {entity_app}.update(data).then( function(data) {{
@@ -247,14 +255,19 @@ def create(data):
     for col, col_type in cols.items():
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
+            has_many = col_type.get('has_many', '')
+            
+            foreign_entity  = converter.convert_to_system_name(has_one if has_one != '' else has_many)
+            foreign_field   = converter.convert_to_system_name(col_type.get('value', foreign_entity))
+            foreign_display = converter.convert_to_system_name(col_type.get('display', foreign_field))
+
             if  has_one != '':
                 #simple 1-1 relationship
-                foreign_entity  = converter.convert_to_system_name(has_one)
-                foreign_field   = converter.convert_to_system_name(col_type.get('value', foreign_entity))
-                foreign_display = converter.convert_to_system_name(col_type.get('display', foreign_field))
-
                 source_code += f"""
                             root.lists.{foreign_field} = [  {{ value: root.{entity_varname}.{foreign_field}, text: root.{entity_varname}.{foreign_field} }},]"""
+            elif has_many != '':
+                source_code += f"""
+                            root.multi_select_values.{foreign_field} = root.{entity_varname}.{foreign_field}.split(', ')"""
 
     source_code += f"""
                             console.log("VIEW: Retreived module data.")
@@ -459,8 +472,7 @@ def create(data):
             has_one = col_type.get('has_one', '')
             has_many = col_type.get('has_many', '')
             if  has_one != '' or has_many != '':
-                relationship = has_one if has_one != '' else has_many
-                foreign_entity  = converter.convert_to_system_name(relationship)
+                foreign_entity  = converter.convert_to_system_name(has_one if has_one != '' else has_many)
                 foreign_field   = converter.convert_to_system_name(col_type.get('value', foreign_entity))
                 foreign_display = converter.convert_to_system_name(col_type.get('display', foreign_field))
 
@@ -480,8 +492,9 @@ def create(data):
                                 root.lists.{foreign_field}.push({{ value: value, text: text }})"""
                 if has_many != '': 
                     source_code += f"""            
-                                root.lists.{foreign_field}.push({{ value }})"""
-                source_code += f""" }})
+                                root.lists.{foreign_field}.push(value)"""
+                source_code += f""" 
+                }})
                             root.list_status.{foreign_field} = 'populated'
                             loading_modal.hide();
                         }}).catch(function(error) {{
