@@ -186,22 +186,6 @@ def create(data, cli_mode=False):
                 WebsiteConfiguration:
                     ErrorDocument: {s3_error_document}
                     IndexDocument: {s3_index_document}
-        BucketPolicyForUploadedFiles:
-            Type: AWS::S3::BucketPolicy
-            Properties:
-                Bucket: !Ref UserWebsiteBucketNameParameter
-                PolicyDocument:
-                    Version: 2012-10-17
-                    Statement:
-                        - 
-                            Sid: VisualEditor0
-                            Effect: Allow
-                            Principal: '*'
-                            Action:
-                                - 's3:GetObject'
-                                - 's3:GetObjectAcl'
-                            Resource: 
-                                - !Join [ "",  [ "arn:aws:s3:::", "{s3_bucket_name}", "/uploaded_files/*"] ]
         STARKBucketCleaner:
             Type: AWS::CloudFormation::CustomResource
             Properties:

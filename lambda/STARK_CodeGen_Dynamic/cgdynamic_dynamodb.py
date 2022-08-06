@@ -384,7 +384,11 @@ def create(data):
                 'Bucket': bucket_name,
                 'Key': 'tmp/' + items
             }}
-            s3_res.meta.client.copy(copy_source, bucket_name, 'uploaded_files/' + items)
+            
+            extra_args = {{
+                'ACL': 'public-read'
+            }}
+            s3_res.meta.client.copy(copy_source, bucket_name, 'uploaded_files/' + items, extra_args)
         """
     source_code += f"""
         UpdateExpressionString = "SET {update_expression}" 
@@ -448,9 +452,13 @@ def create(data):
             STARK_uploaded_s3_keys[key] = {{ 'S' : items }}
             copy_source = {{
                 'Bucket': bucket_name,
-                'Key': 'tmp/' + items
+                'Key': 'tmp/' + items,
             }}
-            s3_res.meta.client.copy(copy_source, bucket_name, 'uploaded_files/' + items)
+            
+            extra_args = {{
+                'ACL': 'public-read'
+            }}
+            s3_res.meta.client.copy(copy_source, bucket_name, 'uploaded_files/' + items, extra_args)
         """
     source_code += f"""
         item={{}}

@@ -86,7 +86,8 @@ def create(data):
     for col, col_type in cols.items():
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
-            if  has_one != '':
+            has_many = col_type.get('has_many', '')
+            if  has_one != '' or has_many != '':
                 #simple 1-1 relationship
                 col_varname = converter.convert_to_system_name(col)
 
@@ -96,6 +97,21 @@ def create(data):
 
 
     source_code += f"""
+                }},
+                multi_select_values: {{"""
+
+    #FIXME: These kinds of logic (determining col types, lists, retreiving settings, etc) are repetitive, should be refactored shipped to a central lib
+    for col, col_type in cols.items():
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_many = col_type.get('has_many', '')
+            if  has_many != '':
+                col_varname = converter.convert_to_system_name(col)
+
+                source_code += f"""
+                    '{col_varname}': [],"""
+
+    source_code += f"""
+
                 }},
                 visibility: 'hidden',
                 next_token: '',
@@ -113,13 +129,21 @@ def create(data):
                 authFailure: false,
                 authTry: false,
                 STARK_upload_elements: {{"""
+    search_string = ""
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_many = col_type.get('has_many', '')
+            search_string += f"""
+                    {col_varname}: '',"""
+
         if isinstance(col_type, str) and col_type == 'file-upload':
             source_code += f"""
                         "{col_varname}": {{"file": '', "progress_bar_val": 0}},"""
     source_code += f"""}},
-
+                search:{{
+                    {search_string}
+                }},
             }},
             methods: {{
 
@@ -133,7 +157,16 @@ def create(data):
 
                 add: function () {{
                     loading_modal.show()
-                    console.log("VIEW: Inserting!")
+                    console.log("VIEW: Inserting!")"""
+    for col, col_type in cols.items():
+        col_varname = converter.convert_to_system_name(col)
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_many = col_type.get('has_many', '')
+            if has_many != "":
+                source_code += f"""
+                    this.{entity_varname}.{col_varname} = root.multi_select_values.{col_varname}.join(', ')"""
+    
+    source_code += f"""
 
                     let data = {{ {entity_varname}: this.{entity_varname} }}
 
@@ -167,8 +200,16 @@ def create(data):
 
                 update: function () {{
                     loading_modal.show()
-                    console.log("VIEW: Updating!")
-
+                    console.log("VIEW: Updating!")"""
+    for col, col_type in cols.items():
+        col_varname = converter.convert_to_system_name(col)
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_many = col_type.get('has_many', '')
+            if has_many != "":
+                source_code += f"""
+                    this.{entity_varname}.{col_varname} = root.multi_select_values.{col_varname}.join(', ')"""
+    
+    source_code += f"""
                     let data = {{ {entity_varname}: this.{entity_varname} }}
 
                     {entity_app}.update(data).then( function(data) {{
@@ -214,14 +255,19 @@ def create(data):
     for col, col_type in cols.items():
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
+            has_many = col_type.get('has_many', '')
+            
+            foreign_entity  = converter.convert_to_system_name(has_one if has_one != '' else has_many)
+            foreign_field   = converter.convert_to_system_name(col_type.get('value', foreign_entity))
+            foreign_display = converter.convert_to_system_name(col_type.get('display', foreign_field))
+
             if  has_one != '':
                 #simple 1-1 relationship
-                foreign_entity  = converter.convert_to_system_name(has_one)
-                foreign_field   = converter.convert_to_system_name(col_type.get('value', foreign_entity))
-                foreign_display = converter.convert_to_system_name(col_type.get('display', foreign_field))
-
                 source_code += f"""
                             root.lists.{foreign_field} = [  {{ value: root.{entity_varname}.{foreign_field}, text: root.{entity_varname}.{foreign_field} }},]"""
+            elif has_many != '':
+                source_code += f"""
+                            root.multi_select_values.{foreign_field} = root.{entity_varname}.{foreign_field}.split(', ')"""
 
     source_code += f"""
                             console.log("VIEW: Retreived module data.")
@@ -414,14 +460,19 @@ def create(data):
                         root.STARK_upload_elements[file_upload_element].progress_bar_val = parseInt((progress.loaded * 100) / progress.total);
                     }});
                     
+                }},
+                onOptionClick({{ option, addTag }}, reference) {{
+                    addTag(option)
+                    this.search[reference] = ''
+                    this.$refs[reference].show(true)
                 }},"""
 
     for col, col_type in cols.items():
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
-            if  has_one != '':
-                #simple 1-1 relationship
-                foreign_entity  = converter.convert_to_system_name(has_one)
+            has_many = col_type.get('has_many', '')
+            if  has_one != '' or has_many != '':
+                foreign_entity  = converter.convert_to_system_name(has_one if has_one != '' else has_many)
                 foreign_field   = converter.convert_to_system_name(col_type.get('value', foreign_entity))
                 foreign_display = converter.convert_to_system_name(col_type.get('display', foreign_field))
 
@@ -435,9 +486,15 @@ def create(data):
                         {foreign_entity}_app.list().then( function(data) {{
                             data['Items'].forEach(function(arrayItem) {{
                                 value = arrayItem['{foreign_field}']
-                                text  = arrayItem['{foreign_display}']
-                                root.lists.{foreign_field}.push({{ value: value, text: text }})
-                            }})
+                                text  = arrayItem['{foreign_display}']"""
+                if has_one != '': 
+                    source_code += f"""            
+                                root.lists.{foreign_field}.push({{ value: value, text: text }})"""
+                if has_many != '': 
+                    source_code += f"""            
+                                root.lists.{foreign_field}.push(value)"""
+                source_code += f""" 
+                }})
                             root.list_status.{foreign_field} = 'populated'
                             loading_modal.hide();
                         }}).catch(function(error) {{
@@ -446,10 +503,37 @@ def create(data):
                         }});
                     }}
                 }},"""
-
-
     source_code += f"""
-            }}
+            }},
+            computed: {{"""
+    for col, col_type in cols.items():
+        col_varname = converter.convert_to_system_name(col)
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_many = col_type.get('has_many', '')
+            if has_many != "":
+                source_code += f"""
+                {col_varname}_criteria() {{
+                    return this.search['{col_varname}'].trim().toLowerCase()
+                }},
+                {col_varname}() {{
+                    const {col_varname}_criteria = this.{col_varname}_criteria
+                    // Filter out already selected options
+                    const options = this.lists.{col_varname}.filter(opt => this.multi_select_values.{col_varname}.indexOf(opt) === -1)
+                    if ({col_varname}_criteria) {{
+                    // Show only options that match {col_varname}_criteria
+                    return options.filter(opt => opt.toLowerCase().indexOf({col_varname}_criteria) > -1);
+                    }}
+                    // Show all options available
+                    return options
+                }},
+                {col_varname}_search_desc() {{
+                    if (this.{col_varname}_criteria && this.{col_varname}.length === 0) {{
+                    return 'There are no tags matching your search criteria'
+                    }}
+                    return ''
+                }},"""
+    source_code += f"""
+            }}    
         }})
 
     //for selecting individually, select all or uncheck all of checkboxes
