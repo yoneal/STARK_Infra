@@ -12,10 +12,10 @@ import convert_friendly_to_system as converter
 def create(data, special="none"):
 
     project = data["Project Name"]
-
+    entity  = data["Entity"]
+    cols    = data["Columns"]
     if special != "HomePage":
-        entity  = data["Entity"]
-        cols    = data["Columns"]
+        
         #Convert human-friendly names to variable-friendly names
         entity_varname = converter.convert_to_system_name(entity)
 
@@ -43,7 +43,8 @@ def create(data, special="none"):
             has_one = col_type.get('has_one', '')
             has_many = col_type.get('has_many', '')
             if  has_one != '' or has_many != '':
-                source_code = f"""\<script src="js/{col}.js" defer></script>"""
+                source_code = f"""\<script src="js/{col}.js" defer></script>
+                    """
 
 
     if special == "HomePage":
