@@ -231,9 +231,17 @@ def create(data):
                     "headers": {{
                         "Content-Type": "application/json",
                     }}
-                }}
-
-        return {{
+                }}"""
+            
+    if len(relationships) > 0:
+        source_code += f"""
+        elif request_type == "get_field":
+            field = event.get('queryStringParameters').get('field','')
+            response = get_field(field, default_sk)
+        """
+        
+    source_code +=f"""
+            return {{
             "isBase64Encoded": False,
             "statusCode": 200,
             "body": json.dumps(response),
@@ -713,6 +721,7 @@ def create(data):
             newline_print_counter += 1                
         pdf.ln()
         """
+    
     if len(relationships) > 0:
         source_code += f"""    
     def cascade_pk_change_to_child(params, parent_entity_name, child_entity_name, attribute):
@@ -733,8 +742,43 @@ def create(data):
         return "OK"
     """
 
-    return textwrap.dedent(source_code)
+    if len(relationships) > 0:
+        source_code += f"""
+    def get_field(field, sk = default_sk):
 
+        dd_arguments = {{}}
+        lv_token = 'initial'
+        items = []
+        while lv_token != None:
+            lv_token = '' if lv_token == 'initial' else lv_token
+            print(lv_token)
+            dd_arguments['TableName']=ddb_table
+            dd_arguments['IndexName']="STARK-ListView-Index"
+            dd_arguments['Limit']=5
+            dd_arguments['ReturnConsumedCapacity']='TOTAL'
+            dd_arguments['KeyConditionExpression']='sk = :sk'
+            dd_arguments['ExpressionAttributeValues']={{
+                ':sk' : {{'S' : sk}}
+            }}
+            
+            if lv_token != '':
+                dd_arguments['ExclusiveStartKey']=lv_token
+
+            response = ddb.query(**dd_arguments)
+            raw = response.get('Items')
+
+            for record in raw:
+                item = {{}}
+                item[field] = record.get('pk', {{}}).get('S','')
+                items.append(item)
+
+            #Get the "next" token, pass to calling function. This enables a "next page" request later.
+            lv_token = response.get('LastEvaluatedKey')
+            
+        return items 
+        """
+
+    return textwrap.dedent(source_code)
 
 def set_type(col_type):
 
@@ -753,3 +797,5 @@ def set_type(col_type):
         col_type_id = 'N'
 
     return col_type_id
+
+    

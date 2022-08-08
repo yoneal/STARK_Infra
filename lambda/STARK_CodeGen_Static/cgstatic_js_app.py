@@ -61,5 +61,16 @@ def create(data):
         }}
 
     """
+    for col, col_type in cols.items():
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_one = col_type.get('has_one', '')
+            has_many = col_type.get('has_many', '')
+            if  has_one != '' or has_many != '':
+                source_code = f"""\
+                    get_field: function (field) {{
+                        fetchUrl = this.api_endpoint + '?rt=get_field&field=' + field
+                        return STARK.request('GET', fetchUrl)
+                    }},
+                    """
 
     return textwrap.dedent(source_code)
