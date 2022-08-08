@@ -66,13 +66,6 @@ def create(data, special="none"):
     elif(special == "Listview"):
         source_code += f"""
             <script src="js/generic_root_list.js" defer></script>"""
-    
-    for col, col_type in cols.items():
-            if isinstance(col_type, dict) and col_type["type"] == "relationship":
-                has_one = col_type.get('has_one', '')
-                has_many = col_type.get('has_many', '')
-                if  has_one != '' or has_many != '':
-                    source_code += f"""\<script src="js/{col}.js" defer></script>"""
 
     if special != "HomePage":
         source_code += f"""
@@ -86,7 +79,5 @@ def create(data, special="none"):
             <title>{project}</title>
         </head>
 """
-
- 
 
     return source_code
