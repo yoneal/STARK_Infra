@@ -133,7 +133,6 @@ def create(data):
                 data['{col_varname}'] = payload.get('{col_varname}','')"""
 
     source_code +=f"""
-                data['STARK_uploaded_s3_keys'] = payload.get('STARK_uploaded_s3_keys',{{}})
                 if payload.get('STARK_isReport', False) == False:
                     data['orig_pk'] = payload.get('orig_{pk_varname}','')
                     data['sk'] = payload.get('sk', '')
@@ -158,6 +157,8 @@ def create(data):
                                 isInvalidPayload = True
                     data['STARK_report_fields'] = temp_report_fields
                     data['STARK_isReport'] = payload.get('STARK_isReport', False)
+
+                data['STARK_uploaded_s3_keys'] = payload.get('STARK_uploaded_s3_keys',{{}})
 
                 if isInvalidPayload:
                     return {{
@@ -250,7 +251,7 @@ def create(data):
         object_expression_value = {{':sk' : {{'S' : sk}}}}
         report_param_dict = {{}}
         for key, index in data.items():
-            if key not in ["STARK_isReport", "STARK_report_fields"]:
+            if key not in ["STARK_isReport", "STARK_report_fields", "STARK_uploaded_s3_keys"]:
                 if index['value'] != "":
                     processed_operator_and_parameter_dict = compose_report_operators_and_parameters(key, index) 
                     temp_string_filter += processed_operator_and_parameter_dict['filter_string']
