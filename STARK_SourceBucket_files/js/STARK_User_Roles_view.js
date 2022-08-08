@@ -187,18 +187,16 @@ var root = new Vue({
                 root.lists.Permissions = []
 
                 //FIXME: for now, generic list() is used. Can be optimized to use a list function that only retrieves specific columns
-                STARK_Module_app.get_module().then( function(data) {
+                field = 'Module_Name'
+                STARK_Module_app.get_field(field).then( function(data) {
                     
                     data.forEach(function(arrayItem) {
                         value = arrayItem['Module_Name']
-                        // console.log(value.sort())
                         text  = arrayItem['Module_Name']
                         root.lists.Permissions.push({ value: value, text: text })  
                           
                         root.list_status.Permissions = 'populated'
                     })
-                    // console.log(root.lists.Permissions.sort(function(a,b){ return b[2] < a[2] ? 1 : 1; }))  
-                    // console.log(root.list_status.Permissions)
                     loading_modal.hide();
                 }).catch(function(error) {
                     console.log("Encountered an error! [" + error + "]")

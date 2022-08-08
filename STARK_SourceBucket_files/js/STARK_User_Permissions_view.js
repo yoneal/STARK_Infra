@@ -188,8 +188,8 @@ var root = new Vue({
                 root.lists.Permissions = []
 
                 //FIXME: for now, generic list() is used. Can be optimized to use a list function that only retrieves specific columns
-                STARK_Module_app.get_module().then( function(data) {
-                    
+                field = 'Module_Name'
+                STARK_Module_app.get_field(field).then( function(data) {
                     data.forEach(function(arrayItem) {
                         value = arrayItem['Module_Name']
                         text  = arrayItem['Module_Name']

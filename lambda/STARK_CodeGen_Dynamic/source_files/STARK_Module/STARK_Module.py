@@ -111,8 +111,9 @@ def lambda_handler(event, context):
         elif request_type == "report":
             response = report(default_sk)
         
-        elif request_type == "get_module":
-            response = get_module_names(default_sk)
+        elif request_type == "get_field":
+            field = event.get('queryStringParameters').get('field','')
+            response = get_field(field, default_sk)
 
         elif request_type == "detail":
 
@@ -559,25 +560,35 @@ def get_all_by_old_parent_value(old_pk_val, sk = default_sk):
 
     return items
 
-def get_module_names(sk = default_sk):
-    response = ddb.query(
-        TableName=ddb_table,
-        IndexName="STARK-ListView-Index",
-        ReturnConsumedCapacity='TOTAL',
-        KeyConditionExpression='sk = :sk',
-        ExpressionAttributeValues={
+def get_field(field, sk = default_sk):
+
+    dd_arguments = {}
+    lv_token = 'initial'
+    items = []
+    while lv_token != None:
+        lv_token = '' if lv_token == 'initial' else lv_token
+        print(lv_token)
+        dd_arguments['TableName']=ddb_table
+        dd_arguments['IndexName']="STARK-ListView-Index"
+        dd_arguments['Limit']=5
+        dd_arguments['ReturnConsumedCapacity']='TOTAL'
+        dd_arguments['KeyConditionExpression']='sk = :sk'
+        dd_arguments['ExpressionAttributeValues']={
             ':sk' : {'S' : sk}
         }
-    )
+        
+        if lv_token != '':
+            dd_arguments['ExclusiveStartKey']=lv_token
 
-    raw = response.get('Items')
+        response = ddb.query(**dd_arguments)
+        raw = response.get('Items')
 
-    #Map to expected structure
-    #FIXME: this is duplicated code, make this DRY by outsourcing the mapping to a different function.
-    items = []
-    for record in raw:
-        item = {}
-        item['Module_Name'] = record.get('pk', {}).get('S','')
-        items.append(item)
+        for record in raw:
+            item = {}
+            item[field] = record.get('pk', {}).get('S','')
+            items.append(item)
 
+        #Get the "next" token, pass to calling function. This enables a "next page" request later.
+        lv_token = response.get('LastEvaluatedKey')
+        
     return items
