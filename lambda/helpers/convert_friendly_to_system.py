@@ -1,7 +1,6 @@
 #This takes a user-supplied human-friendly name and converts that to the appropriate 
 #   system-friendly name (e.g., variable name, CF stack name, or S3 bucket name)
 
-
 def convert_to_system_name(friendly_name, target='variable'):
 
     preprocessed_name = friendly_name.replace(" ", "_")
@@ -16,9 +15,6 @@ def convert_to_system_name(friendly_name, target='variable'):
         system_name = to_variable(preprocessed_name)
 
     return system_name
-
-
-
 
 def to_variable(name):
     system_name = ''
@@ -35,7 +31,6 @@ def to_variable(name):
         system_name = '_' + system_name
 
     return system_name
-
 
 def to_s3(name):
     system_name = ''
@@ -58,8 +53,6 @@ def to_s3(name):
 
     return system_name
 
-
-
 def to_cloudformation_stack(name):
     system_name = ''
     whitelist = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-0123456789'
@@ -74,7 +67,7 @@ def to_cloudformation_stack(name):
 
     #Follow CF stack name length rules
     if len(system_name) > 128:
-        system_name - system_name[0:128]
+        system_name = system_name[0:128]
 
     return system_name
 

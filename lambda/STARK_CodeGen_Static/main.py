@@ -4,6 +4,7 @@
 #Python Standard Library
 import base64
 import json
+import pickle
 import os
 import textwrap
 
@@ -33,6 +34,7 @@ import cgstatic_html_report  as cg_report
 s3   = boto3.client('s3')
 api  = boto3.client('apigatewayv2')
 git  = boto3.client('codecommit')
+cdpl = boto3.client('codepipeline')
 
 helper = CfnResource() #We're using the AWS-provided helper library to minimize the tedious boilerplate just to signal back to CloudFormation
 
@@ -57,7 +59,7 @@ def create_handler(event, context):
         Key=f'STARK_cloud_resources/{project_varname}.yaml'
     )
 
-    #FIXME: Remove raw for now since we need to update cloud_reousrces with API gateway URL - hopefully using sort_keys=False will remove the need for the raw version) 
+    #FIXME: Remove raw for now since we need to update cloud_resources with API gateway URL - hopefully using sort_keys=False will remove the need for the raw version) 
     #raw_cloud_resources = response['Body'].read().decode('utf-8')
     #cloud_resources     = yaml.safe_load(raw_cloud_resources) 
     cloud_resources = yaml.safe_load(response['Body'].read().decode('utf-8')) 
@@ -198,7 +200,19 @@ def create_handler(event, context):
             putFiles=chunked_commit_list[commit_batch]
         )
 
+    ##################################################
+    # Optimization Attempt
+    #   After we commit code to the repo, re-enable the Pipeline's source stage change detection 
+    #   We need to get current working settings
 
+    response = s3.get_object(
+        Bucket=codegen_bucket_name,
+        Key=f'STARK_cloud_resources/{project_varname}_pipeline.pickle'
+    )
+    pipeline_definition = pickle.loads(response['Body'].read()) 
+    print(pipeline_definition)
+    response = cdpl.update_pipeline(pipeline=pipeline_definition['pipeline'])
+    cdpl.start_pipeline_execution(name=f"STARK_{project_varname}_pipeline")
 
 
 @helper.delete
