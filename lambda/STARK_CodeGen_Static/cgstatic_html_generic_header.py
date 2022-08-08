@@ -12,10 +12,10 @@ import convert_friendly_to_system as converter
 def create(data, special="none"):
 
     project = data["Project Name"]
-    entity  = data["Entity"]
-    cols    = data["Columns"]
+    
     if special != "HomePage":
-        
+        entity  = data["Entity"]
+        cols    = data["Columns"]
         #Convert human-friendly names to variable-friendly names
         entity_varname = converter.convert_to_system_name(entity)
 
@@ -36,16 +36,7 @@ def create(data, special="none"):
             <script src="js/STARK.js" defer></script>
             <script src="js/STARK_spinner.js" defer></script>
             <script src="js/STARK_loading_modal.js" defer></script>
-            <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.24.min.js"></script>
-"""
-    for col, col_type in cols.items():
-        if isinstance(col_type, dict) and col_type["type"] == "relationship":
-            has_one = col_type.get('has_one', '')
-            has_many = col_type.get('has_many', '')
-            if  has_one != '' or has_many != '':
-                source_code += f"""\<script src="js/{col}.js" defer></script>
-                    """
-
+            <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.24.min.js"></script>"""
 
     if special == "HomePage":
         source_code += f"""\
@@ -75,6 +66,13 @@ def create(data, special="none"):
     elif(special == "Listview"):
         source_code += f"""
             <script src="js/generic_root_list.js" defer></script>"""
+    
+    for col, col_type in cols.items():
+            if isinstance(col_type, dict) and col_type["type"] == "relationship":
+                has_one = col_type.get('has_one', '')
+                has_many = col_type.get('has_many', '')
+                if  has_one != '' or has_many != '':
+                    source_code += f"""\<script src="js/{col}.js" defer></script>"""
 
     if special != "HomePage":
         source_code += f"""
@@ -89,6 +87,6 @@ def create(data, special="none"):
         </head>
 """
 
-
+ 
 
     return source_code
