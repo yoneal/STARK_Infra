@@ -693,26 +693,27 @@ def create(data):
         param_width = pdf.epw / 4
         #Report Title
         pdf.set_font("Times", size=14, style="B")
-        pdf.multi_cell(0,line_height, "{entity_varname} Report", 0, 'C',
+        pdf.multi_cell(0,line_height, "{entity} Report", 0, 'C',
                         new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
         pdf.ln()
         
         #Report Parameters
         newline_print_counter = 1
         pdf.set_font("Times", size=12, style="B")
-        pdf.multi_cell(0,line_height, "Report Parameters:", 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
-        pdf.ln(pdf.font_size *1.5)
-        pdf.set_font("Times", size=10)
-        for key, value in report_params.items():
-            if key == 'pk':
-                key = pk_field
-            pdf.multi_cell(30,line_height, key.replace("_", " "), 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
-            pdf.multi_cell(param_width,line_height, value, 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
-            if newline_print_counter == 2:
-                pdf.ln(pdf.font_size *1.5)
-                newline_print_counter = 0
-            newline_print_counter += 1                
-        pdf.ln()
+        if len(report_params) > 0:
+            pdf.multi_cell(0,line_height, "Report Parameters:", 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
+            pdf.ln(pdf.font_size *1.5)
+            pdf.set_font("Times", size=10)
+            for key, value in report_params.items():
+                if key == 'pk':
+                    key = pk_field
+                pdf.multi_cell(30,line_height, key.replace("_", " "), 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
+                pdf.multi_cell(param_width,line_height, value, 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
+                if newline_print_counter == 2:
+                    pdf.ln(pdf.font_size *1.5)
+                    newline_print_counter = 0
+                newline_print_counter += 1                
+            pdf.ln()
         """
     if len(relationships) > 0:
         source_code += f"""    
