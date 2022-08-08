@@ -43,7 +43,7 @@ def create(data, special="none"):
             has_one = col_type.get('has_one', '')
             has_many = col_type.get('has_many', '')
             if  has_one != '' or has_many != '':
-                source_code = f"""\<script src="js/{col}.js" defer></script>
+                source_code += f"""\<script src="js/{col}.js" defer></script>
                     """
 
 
