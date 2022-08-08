@@ -127,6 +127,7 @@ def create(data):
                         <table class="table  table-hover table-striped">
                             <thead class="thead-dark">
                                 <tr>
+                                    <th scope="col"> Operations </th>
                                     <template v-for="column in STARK_report_fields" id="STARK_report_fields">
                                         <th scope="col">{{{{column.label}}}}</th>
                                     </template>"""
@@ -136,6 +137,10 @@ def create(data):
                             <tbody>
                                 <template v-for="{entity_varname} in listview_table" id="listview-table">
                                     <tr>
+                                        <td align="center">
+                                            <a :href="'{entity_varname}_edit.html?{pk_varname}=' + {entity_varname}.{pk_varname}" target="_blank"><img src="images/pencil2.png" ></a>
+                                            <a :href="'{entity_varname}_delete.html?{pk_varname}=' + {entity_varname}.{pk_varname}" target="_blank"><img src="images/trash2.png" ></a>
+                                        </td>
                                         <template v-for="column in STARK_report_fields">
                                             <td>{{{{ {entity_varname}[column.field] }}}}</td>
                                         </template>"""
