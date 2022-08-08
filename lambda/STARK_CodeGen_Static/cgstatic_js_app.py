@@ -69,9 +69,11 @@ def create(data):
                             fetchUrl = this.api_endpoint + '?rt=get_field&field=' + field
                             return STARK.request('GET', fetchUrl)
                         }},
-                    }}
+                    
                     """
-        
+    source_code += f"""\
+        }}
+        """
 
     
 
