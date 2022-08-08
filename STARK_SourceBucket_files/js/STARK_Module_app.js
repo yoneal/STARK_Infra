@@ -32,5 +32,10 @@ var STARK_Module_app = {
 
         return STARK.request('GET', fetchUrl)
     },
+
+    get_field: function (field) {
+        fetchUrl = this.api_endpoint + '?rt=get_field&field=' + field
+        return STARK.request('GET', fetchUrl)
+    },
 }
 

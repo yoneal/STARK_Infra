@@ -110,6 +110,10 @@ def lambda_handler(event, context):
 
         elif request_type == "report":
             response = report(default_sk)
+        
+        elif request_type == "get_field":
+            field = event.get('queryStringParameters').get('field','')
+            response = get_field(field, default_sk)
 
         elif request_type == "detail":
 
@@ -554,4 +558,37 @@ def get_all_by_old_parent_value(old_pk_val, sk = default_sk):
         item['STARK-ListView-sk'] = record.get('STARK-ListView-sk',{}).get('S','')
         items.append(item)
 
+    return items
+
+def get_field(field, sk = default_sk):
+
+    dd_arguments = {}
+    lv_token = 'initial'
+    items = []
+    while lv_token != None:
+        lv_token = '' if lv_token == 'initial' else lv_token
+        print(lv_token)
+        dd_arguments['TableName']=ddb_table
+        dd_arguments['IndexName']="STARK-ListView-Index"
+        dd_arguments['Limit']=5
+        dd_arguments['ReturnConsumedCapacity']='TOTAL'
+        dd_arguments['KeyConditionExpression']='sk = :sk'
+        dd_arguments['ExpressionAttributeValues']={
+            ':sk' : {'S' : sk}
+        }
+        
+        if lv_token != '':
+            dd_arguments['ExclusiveStartKey']=lv_token
+
+        response = ddb.query(**dd_arguments)
+        raw = response.get('Items')
+
+        for record in raw:
+            item = {}
+            item[field] = record.get('pk', {}).get('S','')
+            items.append(item)
+
+        #Get the "next" token, pass to calling function. This enables a "next page" request later.
+        lv_token = response.get('LastEvaluatedKey')
+        
     return items

@@ -73,12 +73,34 @@
                             <input type="text" class="form-control-plaintext" readonly id="Description" placeholder="" v-model="STARK_User_Roles.Description">
                         </div>
                     </div>
-                    <div class="form-group row">
-                        <label for="Permissions" class="col-sm-2 col-form-label">Permissions</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control-plaintext" readonly id="Permissions" placeholder="" v-model="STARK_User_Roles.Permissions">
-                        </div>
-                    </div>
+                    <template>
+                        <b-form-group label="Permissions" label-for="tags-component-select">
+                        <b-form-tags
+                            id="tags-component-select"
+                            v-model="PermissionsVal"
+                            size="lg"
+                            class="mb-2"
+                            add-on-change
+                            no-outer-focus
+                            
+                        >
+                        <template v-slot="{ tags, inputAttrs, inputHandlers, disabled  }">
+                        
+                        
+                            <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2" id="">
+                                <li v-for="tag in tags" :key="tag" class="list-inline-item" >
+                                <b-form-tag
+                                    :title="tag"
+                                    :disabled="true"
+                                    variant="info"
+                                    
+                                >{{ tag }}</b-form-tag>
+                                </li>
+                            </ul>
+                        </template>
+                        </b-form-tags>
+                        </b-form-group>
+                    </template> 
                     <button type="button" class="btn btn-secondary" onClick="window.location.href='STARK_User_Roles.html'">Back</button>
                     </form>
                 </div>
