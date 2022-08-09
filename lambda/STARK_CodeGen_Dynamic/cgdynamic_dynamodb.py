@@ -214,6 +214,10 @@ def create(data):
                     'Next_Token': json.dumps(next_token),
                     'Items': items
                 }}
+            
+            elif request_type == "get_field":
+                field = event.get('queryStringParameters').get('field','')
+                response = get_field(field, default_sk)
 
             elif request_type == "detail":
 
@@ -223,6 +227,8 @@ def create(data):
                     sk = default_sk
 
                 response = get_by_pk(pk, sk)
+
+            
             else:
                 return {{
                     "isBase64Encoded": False,
@@ -235,9 +241,7 @@ def create(data):
             
     if len(relationships) > 0:
         source_code += f"""
-        elif request_type == "get_field":
-            field = event.get('queryStringParameters').get('field','')
-            response = get_field(field, default_sk)
+        
         """
         
     source_code +=f"""
@@ -720,30 +724,7 @@ def create(data):
                 newline_print_counter = 0
             newline_print_counter += 1                
         pdf.ln()
-        """
-    
-    if len(relationships) > 0:
-        source_code += f"""    
-    def cascade_pk_change_to_child(params, parent_entity_name, child_entity_name, attribute):
-        from os import getcwd 
-        STARK_folder = getcwd() + f"/{{child_entity_name}}"
-        sys.path = [STARK_folder] + sys.path
 
-        temp_import = importlib.import_module(child_entity_name)
-
-        #fetch all records from child using old pk value
-        response = temp_import.get_all_by_old_parent_value(params['orig_pk'], attribute)
-
-        #loop through response and update each record
-        for record in response:
-            record[attribute] = params['pk']
-            temp_import.edit(record)
-
-        return "OK"
-    """
-
-    if len(relationships) > 0:
-        source_code += f"""
     def get_field(field, sk = default_sk):
 
         dd_arguments = {{}}
@@ -775,8 +756,29 @@ def create(data):
             #Get the "next" token, pass to calling function. This enables a "next page" request later.
             lv_token = response.get('LastEvaluatedKey')
             
-        return items 
-        """
+        return items
+    """
+    
+    if len(relationships) > 0:
+        source_code += f"""    
+    def cascade_pk_change_to_child(params, parent_entity_name, child_entity_name, attribute):
+        from os import getcwd 
+        STARK_folder = getcwd() + f"/{{child_entity_name}}"
+        sys.path = [STARK_folder] + sys.path
+
+        temp_import = importlib.import_module(child_entity_name)
+
+        #fetch all records from child using old pk value
+        response = temp_import.get_all_by_old_parent_value(params['orig_pk'], attribute)
+
+        #loop through response and update each record
+        for record in response:
+            record[attribute] = params['pk']
+            temp_import.edit(record)
+
+        return "OK"
+    
+    """
 
     return textwrap.dedent(source_code)
 

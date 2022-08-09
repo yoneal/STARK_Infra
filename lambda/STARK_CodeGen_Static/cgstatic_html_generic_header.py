@@ -57,24 +57,24 @@ def create(data, special="none"):
         
             for related in entities:
                 related_varname = converter.convert_to_system_name(related)
-                source_code += f"""
+                source_code += f"""\
             <script src="js/{related_varname}_app.js" defer></script>"""
 
     if(special == "none"):
-        source_code += f"""
+        source_code += f"""\
             <script src="js/generic_root_get.js" defer></script>"""
     elif(special == "Listview"):
-        source_code += f"""
+        source_code += f"""\
             <script src="js/generic_root_list.js" defer></script>"""
 
     if special != "HomePage":
-        source_code += f"""
+        source_code += f"""\
 
             <title>{project} - {entity}</title>
         </head>
 """
     else:
-        source_code += f"""
+        source_code += f"""\
 
             <title>{project}</title>
         </head>
