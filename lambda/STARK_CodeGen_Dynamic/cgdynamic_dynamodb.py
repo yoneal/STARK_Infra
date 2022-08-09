@@ -686,6 +686,7 @@ def create(data):
             for datum in row:
                 pdf.multi_cell(col_width, row_height, datum, border=0, new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size, fill = True)
             pdf.ln(row_height)
+            counter += 1
 
         s3_action = s3.put_object(
             ACL='public-read',
@@ -698,10 +699,11 @@ def create(data):
         pdf.set_font(style="B")  # enabling bold text
         pdf.set_fill_color(52, 58,64)
         pdf.set_text_color(255,255,255)
+        row_header_line_height = line_height * 1.5
         for col_name in header_tuple:
-            pdf.multi_cell(col_width, line_height, col_name, border='TB', align='C',
+            pdf.multi_cell(col_width, row_header_line_height, col_name, border='TB', align='C',
                     new_x="RIGHT", new_y="TOP",max_line_height=pdf.font_size, fill=True)
-        pdf.ln(line_height)
+        pdf.ln(row_header_line_height)
         pdf.set_font(style="")  # disabling bold text
         pdf.set_text_color(0, 0, 0)
         pdf.set_fill_color(0, 0, 0)
