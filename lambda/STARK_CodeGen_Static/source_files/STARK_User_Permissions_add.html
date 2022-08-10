@@ -84,7 +84,7 @@
                 
                         <b-dropdown size="sm" variant="outline-secondary" 
                             block menu-class="w-50" 
-                            no-flip ref="Customer_Type" 
+                            no-flip ref="Permissions" 
                             onmouseover="root.list_Permissions()" 
                             onfocus="root.list_Permissions()">
                             <template #button-content>
@@ -118,7 +118,7 @@
                             {{ option }}
                             </b-dropdown-item-button>
                             <b-dropdown-text v-if="Permissions.length === 0">
-                            There are no tags available to select
+                            There are no permissions available to select
                             </b-dropdown-text>
                         </b-dropdown>
                         </template>
