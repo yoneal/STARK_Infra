@@ -33,6 +33,7 @@ def create(cloud_resources, current_cloud_resources, project_basedir):
         entities.append(entity)
 
     project_name    = cloud_resources["Project Name"]
+    web_bucket_name = cloud_resources["S3 webserve"]["Bucket Name"]
     project_varname = converter.convert_to_system_name(project_name)
 
     #FIXME: API G is now in our `cloud_resources`` file, update this code
@@ -54,7 +55,7 @@ def create(cloud_resources, current_cloud_resources, project_basedir):
     for entity in models:
         pk   = models[entity]["pk"]
         cols = models[entity]["data"]
-        cgstatic_data = { "Entity": entity, "PK": pk, "Columns": cols, "Project Name": project_name }
+        cgstatic_data = { "Entity": entity, "PK": pk, "Columns": cols, "Project Name": project_name  }
         entity_varname = converter.convert_to_system_name(entity)
 
         add_to_commit(source_code=cg_add.create(cgstatic_data), key=f"{entity_varname}_add.html", files_to_commit=files_to_commit, file_path='static')
@@ -72,7 +73,7 @@ def create(cloud_resources, current_cloud_resources, project_basedir):
     combined_models = current_cloud_resources["Data Model"].copy()
     combined_models.update(models)
 
-    data = { 'API Endpoint': endpoint, 'Entities': combined_models }
+    data = { 'API Endpoint': endpoint, 'Entities': combined_models, "Bucket Name": web_bucket_name }
     add_to_commit(cg_js_stark.create(data), key=f"js/STARK.js", files_to_commit=files_to_commit, file_path='static')
 
     ##################################################

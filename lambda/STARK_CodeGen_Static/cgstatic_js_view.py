@@ -14,8 +14,6 @@ def create(data):
     entity = data["Entity"]
     cols   = data["Columns"]
     pk     = data['PK']
-    bucket_name = data['Bucket Name'] #temporary: remove once s3 credentials for file upload is solved
-    region_name   = os.environ['AWS_REGION'] #temporary: remove once s3 credentials for file upload is solved
 
     entity_varname = converter.convert_to_system_name(entity)
     entity_app     = entity_varname + '_app'
@@ -557,10 +555,9 @@ def create(data):
     source_code += f"""]
     
     //Bucket Configurations
-    var bucketName = '{bucket_name}';
     var config = get_s3_temporary_config()
     var s3 = new AWS.S3({{
-        params: {{Bucket: bucketName}},
+        params: {{Bucket: STARK.bucket_name}},
         region: config['region_name'],
         apiVersion: '2006-03-01',
         accessKeyId: config['access_key_id'],

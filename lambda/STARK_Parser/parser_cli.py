@@ -42,6 +42,7 @@ def parse(construct_file):
         project_name            = current_cloud_resources["Project Name"]
         project_varname         = converter.convert_to_system_name(project_name)
         ddb_table_name          = current_cloud_resources["DynamoDB"]["Table Name"]
+        web_bucket_name         = current_cloud_resources["S3 webserve"]["Bucket Name"]
 
     for key in data_model:
         if key == "__STARK_project_name__":
@@ -57,7 +58,7 @@ def parse(construct_file):
     #####################################################
     ###START OF INFRA LIST CREATION #####################
 
-    cloud_resources = {"Project Name": project_name} 
+    cloud_resources = {"Project Name": project_name, "S3 webserve": {"Bucket Name": web_bucket_name}} 
 
     data = {
         'entities': entities,

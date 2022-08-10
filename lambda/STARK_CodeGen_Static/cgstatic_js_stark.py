@@ -11,6 +11,7 @@ def create(data):
 
     api_endpoint = data['API Endpoint']
     entities     = data['Entities']
+    bucket_name  = data['Bucket Name']
 
     source_code = f"""\
         api_endpoint_1 = '{api_endpoint}'
@@ -35,6 +36,7 @@ def create(data):
             'STARK_User_Sessions_url':`${{api_endpoint_1}}/STARK_User_Sessions`,
             'STARK_Module_Groups_url':`${{api_endpoint_1}}/STARK_Module_Groups`,
             'methods_with_body': ["POST", "DELETE", "PUT"],
+            'bucket_name': '{bucket_name}'
 
             request: function(method, fetchURL, payload='') {{
 
