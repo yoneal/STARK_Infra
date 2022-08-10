@@ -12,6 +12,9 @@ var root = new Vue({
             'Permissions': [
             ],
         },
+        multi_select_values: {
+            'Permissions': [],
+        },
         list_status: {
             'Permissions': 'empty',
         },
@@ -22,7 +25,10 @@ var root = new Vue({
         prev_disabled: true,
         page_token_map: {1: ''},
         curr_page: 1,
-        PermissionsVal: [] // Array reference
+        PermissionsVal: [],
+        search:{
+            'Permissions': '',
+        }
 
 
     },
@@ -39,8 +45,8 @@ var root = new Vue({
         add: function () {
             loading_modal.show()
             console.log("VIEW: Inserting!")
-
-			this.STARK_User_Roles.Permissions = this.PermissionsVal.join(', ')																  
+            // console.log(this.PermissionsVal.join(', '))
+            this.STARK_User_Roles.Permissions = root.multi_select_values.Permissions.join(', ')
             let data = { STARK_User_Roles: this.STARK_User_Roles }
 
             STARK_User_Roles_app.add(data).then( function(data) {
@@ -75,7 +81,7 @@ var root = new Vue({
             loading_modal.show()
             console.log("VIEW: Updating!")
 
-			this.STARK_User_Roles.Permissions = this.PermissionsVal.join(', ')																  
+            this.STARK_User_Roles.Permissions = root.multi_select_values.Permissions.join(', ')
             let data = { STARK_User_Roles: this.STARK_User_Roles }
 
             STARK_User_Roles_app.update(data).then( function(data) {
@@ -107,8 +113,8 @@ var root = new Vue({
                 STARK_User_Roles_app.get(data).then( function(data) {
                     root.STARK_User_Roles = data[0]; //We need 0, because API backed func always returns a list for now
                     root.STARK_User_Roles.orig_Role_Name = root.STARK_User_Roles.Role_Name;
-					permission_list = root.STARK_User_Roles.Permissions 
-                    root.PermissionsVal = permission_list.split(",")													
+                    permission_list = root.STARK_User_Roles.Permissions 
+                    root.multi_select_values.Permissions = root.STARK_User_Roles.Permissions.split(', ')
                     console.log("VIEW: Retreived module data.")
                     root.show()
                     loading_modal.hide()
@@ -181,7 +187,7 @@ var root = new Vue({
             });
         },
 
-		list_Permissions: function () {
+        list_Permissions: function () {
             if (this.list_status.Permissions == 'empty') {
                 loading_modal.show();
                 root.lists.Permissions = []
@@ -192,23 +198,49 @@ var root = new Vue({
                     
                     data.forEach(function(arrayItem) {
                         value = arrayItem['Module_Name']
+                        // console.log(value.sort())
                         text  = arrayItem['Module_Name']
-                        root.lists.Permissions.push({ value: value, text: text })  
+                        root.lists.Permissions.push(value) 
                           
                         root.list_status.Permissions = 'populated'
                     })
+                    // console.log(root.lists.Permissions.sort(function(a,b){ return b[2] < a[2] ? 1 : 1; }))  
+                    // console.log(root.list_status.Permissions)
                     loading_modal.hide();
                 }).catch(function(error) {
                     console.log("Encountered an error! [" + error + "]")
                     loading_modal.hide();
                 });
             }
-        }
+        },
+        onOptionClick({ option, addTag }, reference) {
+            addTag(option)
+            this.search[reference] = ''
+            this.$refs[reference].show(true)
+        },
     },
     computed: {
-        availableOptions() {
-            // this.list_Permissions()
-            return this.lists.Permissions.filter(data => !(this.PermissionsVal.includes(data.value)))
-        },							   
+        Permissions_criteria() {
+            console.log(this.search['Permissions'].trim().toLowerCase())
+            return this.search['Permissions'].trim().toLowerCase()
+        },
+        Permissions() {
+            const Permissions_criteria = this.Permissions_criteria
+            // Filter out already selected options
+            const options = this.lists.Permissions.filter(opt => this.multi_select_values.Permissions.indexOf(opt) === -1)
+            if (Permissions_criteria) {
+            // Show only options that match Permissions_criteria
+            return options.filter(opt => opt.toLowerCase().indexOf(Permissions_criteria) > -1);
+            }
+            // Show all options available
+            console.log(options)
+            return options
+        },
+        Permissions_search_desc() {
+            if (this.Permissions_criteria && this.Permissions.length === 0) {
+            return 'There are no tags matching your search criteria'
+            }
+            return ''
+        },
     }
 })

@@ -12,7 +12,7 @@ import convert_friendly_to_system as converter
 def create(data, special="none"):
 
     project = data["Project Name"]
-
+    
     if special != "HomePage":
         entity  = data["Entity"]
         cols    = data["Columns"]
@@ -36,8 +36,7 @@ def create(data, special="none"):
             <script src="js/STARK.js" defer></script>
             <script src="js/STARK_spinner.js" defer></script>
             <script src="js/STARK_loading_modal.js" defer></script>
-            <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.24.min.js"></script>
-"""
+            <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.24.min.js"></script>"""
 
     if special == "HomePage":
         source_code += f"""\
@@ -47,7 +46,8 @@ def create(data, special="none"):
     else:
         source_code += f"""\
             <script src="js/{entity_varname}_app.js" defer></script>
-            <script src="js/{entity_varname}_view.js" defer></script>"""
+            <script src="js/{entity_varname}_view.js" defer></script>
+            """
 
         #Figure out which other _app.js files we need to add based on relationships
         for col, col_type in cols.items():
@@ -80,7 +80,5 @@ def create(data, special="none"):
             <title>{project}</title>
         </head>
 """
-
-
 
     return source_code

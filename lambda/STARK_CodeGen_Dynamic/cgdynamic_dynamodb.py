@@ -216,6 +216,10 @@ def create(data):
                     'Next_Token': json.dumps(next_token),
                     'Items': items
                 }}
+            
+            elif request_type == "get_field":
+                field = event.get('queryStringParameters').get('field','')
+                response = get_field(field, default_sk)
 
             elif request_type == "detail":
 
@@ -743,7 +747,41 @@ def create(data):
         )  # assumption: a letter is half his height in width, the 0.5 is the value you want to play with
         max_cell_text_len_header = max([len(str(col)) for col in iter])  # how long is the longest string?
         return math.ceil(max_cell_text_len_header * font_width_in_mm / col_width)
-        """
+
+    def get_field(field, sk = default_sk):
+
+        dd_arguments = {{}}
+        lv_token = 'initial'
+        items = []
+        while lv_token != None:
+            lv_token = '' if lv_token == 'initial' else lv_token
+            print(lv_token)
+            dd_arguments['TableName']=ddb_table
+            dd_arguments['IndexName']="STARK-ListView-Index"
+            dd_arguments['Limit']=5
+            dd_arguments['ReturnConsumedCapacity']='TOTAL'
+            dd_arguments['KeyConditionExpression']='sk = :sk'
+            dd_arguments['ExpressionAttributeValues']={{
+                ':sk' : {{'S' : sk}}
+            }}
+            
+            if lv_token != '':
+                dd_arguments['ExclusiveStartKey']=lv_token
+
+            response = ddb.query(**dd_arguments)
+            raw = response.get('Items')
+
+            for record in raw:
+                item = {{}}
+                item[field] = record.get('pk', {{}}).get('S','')
+                items.append(item)
+
+            #Get the "next" token, pass to calling function. This enables a "next page" request later.
+            lv_token = response.get('LastEvaluatedKey')
+            
+        return items
+    """
+    
     if len(relationships) > 0:
         source_code += f"""    
     def cascade_pk_change_to_child(params, parent_entity_name, child_entity_name, attribute):

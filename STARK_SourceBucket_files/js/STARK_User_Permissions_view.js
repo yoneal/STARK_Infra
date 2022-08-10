@@ -14,6 +14,9 @@ var root = new Vue({
         list_status: {
             'Permissions': 'empty',								   
         },
+        multi_select_values: {
+            'Permissions': [],
+        },
 		PermissionsVal: [],									  
         visibility: 'hidden',
         next_token: '',
@@ -21,7 +24,10 @@ var root = new Vue({
         prev_token: '',
         prev_disabled: true,
         page_token_map: {1: ''},
-        curr_page: 1
+        curr_page: 1,
+        search:{
+            'Permissions': '',
+        },
 
     },
     methods: {
@@ -36,7 +42,7 @@ var root = new Vue({
 
         add: function () {
 													   
-            this.STARK_User_Permissions.Permissions = this.PermissionsVal.join(', ')																					
+            this.STARK_User_Permissions.Permissions = root.multi_select_values.Permissions.join(', ')																					
 			
             loading_modal.show()
             console.log("VIEW: Inserting!")
@@ -76,7 +82,7 @@ var root = new Vue({
             loading_modal.show()
             console.log("VIEW: Updating!")
 
-			this.STARK_User_Permissions.Permissions = this.PermissionsVal.join(', ')																		
+			this.STARK_User_Permissions.Permissions = root.multi_select_values.Permissions.join(', ')																		
             let data = { STARK_User_Permissions: this.STARK_User_Permissions }
 
             STARK_User_Permissions_app.update(data).then( function(data) {
@@ -109,7 +115,7 @@ var root = new Vue({
                     root.STARK_User_Permissions = data[0]; //We need 0, because API backed func always returns a list for now
                     root.STARK_User_Permissions.orig_Username = root.STARK_User_Permissions.Username;
 					permission_list = root.STARK_User_Permissions.Permissions 
-                    root.PermissionsVal = permission_list.split(",")																
+                    root.multi_select_values.Permissions = root.STARK_User_Permissions.Permissions.split(', ')																
                     console.log("VIEW: Retreived module data.")
                     root.show()
                     loading_modal.hide()
@@ -193,24 +199,47 @@ var root = new Vue({
                     data.forEach(function(arrayItem) {
                         value = arrayItem['Module_Name']
                         text  = arrayItem['Module_Name']
-                        root.lists.Permissions.push({ value: value, text: text })  
+                        root.lists.Permissions.push(value)   
                         // console.log(root.lists.Permissions)    
-                        root.list_status.Permissions = 'populated'
+                        
                     })
 
-                    console.log(root.list_status.Permissions)
+                    root.list_status.Permissions = 'populated'
                     loading_modal.hide();
                 }).catch(function(error) {
                     console.log("Encountered an error! [" + error + "]")
                     loading_modal.hide();
                 });
             }
-        }
+        },
+        onOptionClick({ option, addTag }, reference) {
+            addTag(option)
+            this.search[reference] = ''
+            this.$refs[reference].show(true)
+        },
     },
     computed: {
-        availableOptions() {
-            // this.list_Permissions()
-            return this.lists.Permissions.filter(data => !(this.PermissionsVal.includes(data.value)))
+        Permissions_criteria() {
+            console.log(this.search['Permissions'].trim().toLowerCase())
+            return this.search['Permissions'].trim().toLowerCase()
+        },
+        Permissions() {
+            const Permissions_criteria = this.Permissions_criteria
+            // Filter out already selected options
+            const options = this.lists.Permissions.filter(opt => this.multi_select_values.Permissions.indexOf(opt) === -1)
+            if (Permissions_criteria) {
+            // Show only options that match Permissions_criteria
+            return options.filter(opt => opt.toLowerCase().indexOf(Permissions_criteria) > -1);
+            }
+            // Show all options available
+            console.log(options)
+            return options
+        },
+        Permissions_search_desc() {
+            if (this.Permissions_criteria && this.Permissions.length === 0) {
+            return 'There are no tags matching your search criteria'
+            }
+            return ''
         },
     }
 })
