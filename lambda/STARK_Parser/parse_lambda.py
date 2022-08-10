@@ -86,7 +86,7 @@ def parse(data, relationship = []):
             "Timeout": 5
         }
 
-        if dependencies.len() > 0:
+        if len(dependencies) > 0:
             parsed[entity]["Dependencies"] = dependencies
 
     return parsed
