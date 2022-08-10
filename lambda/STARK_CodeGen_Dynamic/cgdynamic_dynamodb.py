@@ -357,13 +357,14 @@ def create(data):
         raw = response.get('Items')
 
         #Map to expected structure
-        items = []
-        for record in raw:
-            items.append(map_results(record))
-
-        return items"""
-    if with_upload : ', s3_link_prefix'
+        response = {{}}
+        response['item'] = map_results(raw[0])"""
+    if with_upload : 
+        source_code +=f"""
+        response['s3_link_prefix'] = s3_link_prefix"""
     source_code+= f"""
+
+        return response
 
     def delete(data):
         pk = data.get('pk','')

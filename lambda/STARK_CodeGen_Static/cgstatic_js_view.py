@@ -240,7 +240,7 @@ def create(data):
                         console.log("VIEW: Getting!")
 
                         {entity_app}.get(data).then( function(data) {{
-                            root.{entity_varname} = data[0]; //We need 0, because API backed func always returns a list for now
+                            root.{entity_varname} = data["item"]; 
                             root.{entity_varname}.orig_{pk_varname} = root.{entity_varname}.{pk_varname};"""
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
@@ -249,7 +249,7 @@ def create(data):
                             root.{entity_varname}.STARK_uploaded_s3_keys['{col_varname}'] = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.STARK_uploaded_s3_keys.{col_varname}.S : ""
                             root.STARK_upload_elements['{col_varname}'].file              = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.{col_varname} : ""
                             root.STARK_upload_elements['{col_varname}'].progress_bar_val  = root.{entity_varname}.{col_varname} != "" ? 100 : 0
-                            root.s3_link_prefix                                           = data[1]
+                            root.s3_link_prefix                                           = data['s3_link_prefix']
                             """
 
     #If there are 1:1 rel fields, we need to assign their initial value to the still-unpopulated drop-down list so that it displays 
