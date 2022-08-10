@@ -250,8 +250,10 @@ Resources:
             Policies:
                 - AmazonS3FullAccess
                 - AWSLambdaBasicExecutionRole
-                - ReadOnlyAccess
                 - AWSCodeCommitFullAccess
+                - AWSCodePipelineFullAccess
+                - ReadOnlyAccess
+                - IAMFullAccess
             Layers:
                 - !Ref CFCustomResourceHelperLayer
                 - !Ref PyYamlLayer
@@ -273,6 +275,8 @@ Resources:
                 - AmazonS3FullAccess
                 - AWSLambda_FullAccess 
                 - AWSCodeCommitFullAccess
+                - AWSCodePipelineFullAccess
+                - IAMFullAccess
             Layers:
                 - !Ref CFCustomResourceHelperLayer
                 - !Ref PyYamlLayer
