@@ -72,6 +72,7 @@ def create(data):
     import sys
     import importlib
     from urllib.parse import unquote
+    import math
 
     #Extra modules
     import boto3
@@ -661,18 +662,31 @@ def create(data):
         data_tuple = tuple(row_list)
         pdf = FPDF(orientation='L')
         pdf.add_page()
-        pdf.set_font("Times", size=10)
+        pdf.set_font("Helvetica", size=10)
         line_height = pdf.font_size * 2.5
         col_width = pdf.epw / len(master_fields)  # distribute content evenly
 
         render_page_header(pdf, line_height, report_params)
         render_table_header(pdf, header_tuple,  col_width, line_height) 
+        counter = 0
         for row in data_tuple:
             if pdf.will_page_break(line_height):
                 render_table_header()
+            row_height = pdf.font_size * estimate_lines_needed(pdf, row, col_width)
+            if row_height < line_height: #min height
+                row_height = line_height
+            elif row_height > 120: #max height tested, beyond this value will distort the table
+                row_height = 120
+                
+            if counter % 2 ==0:
+                pdf.set_fill_color(222,226,230)
+            else:
+                pdf.set_fill_color(255,255,255)
+
             for datum in row:
-                pdf.multi_cell(col_width, line_height, datum, border=1, new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
-            pdf.ln(line_height)
+                pdf.multi_cell(col_width, row_height, datum, border=0, new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size, fill = True)
+            pdf.ln(row_height)
+            counter += 1
 
         s3_action = s3.put_object(
             ACL='public-read',
@@ -683,36 +697,52 @@ def create(data):
 
     def render_table_header(pdf, header_tuple, col_width, line_height):
         pdf.set_font(style="B")  # enabling bold text
+        pdf.set_fill_color(52, 58,64)
+        pdf.set_text_color(255,255,255)
+        row_header_line_height = line_height * 1.5
         for col_name in header_tuple:
-            pdf.multi_cell(col_width, line_height, col_name, border=1, align='C',
-                    new_x="RIGHT", new_y="TOP",max_line_height=pdf.font_size)
-        pdf.ln(line_height)
+            pdf.multi_cell(col_width, row_header_line_height, col_name, border='TB', align='C',
+                    new_x="RIGHT", new_y="TOP",max_line_height=pdf.font_size, fill=True)
+        pdf.ln(row_header_line_height)
         pdf.set_font(style="")  # disabling bold text
+        pdf.set_text_color(0, 0, 0)
+        pdf.set_fill_color(0, 0, 0)
 
     def render_page_header(pdf, line_height, report_params):
         param_width = pdf.epw / 4
         #Report Title
-        pdf.set_font("Times", size=14, style="B")
-        pdf.multi_cell(0,line_height, "{entity_varname} Report", 0, 'C',
+        pdf.set_font("Helvetica", size=14, style="B")
+        pdf.multi_cell(0,line_height, "{entity} Report", 0, 'C',
                         new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
         pdf.ln()
         
         #Report Parameters
         newline_print_counter = 1
-        pdf.set_font("Times", size=12, style="B")
+        pdf.set_font("Helvetica", size=12, style="B")
         pdf.multi_cell(0,line_height, "Report Parameters:", 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
         pdf.ln(pdf.font_size *1.5)
-        pdf.set_font("Times", size=10)
-        for key, value in report_params.items():
-            if key == 'pk':
-                key = pk_field
-            pdf.multi_cell(30,line_height, key.replace("_", " "), 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
-            pdf.multi_cell(param_width,line_height, value, 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
-            if newline_print_counter == 2:
-                pdf.ln(pdf.font_size *1.5)
-                newline_print_counter = 0
-            newline_print_counter += 1                
+        if len(report_params) > 0:
+            pdf.set_font("Helvetica", size=10)
+            for key, value in report_params.items():
+                if key == 'pk':
+                    key = pk_field
+                pdf.multi_cell(30,line_height, key.replace("_", " "), 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
+                pdf.multi_cell(param_width,line_height, value, 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
+                if newline_print_counter == 2:
+                    pdf.ln(pdf.font_size *1.5)
+                    newline_print_counter = 0
+                newline_print_counter += 1
+        else:
+            pdf.multi_cell(30,line_height, "N/A", 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
         pdf.ln()
+        
+
+    def estimate_lines_needed(self, iter, col_width: float) -> int:
+        font_width_in_mm = (
+            self.font_size_pt * 0.33 * 0.6
+        )  # assumption: a letter is half his height in width, the 0.5 is the value you want to play with
+        max_cell_text_len_header = max([len(str(col)) for col in iter])  # how long is the longest string?
+        return math.ceil(max_cell_text_len_header * font_width_in_mm / col_width)
         """
     if len(relationships) > 0:
         source_code += f"""    
