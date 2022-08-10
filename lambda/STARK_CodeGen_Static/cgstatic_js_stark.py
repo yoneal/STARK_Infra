@@ -36,7 +36,7 @@ def create(data):
             'STARK_User_Sessions_url':`${{api_endpoint_1}}/STARK_User_Sessions`,
             'STARK_Module_Groups_url':`${{api_endpoint_1}}/STARK_Module_Groups`,
             'methods_with_body': ["POST", "DELETE", "PUT"],
-            'bucket_name': '{bucket_name}'
+            'bucket_name': '{bucket_name}',
 
             request: function(method, fetchURL, payload='') {{
 
