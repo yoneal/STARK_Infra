@@ -88,14 +88,15 @@ def create(data):
 
     #######
     #CONFIG
-    ddb_table     = "{ddb_table_name}"
-    pk_field      = "{pk_varname}"
-    default_sk    = "{default_sk}"
-    sort_fields   = ["{pk_varname}", ]
-    bucket_name   = "{bucket_name}"
-    relationships = {relationships}
-    region_name   = os.environ['AWS_REGION']
-    page_limit    = 10
+    ddb_table      = "{ddb_table_name}"
+    pk_field       = "{pk_varname}"
+    default_sk     = "{default_sk}"
+    sort_fields    = ["{pk_varname}", ]
+    bucket_name    = "{bucket_name}"
+    relationships  = {relationships}
+    region_name    = os.environ['AWS_REGION']
+    page_limit     = 10
+    s3_link_prefix = "{{bucket_name}}.s3.{{region_name}}.amazonaws.com/"
 
     def lambda_handler(event, context):
 
@@ -360,7 +361,9 @@ def create(data):
         for record in raw:
             items.append(map_results(record))
 
-        return items
+        return items"""
+    if with_upload : ', s3_link_prefix'
+    source_code+= f"""
 
     def delete(data):
         pk = data.get('pk','')
@@ -619,8 +622,8 @@ def create(data):
 
         create_pdf(report_list, csv_header, pdf_file, report_params)
 
-        csv_bucket_key = bucket_name+".s3."+ region_name + ".amazonaws.com/tmp/" +csv_file
-        pdf_bucket_key = bucket_name+".s3."+ region_name + ".amazonaws.com/tmp/" +pdf_file
+        csv_bucket_key = s3_link_prefix+ "tmp/" +csv_file
+        pdf_bucket_key = s3_link_prefix+ "tmp/" +pdf_file
 
         return csv_bucket_key, pdf_bucket_key
 
