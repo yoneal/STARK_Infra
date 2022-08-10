@@ -190,7 +190,6 @@ def create_handler(event, context):
     #   We need to get current working settings first and save for retreival later, so that CGStatic can re-enable
     pipeline_definition = cdpl.get_pipeline(name=f"STARK_{project_varname}_pipeline")
     print(pipeline_definition)
-    pipeline_definition['pipeline']['stages'][0]['actions'][0]['configuration']['PollForSourceChanges'] = "false"
     response = s3.put_object(
         Body=pickle.dumps(pipeline_definition),
         Bucket=codegen_bucket_name,
@@ -199,6 +198,7 @@ def create_handler(event, context):
             'STARK_Description': 'Pickled pipeline definition for this project, with change detection in Source stage.'
         }
     )
+    pipeline_definition['pipeline']['stages'][0]['actions'][0]['configuration']['PollForSourceChanges'] = "false"
     updated_pipeline = cdpl.update_pipeline(pipeline=pipeline_definition['pipeline'])
     print(updated_pipeline)
 
