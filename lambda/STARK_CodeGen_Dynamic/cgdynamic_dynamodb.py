@@ -96,7 +96,7 @@ def create(data):
     relationships  = {relationships}
     region_name    = os.environ['AWS_REGION']
     page_limit     = 10
-    s3_link_prefix = "{{bucket_name}}.s3.{{region_name}}.amazonaws.com/"
+    s3_link_prefix = f"{{bucket_name}}.s3.{{region_name}}.amazonaws.com/"
 
     def lambda_handler(event, context):
 
