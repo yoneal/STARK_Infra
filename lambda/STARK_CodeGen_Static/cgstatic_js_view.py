@@ -558,14 +558,13 @@ def create(data):
     
     //Bucket Configurations
     var bucketName = '{bucket_name}';
-    var bucketRegion = '{region_name}';
-    var credentials = get_s3_credential_keys()
+    var config = get_s3_temporary_config()
     var s3 = new AWS.S3({{
         params: {{Bucket: bucketName}},
-        region: bucketRegion,
+        region: config['region_name'],
         apiVersion: '2006-03-01',
-        accessKeyId: credentials['access_key_id'],
-        secretAccessKey: credentials['secret_access_key'],
+        accessKeyId: config['access_key_id'],
+        secretAccessKey: config['secret_access_key'],
     }});"""
 
     return textwrap.dedent(source_code)

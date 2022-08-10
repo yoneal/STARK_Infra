@@ -113,8 +113,8 @@ def create(data):
             return uuid;
         }}
         
-        function get_s3_credential_keys(){{
-            return {{'access_key_id': '', 'secret_access_key': ''}}
+        function get_s3_temporary_config(){{
+            return {{'access_key_id': '', 'secret_access_key': '', 'region_name':''}}
         }}"""
 
     return textwrap.dedent(source_code)

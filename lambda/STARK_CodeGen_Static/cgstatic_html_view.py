@@ -4,7 +4,6 @@
 #Python Standard Library
 import base64
 import textwrap
-import os
 
 #Private modules
 import cgstatic_relationships as cg_rel
@@ -20,8 +19,6 @@ def create(data):
     entity  = data["Entity"]
     cols    = data["Columns"]
     pk      = data["PK"]
-    bucket_name = data['Bucket Name'] #temporary: remove once s3 credentials for file upload is solved
-    region_name   = os.environ['AWS_REGION'] #temporary: remove once s3 credentials for file upload is solved
 
     #Convert human-friendly names to variable-friendly names
     entity_varname = converter.convert_to_system_name(entity)
