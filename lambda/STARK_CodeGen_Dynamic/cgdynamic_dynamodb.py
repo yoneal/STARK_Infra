@@ -397,7 +397,7 @@ def create(data):
             extra_args = {{
                 'ACL': 'public-read'
             }}
-            s3_res.meta.client.copy(copy_source, bucket_name, 'uploaded_files/' + items, extra_args)
+            s3_res.meta.client.copy(copy_source, bucket_name, 'uploaded_files/{entity_varname}/' + items, extra_args)
         """
     source_code += f"""
         UpdateExpressionString = "SET {update_expression}" 
@@ -467,7 +467,7 @@ def create(data):
             extra_args = {{
                 'ACL': 'public-read'
             }}
-            s3_res.meta.client.copy(copy_source, bucket_name, 'uploaded_files/' + items, extra_args)
+            s3_res.meta.client.copy(copy_source, bucket_name, 'uploaded_files/{entity_varname}/' + items, extra_args)
         """
     source_code += f"""
         item={{}}
