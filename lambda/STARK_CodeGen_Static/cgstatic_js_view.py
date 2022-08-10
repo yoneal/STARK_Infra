@@ -483,8 +483,9 @@ def create(data):
                         root.lists.{foreign_field} = []
 
                         //FIXME: for now, generic list() is used. Can be optimized to use a list function that only retrieves specific columns
-                        {foreign_entity}_app.list().then( function(data) {{
-                            data['Items'].forEach(function(arrayItem) {{
+                        field = '{foreign_field}'
+                        {foreign_entity}_app.get_field(field).then( function(data) {{
+                            data.forEach(function(arrayItem) {{
                                 value = arrayItem['{foreign_field}']
                                 text  = arrayItem['{foreign_display}']"""
                 if has_one != '': 

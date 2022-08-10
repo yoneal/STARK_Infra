@@ -112,7 +112,6 @@ def lambda_handler(event, context):
 
     #Data Model ###
     cloud_resources["Data Model"] = model_parser.parse(data)
-    print(cloud_resources["Data Model"])
 
     #S3 Bucket ###
     cloud_resources["S3 webserve"] = s3_parser.parse(data)

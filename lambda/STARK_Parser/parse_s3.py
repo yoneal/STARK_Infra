@@ -1,6 +1,8 @@
 #Python Standard Library
 import base64
 import json
+import convert_friendly_to_system as converter
+
 
 def parse(data):
 
@@ -17,11 +19,8 @@ def parse(data):
 
     if s3_static_bucket_name == "":
         s3_static_bucket_name = project_varname + "-stark-dynamic-site"
-    #S3-SETTINGS-END
 
-    #Sample of removing invalid characters in bucket name, replacing with acceptable ones
-    #FIXME: This definitely needs to be done by a shared common library instead of in-lined like this.
-    s3_static_bucket_name = s3_static_bucket_name.replace("_", "-")
+    s3_static_bucket_name = converter.convert_to_system_name(s3_static_bucket_name, 's3')
 
     parsed =  {
         "Bucket Name": s3_static_bucket_name,
