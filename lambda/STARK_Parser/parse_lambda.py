@@ -79,15 +79,14 @@ def parse(data, relationship = []):
         for relation in relationship:
             if entity == relation['parent']:
                 dependencies.append(relation['child'])
+
         parsed[entity] = {
             "Memory": 128,
             "Arch": "arm64",
-            "Timeout": 5,
-            "Dependencies": dependencies
+            "Timeout": 5
         }
 
-
-
-
+        if dependencies.len() > 0:
+            parsed[entity]["Dependencies"] = dependencies
 
     return parsed
