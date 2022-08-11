@@ -39,7 +39,7 @@ def create(data):
             'STARK_Module_Groups_url':`${{api_endpoint_1}}/STARK_Module_Groups`,
             'methods_with_body': ["POST", "DELETE", "PUT"],
             'bucket_name': '{bucket_name}',
-            'region_name': '{region_name},
+            'region_name': '{region_name}',
 
             request: function(method, fetchURL, payload='') {{
 
