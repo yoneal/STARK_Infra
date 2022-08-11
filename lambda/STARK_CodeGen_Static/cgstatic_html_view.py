@@ -46,32 +46,32 @@ def create(data):
     for col, col_type in cols.items():
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_many = col_type.get('has_many', '')
-            foreign_entity  = converter.convert_to_system_name(has_many)
-            if has_many != '':
-                source_code += f"""
-                <div class="form-group row">
-                    <label for="{foreign_entity}" class="col-sm-2 col-form-label">{foreign_entity}</label>
-                    <div class="col-sm-10">
-                        <b-form-group label-for="tags-with-dropdown">
-                            <b-form-tags id="tags-with-dropdown" v-model="multi_select_values.{foreign_entity}" no-outer-focus class="mb-2">
-                                <template v-slot="{{ tags, disabled, addTag, removeTag }}">
-                                    <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
-                                        <li v-for="tag in tags" :key="tag" class="list-inline-item">
-                                            <b-form-tag 
-                                                @remove="removeTag(tag)" 
-                                                :title="tag" 
-                                                :disabled="true" 
-                                                variant="info" >
-                                                {{ tag_display_text(tag) }}
-                                            </b-form-tag>
-                                        </li>
-                                    </ul>
-                                </template>
-                            </b-form-tags>
-                        </b-form-group>
-                    </div>
-                </div>
-                """
+            # foreign_entity  = converter.convert_to_system_name(has_many)
+            # if has_many != '':
+            #     source_code += f"""
+            #     <div class="form-group row">
+            #         <label for="{foreign_entity}" class="col-sm-2 col-form-label">{foreign_entity}</label>
+            #         <div class="col-sm-10">
+            #             <b-form-group label-for="tags-with-dropdown">
+            #                 <b-form-tags id="tags-with-dropdown" v-model="multi_select_values.{foreign_entity}" no-outer-focus class="mb-2">
+            #                     <template v-slot="{{ tags, disabled, addTag, removeTag }}">
+            #                         <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
+            #                             <li v-for="tag in tags" :key="tag" class="list-inline-item">
+            #                                 <b-form-tag 
+            #                                     @remove="removeTag(tag)" 
+            #                                     :title="tag" 
+            #                                     :disabled="true" 
+            #                                     variant="info" >
+            #                                     {{ tag_display_text(tag) }}
+            #                                 </b-form-tag>
+            #                             </li>
+            #                         </ul>
+            #                     </template>
+            #                 </b-form-tags>
+            #             </b-form-group>
+            #         </div>
+            #     </div>
+            #     """
 
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
