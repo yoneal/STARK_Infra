@@ -484,11 +484,8 @@ def create(data):
                         root.lists.{foreign_entity} = []
 
                         //FIXME: for now, generic list() is used. Can be optimized to use a list function that only retrieves specific columns
-                        field = ['{foreign_field}', '{foreign_display}']
-                        payload = []
-                        payload['fields'] = [{{ foreign_field, foreign_display }}]
-                        payload['STARK_isOptions'] = true
-                        {foreign_entity}_app.get_field(field).then( function(data) {{
+                        fields = ['{foreign_field}', '{foreign_display}']
+                        {foreign_entity}_app.get_fields(fields).then( function(data) {{
                             data.forEach(function(arrayItem) {{
                                 value = arrayItem['{foreign_field}']
                                 text  = arrayItem['{foreign_display}']"""

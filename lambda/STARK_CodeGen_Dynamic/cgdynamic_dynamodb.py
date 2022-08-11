@@ -218,8 +218,9 @@ def create(data):
                 }}
             
             elif request_type == "get_field":
-                field = event.get('queryStringParameters').get('field','')
-                response = get_field(field, default_sk)
+                fields = event.get('queryStringParameters').get('fields','')
+                fields = fields.split(",")
+                response = get_fields(fields, default_sk)
 
             elif request_type == "detail":
 
@@ -748,14 +749,13 @@ def create(data):
         max_cell_text_len_header = max([len(str(col)) for col in iter])  # how long is the longest string?
         return math.ceil(max_cell_text_len_header * font_width_in_mm / col_width)
 
-    def get_field(field, sk = default_sk):
-
+    def get_fields(fields, sk = default_sk):
+            
         dd_arguments = {{}}
-        lv_token = 'initial'
+        next_token = 'initial'
         items = []
-        while lv_token != None:
-            lv_token = '' if lv_token == 'initial' else lv_token
-            print(lv_token)
+        while next_token != None:
+            next_token = '' if next_token == 'initial' else next_token
             dd_arguments['TableName']=ddb_table
             dd_arguments['IndexName']="STARK-ListView-Index"
             dd_arguments['Limit']=5
@@ -764,21 +764,27 @@ def create(data):
             dd_arguments['ExpressionAttributeValues']={{
                 ':sk' : {{'S' : sk}}
             }}
-            
-            if lv_token != '':
-                dd_arguments['ExclusiveStartKey']=lv_token
+
+            if next_token != '':
+                dd_arguments['ExclusiveStartKey']=next_token
 
             response = ddb.query(**dd_arguments)
             raw = response.get('Items')
 
             for record in raw:
+                
                 item = {{}}
-                item[field] = record.get('pk', {{}}).get('S','')
+                for field in fields:
+                    if field == pk_field:
+                        get_record = record.get('pk',{{}}).get('S','')
+                    else:
+                        get_record = record.get(field,{{}}).get('S','')
+                        
+                    item[field] = get_record
                 items.append(item)
-
             #Get the "next" token, pass to calling function. This enables a "next page" request later.
-            lv_token = response.get('LastEvaluatedKey')
-            
+            next_token = response.get('LastEvaluatedKey')
+
         return items
     """
     
