@@ -114,7 +114,7 @@ def create(data):
                 }});
                 return uuid;
             }},
-            function get_s3_credentials(){{
+            get_s3_credentials: function(){{
                 //temporary
                 return {{'access_key_id': '', 'secret_access_key': ''}}
             }}
