@@ -45,14 +45,11 @@ def create(data):
                             </div>"""
 
     for col, col_type in cols.items():
-        entities = cg_rel.get({
-            "col": col,
-            "col_type": col_type,
-        })
-    
-        for related, type in entities:
-            print(related)
-            print(type)
+        if isinstance(col_type, dict):
+            if col_type["type"] == "relationship":
+                has_many = col_type.get('has_many', '')
+                foreign_entity  = converter.convert_to_system_name(has_many)
+                print(foreign_entity)
             # foreign_entity  = converter.convert_to_system_name(has_many)
             # if has_many != '':
             #     source_code += f"""
