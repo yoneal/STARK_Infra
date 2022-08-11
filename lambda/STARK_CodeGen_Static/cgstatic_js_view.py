@@ -463,10 +463,11 @@ def create(data):
                     
                 }},
                 onOptionClick({{ option, addTag }}, reference) {{
-                    addTag(option)
+                    addTag(option.value)
                     this.search[reference] = ''
                     this.$refs[reference].show(true)
-                }},"""
+                }},
+                """
 
     for col, col_type in cols.items():
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
@@ -505,20 +506,24 @@ def create(data):
                         }});
                     }}
                 }},
-                split_string: function(str) {{
-                    var arr = str.split(", ")
-                    var return_str = ''
-                    arr.forEach(element => {{
-                        return_str += this.tag_display_text(element).concat(", ")
-                    }});
-                    return return_str
-                }},
+                """
+                if has_many != '':
+                    source_code += f"""
+                    split_string: function(str) {{
+                        var arr = str.split(", ")
+                        var return_str = ''
+                        arr.forEach(element => {{
+                            return_str += this.tag_display_text(element).concat(", ")
+                        }});
+                        return return_str
+                    }},
 
-                tag_display_text: function (tag) {{
-                    var index = this.lists.{foreign_entity}.findIndex(opt => tag == opt.value)
-                    return this.lists.{foreign_entity}[index].text
-                    // return this.lists.{foreign_entity}.filter(opt => tag == opt.value)
-                }},"""
+                    tag_display_text: function (tag) {{
+                        var index = this.lists.{foreign_entity}.findIndex(opt => tag == opt.value)
+                        return this.lists.{foreign_entity}[index].text
+                        // return this.lists.{foreign_entity}.filter(opt => tag == opt.value)
+                    }},
+                    """
 
     source_code += f"""
             }},
