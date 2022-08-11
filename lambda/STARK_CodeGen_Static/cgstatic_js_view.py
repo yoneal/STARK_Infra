@@ -264,11 +264,12 @@ def create(data):
             if  has_one != '':
                 #simple 1-1 relationship
                 source_code += f"""
-                            root.lists.{foreign_field} = [  {{ value: root.{entity_varname}.{foreign_field}, text: root.{entity_varname}.{foreign_field} }},]"""
+                            root.lists.{foreign_field} = [  {{ value: root.{entity_varname}.{foreign_field}, text: root.{entity_varname}.{foreign_field} }},]
+                            root.list_{foreign_field}()"""
             elif has_many != '':
                 source_code += f"""
-                            root.multi_select_values.{foreign_field} = root.{entity_varname}.{foreign_field}.split(', ')"""
-
+                            root.multi_select_values.{foreign_entity} = root.{entity_varname}.{foreign_entity}.split(', ')
+                            root.list_{foreign_field}()"""
     source_code += f"""
                             console.log("VIEW: Retreived module data.")
                             root.show()
@@ -483,7 +484,7 @@ def create(data):
                         root.lists.{foreign_entity} = []
 
                         //FIXME: for now, generic list() is used. Can be optimized to use a list function that only retrieves specific columns
-                        field = '{foreign_field}'
+                        field = ['{foreign_field}', '{foreign_display}']
                         payload = []
                         payload['fields'] = [{{ foreign_field, foreign_display }}]
                         payload['STARK_isOptions'] = true
@@ -496,7 +497,7 @@ def create(data):
                                 root.lists.{foreign_entity}.push({{ value: value, text: text }})"""
                 if has_many != '': 
                     source_code += f"""            
-                                root.lists.{foreign_entity}.push(value)"""
+                                root.lists.{foreign_entity}.push({{ value: value, text: text }})"""
                 source_code += f""" 
                 }})
                             root.list_status.{foreign_entity} = 'populated'
@@ -506,7 +507,22 @@ def create(data):
                             loading_modal.hide();
                         }});
                     }}
-                }},"""
+                }},
+                split_string: function(str) {{
+                    var arr = str.split(", ")
+                    var return_str = ''
+                    arr.forEach(element => {{
+                        return_str += this.tag_display_text(element).concat(", ")
+                    }});
+                    return return_str
+                }},
+
+                tag_display_text: function (tag) {{
+                    var index = this.lists.{foreign_entity}.findIndex(opt => tag == opt.value)
+                    return this.lists.{foreign_entity}[index].text
+                    // return this.lists.{foreign_entity}.filter(opt => tag == opt.value)
+                }}"""
+
     source_code += f"""
             }},
             computed: {{"""
@@ -525,7 +541,7 @@ def create(data):
                     const options = this.lists.{col_varname}.filter(opt => this.multi_select_values.{col_varname}.indexOf(opt) === -1)
                     if ({col_varname}_criteria) {{
                     // Show only options that match {col_varname}_criteria
-                    return options.filter(opt => opt.toLowerCase().indexOf({col_varname}_criteria) > -1);
+                    return options.filter(opt => (opt.text).toLowerCase().indexOf({col_varname}_criteria) > -1);
                     }}
                     // Show all options available
                     return options
