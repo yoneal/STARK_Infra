@@ -45,7 +45,7 @@ def create(data):
                             </div>"""
 
     for col, col_type in cols.items():
-        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+        if isinstance(col_type, dict) and col_type == "relationship":
             has_many = col_type.get('has_many', '')
             foreign_entity  = converter.convert_to_system_name(has_many)
             if has_many != '':
