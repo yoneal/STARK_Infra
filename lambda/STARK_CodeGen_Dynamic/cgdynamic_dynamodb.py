@@ -601,6 +601,9 @@ def create(data):
         report_list = []
         for key in mapped_results:
             temp_dict = {{}}
+            #remove primary identifiers and STARK attributes
+            key.pop("sk")
+            key.pop("STARK_uploaded_s3_keys")
             for index, value in key.items():
                 temp_dict[index.replace("_"," ")] = value
             report_list.append(temp_dict)
@@ -609,7 +612,6 @@ def create(data):
         writer = csv.DictWriter(file_buff, fieldnames=csv_header)
         writer.writeheader()
         for rows in report_list:
-            rows.pop("sk")
             for index in diff_list:
                 rows.pop(index)
             writer.writerow(rows)
