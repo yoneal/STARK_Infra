@@ -217,7 +217,7 @@ def create(data):
                     'Items': items
                 }}
             
-            elif request_type == "get_field":
+            elif request_type == "get_fields":
                 fields = event.get('queryStringParameters').get('fields','')
                 fields = fields.split(",")
                 response = get_fields(fields, default_sk)

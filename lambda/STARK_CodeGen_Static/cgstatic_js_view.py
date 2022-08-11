@@ -265,11 +265,11 @@ def create(data):
                 #simple 1-1 relationship
                 source_code += f"""
                             root.lists.{foreign_field} = [  {{ value: root.{entity_varname}.{foreign_field}, text: root.{entity_varname}.{foreign_field} }},]
-                            root.list_{foreign_field}()"""
+                            root.list_{foreign_entity}()"""
             elif has_many != '':
                 source_code += f"""
                             root.multi_select_values.{foreign_entity} = root.{entity_varname}.{foreign_entity}.split(', ')
-                            root.list_{foreign_field}()"""
+                            root.list_{foreign_entity}()"""
     source_code += f"""
                             console.log("VIEW: Retreived module data.")
                             root.show()
@@ -518,7 +518,7 @@ def create(data):
                     var index = this.lists.{foreign_entity}.findIndex(opt => tag == opt.value)
                     return this.lists.{foreign_entity}[index].text
                     // return this.lists.{foreign_entity}.filter(opt => tag == opt.value)
-                }}"""
+                }},"""
 
     source_code += f"""
             }},
@@ -535,7 +535,7 @@ def create(data):
                 {col_varname}() {{
                     const {col_varname}_criteria = this.{col_varname}_criteria
                     // Filter out already selected options
-                    const options = this.lists.{col_varname}.filter(opt => this.multi_select_values.{col_varname}.indexOf(opt) === -1)
+                    const options = this.lists.{col_varname}.filter(opt => this.multi_select_values.{col_varname}.indexOf(opt.value) === -1)
                     if ({col_varname}_criteria) {{
                     // Show only options that match {col_varname}_criteria
                     return options.filter(opt => (opt.text).toLowerCase().indexOf({col_varname}_criteria) > -1);

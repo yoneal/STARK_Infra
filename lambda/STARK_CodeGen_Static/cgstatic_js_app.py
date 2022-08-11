@@ -59,7 +59,7 @@ def create(data):
                 return STARK.request('POST', fetchUrl, data)
             }},
             get_fields: function (fields=[]) {{
-                    fetchUrl = this.api_endpoint + '?rt=get_fields&field=' + field
+                    fetchUrl = this.api_endpoint + '?rt=get_fields&fields=' + fields
                     return STARK.request('GET', fetchUrl)
             }},
         }}
