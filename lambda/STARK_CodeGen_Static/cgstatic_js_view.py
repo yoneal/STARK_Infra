@@ -478,25 +478,28 @@ def create(data):
 
                 source_code += f"""
                 list_{foreign_entity}: function () {{
-                    if (this.list_status.{foreign_field} == 'empty') {{
+                    if (this.list_status.{foreign_entity} == 'empty') {{
                         loading_modal.show();
-                        root.lists.{foreign_field} = []
+                        root.lists.{foreign_entity} = []
 
                         //FIXME: for now, generic list() is used. Can be optimized to use a list function that only retrieves specific columns
                         field = '{foreign_field}'
+                        payload = []
+                        payload['fields'] = [{{ foreign_field, foreign_display }}]
+                        payload['STARK_isOptions'] = true
                         {foreign_entity}_app.get_field(field).then( function(data) {{
                             data.forEach(function(arrayItem) {{
                                 value = arrayItem['{foreign_field}']
                                 text  = arrayItem['{foreign_display}']"""
                 if has_one != '': 
                     source_code += f"""            
-                                root.lists.{foreign_field}.push({{ value: value, text: text }})"""
+                                root.lists.{foreign_entity}.push({{ value: value, text: text }})"""
                 if has_many != '': 
                     source_code += f"""            
-                                root.lists.{foreign_field}.push(value)"""
+                                root.lists.{foreign_entity}.push(value)"""
                 source_code += f""" 
                 }})
-                            root.list_status.{foreign_field} = 'populated'
+                            root.list_status.{foreign_entity} = 'populated'
                             loading_modal.hide();
                         }}).catch(function(error) {{
                             console.log("Encountered an error! [" + error + "]")
