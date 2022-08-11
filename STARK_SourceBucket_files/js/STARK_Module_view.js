@@ -14,7 +14,33 @@ var root = new Vue({
             'Icon': '',
             'Priority': '',
         },
+        custom_report:{
+            'Module_Name': {"operator": "", "value": "", "type":"S"},
+            'Descriptive_Title':  {"operator": "", "value": "", "type":"S"},
+            'Target':  {"operator": "", "value": "", "type":"S"},
+            'Description':  {"operator": "", "value": "", "type":"S"},
+            'Module_Group':  {"operator": "", "value": "", "type":"S"},
+            'Is_Menu_Item':  {"operator": "", "value": "", "type":"S"},
+            'Is_Enabled':  {"operator": "", "value": "", "type":"S"},
+            'Icon':  {"operator": "", "value": "", "type":"S"},
+            'Priority':  {"operator": "", "value": "", "type":"S"},
+            'STARK_isReport':true,
+            'STARK_report_fields':[]
+        },
         lists: {
+            'Report_Operator': [
+                { value: '', text: '' },
+                { value: '=', text: 'EQUAL TO (=)' },
+                { value: '<>', text: 'NOT EQUAL TO (!=)' },
+                { value: '<', text: 'LESS THAN (<)' },
+                { value: '<=', text: 'LESS THAN OR EQUAL TO (<=)' },
+                { value: '>', text: 'GREATER THAN (>)' },
+                { value: '>=', text: 'GREATER THAN OR EQUAL TO (>=)' },
+                { value: 'contains', text: 'CONTAINS (%..%)' },
+                { value: 'begins_with', text: 'BEGINS WITH (..%)' },
+                { value: 'IN', text: 'IN (value1, value2, value3, ... valueN)' },
+                { value: 'between', text: 'BETWEEN (value1, value2)' },
+            ],
             'Is_Menu_Item': [
                 { value: true, text: 'Y' },
                 { value: false, text: 'N' },
@@ -29,13 +55,25 @@ var root = new Vue({
         list_status: {
             'Module_Group': 'empty'
         },
+        multi_select_values: {
+
+        },
         visibility: 'hidden',
         next_token: '',
         next_disabled: true,
         prev_token: '',
         prev_disabled: true,
         page_token_map: {1: ''},
-        curr_page: 1
+        curr_page: 1,
+        showReport: false,
+        s3_link_prefix: "",
+        temp_csv_link: "",
+        temp_pdf_link: "",
+        showError: false,
+        no_operator: [],
+        error_message: '',
+        authFailure: false,
+        authTry: false,
 
     },
     methods: {
@@ -201,6 +239,77 @@ var root = new Vue({
                 spinner.hide()
             });
         },
+
+        formValidation: function () {
+            root.error_message = ""
+            let no_operator = []
+            let isValid = true;
+            root.showError = false
+            for (element in root.custom_report) {
+                if(root.custom_report[element].value != '' && root.custom_report[element].operator == '')
+                {
+                    root.showError = true
+                    //fetch all error
+                    if(root.custom_report[element].operator == '')
+                    {
+                        isValid = false
+                        no_operator.push(element)
+                    }
+                }
+            }
+            root.no_operator = no_operator;
+            //display error
+            root.error_message = "Put operator/s on: " + no_operator ;
+            return isValid
+        },
+
+        generate: function () {
+            let temp_show_fields = []
+            checked_fields.forEach(element => {
+                let temp_index = {'field': element, label: element.replaceAll("_"," ")}
+                temp_show_fields.push(temp_index)
+            });
+            root.STARK_report_fields = temp_show_fields;
+            this.custom_report['STARK_report_fields'] = root.STARK_report_fields
+            let report_payload = { STARK_Module: this.custom_report }
+            if(root.formValidation())
+            {
+                loading_modal.show()
+                STARK_Module_app.report(report_payload).then( function(data) {
+                    root.listview_table = data[0];
+                    root.temp_csv_link = data[2][0];
+                    root.temp_pdf_link = data[2][1];
+                    console.log("DONE! Retrieved report.");
+                    loading_modal.hide()
+                    root.showReport = true
+
+                })
+                .catch(function(error) {
+                    console.log("Encountered an error! [" + error + "]")
+                    loading_modal.hide()
+                });
+            }
+        },
+        download_report(file_type = "csv") {
+            let link = "https://" + (file_type == "csv" ? root.temp_csv_link : root.temp_pdf_link)
+            window.location.href = link
+        },
+        checkUncheck: function (checked) {
+            arrCheckBoxes = document.getElementsByName('check_checkbox');
+            for (var i = 0; i < arrCheckBoxes.length; i++)
+            {
+                arrCheckBoxes[i].checked = checked;
+            }
+
+            if(checked)
+            {
+                checked_fields = temp_checked_fields
+            }
+            else
+            {
+                checked_fields = []
+            }
+        },
         list_Module_Group: function () {
             if (this.list_status.Module_Group == 'empty') {
                 loading_modal.show();
@@ -223,3 +332,8 @@ var root = new Vue({
         },
     }
 })
+
+//for selecting individually, select all or uncheck all of checkboxes
+var temp_checked_fields = ['Module_Name','Descriptive_Title','Target','Description','Module_Group','Is_Menu_Item','Is_Enabled','Icon','Priority',]
+var checked_fields = ['Module_Name','Descriptive_Title','Target','Description','Module_Group','Is_Menu_Item','Is_Enabled','Icon','Priority',]
+

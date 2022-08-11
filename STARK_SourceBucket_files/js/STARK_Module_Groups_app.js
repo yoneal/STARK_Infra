@@ -32,5 +32,10 @@ var STARK_Module_Groups_app = {
 
         return STARK.request('GET', fetchUrl)
     },
+    
+    report: function (data=[]) {
+        fetchUrl = this.api_endpoint
+        return STARK.request('POST', fetchUrl, data)
+    },
 }
 

@@ -138,8 +138,7 @@ def create_handler(event, context):
         source_files = os.listdir(dir + os.sep + lambda_dir)
         for source_file in source_files:
             with open(dir + os.sep + lambda_dir + os.sep + source_file) as f:
-                source_code = f.read().replace("[[STARK_DDB_TABLE_NAME]]", ddb_table_name)
-                source_code = f.read().replace("[[STARK_WEBSITE_BUCKET_NAME]]", website_bucket)
+                source_code = f.read().replace("[[STARK_DDB_TABLE_NAME]]", ddb_table_name).replace("[[STARK_WEBSITE_BUCKET_NAME]]", website_bucket)
                 files_to_commit.append({
                     'filePath': f"lambda/{lambda_dir}/{source_file}",
                     'fileContent': source_code.encode()
