@@ -3,6 +3,7 @@
 
 #Python Standard Library
 import textwrap
+import os
 
 #Private modules
 import convert_friendly_to_system as converter
@@ -11,6 +12,8 @@ def create(data):
 
     api_endpoint = data['API Endpoint']
     entities     = data['Entities']
+    bucket_name  = data['Bucket Name']
+    region_name  = os.environ['AWS_REGION']
 
     source_code = f"""\
         api_endpoint_1 = '{api_endpoint}'
@@ -35,6 +38,8 @@ def create(data):
             'STARK_User_Sessions_url':`${{api_endpoint_1}}/STARK_User_Sessions`,
             'STARK_Module_Groups_url':`${{api_endpoint_1}}/STARK_Module_Groups`,
             'methods_with_body': ["POST", "DELETE", "PUT"],
+            'bucket_name': '{bucket_name}',
+            'region_name': '{region_name}',
 
             request: function(method, fetchURL, payload='') {{
 
@@ -99,22 +104,20 @@ def create(data):
                         loading_modal.hide()
                     }});
                 }}
+            }},
+            create_UUID: function(){{
+                var dt = new Date().getTime();
+                var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {{
+                    var r = (dt + Math.random()*16)%16 | 0;
+                    dt = Math.floor(dt/16);
+                    return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+                }});
+                return uuid;
+            }},
+            get_s3_credentials: function(){{
+                //temporary
+                return {{'access_key_id': '', 'secret_access_key': ''}}
             }}
-        }};
-    
-        //temporary
-        function create_UUID(){{
-            var dt = new Date().getTime();
-            var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {{
-                var r = (dt + Math.random()*16)%16 | 0;
-                dt = Math.floor(dt/16);
-                return (c=='x' ? r :(r&0x3|0x8)).toString(16);
-            }});
-            return uuid;
-        }}
-        
-        function get_s3_credential_keys(){{
-            return {{'access_key_id': '', 'secret_access_key': ''}}
-        }}"""
+        }};"""
 
     return textwrap.dedent(source_code)

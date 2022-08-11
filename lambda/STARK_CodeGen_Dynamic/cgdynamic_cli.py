@@ -18,6 +18,7 @@ import cgdynamic_buildspec as cg_build
 import cgdynamic_sam_template as cg_sam
 import cgdynamic_template_conf as cg_conf
 import convert_friendly_to_system as converter
+import get_relationship as get_rel
 
 def create(cloud_resources, project_basedir):
 
@@ -29,6 +30,7 @@ def create(cloud_resources, project_basedir):
     project_name    = cloud_resources["Project Name"]
     project_varname = converter.convert_to_system_name(project_name)
     ddb_table_name  = cloud_resources["DynamoDB"]["Table Name"]
+    web_bucket_name = cloud_resources["S3 webserve"]["Bucket Name"]
 
     ##########################################
     #Create code for our entity Lambdas (API endpoint backing)
@@ -36,11 +38,15 @@ def create(cloud_resources, project_basedir):
     for entity in entities:
         entity_varname = converter.convert_to_system_name(entity)
         #Step 1: generate source code.
+        #Step 1.1: extract relationship
+        relationships = get_rel.get_relationship(models, entity)
         data = {
             "Entity": entity_varname,
             "Columns": models[entity]["data"],
             "PK": models[entity]["pk"],
-            "DynamoDB Name": ddb_table_name
+            "DynamoDB Name": ddb_table_name,
+            "Bucket Name": web_bucket_name,
+            "Relationships": relationships
         }
         source_code = cg_ddb.create(data)
 

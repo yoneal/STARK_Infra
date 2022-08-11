@@ -14,8 +14,6 @@ def create(data):
     entity = data["Entity"]
     cols   = data["Columns"]
     pk     = data['PK']
-    bucket_name = data['Bucket Name'] #temporary: remove once s3 credentials for file upload is solved
-    region_name   = os.environ['AWS_REGION'] #temporary: remove once s3 credentials for file upload is solved
 
     entity_varname = converter.convert_to_system_name(entity)
     entity_app     = entity_varname + '_app'
@@ -121,6 +119,7 @@ def create(data):
                 page_token_map: {{1: ''}},
                 curr_page: 1,
                 showReport: false,
+                s3_link_prefix: "",
                 temp_csv_link: "",
                 temp_pdf_link: "",
                 showError: false,
@@ -239,7 +238,7 @@ def create(data):
                         console.log("VIEW: Getting!")
 
                         {entity_app}.get(data).then( function(data) {{
-                            root.{entity_varname} = data[0]; //We need 0, because API backed func always returns a list for now
+                            root.{entity_varname} = data["item"]; 
                             root.{entity_varname}.orig_{pk_varname} = root.{entity_varname}.{pk_varname};"""
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
@@ -248,6 +247,7 @@ def create(data):
                             root.{entity_varname}.STARK_uploaded_s3_keys['{col_varname}'] = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.STARK_uploaded_s3_keys.{col_varname}.S : ""
                             root.STARK_upload_elements['{col_varname}'].file              = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.{col_varname} : ""
                             root.STARK_upload_elements['{col_varname}'].progress_bar_val  = root.{entity_varname}.{col_varname} != "" ? 100 : 0
+                            root.s3_link_prefix                                           = data['s3_link_prefix']
                             """
 
     #If there are 1:1 rel fields, we need to assign their initial value to the still-unpopulated drop-down list so that it displays 
@@ -419,7 +419,7 @@ def create(data):
                     var file = root.STARK_upload_elements[file_upload_element].file;
                     if(typeof root.{entity_varname}.STARK_uploaded_s3_keys[file_upload_element] == 'undefined')
                     {{
-                        uuid = create_UUID()
+                        uuid = STARK.create_UUID()
                         ext = file.name.split('.').pop()
                     }}
                     else
@@ -555,12 +555,10 @@ def create(data):
     source_code += f"""]
     
     //Bucket Configurations
-    var bucketName = '{bucket_name}';
-    var bucketRegion = '{region_name}';
-    var credentials = get_s3_credential_keys()
+    var credentials = STARK.get_s3_credentials()
     var s3 = new AWS.S3({{
-        params: {{Bucket: bucketName}},
-        region: bucketRegion,
+        params: {{Bucket: STARK.bucket_name}},
+        region: STARK.region_name,
         apiVersion: '2006-03-01',
         accessKeyId: credentials['access_key_id'],
         secretAccessKey: credentials['secret_access_key'],

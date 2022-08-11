@@ -71,14 +71,14 @@ def create_handler(event, context):
     files_to_commit = []
 
     #STARK main JS file
-    data = { 'API Endpoint': endpoint, 'Entities': models }
+    data = { 'API Endpoint': endpoint, 'Entities': models, "Bucket Name": bucket_name }
     add_to_commit(cg_js_stark.create(data), key=f"js/STARK.js", files_to_commit=files_to_commit, file_path='static')
 
-    #For each entity, we'll create a set of HTML and JS Files
+    #For each entity, we'll create a set of HTML and JS Files and uploaded folder
     for entity in models:
         pk   = models[entity]["pk"]
         cols = models[entity]["data"]
-        cgstatic_data = { "Entity": entity, "PK": pk, "Columns": cols, "Project Name": project_name, "Bucket Name": bucket_name }
+        cgstatic_data = { "Entity": entity, "PK": pk, "Columns": cols, "Project Name": project_name}
         entity_varname = converter.convert_to_system_name(entity)
 
         add_to_commit(source_code=cg_add.create(cgstatic_data), key=f"{entity_varname}_add.html", files_to_commit=files_to_commit, file_path='static')
@@ -89,7 +89,8 @@ def create_handler(event, context):
         add_to_commit(source_code=cg_report.create(cgstatic_data), key=f"{entity_varname}_report.html", files_to_commit=files_to_commit, file_path='static')
         add_to_commit(source_code=cg_js_app.create(cgstatic_data), key=f"js/{entity_varname}_app.js", files_to_commit=files_to_commit, file_path='static')
         add_to_commit(source_code=cg_js_view.create(cgstatic_data), key=f"js/{entity_varname}_view.js", files_to_commit=files_to_commit, file_path='static')
-  
+        add_to_commit(source_code=f"{entity} Uploaded files", key=f"uploaded_files/{entity_varname}/README.txt", files_to_commit=files_to_commit, file_path='')
+        
     #HTML+JS for our homepage
     homepage_data = { "Project Name": project_name }
     add_to_commit(source_code=cg_homepage.create(homepage_data), key=f"home.html", files_to_commit=files_to_commit, file_path='static')
@@ -100,8 +101,9 @@ def create_handler(event, context):
     add_to_commit(source_code=cg_login.create(homepage_data), key=f"index.html", files_to_commit=files_to_commit, file_path='static')
     add_to_commit(source_code=cg_js_login.create(homepage_data), key=f"js/login.js", files_to_commit=files_to_commit, file_path='static')
     add_to_commit(source_code=cg_css_login.create(homepage_data), key=f"css/login.css", files_to_commit=files_to_commit, file_path='static')
+    
+    #TMP folder
     add_to_commit(source_code="Temporary files", key=f"tmp/README.txt", files_to_commit=files_to_commit, file_path='')
-    add_to_commit(source_code="Uploaded files", key=f"uploaded_files/README.txt", files_to_commit=files_to_commit, file_path='')
 
     ##########################################
     #Add cloud resources document to our files
