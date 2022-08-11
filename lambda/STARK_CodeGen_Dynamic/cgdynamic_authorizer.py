@@ -32,25 +32,28 @@ def create(data):
 
         #Get cookies, if any
         eventCookies = event.get('cookies', {{}})
-        cookies = {{}}
+        cookies      = {{}}
+        username     = ''
+
         for cookie in eventCookies:
             info = cookie.partition("=")
             cookies[info[0]] = info[2]
 
-        isAuthorized=False
+        isAuthorized = False
         sess_id = cookies.get('sessid','')
         if sess_id != '':
             #Get session record from DDB
             sess_record = get_session(sess_id)
 
-            #Get username from record 
-            username = sess_record['Username']
+            if sess_record != {{}}:
+                #Get username from record 
+                username = sess_record['Username']
 
-            #FIXME: Optional/Future - immediately check permissions here and decide if API endpoint requested is authorized
+                #FIXME: Optional/Future - immediately check permissions here and decide if API endpoint requested is authorized
 
-            #Set authorized if everything is ok 
-            if username != '':
-                isAuthorized=True
+        #Set authorized if everything is ok 
+        if username != '':
+            isAuthorized=True
 
         response = {{ 
             "isAuthorized": isAuthorized,
@@ -100,6 +103,7 @@ def create(data):
 
         raw = response.get('Items')
 
+        item = {{}}
         for record in raw:
             item = {{'pk': record['pk']['S'],
                     'sk': record['sk']['S'],
