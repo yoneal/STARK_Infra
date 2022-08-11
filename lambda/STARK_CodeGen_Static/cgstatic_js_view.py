@@ -419,7 +419,7 @@ def create(data):
                     var file = root.STARK_upload_elements[file_upload_element].file;
                     if(typeof root.{entity_varname}.STARK_uploaded_s3_keys[file_upload_element] == 'undefined')
                     {{
-                        uuid = create_UUID()
+                        uuid = STARK.create_UUID()
                         ext = file.name.split('.').pop()
                     }}
                     else
@@ -555,13 +555,13 @@ def create(data):
     source_code += f"""]
     
     //Bucket Configurations
-    var config = get_s3_temporary_config()
+    var credentials = STARK.get_s3_credentials()
     var s3 = new AWS.S3({{
         params: {{Bucket: STARK.bucket_name}},
-        region: config['region_name'],
+        region: STARK.region_name,
         apiVersion: '2006-03-01',
-        accessKeyId: config['access_key_id'],
-        secretAccessKey: config['secret_access_key'],
+        accessKeyId: credentials['access_key_id'],
+        secretAccessKey: credentials['secret_access_key'],
     }});"""
 
     return textwrap.dedent(source_code)
