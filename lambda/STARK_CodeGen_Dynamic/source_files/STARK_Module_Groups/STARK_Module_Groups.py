@@ -15,6 +15,7 @@ ddb_table   = "[[STARK_DDB_TABLE_NAME]]"
 pk_field    = "Group_Name"
 default_sk  = "STARK|module_group"
 sort_fields = ["Group_Name", ]
+bucket_name     = "[[STARK_WEBSITE_BUCKET_NAME]]"
 page_limit  = 10
 
 def lambda_handler(event, context):
