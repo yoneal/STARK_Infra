@@ -60,6 +60,7 @@ var root = new Vue({
                 window.location.href = "STARK_Module.html";
             }).catch(function(error) {
                 console.log("Encountered an error! [" + error + "]")
+                alert("Request Failed: System error or you may not have enough privileges")
                 loading_modal.hide()
             });
         },
@@ -78,6 +79,7 @@ var root = new Vue({
             })
             .catch(function(error) {
                 console.log("Encountered an error! [" + error + "]")
+                alert("Request Failed: System error or you may not have enough privileges")
                 loading_modal.hide()
             });
         },
@@ -96,6 +98,7 @@ var root = new Vue({
             })
             .catch(function(error) {
                 console.log("Encountered an error! [" + error + "]")
+                alert("Request Failed: System error or you may not have enough privileges")
                 loading_modal.hide()
             });
         },
@@ -136,6 +139,7 @@ var root = new Vue({
                 })
                 .catch(function(error) {
                     console.log("Encountered an error! [" + error + "]")
+                    alert("Request Failed: System error or you may not have enough privileges")
                     loading_modal.hide()
                 });
             }
@@ -198,6 +202,7 @@ var root = new Vue({
             })
             .catch(function(error) {
                 console.log("Encountered an error! [" + error + "]")
+                alert("Request Failed: System error or you may not have enough privileges")
                 spinner.hide()
             });
         },
@@ -217,6 +222,7 @@ var root = new Vue({
                     loading_modal.hide();
                 }).catch(function(error) {
                     console.log("Encountered an error! [" + error + "]")
+                    alert("Request Failed: System error or you may not have enough privileges")
                     loading_modal.hide();
                 });
             }

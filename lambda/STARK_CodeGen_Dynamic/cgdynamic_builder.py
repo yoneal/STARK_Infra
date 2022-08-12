@@ -35,6 +35,9 @@ def create():
                 #Copy entire Lambda module code (folder)    
                 dependency_varname =  converter.convert_to_system_name(dependency)
                 os.system(f"cp -R lambda_src/{{dependency_varname}} lambda/{{destination_varname}}")
+
+        #Additionally, every module by default gets stark_core bundled with them
+        os.system(f"cp -R lambda_src/stark_core lambda/{{destination_varname}}")
     """
     return textwrap.dedent(source_code)
 

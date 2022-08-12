@@ -175,6 +175,7 @@ def create(data):
                         window.location.href = "{entity_varname}.html";
                     }}).catch(function(error) {{
                         console.log("Encountered an error! [" + error + "]")
+                        alert("Request Failed: System error or you may not have enough privileges")
                         loading_modal.hide()
                     }});
                 }},
@@ -193,6 +194,7 @@ def create(data):
                     }})
                     .catch(function(error) {{
                         console.log("Encountered an error! [" + error + "]")
+                        alert("Request Failed: System error or you may not have enough privileges")
                         loading_modal.hide()
                     }});
                 }},
@@ -219,6 +221,7 @@ def create(data):
                     }})
                     .catch(function(error) {{
                         console.log("Encountered an error! [" + error + "]")
+                        alert("Request Failed: System error or you may not have enough privileges")
                         loading_modal.hide()
                     }});
                 }},
@@ -277,6 +280,7 @@ def create(data):
                         }})
                         .catch(function(error) {{
                             console.log("Encountered an error! [" + error + "]")
+                            alert("Request Failed: System error or you may not have enough privileges")
                             loading_modal.hide()
                         }});
                     }}
@@ -339,6 +343,7 @@ def create(data):
                     }})
                     .catch(function(error) {{
                         console.log("Encountered an error! [" + error + "]")
+                        alert("Request Failed: System error or you may not have enough privileges")
                         spinner.hide()
                     }});
                 }},
@@ -389,6 +394,7 @@ def create(data):
                         }})
                         .catch(function(error) {{
                             console.log("Encountered an error! [" + error + "]")
+                            alert("Request Failed: System error or you may not have enough privileges")
                             loading_modal.hide()
                         }});
                     }}
