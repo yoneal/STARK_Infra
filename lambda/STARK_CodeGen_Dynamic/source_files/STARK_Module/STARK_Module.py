@@ -681,7 +681,7 @@ def create_pdf(data_to_tuple, master_fields, pdf_filename, report_params):
     counter = 0
     for row in data_tuple:
         if pdf.will_page_break(line_height):
-            render_table_header()
+            render_table_header(pdf, header_tuple,  col_width, line_height) 
         row_height = pdf.font_size * estimate_lines_needed(pdf, row, col_width)
         if row_height < line_height: #min height
             row_height = line_height

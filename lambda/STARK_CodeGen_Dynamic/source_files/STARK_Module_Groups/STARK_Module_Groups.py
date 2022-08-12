@@ -465,7 +465,6 @@ def generate_reports(mapped_results = [], display_fields=[], report_params = {})
         temp_dict = {}
         #remove primary identifiers and STARK attributes
         key.pop("sk")
-        key.pop("STARK_uploaded_s3_keys")
         for index, value in key.items():
             temp_dict[index.replace("_"," ")] = value
         report_list.append(temp_dict)
