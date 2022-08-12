@@ -174,7 +174,7 @@ def create(data):
                                     <template v-slot="{{ tags, disabled, addTag, removeTag }}">
                                         <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
                                             <li v-for="tag in tags" :key="tag" class="list-inline-item">
-                                                <b-form-tag @remove="removeTag(tag)" :title="tag" :disabled="disabled" variant="info" >{{{{ tag }}}}</b-form-tag>
+                                                <b-form-tag @remove="removeTag(tag)" :title="tag" :disabled="disabled" variant="info" >{{{{ tag_display_text(tag) }}}}</b-form-tag>
                                             </li>
                                         </ul>
                                         <b-dropdown size="sm" variant="outline-secondary" block menu-class="w-50" no-flip ref="{foreign_entity}" onmouseover="root.list_{foreign_entity}()" onfocus="root.list_{foreign_entity}()">
@@ -188,7 +188,7 @@ def create(data):
                                             </b-dropdown-form>
                                             <b-dropdown-divider></b-dropdown-divider>
                                             <b-dropdown-item-button  v-for="option in {foreign_entity}" :key="option" @click="onOptionClick({{ option, addTag }},'{foreign_entity}')">
-                                                {{{{ option }}}}
+                                                {{{{ option.text }}}}
                                             </b-dropdown-item-button>
                                             <b-dropdown-text v-if="{foreign_entity}.length === 0">
                                                 There are no {has_many.lower()}s available to select
