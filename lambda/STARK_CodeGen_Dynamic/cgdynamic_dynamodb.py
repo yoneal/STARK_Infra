@@ -82,25 +82,39 @@ def create(data):
     import os
     from fpdf import FPDF
 
-    ddb = boto3.client('dynamodb')
-    s3 = boto3.client("s3")
+    #STARK
+    import stark_core 
+
+    ddb    = boto3.client('dynamodb')
+    s3     = boto3.client("s3")
     s3_res = boto3.resource('s3')
 
     #######
     #CONFIG
-    ddb_table         = "{ddb_table_name}"
+    ddb_table         = stark_core.ddb_table
+    bucket_name       = stark_core.bucket_name
+    region_name       = stark_core.region_name
+    page_limit        = stark_core.page_limit
+    s3_link_prefix    = stark_core.bucket_url
+    tmp_prefix        = stark_core.bucket_tmp
     pk_field          = "{pk_varname}"
     default_sk        = "{default_sk}"
     sort_fields       = ["{pk_varname}", ]
-    bucket_name       = "{bucket_name}"
     relationships     = {relationships}
-    region_name       = os.environ['AWS_REGION']
-    page_limit        = 10
-    s3_link_prefix    = f"{{bucket_name}}.s3.{{region_name}}.amazonaws.com/"
-    tmp_prefix        = f"{{s3_link_prefix}}tmp/"
-    upload_entity_dir = f"uploaded_files/{entity_varname}/"
+    upload_entity_dir = stark_core.upload_dir + "{entity_varname}/"
+
+    ############
+    #PERMISSIONS
+    stark_permissions = {{
+        'view': '{entity}|View',
+        'add': '{entity}|Add',
+        'delete': '{entity}|Delete',
+        'edit': '{entity}|Edit',
+        'report': '{entity}|Report'
+    }}
 
     def lambda_handler(event, context):
+        responseStatusCode = 200
 
         #Get request type
         request_type = event.get('queryStringParameters',{{}}).get('rt','')
@@ -175,23 +189,34 @@ def create(data):
                     }}
 
             if method == "DELETE":
-                response = delete(data)
+                if(stark_core.sec.is_authorized(stark_permissions['delete'], event, ddb)):
+                    response = delete(data)
+                else:
+                    responseStatusCode, response = stark_core.sec.authFailResponse
 
             elif method == "PUT":
-
-                #We can't update DDB PK, so if PK is different, we need to do ADD + DELETE
-                if data['orig_pk'] == data['pk']:
-                    response = edit(data)
+                if(stark_core.sec.is_authorized(stark_permissions['edit'], event, ddb)):
+                    if data['orig_pk'] == data['pk']:
+                        response = edit(data)
+                    else:
+                        #We can't update DDB PK, so if PK is different, we need to do ADD + DELETE
+                        response   = add(data, method)
+                        data['pk'] = data['orig_pk']
+                        response   = delete(data)
                 else:
-                    response   = add(data, method)
-                    data['pk'] = data['orig_pk']
-                    response   = delete(data)
+                    responseStatusCode, response = stark_core.sec.authFailResponse
 
             elif method == "POST":
                 if 'STARK_isReport' in data:
-                    response = report(data, default_sk)
+                    if(stark_core.sec.is_authorized(stark_permissions['report'], event, ddb)):
+                        response = report(data, default_sk)
+                    else:
+                        responseStatusCode, response = stark_core.sec.authFailResponse
                 else:
-                    response = add(data)
+                    if(stark_core.sec.is_authorized(stark_permissions['add'], event, ddb)):
+                        response = add(data)
+                    else:
+                        responseStatusCode, response = stark_core.sec.authFailResponse
 
             else:
                 return {{
@@ -245,7 +270,7 @@ def create(data):
 
         return {{
             "isBase64Encoded": False,
-            "statusCode": 200,
+            "statusCode": responseStatusCode,
             "body": json.dumps(response),
             "headers": {{
                 "Content-Type": "application/json",
