@@ -264,11 +264,12 @@ def create(data):
             if  has_one != '':
                 #simple 1-1 relationship
                 source_code += f"""
-                            root.lists.{foreign_field} = [  {{ value: root.{entity_varname}.{foreign_field}, text: root.{entity_varname}.{foreign_field} }},]"""
+                            root.lists.{foreign_field} = [  {{ value: root.{entity_varname}.{foreign_field}, text: root.{entity_varname}.{foreign_field} }},]
+                            root.list_{foreign_entity}()"""
             elif has_many != '':
                 source_code += f"""
-                            root.multi_select_values.{foreign_field} = root.{entity_varname}.{foreign_field}.split(', ')"""
-
+                            root.multi_select_values.{foreign_entity} = root.{entity_varname}.{foreign_entity}.split(', ')
+                            root.list_{foreign_entity}()"""
     source_code += f"""
                             console.log("VIEW: Retreived module data.")
                             root.show()
@@ -462,10 +463,11 @@ def create(data):
                     
                 }},
                 onOptionClick({{ option, addTag }}, reference) {{
-                    addTag(option)
+                    addTag(option.value)
                     this.search[reference] = ''
                     this.$refs[reference].show(true)
-                }},"""
+                }},
+                """
 
     for col, col_type in cols.items():
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
@@ -478,32 +480,51 @@ def create(data):
 
                 source_code += f"""
                 list_{foreign_entity}: function () {{
-                    if (this.list_status.{foreign_field} == 'empty') {{
+                    if (this.list_status.{foreign_entity} == 'empty') {{
                         loading_modal.show();
-                        root.lists.{foreign_field} = []
+                        root.lists.{foreign_entity} = []
 
                         //FIXME: for now, generic list() is used. Can be optimized to use a list function that only retrieves specific columns
-                        field = '{foreign_field}'
-                        {foreign_entity}_app.get_field(field).then( function(data) {{
+                        fields = ['{foreign_field}', '{foreign_display}']
+                        {foreign_entity}_app.get_fields(fields).then( function(data) {{
                             data.forEach(function(arrayItem) {{
                                 value = arrayItem['{foreign_field}']
                                 text  = arrayItem['{foreign_display}']"""
                 if has_one != '': 
                     source_code += f"""            
-                                root.lists.{foreign_field}.push({{ value: value, text: text }})"""
+                                root.lists.{foreign_entity}.push({{ value: value, text: text }})"""
                 if has_many != '': 
                     source_code += f"""            
-                                root.lists.{foreign_field}.push(value)"""
+                                root.lists.{foreign_entity}.push({{ value: value, text: text }})"""
                 source_code += f""" 
                 }})
-                            root.list_status.{foreign_field} = 'populated'
+                            root.list_status.{foreign_entity} = 'populated'
                             loading_modal.hide();
                         }}).catch(function(error) {{
                             console.log("Encountered an error! [" + error + "]")
                             loading_modal.hide();
                         }});
                     }}
-                }},"""
+                }},
+                """
+                if has_many != '':
+                    source_code += f"""
+                    split_string: function(str) {{
+                        var arr = str.split(", ")
+                        var return_str = ''
+                        arr.forEach(element => {{
+                            return_str += this.tag_display_text(element).concat(", ")
+                        }});
+                        return return_str
+                    }},
+
+                    tag_display_text: function (tag) {{
+                        var index = this.lists.{foreign_entity}.findIndex(opt => tag == opt.value)
+                        return this.lists.{foreign_entity}[index].text
+                        // return this.lists.{foreign_entity}.filter(opt => tag == opt.value)
+                    }},
+                    """
+
     source_code += f"""
             }},
             computed: {{"""
@@ -519,10 +540,10 @@ def create(data):
                 {col_varname}() {{
                     const {col_varname}_criteria = this.{col_varname}_criteria
                     // Filter out already selected options
-                    const options = this.lists.{col_varname}.filter(opt => this.multi_select_values.{col_varname}.indexOf(opt) === -1)
+                    const options = this.lists.{col_varname}.filter(opt => this.multi_select_values.{col_varname}.indexOf(opt.value) === -1)
                     if ({col_varname}_criteria) {{
                     // Show only options that match {col_varname}_criteria
-                    return options.filter(opt => opt.toLowerCase().indexOf({col_varname}_criteria) > -1);
+                    return options.filter(opt => (opt.text).toLowerCase().indexOf({col_varname}_criteria) > -1);
                     }}
                     // Show all options available
                     return options
