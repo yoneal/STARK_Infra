@@ -132,17 +132,17 @@ def create_handler(event, context):
     #########################################
     #Create Lambdas of built-in STARK modules 
     #    (user management, permissions, etc)
-    dir = "source_files"
-    lambda_dirs = os.listdir(dir)
-    for lambda_dir in lambda_dirs:
-        source_files = os.listdir(dir + os.sep + lambda_dir)
-        for source_file in source_files:
-            with open(dir + os.sep + lambda_dir + os.sep + source_file) as f:
+    for root, subdirs, files in os.walk('source_files'):
+        for source_file in files:
+            with open(os.path.join(root, source_file)) as f:
                 source_code = f.read().replace("[[STARK_DDB_TABLE_NAME]]", ddb_table_name)
+                source_code = source_code.replace("[[STARK_WEB_BUCKET]]", website_bucket)
+                #We use root[13:] because we want to strip out the "source_files/" part of the root path
                 files_to_commit.append({
-                    'filePath': f"lambda/{lambda_dir}/{source_file}",
+                    'filePath': f"lambda/" + os.path.join(root[13:], source_file),
                     'fileContent': source_code.encode()
                 })
+
     ############################################
     #Create build files we need for our pipeline:
     # - template.yml
