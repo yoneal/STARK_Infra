@@ -21,11 +21,14 @@ def create(data):
     #Extra modules
     import boto3
 
+    #STARK
+    import stark_core
+
     ddb = boto3.client('dynamodb')
 
     #######
     #CONFIG
-    ddb_table  = "{ddb_table_name}"
+    ddb_table = stark_core.ddb_table
 
     def lambda_handler(event, context):
 

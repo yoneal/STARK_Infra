@@ -104,20 +104,15 @@ def create_handler(event, context):
 
     ###########################################################
     #Create our Lambda for the /login and /logout API endpoints
-    source_code, stark_scrypt = cg_login.create({"DynamoDB Name": ddb_table_name})    
+    source_code = cg_login.create({"DynamoDB Name": ddb_table_name})    
     files_to_commit.append({
-        'filePath': f"lambda/login/login.py",
+        'filePath': f"lambda/stark_login/login.py",
         'fileContent': source_code.encode()
-    })
-    files_to_commit.append({
-        'filePath': f"lambda/login/stark_scrypt.py",
-        'fileContent': stark_scrypt.encode()
-    })
-    
+    })    
 
     source_code = cg_logout.create({"DynamoDB Name": ddb_table_name})
     files_to_commit.append({
-        'filePath': f"lambda/logout/logout.py",
+        'filePath': f"lambda/stark_logout/logout.py",
         'fileContent': source_code.encode()
     })
 

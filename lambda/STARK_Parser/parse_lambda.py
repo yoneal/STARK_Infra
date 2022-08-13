@@ -8,6 +8,11 @@ def parse(data, relationship = []):
  
     #Each entity will be its own lambda function, and will become integrations for API gateway routes
     parsed = {
+        "authorizer_default": {
+            "Memory": 128,
+            "Arch": "arm64",
+            "Timeout": 5,
+        },
         "stark_login": {
             "Memory": 1790,
             "Arch": "arm64",
