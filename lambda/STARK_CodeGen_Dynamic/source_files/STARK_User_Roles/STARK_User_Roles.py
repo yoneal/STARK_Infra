@@ -13,21 +13,24 @@ from io import StringIO
 import os
 from fpdf import FPDF
 
+#STARK
+import stark_core 
+
 ddb = boto3.client('dynamodb')
 s3 = boto3.client("s3")
 
 #######
 #CONFIG
-ddb_table         = "[[STARK_DDB_TABLE_NAME]]"
+ddb_table         = stark_core.ddb_table
+bucket_name       = stark_core.bucket_name
+region_name       = stark_core.region_name
+page_limit        = stark_core.page_limit
+s3_link_prefix    = stark_core.bucket_url
+tmp_prefix        = stark_core.bucket_tmp
 pk_field          = "Role_Name"
 default_sk        = "STARK|role"
 sort_fields       = ["Role_Name", ]
-bucket_name       = "[[STARK_WEBSITE_BUCKET_NAME]]"
 relationships     = []
-region_name       = os.environ['AWS_REGION']
-page_limit        = 10
-s3_link_prefix    = f"{bucket_name}.s3.{region_name}.amazonaws.com/"
-tmp_prefix        = f"{s3_link_prefix}tmp/"
 
 def lambda_handler(event, context):
 
