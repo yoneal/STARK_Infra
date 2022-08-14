@@ -80,7 +80,7 @@ def create(data):
                         //  403. Browser clearing local cookie faster than DDB TTL execution is practically guaranteed, as TTL execution is not guaranteed real time.
                     }}
 
-                        throw Error(response.statusText);
+                        throw Error("Probably an auth failure from STARK SEC");
                     }}
                     return response
                 }}).then((response) => response.json())
