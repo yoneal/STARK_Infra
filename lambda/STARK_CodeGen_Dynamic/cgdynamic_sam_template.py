@@ -563,6 +563,7 @@ def create(data, cli_mode=False):
                 Timeout: 10
                 Layers:
                     - !Ref STARKScryptLayer
+                    - !Ref Fpdf2Layer
         STARKBackendApiForSTARKModule:
             Type: AWS::Serverless::Function
             Properties:
@@ -603,6 +604,8 @@ def create(data, cli_mode=False):
                     - arm64
                 MemorySize: 128
                 Timeout: 5
+                Layers:
+                    - !Ref Fpdf2Layer
         STARKBackendApiForSTARKUserRoles:
             Type: AWS::Serverless::Function
             Properties:
@@ -645,6 +648,7 @@ def create(data, cli_mode=False):
                 Timeout: 5
                 Layers:
                     - !Ref STARKScryptLayer
+                    - !Ref Fpdf2Layer
         STARKBackendApiForSTARKUserPermissions:
             Type: AWS::Serverless::Function
             Properties:
@@ -685,6 +689,8 @@ def create(data, cli_mode=False):
                     - arm64
                 MemorySize: 128
                 Timeout: 5
+                Layers:
+                    - !Ref Fpdf2Layer
         STARKBackendApiForSTARKUserSessions:
             Type: AWS::Serverless::Function
             Properties:
@@ -725,6 +731,8 @@ def create(data, cli_mode=False):
                     - arm64
                 MemorySize: 128
                 Timeout: 5
+                Layers:
+                    - !Ref Fpdf2Layer
         STARKBackendApiForSTARKModuleGroups:
             Type: AWS::Serverless::Function
             Properties:
@@ -765,6 +773,8 @@ def create(data, cli_mode=False):
                     - arm64
                 MemorySize: 128
                 Timeout: 5
+                Layers:
+                    - !Ref Fpdf2Layer
         STARKBackendApiForSysModules:
             Type: AWS::Serverless::Function
             Properties:
