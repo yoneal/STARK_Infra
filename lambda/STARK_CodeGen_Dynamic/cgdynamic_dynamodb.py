@@ -95,13 +95,13 @@ def create(data):
     bucket_name       = stark_core.bucket_name
     region_name       = stark_core.region_name
     page_limit        = stark_core.page_limit
-    s3_link_prefix    = stark_core.bucket_url
-    tmp_prefix        = stark_core.bucket_tmp
+    bucket_url        = stark_core.bucket_url
+    bucket_tmp        = stark_core.bucket_tmp
     pk_field          = "{pk_varname}"
     default_sk        = "{default_sk}"
     sort_fields       = ["{pk_varname}", ]
     relationships     = {relationships}
-    upload_entity_dir = stark_core.upload_dir + "{entity_varname}/"
+    entity_upload_dir = stark_core.upload_dir + "{entity_varname}/"
 
     ############
     #PERMISSIONS
@@ -389,7 +389,7 @@ def create(data):
         response['item'] = map_results(raw[0])"""
     if with_upload : 
         source_code +=f"""
-        response['s3_link_prefix'] = s3_link_prefix + upload_entity_dir"""
+        response['object_url_prefix'] = bucket_url + entity_upload_dir"""
     source_code+= f"""
 
         return response
@@ -426,7 +426,7 @@ def create(data):
             extra_args = {{
                 'ACL': 'public-read'
             }}
-            s3_res.meta.client.copy(copy_source, bucket_name, upload_entity_dir + items, extra_args)
+            s3_res.meta.client.copy(copy_source, bucket_name, entity_upload_dir + items, extra_args)
         """
     source_code += f"""
         UpdateExpressionString = "SET {update_expression}" 
@@ -496,7 +496,7 @@ def create(data):
             extra_args = {{
                 'ACL': 'public-read'
             }}
-            s3_res.meta.client.copy(copy_source, bucket_name, upload_entity_dir + items, extra_args)
+            s3_res.meta.client.copy(copy_source, bucket_name, entity_upload_dir + items, extra_args)
         """
     source_code += f"""
         item={{}}
@@ -653,8 +653,8 @@ def create(data):
 
         create_pdf(report_list, csv_header, pdf_file, report_params)
 
-        csv_bucket_key = tmp_prefix + csv_file
-        pdf_bucket_key = tmp_prefix + pdf_file
+        csv_bucket_key = bucket_tmp + csv_file
+        pdf_bucket_key = bucket_tmp + pdf_file
 
         return csv_bucket_key, pdf_bucket_key
 

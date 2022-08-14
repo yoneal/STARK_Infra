@@ -47,7 +47,7 @@ var root = new Vue({
         page_token_map: {1: ''},
         curr_page: 1,
         showReport: false,
-        s3_link_prefix: "",
+        object_url_prefix: "",
         temp_csv_link: "",
         temp_pdf_link: "",
         showError: false,

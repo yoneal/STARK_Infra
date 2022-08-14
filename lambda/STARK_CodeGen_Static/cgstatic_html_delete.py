@@ -86,7 +86,7 @@ def create(data):
                                 <div class="col-sm-10">"""
         if col_type == 'file-upload':
             source_code += f""" 
-                            <a :href="'https://'+ root.s3_link_prefix + {entity_varname}.STARK_uploaded_s3_keys.{col_varname}">
+                            <a :href="'https://'+ root.object_url_prefix + {entity_varname}.STARK_uploaded_s3_keys.{col_varname}">
                                 <span class="form-control-link" readonly id="{col_varname}" placeholder="" >{{{{{entity_varname}.{col_varname}}}}}</span>   
                             </a>
                             """
