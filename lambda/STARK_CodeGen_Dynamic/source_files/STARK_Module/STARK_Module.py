@@ -26,8 +26,8 @@ ddb_table         = stark_core.ddb_table
 bucket_name       = stark_core.bucket_name
 region_name       = stark_core.region_name
 page_limit        = stark_core.page_limit
-s3_link_prefix    = stark_core.bucket_url
-tmp_prefix        = stark_core.bucket_tmp
+bucket_url        = stark_core.bucket_url
+bucket_tmp        = stark_core.bucket_tmp
 pk_field          = "Module_Name"
 default_sk        = "STARK|module"
 sort_fields       = ["Module_Name", ]
@@ -640,8 +640,8 @@ def generate_reports(mapped_results = [], display_fields=[], report_params = {})
 
     create_pdf(report_list, csv_header, pdf_file, report_params)
 
-    csv_bucket_key = tmp_prefix + csv_file
-    pdf_bucket_key = tmp_prefix + pdf_file
+    csv_bucket_key = bucket_tmp + csv_file
+    pdf_bucket_key = bucket_tmp + pdf_file
 
     return csv_bucket_key, pdf_bucket_key
 
