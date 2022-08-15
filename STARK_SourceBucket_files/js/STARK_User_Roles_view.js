@@ -148,6 +148,7 @@ var root = new Vue({
                     root.STARK_User_Roles.orig_Role_Name = root.STARK_User_Roles.Role_Name;
                     permission_list = root.STARK_User_Roles.Permissions 
                     root.multi_select_values.Permissions = root.STARK_User_Roles.Permissions.split(', ')
+                    root.list_Permissions()
                     console.log("VIEW: Retreived module data.")
                     root.show()
                     loading_modal.hide()
@@ -228,19 +229,16 @@ var root = new Vue({
                 root.lists.Permissions = []
 
                 //FIXME: for now, generic list() is used. Can be optimized to use a list function that only retrieves specific columns
-                field = 'Module_Name'
-                STARK_Module_app.get_field(field).then( function(data) {
+                fields = ['Module_Name', 'Module_Name']
+                STARK_Module_app.get_fields(fields).then( function(data) {
                     
                     data.forEach(function(arrayItem) {
                         value = arrayItem['Module_Name']
-                        // console.log(value.sort())
                         text  = arrayItem['Module_Name']
-                        root.lists.Permissions.push(value) 
-                          
-                        root.list_status.Permissions = 'populated'
+                        root.lists.Permissions.push({ value: value, text: text })
                     })
-                    // console.log(root.lists.Permissions.sort(function(a,b){ return b[2] < a[2] ? 1 : 1; }))  
-                    // console.log(root.list_status.Permissions)
+
+                    root.list_status.Permissions = 'populated'
                     loading_modal.hide();
                 }).catch(function(error) {
                     console.log("Encountered an error! [" + error + "]")
@@ -248,6 +246,12 @@ var root = new Vue({
                     loading_modal.hide();
                 });
             }
+        },
+
+        tag_display_text: function (tag) {
+            var index = this.lists.Permissions.findIndex(opt => tag == opt.value)
+            return this.lists.Permissions[index].text
+            // return this.lists.Document.filter(opt => tag == opt.value)
         },
 
         formValidation: function () {
@@ -321,7 +325,7 @@ var root = new Vue({
             }
         },
         onOptionClick({ option, addTag }, reference) {
-            addTag(option)
+            addTag(option.value)
             this.search[reference] = ''
             this.$refs[reference].show(true)
         },
@@ -334,10 +338,10 @@ var root = new Vue({
         Permissions() {
             const Permissions_criteria = this.Permissions_criteria
             // Filter out already selected options
-            const options = this.lists.Permissions.filter(opt => this.multi_select_values.Permissions.indexOf(opt) === -1)
+            const options = this.lists.Permissions.filter(opt => this.multi_select_values.Permissions.indexOf(opt.value) === -1)
             if (Permissions_criteria) {
             // Show only options that match Permissions_criteria
-            return options.filter(opt => opt.toLowerCase().indexOf(Permissions_criteria) > -1);
+            return options.filter(opt => (opt.text).toLowerCase().indexOf(Permissions_criteria) > -1);
             }
             // Show all options available
             console.log(options)
