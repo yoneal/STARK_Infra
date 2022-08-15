@@ -382,8 +382,16 @@ def create(data):
                         temp_show_fields.push(temp_index)
                     }});
                     root.STARK_report_fields = temp_show_fields;
-                    this.custom_report['STARK_report_fields'] = root.STARK_report_fields
-                    let report_payload = {{ {entity_varname}: this.custom_report }}
+                    root.custom_report['STARK_report_fields'] = root.STARK_report_fields"""
+    for col, col_type in cols.items():
+        col_varname = converter.convert_to_system_name(col)
+        if isinstance(col_type, dict):
+            col_values = col_type.get("values", "")
+            if isinstance(col_values, list):
+                source_code += f"""
+                    root.custom_report['{col_varname}']['value'] = root.custom_report['{col_varname}']['value'] == "" ? root.multi_select_values['{col_varname}'].join(', '): root.custom_report['{col_varname}']['value']"""
+    source_code += f"""
+                    let report_payload = {{ {entity_varname}: root.custom_report }}
                     if(root.formValidation())
                     {{
                         loading_modal.show()
