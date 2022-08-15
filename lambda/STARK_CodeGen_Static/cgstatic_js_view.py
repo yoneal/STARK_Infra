@@ -550,7 +550,7 @@ def create(data):
         col_varname = converter.convert_to_system_name(col)
         if isinstance(col_type, dict):
             col_values = col_type.get("values","")
-            if (col_type["type"] == "relationship") or isinstance(col_type["values", list]):
+            if (col_type["type"] == "relationship") or isinstance(col_values, list):
                 source_code += f"""
             {col_varname}_criteria() {{
                 return this.search['{col_varname}'].trim().toLowerCase()
