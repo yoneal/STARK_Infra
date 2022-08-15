@@ -131,8 +131,7 @@ def create(data):
     search_string = ""
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
-        if isinstance(col_type, dict) and col_type["type"] == "relationship":
-            has_many = col_type.get('has_many', '')
+        if isinstance(col_type, dict) and (col_type["type"] == "relationship"  or isinstance(col_type["values", list])):
             search_string += f"""
                     {col_varname}: '',"""
 
@@ -525,9 +524,17 @@ def create(data):
                     }},
 
                     tag_display_text: function (tag) {{
-                        var index = this.lists.{foreign_entity}.findIndex(opt => tag == opt.value)
-                        return this.lists.{foreign_entity}[index].text
-                        // return this.lists.{foreign_entity}.filter(opt => tag == opt.value)
+                        display_text = ""
+                        if(typeof tag =='string')
+                        {{
+                            display_text = tag
+                        }}
+                        else
+                        {{
+                            var index = this.lists.{foreign_entity}.findIndex(opt => tag == opt.value)
+                            display_text = this.lists.{foreign_entity}[index].text
+                        }}
+                        return display_text
                     }},
                     """
 
@@ -536,30 +543,28 @@ def create(data):
             computed: {{"""
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
-        if isinstance(col_type, dict) and col_type["type"] == "relationship":
-            has_many = col_type.get('has_many', '')
-            if has_many != "":
-                source_code += f"""
-                {col_varname}_criteria() {{
-                    return this.search['{col_varname}'].trim().toLowerCase()
-                }},
-                {col_varname}() {{
-                    const {col_varname}_criteria = this.{col_varname}_criteria
-                    // Filter out already selected options
-                    const options = this.lists.{col_varname}.filter(opt => this.multi_select_values.{col_varname}.indexOf(opt.value) === -1)
-                    if ({col_varname}_criteria) {{
-                    // Show only options that match {col_varname}_criteria
-                    return options.filter(opt => (opt.text).toLowerCase().indexOf({col_varname}_criteria) > -1);
-                    }}
-                    // Show all options available
-                    return options
-                }},
-                {col_varname}_search_desc() {{
-                    if (this.{col_varname}_criteria && this.{col_varname}.length === 0) {{
-                    return 'There are no tags matching your search criteria'
-                    }}
-                    return ''
-                }},"""
+        if isinstance(col_type, dict) and (col_type["type"] == "relationship" or isinstance(col_type["values", list])):
+            source_code += f"""
+            {col_varname}_criteria() {{
+                return this.search['{col_varname}'].trim().toLowerCase()
+            }},
+            {col_varname}() {{
+                const {col_varname}_criteria = this.{col_varname}_criteria
+                // Filter out already selected options
+                const options = this.lists.{col_varname}.filter(opt => this.multi_select_values.{col_varname}.indexOf(opt.value) === -1)
+                if ({col_varname}_criteria) {{
+                // Show only options that match {col_varname}_criteria
+                return options.filter(opt => (opt.text).toLowerCase().indexOf({col_varname}_criteria) > -1);
+                }}
+                // Show all options available
+                return options
+            }},
+            {col_varname}_search_desc() {{
+                if (this.{col_varname}_criteria && this.{col_varname}.length === 0) {{
+                return 'There are no tags matching your search criteria'
+                }}
+                return ''
+            }},"""
     source_code += f"""
             }}    
         }})

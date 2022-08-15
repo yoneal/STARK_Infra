@@ -12,7 +12,7 @@ import cgstatic_html_generic_footer as cg_footer
 import cgstatic_html_generic_bodyhead as cg_bodyhead
 import cgstatic_html_generic_loadingmodal as cg_loadmod
 import cgstatic_html_generic_loadingspinner as cg_loadspin
-import cgstatic_controls_coltype as cg_coltype
+import cgstatic_controls_report as cg_colreport
 
 def create(data):
 
@@ -79,6 +79,13 @@ def create(data):
 
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
+        html_control_code = cg_colreport.create({
+            "col": col,
+            "col_type": col_type,
+            "col_varname": col_varname,
+            "entity" : entity,
+            "entity_varname": entity_varname
+        })
         source_code += f"""
                                     <tr>
                                         <td>
@@ -95,7 +102,9 @@ def create(data):
                                             </b-form-select>
                                         </td>
                                         <td>
-                                            <input type="text" class="form-control" id="{col_varname}_filter_value" placeholder="" v-model="custom_report.{col_varname}.value">
+                                            <div class="report">
+                                                {html_control_code}
+                                            </div>
                                         </td>
                                     </tr>"""
 
