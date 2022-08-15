@@ -119,7 +119,7 @@ def create(data):
                 page_token_map: {{1: ''}},
                 curr_page: 1,
                 showReport: false,
-                s3_link_prefix: "",
+                object_url_prefix: "",
                 temp_csv_link: "",
                 temp_pdf_link: "",
                 showError: false,
@@ -250,7 +250,7 @@ def create(data):
                             root.{entity_varname}.STARK_uploaded_s3_keys['{col_varname}'] = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.STARK_uploaded_s3_keys.{col_varname}.S : ""
                             root.STARK_upload_elements['{col_varname}'].file              = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.{col_varname} : ""
                             root.STARK_upload_elements['{col_varname}'].progress_bar_val  = root.{entity_varname}.{col_varname} != "" ? 100 : 0
-                            root.s3_link_prefix                                           = data['s3_link_prefix']
+                            root.object_url_prefix                                           = data['object_url_prefix']
                             """
 
     #If there are 1:1 rel fields, we need to assign their initial value to the still-unpopulated drop-down list so that it displays 
