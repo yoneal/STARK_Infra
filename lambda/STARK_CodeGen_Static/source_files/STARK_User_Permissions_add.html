@@ -78,7 +78,7 @@
                                 :title="tag"
                                 :disabled="disabled"
                                 variant="info"
-                            >{{ tag }}</b-form-tag>
+                            >{{ tag_display_text(tag) }}</b-form-tag>
                             </li>
                         </ul>
                 
@@ -115,7 +115,7 @@
                             :key="option"
                             @click="onOptionClick({ option, addTag }, 'Permissions')"
                             >
-                            {{ option }}
+                            {{ option.text }}
                             </b-dropdown-item-button>
                             <b-dropdown-text v-if="Permissions.length === 0">
                             There are no permissions available to select
