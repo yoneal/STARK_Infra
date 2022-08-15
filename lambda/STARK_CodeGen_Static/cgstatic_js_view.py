@@ -100,14 +100,18 @@ def create(data):
 
     #FIXME: These kinds of logic (determining col types, lists, retreiving settings, etc) are repetitive, should be refactored shipped to a central lib
     for col, col_type in cols.items():
-        if isinstance(col_type, dict) and col_type["type"] == "relationship":
-            has_many = col_type.get('has_many', '')
-            if  has_many != '':
-                col_varname = converter.convert_to_system_name(col)
-
-                source_code += f"""
-                    '{col_varname}': [],"""
-
+        if isinstance(col_type, dict):
+            col_varname = converter.convert_to_system_name(col)
+            col_values = col_type.get("values", "")
+            if col_type["type"] == "relationship":
+                has_many = col_type.get('has_many', '')
+                if  has_many != '':
+                    source_code += f"""
+                        '{col_varname}': [],"""
+            elif isinstance(col_values, list):
+                    source_code += f"""
+                        '{col_varname}': [],"""
+                
     source_code += f"""
 
                 }},
@@ -131,16 +135,17 @@ def create(data):
     search_string = ""
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
-        if isinstance(col_type, dict) and (col_type["type"] == "relationship"  or isinstance(col_type["values", list])):
-            search_string += f"""
+        if isinstance(col_type, dict):
+            col_values = col_type.get("values", "")
+            if col_type["type"] == "relationship" or isinstance(col_values, list):
+                has_many = col_type.get('has_many', '')
+                search_string += f"""
                     {col_varname}: '',"""
-
         if isinstance(col_type, str) and col_type == 'file-upload':
             source_code += f"""
                         "{col_varname}": {{"file": '', "progress_bar_val": 0}},"""
     source_code += f"""}},
-                search:{{
-                    {search_string}
+                search:{{{search_string}
                 }},
             }},
             methods: {{
@@ -543,8 +548,10 @@ def create(data):
             computed: {{"""
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
-        if isinstance(col_type, dict) and (col_type["type"] == "relationship" or isinstance(col_type["values", list])):
-            source_code += f"""
+        if isinstance(col_type, dict):
+            col_values = col_type.get("values","")
+            if (col_type["type"] == "relationship") or isinstance(col_type["values", list]):
+                source_code += f"""
             {col_varname}_criteria() {{
                 return this.search['{col_varname}'].trim().toLowerCase()
             }},
