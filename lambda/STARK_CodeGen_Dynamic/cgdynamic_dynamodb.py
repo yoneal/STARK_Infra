@@ -628,8 +628,12 @@ def create(data):
         for key in mapped_results:
             temp_dict = {{}}
             #remove primary identifiers and STARK attributes
-            key.pop("sk")
-            key.pop("STARK_uploaded_s3_keys")
+            key.pop("sk")"""
+
+    if with_upload:
+        source_code += f"""
+            key.pop("STARK_uploaded_s3_keys")"""
+    source_code += f"""
             for index, value in key.items():
                 temp_dict[index.replace("_"," ")] = value
             report_list.append(temp_dict)

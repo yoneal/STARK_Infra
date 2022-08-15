@@ -100,14 +100,18 @@ def create(data):
 
     #FIXME: These kinds of logic (determining col types, lists, retreiving settings, etc) are repetitive, should be refactored shipped to a central lib
     for col, col_type in cols.items():
-        if isinstance(col_type, dict) and col_type["type"] == "relationship":
-            has_many = col_type.get('has_many', '')
-            if  has_many != '':
-                col_varname = converter.convert_to_system_name(col)
-
-                source_code += f"""
-                    '{col_varname}': [],"""
-
+        if isinstance(col_type, dict):
+            col_varname = converter.convert_to_system_name(col)
+            col_values = col_type.get("values", "")
+            if col_type["type"] == "relationship":
+                has_many = col_type.get('has_many', '')
+                if  has_many != '':
+                    source_code += f"""
+                        '{col_varname}': [],"""
+            elif isinstance(col_values, list):
+                    source_code += f"""
+                        '{col_varname}': [],"""
+                
     source_code += f"""
 
                 }},
@@ -131,17 +135,17 @@ def create(data):
     search_string = ""
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
-        if isinstance(col_type, dict) and col_type["type"] == "relationship":
-            has_many = col_type.get('has_many', '')
-            search_string += f"""
+        if isinstance(col_type, dict):
+            col_values = col_type.get("values", "")
+            if col_type["type"] == "relationship" or isinstance(col_values, list):
+                has_many = col_type.get('has_many', '')
+                search_string += f"""
                     {col_varname}: '',"""
-
         if isinstance(col_type, str) and col_type == 'file-upload':
             source_code += f"""
                         "{col_varname}": {{"file": '', "progress_bar_val": 0}},"""
     source_code += f"""}},
-                search:{{
-                    {search_string}
+                search:{{{search_string}
                 }},
             }},
             methods: {{
@@ -378,8 +382,16 @@ def create(data):
                         temp_show_fields.push(temp_index)
                     }});
                     root.STARK_report_fields = temp_show_fields;
-                    this.custom_report['STARK_report_fields'] = root.STARK_report_fields
-                    let report_payload = {{ {entity_varname}: this.custom_report }}
+                    root.custom_report['STARK_report_fields'] = root.STARK_report_fields"""
+    for col, col_type in cols.items():
+        col_varname = converter.convert_to_system_name(col)
+        if isinstance(col_type, dict):
+            col_values = col_type.get("values", "")
+            if isinstance(col_values, list):
+                source_code += f"""
+                    root.custom_report['{col_varname}']['value'] = root.custom_report['{col_varname}']['value'] == "" ? root.multi_select_values['{col_varname}'].join(', '): root.custom_report['{col_varname}']['value']"""
+    source_code += f"""
+                    let report_payload = {{ {entity_varname}: root.custom_report }}
                     if(root.formValidation())
                     {{
                         loading_modal.show()
@@ -525,9 +537,17 @@ def create(data):
                     }},
 
                     tag_display_text: function (tag) {{
-                        var index = this.lists.{foreign_entity}.findIndex(opt => tag == opt.value)
-                        return this.lists.{foreign_entity}[index].text
-                        // return this.lists.{foreign_entity}.filter(opt => tag == opt.value)
+                        display_text = ""
+                        if(typeof tag =='string')
+                        {{
+                            display_text = tag
+                        }}
+                        else
+                        {{
+                            var index = this.lists.{foreign_entity}.findIndex(opt => tag == opt.value)
+                            display_text = this.lists.{foreign_entity}[index].text
+                        }}
+                        return display_text
                     }},
                     """
 
@@ -536,30 +556,30 @@ def create(data):
             computed: {{"""
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
-        if isinstance(col_type, dict) and col_type["type"] == "relationship":
-            has_many = col_type.get('has_many', '')
-            if has_many != "":
+        if isinstance(col_type, dict):
+            col_values = col_type.get("values","")
+            if (col_type["type"] == "relationship") or isinstance(col_values, list):
                 source_code += f"""
-                {col_varname}_criteria() {{
-                    return this.search['{col_varname}'].trim().toLowerCase()
-                }},
-                {col_varname}() {{
-                    const {col_varname}_criteria = this.{col_varname}_criteria
-                    // Filter out already selected options
-                    const options = this.lists.{col_varname}.filter(opt => this.multi_select_values.{col_varname}.indexOf(opt.value) === -1)
-                    if ({col_varname}_criteria) {{
-                    // Show only options that match {col_varname}_criteria
-                    return options.filter(opt => (opt.text).toLowerCase().indexOf({col_varname}_criteria) > -1);
-                    }}
-                    // Show all options available
-                    return options
-                }},
-                {col_varname}_search_desc() {{
-                    if (this.{col_varname}_criteria && this.{col_varname}.length === 0) {{
-                    return 'There are no tags matching your search criteria'
-                    }}
-                    return ''
-                }},"""
+            {col_varname}_criteria() {{
+                return this.search['{col_varname}'].trim().toLowerCase()
+            }},
+            {col_varname}() {{
+                const {col_varname}_criteria = this.{col_varname}_criteria
+                // Filter out already selected options
+                const options = this.lists.{col_varname}.filter(opt => this.multi_select_values.{col_varname}.indexOf(opt.value) === -1)
+                if ({col_varname}_criteria) {{
+                // Show only options that match {col_varname}_criteria
+                return options.filter(opt => (opt.text).toLowerCase().indexOf({col_varname}_criteria) > -1);
+                }}
+                // Show all options available
+                return options
+            }},
+            {col_varname}_search_desc() {{
+                if (this.{col_varname}_criteria && this.{col_varname}.length === 0) {{
+                return 'There are no tags matching your search criteria'
+                }}
+                return ''
+            }},"""
     source_code += f"""
             }}    
         }})

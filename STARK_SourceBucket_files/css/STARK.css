@@ -19,3 +19,10 @@
 .not-collapsed > .when-closed {
   display: none;
 }
+
+.report #tags-with-dropdown, 
+.report .b-form-tags{
+  background-color: transparent ;
+  padding:0rem !important;
+  border: 0px;
+}
