@@ -16,6 +16,7 @@
     <script src="js/STARK_loading_modal.js" defer></script>
     <script src="js/STARK_User_Permissions_app.js" defer></script>
     <script src="js/STARK_User_Permissions_view.js" defer></script>
+    <script src="js/STARK_Module_app.js" defer></script>
     <script src="js/generic_root_get.js" defer></script>
 
     <title>[[STARK_PROJECT_NAME]] - User Permissions</title>
@@ -80,7 +81,7 @@
                                 :title="tag"
                                 :disabled="true"
                                 variant="info"
-                            >{{ tag }}</b-form-tag>
+                            >{{ tag_display_text(tag) }}</b-form-tag>
                             </li>
                         </ul>
                         </template>
