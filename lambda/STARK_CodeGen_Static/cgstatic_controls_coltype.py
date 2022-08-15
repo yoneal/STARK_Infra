@@ -173,7 +173,7 @@ def create(data):
                                         <ul v-if="tags.length > 0" class="list-inline d-inline-block">
                                             <li v-for="tag in tags" :key="tag" class="list-inline-item mt-1">
                                                 <b-form-tag  @remove="removeTag(tag)"  :title="tag"  :disabled="disabled"  variant="info">
-                                                    {{{{ tag_display_text(tag) }}}}
+                                                    {{{{ tag }}}}
                                                 </b-form-tag>
                                             </li>
                                         </ul>  
