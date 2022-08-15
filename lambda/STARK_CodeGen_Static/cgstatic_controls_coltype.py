@@ -142,11 +142,11 @@ def create(data):
                 ugly_hack = "<br>"
 
             html_code=f"""{ugly_hack}<b-form-radio-group id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}" {buttons}></b-form-radio-group>"""
-        elif col_type["type"] == "multi-select-combo":
+        elif col_type["type"] == "multi select combo":
             html_code =f"""<b-form-group label-for="tags-with-dropdown">
                                 <b-form-tags id="tags-with-dropdown" v-model="multi_select_values.{col_varname}" no-outer-focus>
                                     <template v-slot="{{ tags, disabled, addTag, removeTag, inputAttrs, inputHandlers}}">
-                                        <b-form-tags style="border:0px" no-outer-focus input-id="{col_varname}" v-model="multi_select_values.{col_varname}" remove-on-delete :input-attrs="{{autocomplete: 'off' }}" add-on-change  onmouseover="root.list_{col_varname}()" onfocus="root.list_{col_varname}()">
+                                        <b-form-tags style="border:0px" no-outer-focus input-id="{col_varname}" v-model="multi_select_values.{col_varname}" remove-on-delete :input-attrs="{{autocomplete: 'off' }}" add-on-change>
                                             <b-input-group>
                                                 <input v-bind="inputAttrs" v-on="inputHandlers" class="form-control" v-model= "custom_report.{col_varname}.value" no-outer-focus>
                                                 <b-input-group-append>
@@ -259,8 +259,9 @@ def create_list(data):
         col_type = col_type.lower()
 
     #We only make lists for specific column types and just return immediately for anything else
+    print(col_type)
     if isinstance(col_type, list) or ( 
-        isinstance(col_type, dict) and col_type["type"] in [ "multiple choice", "radio button", "radio bar"] 
+        isinstance(col_type, dict) and col_type["type"] in [ "multiple choice", "radio button", "radio bar", "multi select combo"] 
     ) or ( 
         isinstance(col_type, dict) and col_type["type"] == "relationship" and (col_type.get('has_one','') != '' or col_type.get('has_many','') != '')
     ) or (
