@@ -19,7 +19,8 @@ def create(data):
     html_code       = ""
 
     if isinstance(col_type, dict):
-        if isinstance(col_type["values"], list):
+        col_values = col_type.get("values", "")
+        if isinstance(col_values, list):
             html_code= cg_coltype.create({
                 "col": col,
                 "col_type": "multi-select-combo",
