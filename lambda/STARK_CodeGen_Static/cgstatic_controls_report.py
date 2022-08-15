@@ -17,6 +17,7 @@ def create(data):
     entity          = data['entity']
     entity_varname  = data['entity_varname']
     html_code       = ""
+    default_control = False
 
     if isinstance(col_type, dict):
         col_values = col_type.get("values", "")
