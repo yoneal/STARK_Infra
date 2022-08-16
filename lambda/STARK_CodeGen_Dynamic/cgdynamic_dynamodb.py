@@ -84,6 +84,7 @@ def create(data):
 
     #STARK
     import stark_core 
+    from stark_core import utilities
 
     ddb    = boto3.client('dynamodb')
     s3     = boto3.client("s3")
@@ -287,7 +288,7 @@ def create(data):
         for key, index in data.items():
             if key not in ["STARK_isReport", "STARK_report_fields", "STARK_uploaded_s3_keys"]:
                 if index['value'] != "":
-                    processed_operator_and_parameter_dict = stark_core.util.compose_report_operators_and_parameters(key, index) 
+                    processed_operator_and_parameter_dict = utilities.compose_report_operators_and_parameters(key, index) 
                     temp_string_filter += processed_operator_and_parameter_dict['filter_string']
                     object_expression_value.update(processed_operator_and_parameter_dict['expression_values'])
                     report_param_dict.update(processed_operator_and_parameter_dict['report_params'])
@@ -656,7 +657,7 @@ def create(data):
         header_tuple = tuple(master_fields) 
         data_tuple = tuple(row_list)
         
-        pdf = stark_core.util.create_pdf(header_tuple, data_tuple, report_params, pk_field)
+        pdf = utilities.create_pdf(header_tuple, data_tuple, report_params, pk_field)
         s3_action = s3.put_object(
             ACL='public-read',
             Body= pdf.output(),

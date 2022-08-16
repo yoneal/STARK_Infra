@@ -392,8 +392,6 @@ def create(data, cli_mode=False):
                     - arm64
                 MemorySize: 128
                 Timeout: 5
-                Layers:
-                    - !Ref Fpdf2Layer
         STARKApiGateway:
             Type: AWS::Serverless::HttpApi
             Properties:
