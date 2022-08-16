@@ -19,6 +19,7 @@ def create(data):
         api_endpoint_1 = '{api_endpoint}'
 
         const STARK={{
+            'auth_url':`${{api_endpoint_1}}/stark_auth`,
             'login_url':`${{api_endpoint_1}}/login`,
             'logout_url':`${{api_endpoint_1}}/logout`,
             'sys_modules_url':`${{api_endpoint_1}}/sys_modules`,"""
@@ -104,6 +105,10 @@ def create(data):
                         loading_modal.hide()
                     }});
                 }}
+            }},
+            auth: function(payload) {{
+                fetchUrl = STARK.auth_url
+                return STARK.request('POST', fetchUrl, payload)
             }},
             create_UUID: function(){{
                 var dt = new Date().getTime();

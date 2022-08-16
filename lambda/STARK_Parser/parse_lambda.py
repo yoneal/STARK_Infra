@@ -13,6 +13,11 @@ def parse(data, relationship = []):
             "Arch": "arm64",
             "Timeout": 5,
         },
+        "stark_auth": {
+            "Memory": 128,
+            "Arch": "arm64",
+            "Timeout": 5,
+        },
         "stark_login": {
             "Memory": 1790,
             "Arch": "arm64",
