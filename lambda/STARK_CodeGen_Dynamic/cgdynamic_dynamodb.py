@@ -84,6 +84,7 @@ def create(data):
 
     #STARK
     import stark_core 
+    from stark_core import utilities
 
     ddb    = boto3.client('dynamodb')
     s3     = boto3.client("s3")
@@ -287,7 +288,7 @@ def create(data):
         for key, index in data.items():
             if key not in ["STARK_isReport", "STARK_report_fields", "STARK_uploaded_s3_keys"]:
                 if index['value'] != "":
-                    processed_operator_and_parameter_dict = compose_report_operators_and_parameters(key, index) 
+                    processed_operator_and_parameter_dict = utilities.compose_report_operators_and_parameters(key, index) 
                     temp_string_filter += processed_operator_and_parameter_dict['filter_string']
                     object_expression_value.update(processed_operator_and_parameter_dict['expression_values'])
                     report_param_dict.update(processed_operator_and_parameter_dict['report_params'])
@@ -538,53 +539,6 @@ def create(data):
     source_code += f"""
         return "OK"
     
-    def compose_report_operators_and_parameters(key, data):
-        composed_filter_dict = {{"filter_string":"","expression_values": {{}}}}
-        if data['operator'] == "IN":
-            string_split = data['value'].split(',')
-            composed_filter_dict['filter_string'] += f" {{key}} IN "
-            temp_in_string = ""
-            in_string = ""
-            in_counter = 1
-            composed_filter_dict['report_params'] = {{key : f"Is in {{data['value']}}"}}
-            for in_index in string_split:
-                in_string += f" :inParam{{in_counter}}, "
-                composed_filter_dict['expression_values'][f":inParam{{in_counter}}"] = {{data['type'] : in_index.strip()}}
-                in_counter += 1
-            temp_in_string = in_string[1:-2]
-            composed_filter_dict['filter_string'] += f"({{temp_in_string}}) AND"
-        elif data['operator'] in [ "contains", "begins_with" ]:
-            composed_filter_dict['filter_string'] += f" {{data['operator']}}({{key}}, :{{key}}) AND"
-            composed_filter_dict['expression_values'][f":{{key}}"] = {{data['type'] : data['value'].strip()}}
-            composed_filter_dict['report_params'] = {{key : f"{{data['operator'].capitalize().replace('_', ' ')}} {{data['value']}}"}}
-        elif data['operator'] == "between":
-            from_to_split = data['value'].split(',')
-            composed_filter_dict['filter_string'] += f" ({{key}} BETWEEN :from{{key}} AND :to{{key}}) AND"
-            composed_filter_dict['expression_values'][f":from{{key}}"] = {{data['type'] : from_to_split[0].strip()}}
-            composed_filter_dict['expression_values'][f":to{{key}}"] = {{data['type'] : from_to_split[1].strip()}}
-            composed_filter_dict['report_params'] = {{key : f"Between {{from_to_split[0].strip()}} and {{from_to_split[1].strip()}}"}}
-        else:
-            composed_filter_dict['filter_string'] += f" {{key}} {{data['operator']}} :{{key}} AND"
-            composed_filter_dict['expression_values'][f":{{key}}"] = {{data['type'] : data['value'].strip()}}
-            operator_string_equivalent = ""
-            if data['operator'] == '=':
-                operator_string_equivalent = 'Is equal to'
-            elif data['operator'] == '>':
-                operator_string_equivalent = 'Is greater than'
-            elif data['operator'] == '>=':
-                operator_string_equivalent = 'Is greater than or equal to'
-            elif data['operator'] == '<':
-                operator_string_equivalent = 'Is less than'
-            elif data['operator'] == '<=':
-                operator_string_equivalent = 'Is greater than or equal to'
-            elif data['operator'] == '<=':
-                operator_string_equivalent = 'Is not equal to'
-            else:
-                operator_string_equivalent = 'Invalid operator'
-            composed_filter_dict['report_params'] = {{key : f" {{operator_string_equivalent}} {{data['value'].strip()}}" }}
-
-        return composed_filter_dict
-
     def create_listview_index_value(data):
         ListView_index_values = []
         for field in sort_fields:
@@ -628,8 +582,12 @@ def create(data):
         for key in mapped_results:
             temp_dict = {{}}
             #remove primary identifiers and STARK attributes
-            key.pop("sk")
-            key.pop("STARK_uploaded_s3_keys")
+            key.pop("sk")"""
+
+    if with_upload:
+        source_code += f"""
+            key.pop("STARK_uploaded_s3_keys")"""
+    source_code += f"""
             for index, value in key.items():
                 temp_dict[index.replace("_"," ")] = value
             report_list.append(temp_dict)
@@ -651,7 +609,7 @@ def create(data):
             Key='tmp/'+csv_file
         )
 
-        create_pdf(report_list, csv_header, pdf_file, report_params)
+        prepare_pdf_data(report_list, csv_header, pdf_file, report_params)
 
         csv_bucket_key = bucket_tmp + csv_file
         pdf_bucket_key = bucket_tmp + pdf_file
@@ -687,7 +645,7 @@ def create(data):
             items.append(item)
         return items
 
-    def create_pdf(data_to_tuple, master_fields, pdf_filename, report_params):
+    def prepare_pdf_data(data_to_tuple, master_fields, pdf_filename, report_params):
         #FIXME: PDF GENERATOR: can be outsourced to a layer, for refining 
         row_list = []
         for key in data_to_tuple:
@@ -698,34 +656,8 @@ def create(data):
 
         header_tuple = tuple(master_fields) 
         data_tuple = tuple(row_list)
-        pdf = FPDF(orientation='L')
-        pdf.add_page()
-        pdf.set_font("Helvetica", size=10)
-        line_height = pdf.font_size * 2.5
-        col_width = pdf.epw / len(master_fields)  # distribute content evenly
-
-        render_page_header(pdf, line_height, report_params)
-        render_table_header(pdf, header_tuple,  col_width, line_height) 
-        counter = 0
-        for row in data_tuple:
-            if pdf.will_page_break(line_height):
-                render_table_header()
-            row_height = pdf.font_size * estimate_lines_needed(pdf, row, col_width)
-            if row_height < line_height: #min height
-                row_height = line_height
-            elif row_height > 120: #max height tested, beyond this value will distort the table
-                row_height = 120
-                
-            if counter % 2 ==0:
-                pdf.set_fill_color(222,226,230)
-            else:
-                pdf.set_fill_color(255,255,255)
-
-            for datum in row:
-                pdf.multi_cell(col_width, row_height, datum, border=0, new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size, fill = True)
-            pdf.ln(row_height)
-            counter += 1
-
+        
+        pdf = utilities.create_pdf(header_tuple, data_tuple, report_params, pk_field)
         s3_action = s3.put_object(
             ACL='public-read',
             Body= pdf.output(),
@@ -733,54 +665,6 @@ def create(data):
             Key='tmp/'+pdf_filename
         )
 
-    def render_table_header(pdf, header_tuple, col_width, line_height):
-        pdf.set_font(style="B")  # enabling bold text
-        pdf.set_fill_color(52, 58,64)
-        pdf.set_text_color(255,255,255)
-        row_header_line_height = line_height * 1.5
-        for col_name in header_tuple:
-            pdf.multi_cell(col_width, row_header_line_height, col_name, border='TB', align='C',
-                    new_x="RIGHT", new_y="TOP",max_line_height=pdf.font_size, fill=True)
-        pdf.ln(row_header_line_height)
-        pdf.set_font(style="")  # disabling bold text
-        pdf.set_text_color(0, 0, 0)
-        pdf.set_fill_color(0, 0, 0)
-
-    def render_page_header(pdf, line_height, report_params):
-        param_width = pdf.epw / 4
-        #Report Title
-        pdf.set_font("Helvetica", size=14, style="B")
-        pdf.multi_cell(0,line_height, "{entity} Report", 0, 'C',
-                        new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
-        pdf.ln()
-        
-        #Report Parameters
-        newline_print_counter = 1
-        pdf.set_font("Helvetica", size=12, style="B")
-        pdf.multi_cell(0,line_height, "Report Parameters:", 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
-        pdf.ln(pdf.font_size *1.5)
-        if len(report_params) > 0:
-            pdf.set_font("Helvetica", size=10)
-            for key, value in report_params.items():
-                if key == 'pk':
-                    key = pk_field
-                pdf.multi_cell(30,line_height, key.replace("_", " "), 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
-                pdf.multi_cell(param_width,line_height, value, 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
-                if newline_print_counter == 2:
-                    pdf.ln(pdf.font_size *1.5)
-                    newline_print_counter = 0
-                newline_print_counter += 1
-        else:
-            pdf.multi_cell(30,line_height, "N/A", 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
-        pdf.ln()
-        
-
-    def estimate_lines_needed(self, iter, col_width: float) -> int:
-        font_width_in_mm = (
-            self.font_size_pt * 0.33 * 0.6
-        )  # assumption: a letter is half his height in width, the 0.5 is the value you want to play with
-        max_cell_text_len_header = max([len(str(col)) for col in iter])  # how long is the longest string?
-        return math.ceil(max_cell_text_len_header * font_width_in_mm / col_width)
 
     def get_fields(fields, sk = default_sk):
             
