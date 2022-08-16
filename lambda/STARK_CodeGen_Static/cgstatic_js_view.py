@@ -23,6 +23,13 @@ def create(data):
         var root = new Vue({{
             el: "#vue-root",
             data: {{
+                stark_permissions: {{
+                    '{entity}|View': false,
+                    '{entity}|Add': false,
+                    '{entity}|Delete': false,
+                    '{entity}|Edit': false,
+                    '{entity}|Report': false,
+                }},
                 listview_table: '',
                 STARK_report_fields: [],
                 {entity_varname}: {{
@@ -292,6 +299,19 @@ def create(data):
 
                list: function (lv_token='', btn='') {{
                     spinner.show()
+                    data = {{}}
+                    data['stark_permissions'] = this.stark_permissions
+                    STARK.auth(data).then( function(data) {{
+                        console.log("Auth Request Done!");
+                        console.log(data);
+                        root.stark_permissions = data;
+                    }})
+                    .catch(function(error) {{
+                        console.log("Encountered an error! [" + error + "]")
+                        alert("Request Failed: System error or you may not have enough privileges")
+                        loading_modal.hide()
+                    }});
+                    
                     payload = []
                     if (btn == 'next') {{
                         root.curr_page++;

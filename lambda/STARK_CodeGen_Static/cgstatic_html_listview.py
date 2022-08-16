@@ -30,8 +30,8 @@ def create(data):
     source_code += f"""\
             <div class="row">
                 <div class="col-6">
-                    <button type="button" class="btn btn-primary mb-2" onClick="window.location.href='{entity_varname}_add.html'"> <b>+</b> Add </button>
-                    <button type="button" class="btn btn-info mb-2" onClick="window.location.href='{entity_varname}_report.html'"> Reports </button>
+                    <button type="button" class="btn btn-primary mb-2" onClick="window.location.href='{entity_varname}_add.html'" v-if="stark_permissions['{entity}|Add']"> <b>+</b> Add </button>
+                    <button type="button" class="btn btn-info mb-2" onClick="window.location.href='{entity_varname}_report.html'" v-if="stark_permissions['{entity}|Report']"> Reports </button>
                 </div>
                 <div class="col-6 text-right d-inline-block">        
                     <button id="prev" type="button" class="btn btn-outline-secondary" :disabled="prev_disabled" onClick="root.list(root.prev_token, 'prev')"> < </button>
@@ -58,9 +58,16 @@ def create(data):
                             <template v-for="{entity_varname} in listview_table" id="listview-table">
                                 <tr>
                                     <td>
-                                        <a :href="'{entity_varname}_edit.html?{pk_varname}=' + {entity_varname}.{pk_varname}"><img src="images/pencil2.png"></a>
+                                        <a :href="'{entity_varname}_edit.html?{pk_varname}=' + {entity_varname}.{pk_varname}"><img src="images/pencil2.png" v-if="stark_permissions['{entity}|Edit']"></a>
                                     </td>
-                                    <th scope="row"><a :href="'{entity_varname}_view.html?{pk_varname}=' + {entity_varname}.{pk_varname}">{{{{ {entity_varname}.{pk_varname} }}}}</a></th>"""
+                                    <th scope="row">
+                                        <template id="detail-view" v-if="stark_permissions['{entity}|View']">
+                                            <a :href="'{entity_varname}_view.html?{pk_varname}=' + {entity_varname}.{pk_varname}">{{{{ {entity_varname}.{pk_varname} }}}}</a>
+                                        </template>
+                                        <template id="detail-view" v-if="!stark_permissions['{entity}|View']">
+                                            {{{{ {entity_varname}.{pk_varname} }}}}
+                                        </template>
+                                    </th>"""
 
     for col in cols:
         col_varname = converter.convert_to_system_name(col)
@@ -68,7 +75,7 @@ def create(data):
                                     <td>{{{{ {entity_varname}.{col_varname} }}}}</td>"""
 
     source_code += f"""
-                                    <td><a :href="'{entity_varname}_delete.html?{pk_varname}=' + {entity_varname}.{pk_varname}"><img src="images/trash2.png"></a></td>
+                                    <td><a :href="'{entity_varname}_delete.html?{pk_varname}=' + {entity_varname}.{pk_varname}"><img src="images/trash2.png" v-if="stark_permissions['{entity}|Delete']"></a></td>
                                 </tr>
                             </template>
                     </tbody>
