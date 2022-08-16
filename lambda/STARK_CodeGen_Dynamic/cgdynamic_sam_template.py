@@ -796,6 +796,25 @@ def create(data, cli_mode=False):
                 Timeout: 5
                 Layers:
                     - !Ref PyYamlLayer
+        STARKBackendApiForAuth:
+            Type: AWS::Serverless::Function
+            Properties:
+                Events:
+                    AuthPostEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /stark_auth
+                            Method: POST
+                            ApiId:
+                                Ref: STARKApiGateway
+                Runtime: python3.9
+                Handler: auth.lambda_handler
+                CodeUri: lambda/stark_auth
+                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
+                Architectures:
+                    - arm64
+                MemorySize: 128
+                Timeout: 5
         STARKBackendApiForLogin:
             Type: AWS::Serverless::Function
             Properties:
