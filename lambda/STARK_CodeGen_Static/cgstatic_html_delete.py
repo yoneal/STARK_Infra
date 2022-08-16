@@ -50,10 +50,10 @@ def create(data):
             "col_type": col_type,
         })
     
-        print(entities)
+        # print(entities)
         
-#         for related in entities:
-#             print(related)
+        for related in entities:
+            print(related)
        
         #         foreign_entity  = converter.convert_to_system_name(has_many)
         #         print(foreign_entity)
