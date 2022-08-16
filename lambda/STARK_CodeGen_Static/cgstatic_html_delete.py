@@ -47,7 +47,7 @@ def create(data):
 
 
     for col, col_type in cols.items():
-        print(col_type['type'])
+        print(col_type)
         col_varname = converter.convert_to_system_name(col)
         source_code += f"""
                             <div class="form-group row">
@@ -59,8 +59,8 @@ def create(data):
                                 <span class="form-control-link" readonly id="{col_varname}" placeholder="" >{{{{{entity_varname}.{col_varname}}}}}</span>   
                             </a>
                             """
-        elif col_type['type'] == 'relationship':
-            print(cols)
+        # elif col_type['type'] == 'relationship':
+        #     print(cols)
             # for col, col_type in cols.items():
             #     # print(col)
             #     # print(col_type["type"])
