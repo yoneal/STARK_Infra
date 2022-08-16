@@ -41,12 +41,14 @@ def create(data):
                                     <input type="text" class="form-control-plaintext" readonly id="{pk_varname}" placeholder="" v-model="{entity_varname}.{pk_varname}">
                                 </div>
                             </div>"""
-    print(cols)
-#    for col, col_type in cols.items():
-#         entities = cg_rel.get({
-#             "col": col,
-#             "col_type": col_type,
-#         })
+    # print(cols)
+    for col, col_type in cols.items():
+        entities = cg_rel.get({
+            "col": col,
+            "col_type": col_type,
+        })
+    
+    print(entities)
         
 #         for related in entities:
 #             print(related)
