@@ -66,45 +66,30 @@ def create(data):
                 # 1-M relationship
                     foreign_entity  = converter.convert_to_system_name(has_many)
                     print(foreign_entity)
-        # elif col_type['type'] == 'relationship':
-        #     print(cols)
-            # for col, col_type in cols.items():
-            #     # print(col)
-            #     # print(col_type["type"])
-            #     entities = cg_rel.get({
-            #         "col": col,
-            #         "col_type": col_type,
-            #     })
-            
-            #     # print(entities)
-                
-            #     for related in entities:
-            #         print(related)
-            #         foreign_entity  = converter.convert_to_system_name(related)
-            #         source_code += f"""
-            #         <div class="form-group row">
-            #             <label for="{foreign_entity}" class="col-sm-2 col-form-label">{foreign_entity}</label>
-            #             <div class="col-sm-10">
-            #                 <b-form-group label-for="tags-with-dropdown">
-            #                     <b-form-tags id="tags-with-dropdown" v-model="multi_select_values.{foreign_entity}" no-outer-focus class="mb-2">
-            #                         <template v-slot="{{ tags, disabled, addTag, removeTag }}">
-            #                             <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
-            #                                 <li v-for="tag in tags" :key="tag" class="list-inline-item">
-            #                                     <b-form-tag 
-            #                                         @remove="removeTag(tag)" 
-            #                                         :title="tag" 
-            #                                         :disabled="true" 
-            #                                         variant="info" >
-            #                                         {{ tag_display_text(tag) }}
-            #                                     </b-form-tag>
-            #                                 </li>
-            #                             </ul>
-            #                         </template>
-            #                     </b-form-tags>
-            #                 </b-form-group>
-            #             </div>
-            #         </div>
-            #         """      
+                    source_code += f"""
+                    <div class="form-group row">
+                        <label for="{foreign_entity}" class="col-sm-2 col-form-label">{foreign_entity}</label>
+                        <div class="col-sm-10">
+                            <b-form-group label-for="tags-with-dropdown">
+                                <b-form-tags id="tags-with-dropdown" v-model="multi_select_values.{foreign_entity}" no-outer-focus class="mb-2">
+                                    <template v-slot="{{ tags, disabled, addTag, removeTag }}">
+                                        <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
+                                            <li v-for="tag in tags" :key="tag" class="list-inline-item">
+                                                <b-form-tag 
+                                                    @remove="removeTag(tag)" 
+                                                    :title="tag" 
+                                                    :disabled="true" 
+                                                    variant="info" >
+                                                    {{ tag_display_text(tag) }}
+                                                </b-form-tag>
+                                            </li>
+                                        </ul>
+                                    </template>
+                                </b-form-tags>
+                            </b-form-group>
+                        </div>
+                    </div>
+                    """      
         else:
             source_code += f"""
                             <input type="text" class="form-control-plaintext" readonly id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}">
