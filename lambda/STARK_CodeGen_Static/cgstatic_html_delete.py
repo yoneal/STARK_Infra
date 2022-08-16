@@ -43,14 +43,14 @@ def create(data):
                             </div>"""
     # print(cols)
     for col, col_type in cols.items():
-        print(col)
-        print(col_type)
-    #     entities = cg_rel.get({
-    #         "col": col,
-    #         "col_type": col_type,
-    #     })
+        # print(col)
+        # print(col_type)
+        entities = cg_rel.get({
+            "col": col,
+            "col_type": col_type,
+        })
     
-    # print(entities)
+        print(entities)
         
 #         for related in entities:
 #             print(related)
