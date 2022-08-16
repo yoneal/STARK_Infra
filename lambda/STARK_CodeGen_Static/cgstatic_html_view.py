@@ -40,9 +40,9 @@ def create(data):
                                     <input type="text" class="form-control-plaintext" readonly id="{pk_varname}" placeholder="" v-model="{entity_varname}.{pk_varname}">
                                 </div>
                             </div>"""
-    for col, col_type in cols.items():
-        if isinstance(col_type, dict) and col_type["type"] == "relationship":
-            has_many = col_type.get('has_many', '')
+    # for col, col_type in cols.items():
+    #     if isinstance(col_type, dict) and col_type["type"] == "relationship":
+    #         has_many = col_type.get('has_many', '')
             # foreign_entity  = converter.convert_to_system_name(has_many)
             # if has_many != '':
             #     source_code += f"""

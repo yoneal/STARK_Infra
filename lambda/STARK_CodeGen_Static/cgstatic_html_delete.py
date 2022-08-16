@@ -2,6 +2,7 @@
 #Produces the customized static content for a STARK system
 
 #Python Standard Library
+from asyncio import constants
 import base64
 import textwrap
 
@@ -40,12 +41,15 @@ def create(data):
                                     <input type="text" class="form-control-plaintext" readonly id="{pk_varname}" placeholder="" v-model="{entity_varname}.{pk_varname}">
                                 </div>
                             </div>"""
-
-    # for col, col_type in cols.items():
-    #     if col_type["type"] == "relationship":
-    #         has_many = col_type.get('has_many', '')
-    #         print(has_many)
-        # if isinstance(col_type, dict):
+    print(cols)
+#    for col, col_type in cols.items():
+#         entities = cg_rel.get({
+#             "col": col,
+#             "col_type": col_type,
+#         })
+        
+#         for related in entities:
+#             print(related)
        
         #         foreign_entity  = converter.convert_to_system_name(has_many)
         #         print(foreign_entity)
