@@ -29,9 +29,9 @@ def create(data):
     source_code += cg_bodyhead.create(data, "Report")
 
     source_code += f"""\
-            <div class="container-unauthorized" v-if="!stark_permissions['{entity}|Report']">UNAUTHORIZED!</div>
+            <!-- <div class="container-unauthorized" v-if="!stark_permissions['{entity}|Report']">UNAUTHORIZED!</div>
             <div class="main-continer" v-if="stark_permissions['{entity}|Report']">
-                <div class="container" v-if="!showReport">
+                <div class="container" v-if="!showReport"> -->
                     <div class="row">
                         <div class="col">
                             <div class="my-auto">
@@ -167,7 +167,7 @@ def create(data):
                     </div>
                 </div>
             </div>
-        </div>
+       <!-- </div>-->
     """
     source_code += cg_loadmod.create()
     source_code += cg_footer.create()
