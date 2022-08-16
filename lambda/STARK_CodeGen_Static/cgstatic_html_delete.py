@@ -47,7 +47,7 @@ def create(data):
 
 
     for col, col_type in cols.items():
-        print(col_type)
+        # print(col_type)
         col_varname = converter.convert_to_system_name(col)
         source_code += f"""
                             <div class="form-group row">
