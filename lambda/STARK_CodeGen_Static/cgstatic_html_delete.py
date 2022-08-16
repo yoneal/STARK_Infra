@@ -59,6 +59,13 @@ def create(data):
                                 <span class="form-control-link" readonly id="{col_varname}" placeholder="" >{{{{{entity_varname}.{col_varname}}}}}</span>   
                             </a>
                             """
+        elif isinstance(col_type, dict):
+            if col_type["type"] == "relationship":
+                has_many = col_type.get('has_many', '')
+                if  has_many != '':
+                # 1-M relationship
+                    foreign_entity  = converter.convert_to_system_name(has_many)
+                    print(foreign_entity)
         # elif col_type['type'] == 'relationship':
         #     print(cols)
             # for col, col_type in cols.items():
