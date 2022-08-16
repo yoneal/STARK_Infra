@@ -44,7 +44,7 @@ def create(data):
     # print(cols)
     for col, col_type in cols.items():
         # print(col)
-        # print(col_type)
+        print(col_type)
         entities = cg_rel.get({
             "col": col,
             "col_type": col_type,
@@ -52,8 +52,8 @@ def create(data):
     
         # print(entities)
         
-        for related in entities:
-            print(related)
+        # for related in entities:
+            # print(related)
        
         #         foreign_entity  = converter.convert_to_system_name(has_many)
         #         print(foreign_entity)
