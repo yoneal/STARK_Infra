@@ -30,8 +30,8 @@ def create(data):
 
     source_code += f"""\
         
-        <div class="container-unauthorized" v-if="!root.{entity}|Delete">UNAUTHORIZED!</div>
-        <div class="main-continer" v-if="root.{entity}|Delete">
+        <div class="container-unauthorized" v-if="!stark_permissions['{entity}|Delete']">UNAUTHORIZED!</div>
+        <div class="main-continer" v-if="stark_permissions['{entity}|Delete']">
             <div class="container hidden" :style="{{visibility: visibility}}">
                 <div class="row">
                     <div class="col">

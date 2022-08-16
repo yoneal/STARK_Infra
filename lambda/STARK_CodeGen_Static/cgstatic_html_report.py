@@ -29,8 +29,8 @@ def create(data):
     source_code += cg_bodyhead.create(data, "Report")
 
     source_code += f"""\
-            <div class="container-unauthorized" v-if="!root.{entity}|Report">UNAUTHORIZED!</div>
-            <div class="main-continer" v-if="root.{entity}|Report">
+            <div class="container-unauthorized" v-if="!stark_permissions['{entity}|Report']">UNAUTHORIZED!</div>
+            <div class="main-continer" v-if="stark_permissions['{entity}|Report']">
                 <div class="container" v-if="!showReport">
                     <div class="row">
                         <div class="col">
@@ -149,9 +149,9 @@ def create(data):
                                     <template v-for="{entity_varname} in listview_table" id="listview-table">
                                         <tr>
                                             <td align="center">
-                                                <a :href="'{entity_varname}_edit.html?{pk_varname}=' + {entity_varname}.{pk_varname}" target="_blank"><img src="images/pencil2.png" ></a>
-                                                <a :href="'{entity_varname}_delete.html?{pk_varname}=' + {entity_varname}.{pk_varname}" target="_blank"><img src="images/trash2.png" ></a>
-                                            </td>
+                                                <a :href="'{entity_varname}_edit.html?{pk_varname}=' + {entity_varname}.{pk_varname}" target="_blank" v-if="stark_permissions['{entity}|Edit']"><img src="images/pencil2.png" ></a>
+                                                <a :href="'{entity_varname}_delete.html?{pk_varname}=' + {entity_varname}.{pk_varname}" target="_blank" v-if="stark_permissions['{entity}|Delete']"><img src="images/trash2.png" ></a>
+                                            </tDelete>
                                             <template v-for="column in STARK_report_fields">
                                                 <td>{{{{ {entity_varname}[column.field] }}}}</td>
                                             </template>"""

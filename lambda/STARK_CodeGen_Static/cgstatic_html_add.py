@@ -29,8 +29,8 @@ def create(data):
     source_code += cg_bodyhead.create(data, "New")
 
     source_code += f"""\
-        <div class="container-unauthorized" v-if="!root.{entity}|Add">UNAUTHORIZED!</div>
-        <div class="main-continer" v-if="root.{entity}|Add">
+        <div class="container-unauthorized" v-if="!stark_permissions['{entity}|Add']">UNAUTHORIZED!</div>
+        <div class="main-continer" v-if="stark_permissions['{entity}|Add']">
             <div class="container hidden" :style="{{visibility: visibility}}">
                 <div class="row">
                     <div class="col">

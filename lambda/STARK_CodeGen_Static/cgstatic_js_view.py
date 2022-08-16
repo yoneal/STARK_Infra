@@ -299,7 +299,6 @@ def create(data):
 
                list: function (lv_token='', btn='') {{
                     spinner.show()
-​
                     data = {{}}
                     data['stark_permissions'] = this.stark_permissions
                     STARK.auth(data).then( function(data) {{
