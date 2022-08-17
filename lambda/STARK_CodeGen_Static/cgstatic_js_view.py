@@ -162,9 +162,11 @@ def create(data):
                     {col_varname}: '',"""
             if col_type["type"] == 'file-upload':  
                 ext_string += f"""
-                         {col_varname}: {str(col_type.get("allowed_ext",""))},"""
+                         "{col_varname}": "{str(col_type.get("allowed_ext",""))}","""
+                allowed_size = col_type.get("max_upload_size", "1 MB")
+                temp_split = allowed_size.split()
                 allowed_size_string += f"""
-                         {col_varname}: {col_type.get("max_upload_size", 0)},"""
+                         "{col_varname}": {int(temp_split[0])},"""
                 source_code += f"""
                         "{col_varname}": {{"file": '', "progress_bar_val": 0}},"""
     source_code += f"""
@@ -279,7 +281,7 @@ def create(data):
                             root.{entity_varname}.orig_{pk_varname} = root.{entity_varname}.{pk_varname};"""
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
-        if col_type == 'file-upload':
+        if isinstance(col_type, dict) and col_type['type'] == 'file-upload':
             source_code += f"""
                             root.{entity_varname}.STARK_uploaded_s3_keys['{col_varname}'] = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.STARK_uploaded_s3_keys.{col_varname}.S : ""
                             root.STARK_upload_elements['{col_varname}'].file              = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.{col_varname} : ""

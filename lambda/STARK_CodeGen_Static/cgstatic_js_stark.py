@@ -127,7 +127,7 @@ def create(data):
             get_s3_credentials: function(){{
                 //temporary
                 return {{'access_key_id': '', 'secret_access_key': ''}}
-            }}
+            }},
             get_file_ext_whitelist: function(field_settings, table_settings = "", mode="overwrite") {{
                 //two modes: overwrite = overwrites the whitelist in the following order: field defined > table defined > globally defined
                 //           mix       = combines the all the whitelist
