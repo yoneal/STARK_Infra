@@ -32,3 +32,8 @@
   border-bottom: 1px solid #dee2e6;
   background-color:white
 }
+
+input.checkbox-med {
+  transform: scale(1.5);
+  margin-left:10px
+}

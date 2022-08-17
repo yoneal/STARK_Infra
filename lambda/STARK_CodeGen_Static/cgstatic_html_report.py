@@ -50,7 +50,7 @@ def create(data):
                                     <table class="table report">
                                         <tr>
                                             <th>
-                                                <b-form-checkbox v-model="all_selected" @change="toggle_all" size="lg"></b-form-checkbox>
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" v-model="all_selected" onchange="root.toggle_all(!root.all_selected)">
                                             </th>
                                             <th style="padding: 10px; min-width: 250px"> Field Name </th>
                                             <th style="padding: 10px"> Operator </th>
@@ -58,7 +58,7 @@ def create(data):
                                         </tr>
                                         <tr>
                                             <td>
-                                                <b-form-checkbox name="check_checkbox" value="{pk_varname}" id="{pk_varname}" v-model="checked_fields" size="lg"></b-form-checkbox>
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{pk_varname}" id="{pk_varname}" v-model="checked_fields">
                                             </td>
                                             <td>
                                                     <label for="{pk_varname}">{pk}</label>
@@ -89,7 +89,7 @@ def create(data):
         source_code += f"""
                                         <tr>
                                             <td>
-                                                <b-form-checkbox name="check_checkbox" value="{col_varname}" id="{col_varname}" v-model="checked_fields" size="lg"></b-form-checkbox>
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="{col_varname}" v-model="checked_fields">
                                             </td>
                                             <td>
                                                     <label for="{col_varname}">{col}</label>
