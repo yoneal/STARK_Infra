@@ -138,6 +138,7 @@ def create(data):
                 error_message: '',
                 authFailure: false,
                 authTry: false,
+                all_selected: true,
                 STARK_upload_elements: {{"""
     search_string = ""
     for col, col_type in cols.items():
@@ -435,21 +436,8 @@ def create(data):
                     let link = "https://" + (file_type == "csv" ? root.temp_csv_link : root.temp_pdf_link)
                     window.location.href = link
                 }},
-                checkUncheck: function (checked) {{
-                    arrCheckBoxes = document.getElementsByName('check_checkbox');
-                    for (var i = 0; i < arrCheckBoxes.length; i++)
-                    {{
-                        arrCheckBoxes[i].checked = checked;
-                    }}
-
-                    if(checked)
-                    {{
-                        checked_fields = temp_checked_fields
-                    }}
-                    else
-                    {{
-                        checked_fields = []
-                    }}
+                toggle_all(checked) {{
+                    checked_fields = checked ? temp_checked_fields.slice() : []
                 }},
                 process_upload_file(file_upload_element) {{
                     var upload_object = null

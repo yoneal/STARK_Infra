@@ -49,10 +49,8 @@ def create(data):
                                     </div>
                                     <table class="table table-bordered">
                                         <tr>
-                                            <th style="padding: 10px">
-                                                Show Column<br>
-                                                <a href="#" style="font-size: 11px" onClick="root.checkUncheck(true)">Check All</a><br>
-                                                <a href="#" style="font-size: 11px" onClick="root.checkUncheck(false)">Uncheck All</a>
+                                            <th>
+                                                <b-form-checkbox v-model="all_selected" @change="toggle_all" size="lg"></b-form-checkbox>
                                             </th>
                                             <th style="padding: 10px; min-width: 250px"> Field Name </th>
                                             <th style="padding: 10px"> Operator </th>
@@ -60,7 +58,7 @@ def create(data):
                                         </tr>
                                         <tr>
                                             <td>
-                                                <input type="checkbox" name="check_checkbox" value="{pk_varname}" id="{pk_varname}" v-model="checked_fields">
+                                                <b-form-checkbox name="check_checkbox" value="{pk_varname}" id="{pk_varname}" v-model="checked_fields size="lg"></b-form-checkbox>
                                             </td>
                                             <td>
                                                     <label for="{pk_varname}">{pk}</label>
@@ -125,8 +123,8 @@ def create(data):
                     <div class="row">
                         <div class="col-6 text-left d-inline-block">
                             <button id="prev" type="button" class="btn btn-secondary mb-2" onClick="root.showReport = false, root.showError = false"> Back </button>
-                    <button type="button" class="btn btn-success mb-2" onClick="root.download_report('csv')" :disabled="listview_table.length < 1"> Export as CSV</button>
-                    <button type="button" class="btn btn-danger mb-2" onClick="root.download_report('pdf')" :disabled="listview_table.length < 1"> Export as PDF</button>
+                            <button type="button" class="btn btn-success mb-2" onClick="root.download_report('csv')" :disabled="listview_table.length < 1"> Export as CSV</button>
+                            <button type="button" class="btn btn-danger mb-2" onClick="root.download_report('pdf')" :disabled="listview_table.length < 1"> Export as PDF</button>
                             <button id="refresh" type="button" class="btn btn-primary mb-2" onClick="root.generate()" :disabled="listview_table.length < 1"> Refresh </button>
                         </div>
                         <div class="col-6">
@@ -151,7 +149,7 @@ def create(data):
                                             <td align="center">
                                                 <a :href="'{entity_varname}_edit.html?{pk_varname}=' + {entity_varname}.{pk_varname}" target="_blank" v-if="stark_permissions['{entity}|Edit']"><img src="images/pencil2.png" ></a>
                                                 <a :href="'{entity_varname}_delete.html?{pk_varname}=' + {entity_varname}.{pk_varname}" target="_blank" v-if="stark_permissions['{entity}|Delete']"><img src="images/trash2.png" ></a>
-                                            </tDelete>
+                                            </td>
                                             <template v-for="column in STARK_report_fields">
                                                 <td>{{{{ {entity_varname}[column.field] }}}}</td>
                                             </template>"""
