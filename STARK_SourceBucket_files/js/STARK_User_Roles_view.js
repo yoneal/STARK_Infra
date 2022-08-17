@@ -252,9 +252,11 @@ var root = new Vue({
         },
 
         tag_display_text: function (tag) {
-            var index = this.lists.Permissions.findIndex(opt => tag == opt.value)
-            return this.lists.Permissions[index].text
-            // return this.lists.Document.filter(opt => tag == opt.value)
+            if((this.lists.Permissions).length !== 0)
+            {
+                var index = this.lists.Permissions.findIndex(opt => tag == opt.value)
+                return this.lists.Permissions[index].text
+            }
         },
 
         formValidation: function () {
