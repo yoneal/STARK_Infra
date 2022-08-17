@@ -92,6 +92,9 @@ def create(data, cli_mode=False):
     s3_versioning     = "Enabled"
     s3_access_control = "PublicRead"
 
+    #User and access key related config
+    web_bucket_user = "stark_" + project_varname + "_web_bucket"
+
     #Update Token - this token forces CloudFormation to update the resources that do dynamic code generation,
     update_token = str(uuid4())
 
@@ -186,6 +189,26 @@ def create(data, cli_mode=False):
                 WebsiteConfiguration:
                     ErrorDocument: {s3_error_document}
                     IndexDocument: {s3_index_document}
+        STARKSystemBucketUser:
+            Type: AWS::IAM::User
+            Properties: 
+                Policies:
+                    - 
+                        PolicyName: PolicyForSTARKSystemBucketUser
+                        PolicyDocument:
+                            Version: "2012-10-17"
+                            Statement:
+                                - 
+                                    Effect: Allow
+                                    Action:
+                                        - 's3:*'
+                                    Resource: !GetAtt STARKSystemBucket.Arn
+                UserName: {web_bucket_user}
+        STARKSystemBucketAccessKey:
+            Type: AWS::IAM::AccessKey
+            Properties: 
+                Status: Active
+                UserName: !Ref STARKSystemBucketUser
         STARKBucketCleaner:
             Type: AWS::CloudFormation::CustomResource
             Properties:
@@ -864,6 +887,8 @@ def create(data, cli_mode=False):
                 UpdateToken: REPLACE-ME-ONLY-FOR-RELAUNCHES
                 Project: {project_name}
                 DDBTable: {ddb_table_name}
+                WebBucket_AccessKeyID: !Ref STARKSystemBucketAccessKey
+                WebBucket_SecretAccessKey: !GetAtt STARKSystemBucketAccessKey.SecretAccessKey
                 Remarks: Final system pre-launch tasks - things to do after the entirety of the new system's infra and code have been deployed
             DependsOn:
                 - STARKApiGateway

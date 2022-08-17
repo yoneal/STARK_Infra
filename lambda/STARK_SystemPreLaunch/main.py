@@ -27,7 +27,11 @@ helper = CfnResource() #We're using the AWS-provided helper library to minimize 
 def create_handler(event, context):
     project_name    = event.get('ResourceProperties', {}).get('Project','')    
     project_varname = converter.convert_to_system_name(project_name)
-    ddb_table_name = event.get('ResourceProperties', {}).get('DDBTable','')
+    ddb_table_name  = event.get('ResourceProperties', {}).get('DDBTable','')
+    
+    #Access Keys
+    WebBucket_AccessKeyID     = event.get('ResourceProperties', {}).get('WebBucket_AccessKeyID','')
+    WebBucket_SecretAccessKey = event.get('ResourceProperties', {}).get('WebBucket_SecretAccessKey','')
 
     #Cloud resources document
     codegen_bucket_name = os.environ['CODEGEN_BUCKET_NAME']
@@ -226,6 +230,20 @@ def create_handler(event, context):
     item['Description']       = {'S' : "Business permissions only"}
     item['Permissions']       = {'S' : business_permissions}
     item['STARK-ListView-sk'] = {'S' : "General User"}
+
+    response = ddb.put_item(
+        TableName=ddb_table_name,
+        Item=item,
+    )
+    print(response)
+
+    
+    #Access Keys
+    #FIXME: This should be in secure storage (Secrets Manager / ParamStore or locked-down, separate, dedicated DDB Table) 
+    item        = {}
+    item['pk']  = {'S' : "STARK|AccessKey|S3"}
+    item['sk']  = {'S' : WebBucket_AccessKeyID}
+    item['key'] = {'S' : WebBucket_SecretAccessKey}
 
     response = ddb.put_item(
         TableName=ddb_table_name,
