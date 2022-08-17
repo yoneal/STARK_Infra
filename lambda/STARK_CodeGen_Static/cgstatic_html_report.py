@@ -37,7 +37,7 @@ def create(data):
                             <div class="my-auto">
                                 <form class="border p-3">
                                     <div>
-                                        <table class="table table-bordered">
+                                        <table class="table report">
                                                     
                                                 <div class="alert alert-danger alert-dismissible fade show" v-if="showError">
                                                     <strong>Error!</strong> Put operator/s on:
