@@ -202,6 +202,9 @@ var root = new Vue({
             }
 
             STARK_User_Roles_app.list(payload).then( function(data) {
+                for (let x = 0; x < (data['Items']).length; x++) {
+                    data['Items'][x]['Permissions'] = ((data['Items'][x]['Permissions'].split(', ')).sort()).join(', ')      
+                }
                 token = data['Next_Token'];
                 root.listview_table = data['Items'];
                 console.log("DONE! Retrieved list.");

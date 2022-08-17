@@ -161,6 +161,9 @@ var root = new Vue({
         },
 
        list: function (lv_token='', btn='') {
+            for (let x = 0; x < (data['Items']).length; x++) {
+                data['Items'][x]['Permissions'] = ((data['Items'][x]['Permissions'].split(', ')).sort()).join(', ')      
+            }
             spinner.show()
             payload = []
             if (btn == 'next') {
