@@ -174,7 +174,7 @@ def create(data):
             has_many = col_type.get('has_many', '')
             if has_many != "":
                 source_code += f"""
-                    this.{entity_varname}.{col_varname} = root.multi_select_values.{col_varname}.join(', ')"""
+                    this.{entity_varname}.{col_varname} = (root.multi_select_values.{col_varname}.sort()).join(', ')"""
     
     source_code += f"""
 
@@ -219,7 +219,7 @@ def create(data):
             has_many = col_type.get('has_many', '')
             if has_many != "":
                 source_code += f"""
-                    this.{entity_varname}.{col_varname} = root.multi_select_values.{col_varname}.join(', ')"""
+                    this.{entity_varname}.{col_varname} = (root.multi_select_values.{col_varname}.sort()).join(', ')"""
     
     source_code += f"""
                     let data = {{ {entity_varname}: this.{entity_varname} }}

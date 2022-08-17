@@ -70,7 +70,7 @@ var root = new Vue({
 
         add: function () {
 													   
-            this.STARK_User_Permissions.Permissions = root.multi_select_values.Permissions.join(', ')																					
+            this.STARK_User_Permissions.Permissions = (root.multi_select_values.Permissions.sort()).join(', ')																					
 			
             loading_modal.show()
             console.log("VIEW: Inserting!")
@@ -112,7 +112,7 @@ var root = new Vue({
             loading_modal.show()
             console.log("VIEW: Updating!")
 
-			this.STARK_User_Permissions.Permissions = root.multi_select_values.Permissions.join(', ')																		
+			this.STARK_User_Permissions.Permissions = (root.multi_select_values.Permissions.sort()).join(', ')																		
             let data = { STARK_User_Permissions: this.STARK_User_Permissions }
 
             STARK_User_Permissions_app.update(data).then( function(data) {
