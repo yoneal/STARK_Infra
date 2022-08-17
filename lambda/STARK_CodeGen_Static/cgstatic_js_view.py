@@ -138,6 +138,15 @@ def create(data):
                 error_message: '',
                 authFailure: false,
                 authTry: false,
+                all_selected: true,"""
+    field_strings = f"['{pk_varname}',"
+    for col in cols:
+        col_varname = converter.convert_to_system_name(col)
+        field_strings += f"""'{col_varname}',"""
+    field_strings += f"""]"""
+    source_code += f"""
+                temp_checked_fields: {field_strings},
+                checked_fields: {field_strings},
                 STARK_upload_elements: {{"""
     search_string = ""
     for col, col_type in cols.items():
@@ -411,7 +420,7 @@ def create(data):
 
                 generate: function () {{
                     let temp_show_fields = []
-                    checked_fields.forEach(element => {{
+                    root.checked_fields.forEach(element => {{
                         let temp_index = {{'field': element, label: element.replace("_"," ")}}
                         temp_show_fields.push(temp_index)
                     }});
@@ -449,21 +458,9 @@ def create(data):
                     let link = "https://" + (file_type == "csv" ? root.temp_csv_link : root.temp_pdf_link)
                     window.location.href = link
                 }},
-                checkUncheck: function (checked) {{
-                    arrCheckBoxes = document.getElementsByName('check_checkbox');
-                    for (var i = 0; i < arrCheckBoxes.length; i++)
-                    {{
-                        arrCheckBoxes[i].checked = checked;
-                    }}
-
-                    if(checked)
-                    {{
-                        checked_fields = temp_checked_fields
-                    }}
-                    else
-                    {{
-                        checked_fields = []
-                    }}
+                toggle_all(checked) {{
+                    root.checked_fields = checked ? root.temp_checked_fields.slice() : []
+                    root.all_selected = checked
                 }},
                 process_upload_file(file_upload_element) {{
                     var upload_object = null
@@ -618,23 +615,6 @@ def create(data):
             }}    
         }})
 
-    //for selecting individually, select all or uncheck all of checkboxes
-    var temp_checked_fields = ['{pk_varname}',"""
-
-    for col in cols:
-        col_varname = converter.convert_to_system_name(col)
-        source_code += f"""'{col_varname}',"""
-    
-    source_code += f"""]"""
-    source_code += f"""
-    var checked_fields = ['{pk_varname}',"""
-
-    for col in cols:
-        col_varname = converter.convert_to_system_name(col)
-        source_code += f"""'{col_varname}',"""
-    
-    source_code += f"""]
-    
     //Bucket Configurations
     var credentials = STARK.get_s3_credentials()
     var s3 = new AWS.S3({{
