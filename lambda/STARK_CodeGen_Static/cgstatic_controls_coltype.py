@@ -52,9 +52,6 @@ def create(data):
                                         <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                     </template>
                                 </b-form-select>"""
-    elif col_type == "file-upload":
-        html_code=f"""<b-form-file v-model="STARK_upload_elements.{col_varname}.file" :placeholder="STARK_upload_elements.{col_varname}.file" drop-placeholder="Drop file here..." @input="s3upload('{col_varname}')" ></b-form-file>      
-                            <b-progress :value="STARK_upload_elements.{col_varname}.progress_bar_val" :max="100" class="mt-2"></b-progress>"""
 
     elif isinstance(col_type, dict):
         #These are the complex data types that need additional settings as part of their spec
@@ -181,6 +178,9 @@ def create(data):
                                 </b-form-tags>
                             </b-form-group>
             """
+        elif col_type["type"] == "file-upload":
+            html_code=f"""<b-form-file v-model="STARK_upload_elements.{col_varname}.file" :placeholder="STARK_upload_elements.{col_varname}.file" drop-placeholder="Drop file here..." @input="s3upload('{col_varname}')" ></b-form-file>      
+                                <b-progress :value="STARK_upload_elements.{col_varname}.progress_bar_val" :max="100" class="mt-2"></b-progress>"""
         elif col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
             has_many = col_type.get('has_many', '')
