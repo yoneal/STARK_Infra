@@ -146,7 +146,7 @@ var root = new Vue({
                     root.STARK_User_Permissions = data[0]; //We need 0, because API backed func always returns a list for now
                     root.STARK_User_Permissions.orig_Username = root.STARK_User_Permissions.Username;
 					permission_list = root.STARK_User_Permissions.Permissions 
-                    root.multi_select_values.Permissions = root.STARK_User_Permissions.Permissions.split(', ')		
+                    root.multi_select_values.Permissions = (root.STARK_User_Roles.Permissions.split(', ')).sort()		
                     root.list_Permissions()														
                     console.log("VIEW: Retreived module data.")
                     root.show()
@@ -161,9 +161,7 @@ var root = new Vue({
         },
 
        list: function (lv_token='', btn='') {
-            for (let x = 0; x < (data['Items']).length; x++) {
-                data['Items'][x]['Permissions'] = ((data['Items'][x]['Permissions'].split(', ')).sort()).join(', ')      
-            }
+            
             spinner.show()
             payload = []
             if (btn == 'next') {
@@ -204,6 +202,9 @@ var root = new Vue({
             }
 
             STARK_User_Permissions_app.list(payload).then( function(data) {
+                for (let x = 0; x < (data['Items']).length; x++) {
+                    data['Items'][x]['Permissions'] = ((data['Items'][x]['Permissions'].split(', ')).sort()).join(', ')      
+                }
                 token = data['Next_Token'];
                 root.listview_table = data['Items'];
                 console.log("DONE! Retrieved list.");
@@ -250,9 +251,11 @@ var root = new Vue({
         },
 
         tag_display_text: function (tag) {
-            var index = this.lists.Permissions.findIndex(opt => tag == opt.value)
-            return this.lists.Permissions[index].text
-            // return this.lists.Document.filter(opt => tag == opt.value)
+            if((this.lists.Permissions).length !== 0)
+            {
+                var index = this.lists.Permissions.findIndex(opt => tag == opt.value)
+                return this.lists.Permissions[index].text
+            }
         },
 
         formValidation: function () {

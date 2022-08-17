@@ -147,7 +147,7 @@ var root = new Vue({
                     root.STARK_User_Roles = data[0]; //We need 0, because API backed func always returns a list for now
                     root.STARK_User_Roles.orig_Role_Name = root.STARK_User_Roles.Role_Name;
                     permission_list = root.STARK_User_Roles.Permissions 
-                    root.multi_select_values.Permissions = root.STARK_User_Roles.Permissions.split(', ')
+                    root.multi_select_values.Permissions = (root.STARK_User_Roles.Permissions.split(', ')).sort()
                     root.list_Permissions()
                     console.log("VIEW: Retreived module data.")
                     root.show()
@@ -252,9 +252,11 @@ var root = new Vue({
         },
 
         tag_display_text: function (tag) {
-            var index = this.lists.Permissions.findIndex(opt => tag == opt.value)
-            return this.lists.Permissions[index].text
-            // return this.lists.Document.filter(opt => tag == opt.value)
+            if((this.lists.Permissions).length !== 0)
+            {
+                var index = this.lists.Permissions.findIndex(opt => tag == opt.value)
+                return this.lists.Permissions[index].text
+            }
         },
 
         formValidation: function () {
