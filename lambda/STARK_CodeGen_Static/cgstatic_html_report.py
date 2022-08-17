@@ -58,7 +58,7 @@ def create(data):
                                         </tr>
                                         <tr>
                                             <td>
-                                                <b-form-checkbox name="check_checkbox" value="{pk_varname}" id="{pk_varname}" v-model="checked_fields size="lg"></b-form-checkbox>
+                                                <b-form-checkbox name="check_checkbox" value="{pk_varname}" id="{pk_varname}" v-model="checked_fields" size="lg"></b-form-checkbox>
                                             </td>
                                             <td>
                                                     <label for="{pk_varname}">{pk}</label>
@@ -89,7 +89,7 @@ def create(data):
         source_code += f"""
                                         <tr>
                                             <td>
-                                                <input type="checkbox" name="check_checkbox" value="{col_varname}" id="{col_varname}" v-model="checked_fields">
+                                                <b-form-checkbox name="check_checkbox" value="{col_varname}" id="{col_varname}" v-model="checked_fields" size="lg"></b-form-checkbox>
                                             </td>
                                             <td>
                                                     <label for="{col_varname}">{col}</label>
