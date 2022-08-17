@@ -37,7 +37,7 @@ def create(data):
                             <div class="my-auto">
                                 <form class="border p-3">
                                     <div>
-                                        <table class="table report">
+                                        <table class="table table-bordered">
                                                     
                                                 <div class="alert alert-danger alert-dismissible fade show" v-if="showError">
                                                     <strong>Error!</strong> Put operator/s on:
@@ -47,7 +47,7 @@ def create(data):
                                                 </div>
                                         </table>
                                     </div>
-                                    <table class="table table-bordered">
+                                    <table class="table report">
                                         <tr>
                                             <th>
                                                 <b-form-checkbox v-model="all_selected" @change="toggle_all" size="lg"></b-form-checkbox>
