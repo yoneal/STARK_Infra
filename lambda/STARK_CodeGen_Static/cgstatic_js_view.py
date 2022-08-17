@@ -351,12 +351,13 @@ def create(data):
                     }}
 
                     {entity_app}.list(payload).then( function(data) {{"""
+
     for col, col_type in cols.items():
+        col_varname = converter.convert_to_system_name(col)
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_many = col_type.get('has_many', '')
-            foreign_entity  = converter.convert_to_system_name(has_many)
-
-            if (has_many != ''):
+            if has_many != "":
+                foreign_entity  = converter.convert_to_system_name(has_many)
                 source_code += f"""
                         for (let x = 0; x < (data['Items']).length; x++) {{
                             data['Items'][x]['{foreign_entity}'] = ((data['Items'][x]['{foreign_entity}'].split(', ')).sort()).join(', ')      
