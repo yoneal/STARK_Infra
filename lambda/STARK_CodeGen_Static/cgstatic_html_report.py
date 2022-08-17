@@ -30,8 +30,8 @@ def create(data):
 
     source_code += f"""\
             <!-- <div class="container-unauthorized" v-if="!stark_permissions['{entity}|Report']">UNAUTHORIZED!</div>
-            <div class="main-continer" v-if="stark_permissions['{entity}|Report']">
-                <div class="container" v-if="!showReport"> -->
+            <div class="main-continer" v-if="stark_permissions['{entity}|Report']"> -->
+                <div class="container" v-if="!showReport">
                     <div class="row">
                         <div class="col">
                             <div class="my-auto">
