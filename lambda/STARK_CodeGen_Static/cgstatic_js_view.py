@@ -19,6 +19,12 @@ def create(data):
     entity_app     = entity_varname + '_app'
     pk_varname     = converter.convert_to_system_name(pk)
 
+    #file upload controls
+    with_upload         = False
+    ext_string          = ""
+    allowed_size_string = ""
+    upload_elems_string = ""
+
     source_code = f"""\
         var root = new Vue({{
             el: "#vue-root",
@@ -146,12 +152,9 @@ def create(data):
     field_strings += f"""]"""
     source_code += f"""
                 temp_checked_fields: {field_strings},
-                checked_fields: {field_strings},
-                STARK_upload_elements: {{"""
+                checked_fields: {field_strings},"""
                 
-    search_string = ""
-    ext_string  = ""
-    allowed_size_string = ""
+    search_string       = ""
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
         if isinstance(col_type, dict):
@@ -160,23 +163,28 @@ def create(data):
                 has_many = col_type.get('has_many', '')
                 search_string += f"""
                     {col_varname}: '',"""
-            if col_type["type"] == 'file-upload':  
+            if col_type["type"] == 'file-upload': 
+                with_upload = True 
                 ext_string += f"""
                          "{col_varname}": "{str(col_type.get("allowed_ext",""))}","""
                 allowed_size = col_type.get("max_upload_size", "1 MB")
                 temp_split = allowed_size.split()
                 allowed_size_string += f"""
                          "{col_varname}": {int(temp_split[0])},"""
-                source_code += f"""
+                upload_elems_string += f"""
                         "{col_varname}": {{"file": '', "progress_bar_val": 0}},"""
-    source_code += f"""
+    if with_upload:
+        source_code += f"""
+                s3_access: {{}},
+                STARK_upload_elements: {{{upload_elems_string}
                 }},
                 ext_whitelist: {{{ext_string}
                 }},
                 allowed_size: {{{allowed_size_string}
                 }},
                 ext_whitelist_table: "",
-                allowed_size_table: 0,
+                allowed_size_table: 0,"""
+    source_code += f"""
                 search:{{{search_string}
                 }},
             }},
@@ -477,7 +485,9 @@ def create(data):
                 toggle_all(checked) {{
                     root.checked_fields = checked ? root.temp_checked_fields.slice() : []
                     root.all_selected = checked
-                }},
+                }},"""
+    if with_upload:
+        source_code += f"""
                 process_upload_file(file_upload_element) {{
                     var upload_processed = {{
                             'message': 'initial'
@@ -534,6 +544,17 @@ def create(data):
 
                     return upload_processed
                 }},
+                init_s3_access: function(){{
+                    
+                    var credentials = STARK.get_s3_credentials()
+                    root.s3_access = new AWS.S3({{
+                        params: {{Bucket: STARK.bucket_name}},
+                        region: STARK.region_name,
+                        apiVersion: '2006-03-01',
+                        accessKeyId: credentials['access_key_id'],
+                        secretAccessKey: credentials['secret_access_key'],
+                    }});
+                }},
                 s3upload: function(file_upload_element) {{
 
                     root.STARK_upload_elements[file_upload_element].progress_bar_val = 0
@@ -543,7 +564,7 @@ def create(data):
                         root.{entity_varname}[file_upload_element] = upload_processed['filename']
                         var filePath = 'tmp/' + upload_processed['s3_key'];
                         root.{entity_varname}.STARK_uploaded_s3_keys[file_upload_element] = upload_processed['s3_key']
-                        s3.upload({{
+                        root.s3_access.upload({{
                             Key: filePath,
                             Body: upload_processed['file_body'],
                             ACL: 'public-read'
@@ -558,10 +579,15 @@ def create(data):
                     }}
                     else
                     {{
-                        alert(upload_processed['message'])
+                        //do not show alert when file upload is opened then closed
+                        if(upload_processed['message'] != 'initial')
+                        {{
+                            alert(upload_processed['message'])
+                        }}
                     }}
 
-                }},
+                }},"""
+    source_code += f"""
                 onOptionClick({{ option, addTag }}, reference) {{
                     addTag(option.value)
                     this.search[reference] = ''
@@ -665,16 +691,12 @@ def create(data):
     source_code += f"""
             }}    
         }})
-
-    //Bucket Configurations
-    var credentials = STARK.get_s3_credentials()
-    var s3 = new AWS.S3({{
-        params: {{Bucket: STARK.bucket_name}},
-        region: STARK.region_name,
-        apiVersion: '2006-03-01',
-        accessKeyId: credentials['access_key_id'],
-        secretAccessKey: credentials['secret_access_key'],
-    }});"""
+        
+        """
+    if with_upload:
+        source_code += f"""
+        //where should I be called?
+        root.init_s3_access()"""
 
     return textwrap.dedent(source_code)
 
