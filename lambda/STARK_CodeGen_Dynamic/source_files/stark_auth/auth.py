@@ -22,23 +22,58 @@ def lambda_handler(event, context):
     else:    
         payload = json.loads(event.get('body'))
 
-    #event must contain an array of permissions in event.get('stark_permissions', [])
-    stark_permissions = payload.get('stark_permissions',[])
+    request_type = payload.get('rt','')
+    if request_type == '':
+        #Default request: Asking for user permissions check
+        #event must contain an array of permissions in payload.get('stark_permissions', [])
+        stark_permissions = payload.get('stark_permissions',[])
 
-    print(stark_permissions)
+        print(stark_permissions)
 
-    for permission in stark_permissions:
-        if(stark_core.sec.is_authorized(permission, event, ddb)):
-            print("permission: " + permission)
-            stark_permissions[permission] = True
-        else:
-            stark_permissions[permission] = False
+        for permission in stark_permissions:
+            if(stark_core.sec.is_authorized(permission, event, ddb)):
+                print("permission: " + permission)
+                stark_permissions[permission] = True
+            else:
+                stark_permissions[permission] = False
 
-    return {
-        "isBase64Encoded": False,
-        "statusCode": responseStatusCode,
-        "body": json.dumps(stark_permissions),
-        "headers": {
-            "Content-Type": "application/json",
+        return {
+            "isBase64Encoded": False,
+            "statusCode": responseStatusCode,
+            "body": json.dumps(stark_permissions),
+            "headers": {
+                "Content-Type": "application/json",
+            }
         }
-    }
+    else:
+        if request_type == 's3':
+            #FIXME: Make sure only logged in and legitimate users can get here
+        
+            #Query for our creds
+            response = ddb.query(
+                TableName=ddb_table,
+                Select='ALL_ATTRIBUTES',
+                KeyConditionExpression="pk = :pk",
+                ExpressionAttributeValues={
+                    ':pk' : {'S' : "STARK|AccessKey|S3"}
+                }
+            )
+
+            raw = response.get('Items')
+
+            items = []
+            for record in raw:
+                item = {}
+                item['access_key_id'] = record.get('sk',{}).get('S','')
+                item['secret_access_key'] = record.get('key',{}).get('S','')
+                items.append(item)
+
+            return {
+                "isBase64Encoded": False,
+                "statusCode": responseStatusCode,
+                "body": json.dumps(items),
+                "headers": {
+                    "Content-Type": "application/json",
+                }
+            }
+

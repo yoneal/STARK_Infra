@@ -125,8 +125,8 @@ def create(data):
                 return uuid;
             }},
             get_s3_credentials: function(){{
-                //temporary
-                return {{'access_key_id': '', 'secret_access_key': ''}}
+                fetchUrl = STARK.auth_url
+                return this.request('POST', fetchUrl, {{'rt': 's3'}})
             }},
             get_file_ext_whitelist: function(field_settings, table_settings = "", mode="overwrite") {{
                 //two modes: overwrite = overwrites the whitelist in the following order: field defined > table defined > globally defined
