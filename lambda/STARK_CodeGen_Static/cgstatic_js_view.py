@@ -18,6 +18,7 @@ def create(data):
     entity_varname = converter.convert_to_system_name(entity)
     entity_app     = entity_varname + '_app'
     pk_varname     = converter.convert_to_system_name(pk)
+    with_upload    = False
 
     source_code = f"""\
         var root = new Vue({{
@@ -147,6 +148,7 @@ def create(data):
     source_code += f"""
                 temp_checked_fields: {field_strings},
                 checked_fields: {field_strings},
+                s3_access: {{}},
                 STARK_upload_elements: {{"""
                 
     search_string = ""
@@ -160,7 +162,8 @@ def create(data):
                 has_many = col_type.get('has_many', '')
                 search_string += f"""
                     {col_varname}: '',"""
-            if col_type["type"] == 'file-upload':  
+            if col_type["type"] == 'file-upload': 
+                with_upload = True 
                 ext_string += f"""
                          "{col_varname}": "{str(col_type.get("allowed_ext",""))}","""
                 allowed_size = col_type.get("max_upload_size", "1 MB")
@@ -534,6 +537,17 @@ def create(data):
 
                     return upload_processed
                 }},
+                init_s3_access: function(){{
+                    
+                    var credentials = STARK.get_s3_credentials()
+                    root.s3_access = new AWS.S3({{
+                        params: {{Bucket: STARK.bucket_name}},
+                        region: STARK.region_name,
+                        apiVersion: '2006-03-01',
+                        accessKeyId: credentials['access_key_id'],
+                        secretAccessKey: credentials['secret_access_key'],
+                    }});
+                }},
                 s3upload: function(file_upload_element) {{
 
                     root.STARK_upload_elements[file_upload_element].progress_bar_val = 0
@@ -543,7 +557,7 @@ def create(data):
                         root.{entity_varname}[file_upload_element] = upload_processed['filename']
                         var filePath = 'tmp/' + upload_processed['s3_key'];
                         root.{entity_varname}.STARK_uploaded_s3_keys[file_upload_element] = upload_processed['s3_key']
-                        s3.upload({{
+                        root.s3_access.upload({{
                             Key: filePath,
                             Body: upload_processed['file_body'],
                             ACL: 'public-read'
@@ -665,16 +679,12 @@ def create(data):
     source_code += f"""
             }}    
         }})
-
-    //Bucket Configurations
-    var credentials = STARK.get_s3_credentials()
-    var s3 = new AWS.S3({{
-        params: {{Bucket: STARK.bucket_name}},
-        region: STARK.region_name,
-        apiVersion: '2006-03-01',
-        accessKeyId: credentials['access_key_id'],
-        secretAccessKey: credentials['secret_access_key'],
-    }});"""
+        
+        """
+    if with_upload:
+        source_code += f"""
+        //where should I be called?
+        root.init_s3_access()"""
 
     return textwrap.dedent(source_code)
 
