@@ -40,9 +40,7 @@ def create(data):
         col_varname = converter.convert_to_system_name(col)
         
         #check for file upload
-        if col == 'Attachments':
-            print(col_type)
-        if col_type == 'file-upload':
+        if isinstance(col_type, dict) and col_type['type'] == 'file-upload':
             with_upload = True
         
         col_type_id = set_type(col_type)

@@ -56,7 +56,10 @@ Document:
         - Revision: int
         - Numerical Code: number
         - Description: string
-        - Attachments: file-upload`,
+        - Attachments:
+            type: file-upload
+            allowed_ext: jpg, png, csv, pdf
+            max_upload_size: 10 MB`,
         },
         api_key: '',
         current_stack: 0,
