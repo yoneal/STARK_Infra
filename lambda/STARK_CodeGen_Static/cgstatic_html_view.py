@@ -50,13 +50,7 @@ def create(data):
                             <div class="form-group row">
                                 <label for="{col_varname}" class="col-sm-2 col-form-label">{col}</label>
                                 <div class="col-sm-10">"""
-        if col_type == 'file-upload':
-            source_code += f""" 
-                            <a :href="'https://'+ root.object_url_prefix + {entity_varname}.STARK_uploaded_s3_keys.{col_varname}">
-                                <span class="form-control-link" readonly id="{col_varname}" placeholder="" >{{{{{entity_varname}.{col_varname}}}}}</span>   
-                            </a>
-                            """
-        elif isinstance(col_type, dict):
+        if isinstance(col_type, dict):
             if col_type["type"] == "relationship":
                 has_one = col_type.get('has_one', '')
                 has_many = col_type.get('has_many', '')
@@ -91,6 +85,12 @@ def create(data):
                         </b-form-tags>
                     </b-form-group>
                     """  
+            elif col_type["type"] == 'file-upload':
+                source_code += f""" 
+                                <a :href="'https://'+ root.object_url_prefix + {entity_varname}.STARK_uploaded_s3_keys.{col_varname}">
+                                    <span class="form-control-link" readonly id="{col_varname}" placeholder="" >{{{{{entity_varname}.{col_varname}}}}}</span>   
+                                </a>
+                                """  
         else:
             source_code += f"""
                             <input type="text" class="form-control-plaintext" readonly id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}">
