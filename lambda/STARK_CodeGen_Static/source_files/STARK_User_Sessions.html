@@ -92,7 +92,7 @@
                             <td>{{ STARK_User_Sessions.Sess_Start }}</td>
                             <td>{{ STARK_User_Sessions.TTL }}</td>
                             <td>{{ STARK_User_Sessions.Permissions }}</td>
-                            <td><a :href="'STARK_User_Sessions_delete.html?Session_ID=' + STARK_User_Sessions.Session_ID"><img src="images/trash2.png" v-if="stark_permissions['User Sessions|Delete']"></a></td>
+                            <td><a :href="'STARK_User_Sessions_delete.html?Session_ID=' + STARK_User_Sessions.Session_ID" v-if="stark_permissions['User Sessions|Delete']"><img src="images/trash2.png"></a></td>
                         </tr>
                     </template>
             </tbody>

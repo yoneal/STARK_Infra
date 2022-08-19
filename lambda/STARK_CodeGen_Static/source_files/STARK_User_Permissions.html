@@ -80,7 +80,7 @@
                     <template v-for="STARK_User_Permissions in listview_table" id="listview-table">
                         <tr>
                             <td>
-                                <a :href="'STARK_User_Permissions_edit.html?Username=' + STARK_User_Permissions.Username"><img src="images/pencil2.png" v-if="stark_permissions['User Permissions|Edit']"></a>
+                                <a :href="'STARK_User_Permissions_edit.html?Username=' + STARK_User_Permissions.Username" v-if="stark_permissions['User Permissions|Edit']"><img src="images/pencil2.png"></a>
                             </td>
                             <th scope="row">
                                 <template id="detail-view" v-if="stark_permissions['User Permissions|View']">
@@ -91,7 +91,7 @@
                                 </template>
                             </th>
                             <td>{{ STARK_User_Permissions.Permissions }}</td>
-                            <td><a :href="'STARK_User_Permissions_delete.html?Username=' + STARK_User_Permissions.Username"><img src="images/trash2.png" v-if="stark_permissions['User Permissions|Delete']"></a></td>
+                            <td><a :href="'STARK_User_Permissions_delete.html?Username=' + STARK_User_Permissions.Username" v-if="stark_permissions['User Permissions|Delete']"><img src="images/trash2.png"></a></td>
                         </tr>
                     </template>
             </tbody>

@@ -82,7 +82,7 @@
                     <template v-for="STARK_Module_Groups in listview_table" id="listview-table">
                         <tr>
                             <td>
-                                <a :href="'STARK_Module_Groups_edit.html?Group_Name=' + STARK_Module_Groups.Group_Name"><img src="images/pencil2.png" v-if="stark_permissions['Module Groups|Edit']"></a>
+                                <a :href="'STARK_Module_Groups_edit.html?Group_Name=' + STARK_Module_Groups.Group_Name" v-if="stark_permissions['Module Groups|Edit']"><img src="images/pencil2.png"></a>
                             </td>
                             <th scope="row">
                                 <template id="detail-view" v-if="stark_permissions['Module Groups|View']">
@@ -95,7 +95,7 @@
                             <td>{{ STARK_Module_Groups.Description }}</td>
                             <td>{{ STARK_Module_Groups.Icon }}</td>
                             <td>{{ STARK_Module_Groups.Priority }}</td>
-                            <td><a :href="'STARK_Module_Groups_delete.html?Group_Name=' + STARK_Module_Groups.Group_Name"><img src="images/trash2.png"  v-if="stark_permissions['Module Groups|Delete']"></a></td>
+                            <td><a :href="'STARK_Module_Groups_delete.html?Group_Name=' + STARK_Module_Groups.Group_Name" v-if="stark_permissions['Module Groups|Delete']"><img src="images/trash2.png"></a></td>
                         </tr>
                     </template>
             </tbody>
