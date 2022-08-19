@@ -201,7 +201,8 @@ def create(data, cli_mode=False):
                                 - 
                                     Effect: Allow
                                     Action:
-                                        - 's3:*'
+                                        - 's3:PutObject'
+                                        - 's3:PutObjectACL'
                                     Resource: !Join [ "",  [ !GetAtt STARKSystemBucket.Arn, "/*"] ]
                 UserName: {web_bucket_user}
         STARKSystemBucketAccessKey:
@@ -533,7 +534,7 @@ def create(data, cli_mode=False):
                             ApiId:
                                 Ref: STARKApiGateway
                 Runtime: python3.9
-                Handler: {entity_endpoint_name}.lambda_handler
+                Handler: __init__.lambda_handler
                 CodeUri: lambda/{entity_endpoint_name}
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
                 Architectures:
