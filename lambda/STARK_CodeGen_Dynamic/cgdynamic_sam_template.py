@@ -201,7 +201,8 @@ def create(data, cli_mode=False):
                                 - 
                                     Effect: Allow
                                     Action:
-                                        - 's3:*'
+                                        - 's3:PutObject'
+                                        - 's3:PutObjectACL'
                                     Resource: !Join [ "",  [ !GetAtt STARKSystemBucket.Arn, "/*"] ]
                 UserName: {web_bucket_user}
         STARKSystemBucketAccessKey:
