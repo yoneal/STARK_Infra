@@ -77,10 +77,10 @@ def lambda_handler(event, context):
                 data['sk'] = payload.get('sk', '')
                 if data['sk'] == "":
                     data['sk'] = default_sk
-                    ListView_index_values = []
-                    for field in sort_fields:
-                        ListView_index_values.append(payload.get(field))
-                    data['STARK-ListView-sk'] = "|".join(ListView_index_values)
+                ListView_index_values = []
+                for field in sort_fields:
+                    ListView_index_values.append(payload.get(field))
+                data['STARK-ListView-sk'] = "|".join(ListView_index_values)
             else:
                 #FIXME: Reporting payload processing:
                 # - identifying filter fields

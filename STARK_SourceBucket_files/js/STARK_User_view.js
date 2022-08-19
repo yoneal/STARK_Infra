@@ -1,6 +1,13 @@
 var root = new Vue({
     el: "#vue-root",
     data: {
+        stark_permissions: {
+            'Users|View': false,
+            'Users|Add': false,
+            'Users|Delete': false,
+            'Users|Edit': false,
+            'Users|Report': false,
+        },
         listview_table: '',
         STARK_report_fields: [],
         STARK_User: {
@@ -157,6 +164,18 @@ var root = new Vue({
 
        list: function (lv_token='', btn='') {
             spinner.show()
+            data = {}
+            data['stark_permissions'] = this.stark_permissions
+            STARK.auth(data).then( function(data) {
+                console.log("Auth Request Done!");
+                console.log(data);
+                root.stark_permissions = data;
+            })
+            .catch(function(error) {
+                console.log("Encountered an error! [" + error + "]")
+                alert("Request Failed: System error or you may not have enough privileges")
+                loading_modal.hide()
+            });
             payload = []
             if (btn == 'next') {
                 root.curr_page++;

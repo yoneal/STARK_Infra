@@ -56,8 +56,8 @@
 
     <div class="row">
         <div class="col-6">
-            <button type="button" class="btn btn-primary mb-2" onClick="window.location.href='STARK_User_add.html'"> <b>+</b> Add </button>
-            <button type="button" class="btn btn-info mb-2" onClick="window.location.href='STARK_User_report.html'"> Reports </button>
+            <button type="button" class="btn btn-primary mb-2" onClick="window.location.href='STARK_User_add.html'" v-if="stark_permissions['Users|Add']"> <b>+</b> Add </button>
+            <button type="button" class="btn btn-info mb-2" onClick="window.location.href='STARK_User_report.html'" v-if="stark_permissions['Users|Report']"> Reports </button>
         </div>
         <div class="col-6 text-right d-inline-block">        
             <button id="prev" type="button" class="btn btn-outline-secondary" :disabled="prev_disabled" onClick="root.list(root.prev_token, 'prev')"> < </button>
@@ -82,13 +82,20 @@
                     <template v-for="STARK_User in listview_table" id="listview-table">
                         <tr>
                             <td>
-                                <a :href="'STARK_User_edit.html?Username=' + STARK_User.Username"><img src="images/pencil2.png"></a>
+                                <a :href="'STARK_User_edit.html?Username=' + STARK_User.Username" v-if="stark_permissions['Users|Edit']"><img src="images/pencil2.png"></a>
                             </td>
-                            <th scope="row"><a :href="'STARK_User_view.html?Username=' + STARK_User.Username">{{ STARK_User.Username }}</a></th>
+                            <th scope="row">
+                                <template id="detail-view" v-if="stark_permissions['Users|View']">
+                                    <a :href="'STARK_User_view.html?Username=' + STARK_User.Username">{{ STARK_User.Username }}</a>
+                                </template>
+                                <template id="detail-view" v-if="!stark_permissions['Users|View']">
+                                    {{ STARK_User.Username }}
+                                </template>
+                            </th>
                             <td>{{ STARK_User.Full_Name }}</td>
                             <td>{{ STARK_User.Nickname }}</td>
                             <td>{{ STARK_User.Role }}</td>
-                            <td><a :href="'STARK_User_delete.html?Username=' + STARK_User.Username"><img src="images/trash2.png"></a></td>
+                            <td><a :href="'STARK_User_delete.html?Username=' + STARK_User.Username" v-if="stark_permissions['Users|Delete']"><img src="images/trash2.png"></a></td>
                         </tr>
                     </template>
             </tbody>

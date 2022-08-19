@@ -56,8 +56,8 @@
 
     <div class="row">
         <div class="col-6">
-            <button type="button" class="btn btn-primary mb-2" onClick="window.location.href='STARK_Module_add.html'"> <b>+</b> Add </button>
-            <button type="button" class="btn btn-info mb-2" onClick="window.location.href='STARK_Module_report.html'"> Reports </button>
+            <button type="button" class="btn btn-primary mb-2" onClick="window.location.href='STARK_Module_add.html'" v-if="stark_permissions['System Modules|Add']"> <b>+</b> Add </button>
+            <button type="button" class="btn btn-info mb-2" onClick="window.location.href='STARK_Module_report.html'" v-if="stark_permissions['System Modules|Report']"> Reports </button>
         </div>
         <div class="col-6 text-right d-inline-block">        
             <button id="prev" type="button" class="btn btn-outline-secondary" :disabled="prev_disabled" onClick="root.list(root.prev_token, 'prev')"> < </button>
@@ -85,16 +85,23 @@
                     <template v-for="STARK_Module in listview_table" id="listview-table">
                         <tr>
                             <td>
-                                <a :href="'STARK_Module_edit.html?Module_Name=' + STARK_Module.Module_Name"><img src="images/pencil2.png"></a>
+                                <a :href="'STARK_Module_edit.html?Module_Name=' + STARK_Module.Module_Name" v-if="stark_permissions['System Modules|Edit']"><img src="images/pencil2.png"></a>
                             </td>
-                            <th scope="row"><a :href="'STARK_Module_view.html?Module_Name=' + STARK_Module.Module_Name">{{ STARK_Module.Module_Name }}</a></th>
+                            <th scope="row">
+                                <template id="detail-view" v-if="stark_permissions['System Modules|View']">
+                                    <a :href="'STARK_Module_view.html?Module_Name=' + STARK_Module.Module_Name">{{ STARK_Module.Module_Name }}</a>
+                                </template>
+                                <template id="detail-view" v-if="!stark_permissions['System Modules|View']">
+                                    {{ STARK_Module.Module_Name }}
+                                </template>
+                            </th>
                             <td>{{ STARK_Module.Descriptive_Title }}</td>
                             <td>{{ STARK_Module.Target }}</td>
                             <td>{{ STARK_Module.Module_Group }}</td>
                             <td>{{ STARK_Module.Is_Menu_Item }}</td>
                             <td>{{ STARK_Module.Is_Enabled }}</td>
                             <td>{{ STARK_Module.Priority }}</td>
-                            <td><a :href="'STARK_Module_delete.html?Module_Name=' + STARK_Module.Module_Name"><img src="images/trash2.png"></a></td>
+                            <td><a :href="'STARK_Module_delete.html?Module_Name=' + STARK_Module.Module_Name" v-if="stark_permissions['System Modules|Delete']"><img src="images/trash2.png"></a></td>
                         </tr>
                     </template>
             </tbody>

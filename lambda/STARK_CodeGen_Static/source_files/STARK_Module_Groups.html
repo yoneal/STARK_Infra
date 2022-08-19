@@ -56,8 +56,8 @@
 
     <div class="row">
         <div class="col-6">
-            <button type="button" class="btn btn-primary mb-2" onClick="window.location.href='STARK_Module_Groups_add.html'"> <b>+</b> Add </button>
-            <button type="button" class="btn btn-info mb-2" onClick="window.location.href='STARK_Module_Groups_report.html'"> Reports </button>
+            <button type="button" class="btn btn-primary mb-2" onClick="window.location.href='STARK_Module_Groups_add.html'" v-if="stark_permissions['Module Groups|Add']"> <b>+</b> Add </button>
+            <button type="button" class="btn btn-info mb-2" onClick="window.location.href='STARK_Module_Groups_report.html'" v-if="stark_permissions['Module Groups|Report']"> Reports </button>
         </div>
         <div class="col-6 text-right d-inline-block">        
             <button id="prev" type="button" class="btn btn-outline-secondary" :disabled="prev_disabled" onClick="root.list(root.prev_token, 'prev')"> < </button>
@@ -82,13 +82,20 @@
                     <template v-for="STARK_Module_Groups in listview_table" id="listview-table">
                         <tr>
                             <td>
-                                <a :href="'STARK_Module_Groups_edit.html?Group_Name=' + STARK_Module_Groups.Group_Name"><img src="images/pencil2.png"></a>
+                                <a :href="'STARK_Module_Groups_edit.html?Group_Name=' + STARK_Module_Groups.Group_Name" v-if="stark_permissions['Module Groups|Edit']"><img src="images/pencil2.png"></a>
                             </td>
-                            <th scope="row"><a :href="'STARK_Module_Groups_view.html?Group_Name=' + STARK_Module_Groups.Group_Name">{{ STARK_Module_Groups.Group_Name }}</a></th>
+                            <th scope="row">
+                                <template id="detail-view" v-if="stark_permissions['Module Groups|View']">
+                                    <a :href="'STARK_Module_Groups_view.html?Group_Name=' + STARK_Module_Groups.Group_Name">{{ STARK_Module_Groups.Group_Name }}</a>
+                                </template>
+                                <template id="detail-view" v-if="!stark_permissions['Module Groups|View']">
+                                    {{ STARK_Module_Groups.Group_Name }}
+                                </template>
+                            </th>
                             <td>{{ STARK_Module_Groups.Description }}</td>
                             <td>{{ STARK_Module_Groups.Icon }}</td>
                             <td>{{ STARK_Module_Groups.Priority }}</td>
-                            <td><a :href="'STARK_Module_Groups_delete.html?Group_Name=' + STARK_Module_Groups.Group_Name"><img src="images/trash2.png"></a></td>
+                            <td><a :href="'STARK_Module_Groups_delete.html?Group_Name=' + STARK_Module_Groups.Group_Name" v-if="stark_permissions['Module Groups|Delete']"><img src="images/trash2.png"></a></td>
                         </tr>
                     </template>
             </tbody>
