@@ -545,14 +545,19 @@ def create(data):
                     return upload_processed
                 }},
                 init_s3_access: function(){{
-                    
-                    var credentials = STARK.get_s3_credentials()
-                    root.s3_access = new AWS.S3({{
-                        params: {{Bucket: STARK.bucket_name}},
-                        region: STARK.region_name,
-                        apiVersion: '2006-03-01',
-                        accessKeyId: credentials['access_key_id'],
-                        secretAccessKey: credentials['secret_access_key'],
+                    STARK.get_s3_credentials().then( function(data){{
+                        access_key_id = data[0]['access_key_id']
+                        secret_access_key = data[0]['secret_access_key']
+
+                        root.s3_access = new AWS.S3({{
+                            params: {{Bucket: STARK.bucket_name}},
+                            region: STARK.region_name,
+                            apiVersion: '2006-03-01',
+                            accessKeyId: access_key_id,
+                            secretAccessKey: secret_access_key,
+                        }});
+                    }}).catch(function(error) {{
+                        console.log("Can't retrieve S3 creds! [" + error + "]")
                     }});
                 }},
                 s3upload: function(file_upload_element) {{
