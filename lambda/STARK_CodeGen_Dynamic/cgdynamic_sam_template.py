@@ -852,7 +852,7 @@ def create(data, cli_mode=False):
                             Auth:
                                 Authorizer: NONE
                 Runtime: python3.9
-                Handler: login.lambda_handler
+                Handler: __init__.lambda_handler
                 CodeUri: lambda/stark_login
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
                 Layers:
@@ -873,7 +873,7 @@ def create(data, cli_mode=False):
                             ApiId:
                                 Ref: STARKApiGateway
                 Runtime: python3.9
-                Handler: logout.lambda_handler
+                Handler: __init__.lambda_handler
                 CodeUri: lambda/stark_logout
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
                 Architectures:

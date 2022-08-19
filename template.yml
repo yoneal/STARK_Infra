@@ -146,7 +146,7 @@ Resources:
                         ApiId:
                             Ref: STARKParserApi
             Runtime: python3.9
-            Handler: main.lambda_handler
+            Handler: __init__.lambda_handler
             CodeUri: lambda/STARK_Parser
             Environment:
                 Variables:
@@ -166,7 +166,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Runtime: python3.9
-            Handler: main.lambda_handler
+            Handler: __init__.lambda_handler
             CodeUri: lambda/STARK_CFWriter
             Environment:
                 Variables:
@@ -193,7 +193,7 @@ Resources:
                         ApiId:
                             Ref: STARKParserApi
             Runtime: python3.9
-            Handler: main.lambda_handler
+            Handler: __init__.lambda_handler
             CodeUri: lambda/STARK_Deploy
             Environment:
                 Variables:
@@ -222,7 +222,7 @@ Resources:
                         ApiId:
                             Ref: STARKParserApi
             Runtime: python3.9
-            Handler: main.lambda_handler
+            Handler: __init__.lambda_handler
             CodeUri: lambda/STARK_Deploy_Check
             Environment:
                 Variables:
@@ -241,7 +241,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Runtime: python3.9
-            Handler: main.lambda_handler
+            Handler: __init__.lambda_handler
             CodeUri: lambda/STARK_CodeGen_Static
             Environment:
                 Variables:
@@ -265,7 +265,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Runtime: python3.9
-            Handler: main.lambda_handler
+            Handler: __init__.lambda_handler
             CodeUri: lambda/STARK_CodeGen_Dynamic
             Environment:
                 Variables:
@@ -289,7 +289,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Runtime: python3.9
-            Handler: main.lambda_handler
+            Handler: __init__.lambda_handler
             CodeUri: lambda/STARK_WebsiteBucketCleaner
             Environment:
                 Variables:
@@ -306,7 +306,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Runtime: python3.9
-            Handler: main.lambda_handler
+            Handler: __init__.lambda_handler
             CodeUri: lambda/STARK_SystemBootstrap
             Environment:
                 Variables:
@@ -327,7 +327,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Runtime: python3.9
-            Handler: main.lambda_handler
+            Handler: __init__.lambda_handler
             CodeUri: lambda/STARK_SystemPreLaunch
             Environment:
                 Variables:
@@ -351,7 +351,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Runtime: python3.9
-            Handler: main.lambda_handler
+            Handler: __init__.lambda_handler
             CodeUri: lambda/STARK_WebsiteUpdater
             Environment:
                 Variables:
@@ -382,7 +382,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Runtime: python3.9
-            Handler: main.lambda_handler
+            Handler: __init__.lambda_handler
             CodeUri: lambda/STARK_ConfigWriter
             Environment:
                 Variables:
