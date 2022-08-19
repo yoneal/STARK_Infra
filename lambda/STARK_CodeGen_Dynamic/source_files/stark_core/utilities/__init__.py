@@ -7,33 +7,33 @@ import stark_core
 name = "STARK Utilities"
 
 def compose_report_operators_and_parameters(key, data):
-    composed_filter_dict = {{"filter_string":"","expression_values": {{}}}}
+    composed_filter_dict = {"filter_string":"","expression_values": {}}
     if data['operator'] == "IN":
         string_split = data['value'].split(',')
-        composed_filter_dict['filter_string'] += f" {{key}} IN "
+        composed_filter_dict['filter_string'] += f" {key} IN "
         temp_in_string = ""
         in_string = ""
         in_counter = 1
-        composed_filter_dict['report_params'] = {{key : f"Is in {{data['value']}}"}}
+        composed_filter_dict['report_params'] = {key : f"Is in {data['value']}"}
         for in_index in string_split:
-            in_string += f" :inParam{{in_counter}}, "
-            composed_filter_dict['expression_values'][f":inParam{{in_counter}}"] = {{data['type'] : in_index.strip()}}
+            in_string += f" :inParam{in_counter}, "
+            composed_filter_dict['expression_values'][f":inParam{in_counter}"] = {data['type'] : in_index.strip()}
             in_counter += 1
         temp_in_string = in_string[1:-2]
-        composed_filter_dict['filter_string'] += f"({{temp_in_string}}) AND"
+        composed_filter_dict['filter_string'] += f"({temp_in_string}) AND"
     elif data['operator'] in [ "contains", "begins_with" ]:
-        composed_filter_dict['filter_string'] += f" {{data['operator']}}({{key}}, :{{key}}) AND"
-        composed_filter_dict['expression_values'][f":{{key}}"] = {{data['type'] : data['value'].strip()}}
-        composed_filter_dict['report_params'] = {{key : f"{{data['operator'].capitalize().replace('_', ' ')}} {{data['value']}}"}}
+        composed_filter_dict['filter_string'] += f" {data['operator']}({key}, :{key}) AND"
+        composed_filter_dict['expression_values'][f":{key}"] = {data['type'] : data['value'].strip()}
+        composed_filter_dict['report_params'] = {key : f"{data['operator'].capitalize().replace('_', ' ')} {data['value']}"}
     elif data['operator'] == "between":
         from_to_split = data['value'].split(',')
-        composed_filter_dict['filter_string'] += f" ({{key}} BETWEEN :from{{key}} AND :to{{key}}) AND"
-        composed_filter_dict['expression_values'][f":from{{key}}"] = {{data['type'] : from_to_split[0].strip()}}
-        composed_filter_dict['expression_values'][f":to{{key}}"] = {{data['type'] : from_to_split[1].strip()}}
-        composed_filter_dict['report_params'] = {{key : f"Between {{from_to_split[0].strip()}} and {{from_to_split[1].strip()}}"}}
+        composed_filter_dict['filter_string'] += f" ({key} BETWEEN :from{key} AND :to{key}) AND"
+        composed_filter_dict['expression_values'][f":from{key}"] = {data['type'] : from_to_split[0].strip()}
+        composed_filter_dict['expression_values'][f":to{key}"] = {data['type'] : from_to_split[1].strip()}
+        composed_filter_dict['report_params'] = {key : f"Between {from_to_split[0].strip()} and {from_to_split[1].strip()}"}
     else:
-        composed_filter_dict['filter_string'] += f" {{key}} {{data['operator']}} :{{key}} AND"
-        composed_filter_dict['expression_values'][f":{{key}}"] = {{data['type'] : data['value'].strip()}}
+        composed_filter_dict['filter_string'] += f" {key} {data['operator']} :{key} AND"
+        composed_filter_dict['expression_values'][f":{key}"] = {data['type'] : data['value'].strip()}
         operator_string_equivalent = ""
         if data['operator'] == '=':
             operator_string_equivalent = 'Is equal to'
@@ -49,7 +49,7 @@ def compose_report_operators_and_parameters(key, data):
             operator_string_equivalent = 'Is not equal to'
         else:
             operator_string_equivalent = 'Invalid operator'
-        composed_filter_dict['report_params'] = {{key : f" {{operator_string_equivalent}} {{data['value'].strip()}}" }}
+        composed_filter_dict['report_params'] = {key : f" {operator_string_equivalent} {data['value'].strip()}" }
 
     return composed_filter_dict
 

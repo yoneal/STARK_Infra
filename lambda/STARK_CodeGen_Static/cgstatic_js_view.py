@@ -175,7 +175,7 @@ def create(data):
                         "{col_varname}": {{"file": '', "progress_bar_val": 0}},"""
     if with_upload:
         source_code += f"""
-                s3_access: {{}},
+                s3_access: "",
                 STARK_upload_elements: {{{upload_elems_string}
                 }},
                 ext_whitelist: {{{ext_string}
@@ -545,15 +545,27 @@ def create(data):
                     return upload_processed
                 }},
                 init_s3_access: function(){{
+
+                    if(root.s3_access == "")
+                    {{
+                        STARK.get_s3_credentials().then( function(data){{
+                            access_key_id = data[0]['access_key_id']
+                            secret_access_key = data[0]['secret_access_key']
+
+                            root.s3_access = new AWS.S3({{
+                                params: {{Bucket: STARK.bucket_name}},
+                                region: STARK.region_name,
+                                apiVersion: '2006-03-01',
+                                accessKeyId: access_key_id,
+                                secretAccessKey: secret_access_key,
+                            }});
+
+                            console.log("S3 authorized")
+                        }}).catch(function(error) {{
+                            console.log("Can't retrieve S3 creds! [" + error + "]")
+                        }});
+                    }}
                     
-                    var credentials = STARK.get_s3_credentials()
-                    root.s3_access = new AWS.S3({{
-                        params: {{Bucket: STARK.bucket_name}},
-                        region: STARK.region_name,
-                        apiVersion: '2006-03-01',
-                        accessKeyId: credentials['access_key_id'],
-                        secretAccessKey: credentials['secret_access_key'],
-                    }});
                 }},
                 s3upload: function(file_upload_element) {{
 
@@ -693,10 +705,6 @@ def create(data):
         }})
         
         """
-    if with_upload:
-        source_code += f"""
-        //where should I be called?
-        root.init_s3_access()"""
 
     return textwrap.dedent(source_code)
 

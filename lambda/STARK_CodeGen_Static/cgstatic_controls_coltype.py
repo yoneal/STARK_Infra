@@ -179,7 +179,7 @@ def create(data):
                             </b-form-group>
             """
         elif col_type["type"] == "file-upload":
-            html_code=f"""<b-form-file v-model="STARK_upload_elements.{col_varname}.file" :placeholder="STARK_upload_elements.{col_varname}.file" drop-placeholder="Drop file here..." @input="s3upload('{col_varname}')" ></b-form-file>      
+            html_code=f"""<b-form-file v-model="STARK_upload_elements.{col_varname}.file" :placeholder="STARK_upload_elements.{col_varname}.file" drop-placeholder="Drop file here..." @input="s3upload('{col_varname}')" v-b-hover="init_s3_access" onfocus="root.init_s3_access()"></b-form-file>      
                                 <b-progress :value="STARK_upload_elements.{col_varname}.progress_bar_val" :max="100" class="mt-2"></b-progress>"""
         elif col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
