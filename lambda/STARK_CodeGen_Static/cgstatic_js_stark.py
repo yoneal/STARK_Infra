@@ -41,6 +41,11 @@ def create(data):
             'methods_with_body': ["POST", "DELETE", "PUT"],
             'bucket_name': '{bucket_name}',
             'region_name': '{region_name}',
+            'file_ext_whitelist': ['jpg','jpeg','gif','bmp','png',
+                                'doc','docx','xls','xlsx','ppt','pptx', 'csv',
+                                'odt','ods','odp','txt','rtf','pdf',
+                                'zip','rar','7z','bz2','tar','gz'],
+            'max_upload_size': 10,//in MB,
 
             request: function(method, fetchURL, payload='') {{
 
@@ -110,7 +115,7 @@ def create(data):
                 fetchUrl = STARK.auth_url
                 return STARK.request('POST', fetchUrl, payload)
             }},
-            create_UUID: function(){{
+            create_UUID: function() {{
                 var dt = new Date().getTime();
                 var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {{
                     var r = (dt + Math.random()*16)%16 | 0;
@@ -120,8 +125,35 @@ def create(data):
                 return uuid;
             }},
             get_s3_credentials: function(){{
-                //temporary
-                return {{'access_key_id': '', 'secret_access_key': ''}}
+                fetchUrl = STARK.auth_url
+                return this.request('POST', fetchUrl, {{'rt': 's3'}})
+            }},
+            get_file_ext_whitelist: function(field_settings, table_settings = "", mode="overwrite") {{
+                //two modes: overwrite = overwrites the whitelist in the following order: field defined > table defined > globally defined
+                //           mix       = combines the all the whitelist
+                whitelist = ""
+                global_settings = STARK.file_ext_whitelist.join(', ')
+                if(mode == "overwrite")
+                {{
+                    whitelist = field_settings == "" ? table_settings == "" ? global_settings : table_settings : field_settings
+                }}
+                else if (mode == "mix")
+                {{
+                    whitelist = table_settings == "" ? global_settings: table_settings
+
+                    if(field_settings != "")
+                    {{
+                        whitelist.concat(`, ${{field_settings}}`)
+                    }}
+
+                }}
+                return whitelist
+            }},
+            get_allowed_upload_size: function(field_settings, table_settings = 0) {{
+                global_settings = STARK.max_upload_size
+                size_setting = field_settings == 0 ? table_settings == 0 ? global_settings : table_settings : field_settings;
+                conversion = size_setting * 1024 * 1024
+                return conversion
             }}
         }};"""
 

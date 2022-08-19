@@ -202,7 +202,7 @@ def create(data, cli_mode=False):
                                     Effect: Allow
                                     Action:
                                         - 's3:*'
-                                    Resource: !GetAtt STARKSystemBucket.Arn
+                                    Resource: !Join [ "",  [ !GetAtt STARKSystemBucket.Arn, "/*"] ]
                 UserName: {web_bucket_user}
         STARKSystemBucketAccessKey:
             Type: AWS::IAM::AccessKey
