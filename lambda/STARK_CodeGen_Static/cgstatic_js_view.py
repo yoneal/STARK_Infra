@@ -175,7 +175,7 @@ def create(data):
                         "{col_varname}": {{"file": '', "progress_bar_val": 0}},"""
     if with_upload:
         source_code += f"""
-                s3_access: {{}},
+                s3_access: "",
                 STARK_upload_elements: {{{upload_elems_string}
                 }},
                 ext_whitelist: {{{ext_string}
@@ -546,7 +546,7 @@ def create(data):
                 }},
                 init_s3_access: function(){{
 
-                    if(typeof root.s3_access == "undefined")
+                    if(root.s3_access == "")
                     {{
                         STARK.get_s3_credentials().then( function(data){{
                             access_key_id = data[0]['access_key_id']
