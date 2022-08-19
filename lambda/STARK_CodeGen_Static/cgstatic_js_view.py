@@ -545,20 +545,27 @@ def create(data):
                     return upload_processed
                 }},
                 init_s3_access: function(){{
-                    STARK.get_s3_credentials().then( function(data){{
-                        access_key_id = data[0]['access_key_id']
-                        secret_access_key = data[0]['secret_access_key']
 
-                        root.s3_access = new AWS.S3({{
-                            params: {{Bucket: STARK.bucket_name}},
-                            region: STARK.region_name,
-                            apiVersion: '2006-03-01',
-                            accessKeyId: access_key_id,
-                            secretAccessKey: secret_access_key,
+                    if(typeof root.s3_access == "undefined")
+                    {{
+                        STARK.get_s3_credentials().then( function(data){{
+                            access_key_id = data[0]['access_key_id']
+                            secret_access_key = data[0]['secret_access_key']
+
+                            root.s3_access = new AWS.S3({{
+                                params: {{Bucket: STARK.bucket_name}},
+                                region: STARK.region_name,
+                                apiVersion: '2006-03-01',
+                                accessKeyId: access_key_id,
+                                secretAccessKey: secret_access_key,
+                            }});
+
+                            console.log("S3 authorized")
+                        }}).catch(function(error) {{
+                            console.log("Can't retrieve S3 creds! [" + error + "]")
                         }});
-                    }}).catch(function(error) {{
-                        console.log("Can't retrieve S3 creds! [" + error + "]")
-                    }});
+                    }}
+                    
                 }},
                 s3upload: function(file_upload_element) {{
 
@@ -698,10 +705,6 @@ def create(data):
         }})
         
         """
-    if with_upload:
-        source_code += f"""
-        //where should I be called?
-        root.init_s3_access()"""
 
     return textwrap.dedent(source_code)
 
