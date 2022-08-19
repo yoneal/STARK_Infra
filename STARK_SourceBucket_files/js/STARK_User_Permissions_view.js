@@ -153,7 +153,7 @@ var root = new Vue({
                     root.STARK_User_Permissions = data[0]; //We need 0, because API backed func always returns a list for now
                     root.STARK_User_Permissions.orig_Username = root.STARK_User_Permissions.Username;
 					permission_list = root.STARK_User_Permissions.Permissions 
-                    root.multi_select_values.Permissions = (root.STARK_User_Roles.Permissions.split(', ')).sort()		
+                    root.multi_select_values.Permissions = (root.STARK_User_Permissions.Permissions.split(', ')).sort()		
                     root.list_Permissions()														
                     console.log("VIEW: Retreived module data.")
                     root.show()
