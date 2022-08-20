@@ -30,7 +30,7 @@ def create(data):
 
             <title>{project_name} :: Login</title>
         </head>
-        <body class="bg-light">
+        <body>
         <div class="container-fluid" id="vue-root">
 
             <div>

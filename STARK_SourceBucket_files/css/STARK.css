@@ -4,15 +4,12 @@
 
 .module_card {
   width: 15rem;
-  background-color: #e9ecef;
+  background-color: #999999;
 }
 
 .module_card:hover {
-  box-shadow:0 0 0 .2rem rgba(0,123,255,.25);
-}
-
-.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
-  background-color: #fff8bb;
+  background-color: #666666;
+  box-shadow:0 0 0 .2rem rgba(181, 217, 255, 0.25);
 }
 
 .collapsed > .when-open,
@@ -20,20 +17,30 @@
   display: none;
 }
 
-.report #tags-with-dropdown, 
-.report .b-form-tags{
-  background-color: transparent ;
-  padding:0rem !important;
-  border: 0px;
+.form-control-plaintext {
+  color: #cccccc;
 }
 
-.report td { 
-  border-top: 1px solid #dee2e6;
-  border-bottom: 1px solid #dee2e6;
-  background-color:white
+a:hover,
+a:active,
+a:link,
+a:visited
+ {
+  text-decoration: underline;
+  color: #17a3b9;
 }
-
-input.checkbox-med {
-  transform: scale(1.5);
-  margin-left:10px
+/* Change Autocomplete styles in Chrome*/
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  border: 1px solid gray;
+  -webkit-text-fill-color: #cccccc;
+  -webkit-box-shadow: 0 0 0px 1000px #000 inset;
+  transition: background-color 5000s ease-in-out 0s;
 }

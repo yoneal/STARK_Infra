@@ -18,7 +18,7 @@ def create(data, breadcrumb):
         entity_varname = converter.convert_to_system_name(entity)
 
     source_code = f"""\
-        <body class="bg-light">
+        <body>
         <div class="container-fluid" id="vue-root">
 
             <div class="row bg-primary mb-3 p-3 text-white" style="background-image: url('images/banner_generic_blue.png')">

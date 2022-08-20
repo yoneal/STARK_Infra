@@ -47,7 +47,7 @@ def create(data):
                                                 </div>
                                         </table>
                                     </div>
-                                    <table class="table report">
+                                    <table class="table report table-dark">
                                         <tr>
                                             <th>
                                                 <input type="checkbox" class="checkbox-med" name="check_checkbox" v-model="all_selected" onchange="root.toggle_all(!root.all_selected)">
@@ -133,7 +133,7 @@ def create(data):
 
                     <div class="row">
                         <div class="col overflow-auto">
-                            <table class="table  table-hover table-striped">
+                            <table class="table  table-hover table-striped table-dark">
                                 <thead class="thead-dark">
                                     <tr>
                                         <th scope="col"> Operations </th>
