@@ -19,9 +19,9 @@ def create(data):
             <template v-for="(group, index) in modules" id="groups-template">
                 <!-- <b-button squared size="lg" v-b-toggle="'group-collapse-'+index" variant="light" class="mb-0 pl-2"> -->        
                 <h4>
-                    <a v-b-toggle class="text-decoration" :href="'#group-collapse-'+index" @click.prevent>
-                        <span class="when-open">[-]</span><span class="when-closed">[+]</span>
+                    <a v-b-toggle class="text-decoration-none" :href="'#group-collapse-'+index" @click.prevent>
                         <span class="align-bottom">{{{{ group.group_name }}}}</span>
+                        <span class="when-open"><img src="images/chevron-up.svg" class="filter-fill-svg-link" height="20rem"></span><span class="when-closed"><img src="images/chevron-down.svg" class="filter-fill-svg-link" height="20rem"></span>
                     </a>
                 </h4>
                 <!-- </b-button> -->
@@ -29,7 +29,7 @@ def create(data):
                     <div class="d-flex align-content-start flex-wrap">
                         <template v-for="module in group.modules" id="modules-template">
                             <div class="card p-0 m-2 border module_card" id="modules_list" :onclick="'window.location.href=\\''  + module.href + '\\''">
-                                <img class="card-img-top p-3 m-0" :src="module.image" alt="Card image cap" height="100rem">
+                                <img class="card-img-top p-3 m-0 filter-fill-svg" :src="module.image" alt="Card image cap" height="100rem">
                                 <div class="card-body bg-info p-2 rounded-bottom">
                                     <p class="card-text text-light font-weight-bold text-center">{{{{module.title}}}}</p>
                                 </div>

@@ -4,12 +4,21 @@
 
 .module_card {
   width: 15rem;
-  background-color: #999999;
+  background-color: #343a40;
 }
 
 .module_card:hover {
-  background-color: #666666;
-  box-shadow:0 0 0 .2rem rgba(181, 217, 255, 0.25);
+  background-color: #17a3b9;
+}
+
+/*Conversion from hexcodes to filter values can be found here: https://codepen.io/sosuke/pen/Pjoqqp */
+/*Currently, this is using the filter value for hexcode #cccccc*/
+.filter-fill-svg {
+  filter: invert(86%) sepia(0%) saturate(0%) hue-rotate(199deg) brightness(91%) contrast(82%);
+}
+
+.filter-fill-svg-link {
+  filter: invert(70%) sepia(38%) saturate(6903%) hue-rotate(148deg) brightness(88%) contrast(82%);
 }
 
 .collapsed > .when-open,
