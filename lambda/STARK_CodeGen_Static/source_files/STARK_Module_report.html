@@ -21,7 +21,7 @@
 
     <title>[[STARK_PROJECT_NAME]] - System Modules</title>
 </head>
-<body class="bg-light">
+<body>
 <div class="container-fluid" id="vue-root">
 
     <div class="row bg-primary mb-3 p-3 text-white" style="background-image: url('images/banner_generic_blue.png')">
@@ -72,7 +72,7 @@
                                     </div>
                             </table>
                         </div>
-                        <table class="table table-bordered">
+                        <table class="table table-dark table-striped">
                             <tr>
                                 <th style="padding: 10px">
                                     Show Column<br>
@@ -257,8 +257,8 @@
         <div class="row">
             <div class="col-6 text-left d-inline-block">
                 <button id="prev" type="button" class="btn btn-secondary mb-2" onClick="root.showReport = false, root.showError = false"> Back </button>
-        <button type="button" class="btn btn-success mb-2" onClick="root.download_report('csv')" :disabled="listview_table.length < 1"> Export as CSV</button>
-        <button type="button" class="btn btn-danger mb-2" onClick="root.download_report('pdf')" :disabled="listview_table.length < 1"> Export as PDF</button>
+                <button type="button" class="btn btn-success mb-2" onClick="root.download_report('csv')" :disabled="listview_table.length < 1"> Export as CSV</button>
+                <button type="button" class="btn btn-danger mb-2" onClick="root.download_report('pdf')" :disabled="listview_table.length < 1"> Export as PDF</button>
                 <button id="refresh" type="button" class="btn btn-primary mb-2" onClick="root.generate()" :disabled="listview_table.length < 1"> Refresh </button>
             </div>
             <div class="col-6">
@@ -267,7 +267,7 @@
 
         <div class="row">
             <div class="col overflow-auto">
-                <table class="table  table-hover table-striped">
+                <table class="table table-dark table-hover table-striped">
                     <thead class="thead-dark">
                         <tr>
                             <th scope="col"> Operations </th>
@@ -280,8 +280,8 @@
                         <template v-for="STARK_Module in listview_table" id="listview-table">
                             <tr>
                                 <td align="center">
-                                    <a :href="'STARK_Module_edit.html?Module_Name=' + STARK_Module.Module_Name" target="_blank"><img src="images/pencil2.png" ></a>
-                                    <a :href="'STARK_Module_delete.html?Module_Name=' + STARK_Module.Module_Name" target="_blank"><img src="images/trash2.png" ></a>
+                                    <a :href="'STARK_Module_edit.html?Module_Name=' + STARK_Module.Module_Name" target="_blank"><img src="images/pencil-square.svg" class="bg-info"></a>
+                                    <a :href="'STARK_Module_delete.html?Module_Name=' + STARK_Module.Module_Name" target="_blank"><img src="images/x-square.svg" class="bg-danger"></a>
                                 </td>
                                 <template v-for="column in STARK_report_fields">
                                     <td>{{ STARK_Module[column.field] }}</td>

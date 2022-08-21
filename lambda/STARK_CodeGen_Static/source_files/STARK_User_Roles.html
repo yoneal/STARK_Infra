@@ -20,7 +20,7 @@
 
     <title>[[STARK_PROJECT_NAME]] - User Roles</title>
 </head>
-<body class="bg-light">
+<body>
 <div class="container-fluid" id="vue-root">
 
     <div class="row bg-primary mb-3 p-3 text-white" style="background-image: url('images/banner_generic_blue.png')">
@@ -60,14 +60,14 @@
             <button type="button" class="btn btn-info mb-2" onClick="window.location.href='STARK_User_Roles_report.html'" v-if="stark_permissions['User Roles|Report']"> Reports </button>
         </div>
         <div class="col-6 text-right d-inline-block">        
-            <button id="prev" type="button" class="btn btn-outline-secondary" :disabled="prev_disabled" onClick="root.list(root.prev_token, 'prev')"> < </button>
-            <button id="next" type="button" class="btn btn-outline-secondary" :disabled="next_disabled" onClick="root.list(root.next_token, 'next')"> > </button>
+            <button id="prev" type="button" class="btn btn-secondary" :disabled="prev_disabled" onClick="root.list(root.prev_token, 'prev')"> < </button>
+            <button id="next" type="button" class="btn btn-secondary" :disabled="next_disabled" onClick="root.list(root.next_token, 'next')"> > </button>
         </div>
     </div>
 
     <div class="row">
         <div class="col overflow-auto">
-            <table class="table  table-hover table-striped">
+            <table class="table table-hover table-striped table-dark">
                 <thead class="thead-dark">
                     <tr>
                         <th scope="col">Edit</th>
@@ -81,7 +81,7 @@
                     <template v-for="STARK_User_Roles in listview_table" id="listview-table">
                         <tr>
                             <td>
-                                <a :href="'STARK_User_Roles_edit.html?Role_Name=' + STARK_User_Roles.Role_Name" v-if="stark_permissions['User Roles|Edit']"><img src="images/pencil2.png"></a>
+                                <a :href="'STARK_User_Roles_edit.html?Role_Name=' + STARK_User_Roles.Role_Name" v-if="stark_permissions['User Roles|Edit']"><img src="images/pencil-square.svg" class="bg-info"></a>
                             </td>
                             <th scope="row">
                                 <template id="detail-view" v-if="stark_permissions['User Roles|View']">
@@ -93,7 +93,7 @@
                             </th>
                             <td>{{ STARK_User_Roles.Description }}</td>
                             <td>{{ STARK_User_Roles.Permissions }}</td>
-                            <td><a :href="'STARK_User_Roles_delete.html?Role_Name=' + STARK_User_Roles.Role_Name" v-if="stark_permissions['User Roles|Delete']"><img src="images/trash2.png"></a></td>
+                            <td><a :href="'STARK_User_Roles_delete.html?Role_Name=' + STARK_User_Roles.Role_Name" v-if="stark_permissions['User Roles|Delete']"><img src="images/x-square.svg" class="bg-danger"></a></td>
                         </tr>
                     </template>
             </tbody>
