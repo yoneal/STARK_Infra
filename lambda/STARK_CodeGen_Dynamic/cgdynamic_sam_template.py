@@ -799,27 +799,6 @@ def create(data, cli_mode=False):
                 Timeout: 5
                 Layers:
                     - !Ref Fpdf2Layer
-        STARKBackendApiForSysModules:
-            Type: AWS::Serverless::Function
-            Properties:
-                Events:
-                    SysModulesGetEvent:
-                        Type: HttpApi
-                        Properties:
-                            Path: /sys_modules
-                            Method: GET
-                            ApiId:
-                                Ref: STARKApiGateway
-                Runtime: python3.9
-                Handler: sys_modules.lambda_handler
-                CodeUri: lambda/sys_modules
-                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
-                Architectures:
-                    - arm64
-                MemorySize: 128
-                Timeout: 5
-                Layers:
-                    - !Ref PyYamlLayer
         STARKBackendApiForAuth:
             Type: AWS::Serverless::Function
             Properties:
@@ -894,7 +873,6 @@ def create(data, cli_mode=False):
             DependsOn:
                 - STARKApiGateway
                 - STARKBackendApiForLogin
-                - STARKBackendApiForSysModules
                 - STARKBucketCleaner
                 - STARKDynamoDB
                 - STARKProjectDefaultLambdaServiceRole

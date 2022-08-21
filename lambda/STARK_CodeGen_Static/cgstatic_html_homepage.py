@@ -20,8 +20,8 @@ def create(data):
                 <!-- <b-button squared size="lg" v-b-toggle="'group-collapse-'+index" variant="light" class="mb-0 pl-2"> -->        
                 <h4>
                     <a v-b-toggle class="text-decoration-none" :href="'#group-collapse-'+index" @click.prevent>
-                        <span class="align-bottom">{{{{ group.group_name }}}}</span>
                         <span class="when-open"><img src="images/chevron-up.svg" class="filter-fill-svg-link" height="20rem"></span><span class="when-closed"><img src="images/chevron-down.svg" class="filter-fill-svg-link" height="20rem"></span>
+                        <span class="align-bottom">{{{{ group.group_name }}}}</span>
                     </a>
                 </h4>
                 <!-- </b-button> -->
