@@ -75,16 +75,6 @@
                     <b-form-group label="Permissions" label-for="tags-with-dropdown">
                     <b-form-tags id="tags-with-dropdown" v-model="multi_select_values.Permissions" no-outer-focus class="mb-2">
                         <template v-slot="{ tags, disabled, addTag, removeTag }">
-                        <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
-                            <li v-for="tag in tags" :key="tag" class="list-inline-item">
-                            <b-form-tag
-                                @remove="removeTag(tag)"
-                                :title="tag"
-                                :disabled="disabled"
-                                variant="info"
-                            >{{ tag_display_text(tag) }}</b-form-tag>
-                            </li>
-                        </ul>
                 
                         <b-dropdown size="sm" variant="outline-secondary" 
                             block menu-class="w-50" 
@@ -114,17 +104,29 @@
                             </b-form-group>
                             </b-dropdown-form>
                             <b-dropdown-divider></b-dropdown-divider>
-                            <b-dropdown-item-button
-                            v-for="option in Permissions"
-                            :key="option"
-                            @click="onOptionClick({ option, addTag }, 'Permissions')"
-                            >
-                            {{ option.text }}
-                            </b-dropdown-item-button>
+                            <b-dropdown-form style="max-height: 350px; overflow-y: scroll;">
+                                <b-dropdown-item-button
+                                v-for="option in Permissions"
+                                :key="option"
+                                @click="onOptionClick({ option, addTag }, 'Permissions')"
+                                >
+                                {{ option.text }}
+                                </b-dropdown-item-button>
+                            </b-dropdown-form>
                             <b-dropdown-text v-if="Permissions.length === 0">
                             There are no permissions available to select
                             </b-dropdown-text>
                         </b-dropdown>
+                        <ul v-if="tags.length > 0" class="list-inline d-inline-block">
+                            <li v-for="tag in tags" :key="tag" class="list-inline-item mt-2">
+                            <b-form-tag
+                                @remove="removeTag(tag)"
+                                :title="tag"
+                                :disabled="disabled"
+                                variant="info"
+                            >{{ tag_display_text(tag) }}</b-form-tag>
+                            </li>
+                        </ul>
                         </template>
                     </b-form-tags>
                     </b-form-group>
