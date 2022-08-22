@@ -625,9 +625,6 @@ def get_module_groups(groups, sk=default_sk):
     return items
     
 def cascade_pk_change_to_child(params):
-    from os import getcwd 
-    STARK_folder = getcwd() + '/STARK_Module'
-    sys.path = [STARK_folder] + sys.path
     import STARK_Module as stark_module
 
     #fetch all records from child using old pk value

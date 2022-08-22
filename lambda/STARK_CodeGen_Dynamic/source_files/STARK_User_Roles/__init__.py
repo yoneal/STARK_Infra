@@ -583,9 +583,6 @@ def create_listview_index_value(data):
     return STARK_ListView_sk
 
 def cascade_pk_change_to_child(params):
-    from os import getcwd 
-    STARK_folder = getcwd() + '/STARK_User'
-    sys.path = [STARK_folder] + sys.path
     import STARK_User as user
 
     #fetch all records from child using old pk value
