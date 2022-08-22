@@ -445,7 +445,7 @@ def create(data):
                 generate: function () {{
                     let temp_show_fields = []
                     root.checked_fields.forEach(element => {{
-                        let temp_index = {{'field': element, label: element.replace("_"," ")}}
+                        let temp_index = {{'field': element, label: element.replaceAll("_"," ")}}
                         temp_show_fields.push(temp_index)
                     }});
                     root.STARK_report_fields = temp_show_fields;
