@@ -534,7 +534,7 @@ def create(data, cli_mode=False):
                             ApiId:
                                 Ref: STARKApiGateway
                 Runtime: python3.9
-                Handler: {entity_endpoint_name}.lambda_handler
+                Handler: __init__.lambda_handler
                 CodeUri: lambda/{entity_endpoint_name}
                 Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
                 Architectures:

@@ -706,10 +706,6 @@ def create(data):
     if len(relationships) > 0:
         source_code += f"""    
     def cascade_pk_change_to_child(params, parent_entity_name, child_entity_name, attribute):
-        from os import getcwd 
-        STARK_folder = getcwd() + f"/{{child_entity_name}}"
-        sys.path = [STARK_folder] + sys.path
-
         temp_import = importlib.import_module(child_entity_name)
 
         #fetch all records from child using old pk value
