@@ -37,7 +37,8 @@ def create(data, special="none"):
             <script src="js/bootstrap-vue.min.js" defer></script>
             <script src="js/STARK.js" defer></script>
             <script src="js/STARK_spinner.js" defer></script>
-            <script src="js/STARK_loading_modal.js" defer></script>"""
+            <script src="js/STARK_loading_modal.js" defer></script>
+            """
 
     if special == "HomePage":
         source_code += f"""\
@@ -67,7 +68,7 @@ def create(data, special="none"):
                     with_upload = True 
 
     if special in ['New', 'Edit'] and with_upload:
-        source_code += f"""\
+        source_code += f"""
             <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.24.min.js"></script>"""
 
     if(special == "none"):
