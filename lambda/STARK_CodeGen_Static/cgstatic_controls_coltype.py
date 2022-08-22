@@ -223,9 +223,11 @@ def create(data):
                                                 </b-form-group>
                                             </b-dropdown-form>
                                             <b-dropdown-divider></b-dropdown-divider>
-                                            <b-dropdown-item-button  v-for="option in {foreign_entity}" :key="option" @click="onOptionClick({{ option, addTag }},'{foreign_entity}')">
-                                                {{{{ option.text }}}}
-                                            </b-dropdown-item-button>
+                                            <b-dropdown-form style="max-height: 350px; overflow-y: scroll;">
+                                                <b-dropdown-item-button  v-for="option in {foreign_entity}" :key="option" @click="onOptionClick({{ option, addTag }},'{foreign_entity}')">
+                                                    {{{{ option.text }}}}
+                                                </b-dropdown-item-button>
+                                            </b-dropdown-form>
                                             <b-dropdown-text v-if="{foreign_entity}.length === 0">
                                                 There are no {has_many.lower()}s available to select
                                             </b-dropdown-text>
