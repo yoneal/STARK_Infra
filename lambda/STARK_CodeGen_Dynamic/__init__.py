@@ -84,7 +84,7 @@ def create_handler(event, context):
 
         #Step 2: Add source code to our commit list to the project repo
         files_to_commit.append({
-            'filePath': f"lambda/{entity_varname}/{entity_varname}.py",
+            'filePath': f"lambda/{entity_varname}/__init__.py",
             'fileContent': source_code.encode()
         })
 
