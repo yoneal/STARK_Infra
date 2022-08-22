@@ -26,6 +26,18 @@
   display: none;
 }
 
+.report #tags-with-dropdown, 
+.report .b-form-tags{
+  background-color: transparent ;
+  padding:0rem !important;
+  border: 0px;
+}
+
+input.checkbox-med {
+  transform: scale(1.5);
+  margin-left:10px
+}
+
 .form-control-plaintext {
   color: #cccccc;
 }
@@ -52,4 +64,24 @@ select:-webkit-autofill:focus {
   -webkit-text-fill-color: #cccccc;
   -webkit-box-shadow: 0 0 0px 1000px #000 inset;
   transition: background-color 5000s ease-in-out 0s;
+}
+/*file upload*/
+.custom-file-label {
+  background-color: #000;
+  color:#d3d3d3;
+  border: 1px solid #6c757d !important;
+}
+
+.custom-file-label::after {
+  background-color: #383d41;
+  color:#d3d3d3;
+}
+
+.progress {
+  background-color:#383d41
+}
+
+/*tags, spinners, date input elements*/
+.form-control.focus {
+  background-color:#191d21 !important;
 }
