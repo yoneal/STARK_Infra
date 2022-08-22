@@ -228,7 +228,7 @@ def create(data):
                                                 There are no {has_many.lower()}s available to select
                                             </b-dropdown-text>
                                         </b-dropdown>
-                                        <ul v-if="tags.length > 0" class="list-inline d-inline-block mt-2">
+                                        <ul v-if="tags.length > 0" class="list-inline d-inline-block mt-1">
                                             <li v-for="tag in tags" :key="tag" class="list-inline-item">
                                                 <b-form-tag @remove="removeTag(tag)" :title="tag" :disabled="disabled" variant="info" >{{{{ tag_display_text(tag) }}}}</b-form-tag>
                                             </li>
