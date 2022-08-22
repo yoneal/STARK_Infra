@@ -25,7 +25,7 @@ def create(data):
     entity_varname = converter.convert_to_system_name(entity)
     pk_varname     = converter.convert_to_system_name(pk)
 
-    source_code  = cg_header.create(data)
+    source_code  = cg_header.create(data, "Edit")
     source_code += cg_bodyhead.create(data, "Edit")
 
     source_code += f"""\

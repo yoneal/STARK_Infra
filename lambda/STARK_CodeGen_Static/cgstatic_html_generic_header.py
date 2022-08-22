@@ -13,6 +13,8 @@ def create(data, special="none"):
 
     project = data["Project Name"]
     
+    with_upload = False
+
     if special != "HomePage":
         entity  = data["Entity"]
         cols    = data["Columns"]
@@ -36,7 +38,7 @@ def create(data, special="none"):
             <script src="js/STARK.js" defer></script>
             <script src="js/STARK_spinner.js" defer></script>
             <script src="js/STARK_loading_modal.js" defer></script>
-            <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.24.min.js"></script>"""
+            """
 
     if special == "HomePage":
         source_code += f"""\
@@ -44,7 +46,7 @@ def create(data, special="none"):
 """
 
     else:
-        source_code += f"""\
+        source_code += f"""
             <script src="js/{entity_varname}_app.js" defer></script>
             <script src="js/{entity_varname}_view.js" defer></script>
             """
@@ -61,7 +63,15 @@ def create(data, special="none"):
                 source_code += f"""
             <script src="js/{related_varname}_app.js" defer></script>"""
 
-    if(special == "none"):
+            if isinstance(col_type, dict):
+                if col_type["type"] == 'file-upload': 
+                    with_upload = True 
+
+    if special in ['New', 'Edit'] and with_upload:
+        source_code += f"""
+            <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.24.min.js"></script>"""
+
+    if(special in ['none', 'New', 'Edit']):
         source_code += f"""
             <script src="js/generic_root_get.js" defer></script>"""
     elif(special == "Listview"):
