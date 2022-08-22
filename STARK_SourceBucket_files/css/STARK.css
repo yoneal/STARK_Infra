@@ -11,16 +11,6 @@
   background-color: #17a3b9;
 }
 
-/*Conversion from hexcodes to filter values can be found here: https://codepen.io/sosuke/pen/Pjoqqp */
-/*Currently, this is using the filter value for hexcode #cccccc*/
-.filter-fill-svg {
-  filter: invert(86%) sepia(0%) saturate(0%) hue-rotate(199deg) brightness(91%) contrast(82%);
-}
-
-.filter-fill-svg-link {
-  filter: invert(70%) sepia(38%) saturate(6903%) hue-rotate(148deg) brightness(88%) contrast(82%);
-}
-
 .collapsed > .when-open,
 .not-collapsed > .when-closed {
   display: none;
@@ -84,4 +74,14 @@ select:-webkit-autofill:focus {
 /*tags, spinners, date input elements*/
 .form-control.focus {
   background-color:#191d21 !important;
+}
+
+/*Conversion from hexcodes to filter values can be found here: https://codepen.io/sosuke/pen/Pjoqqp */
+/*Currently, this is using the filter value for hexcode #cccccc*/
+.filter-fill-svg {
+  filter: invert(86%) sepia(0%) saturate(0%) hue-rotate(199deg) brightness(91%) contrast(82%);
+}
+
+.filter-fill-svg-link {
+  filter: invert(70%) sepia(38%) saturate(6903%) hue-rotate(148deg) brightness(88%) contrast(82%);
 }
