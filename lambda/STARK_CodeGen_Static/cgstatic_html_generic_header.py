@@ -13,6 +13,8 @@ def create(data, special="none"):
 
     project = data["Project Name"]
     
+    with_upload = False
+    
     if special != "HomePage":
         entity  = data["Entity"]
         cols    = data["Columns"]
@@ -35,8 +37,7 @@ def create(data, special="none"):
             <script src="js/bootstrap-vue.min.js" defer></script>
             <script src="js/STARK.js" defer></script>
             <script src="js/STARK_spinner.js" defer></script>
-            <script src="js/STARK_loading_modal.js" defer></script>
-            <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.24.min.js"></script>"""
+            <script src="js/STARK_loading_modal.js" defer></script>"""
 
     if special == "HomePage":
         source_code += f"""\
@@ -60,6 +61,13 @@ def create(data, special="none"):
                 related_varname = converter.convert_to_system_name(related)
                 source_code += f"""
             <script src="js/{related_varname}_app.js" defer></script>"""
+            if isinstance(col_type, dict):
+                if col_type["type"] == 'file-upload': 
+                    with_upload = True 
+
+    if special in ['Add', 'Edit'] and with_upload:
+        source_code += f"""\
+            <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.24.min.js"></script>"""
 
     if(special == "none"):
         source_code += f"""
