@@ -158,9 +158,11 @@ def create(data):
                                                             </b-form-group>
                                                         </b-dropdown-form>
                                                         <b-dropdown-divider></b-dropdown-divider>
-                                                        <b-dropdown-item-button v-for="option in {col_varname}" :key="option" @click="onOptionClick({{ option, addTag }}, '{col_varname}')" >
-                                                            {{{{ option.text }}}}
-                                                        </b-dropdown-item-button>
+                                                        <b-dropdown-form style="max-height: 350px; overflow-y: scroll;">
+                                                            <b-dropdown-item-button v-for="option in {col_varname}" :key="option" @click="onOptionClick({{ option, addTag }}, '{col_varname}')" >
+                                                                {{{{ option.text }}}}
+                                                            </b-dropdown-item-button>
+                                                        </b-dropdown-form>
                                                         <b-dropdown-text v-if="{col_varname}.length === 0">
                                                             There are no tags available to select
                                                         </b-dropdown-text>
@@ -169,7 +171,7 @@ def create(data):
                                             </b-input-group>
                                         </b-form-tags>  
                                         <ul v-if="tags.length > 0" class="list-inline d-inline-block">
-                                            <li v-for="tag in tags" :key="tag" class="list-inline-item mt-1">
+                                            <li v-for="tag in tags" :key="tag" class="list-inline-item mt-2">
                                                 <b-form-tag  @remove="removeTag(tag)"  :title="tag"  :disabled="disabled"  variant="info">
                                                     {{{{ tag }}}}
                                                 </b-form-tag>
@@ -221,9 +223,11 @@ def create(data):
                                                 </b-form-group>
                                             </b-dropdown-form>
                                             <b-dropdown-divider></b-dropdown-divider>
-                                            <b-dropdown-item-button  v-for="option in {foreign_entity}" :key="option" @click="onOptionClick({{ option, addTag }},'{foreign_entity}')">
-                                                {{{{ option.text }}}}
-                                            </b-dropdown-item-button>
+                                            <b-dropdown-form style="max-height: 350px; overflow-y: scroll;">
+                                                <b-dropdown-item-button  v-for="option in {foreign_entity}" :key="option" @click="onOptionClick({{ option, addTag }},'{foreign_entity}')">
+                                                    {{{{ option.text }}}}
+                                                </b-dropdown-item-button>
+                                            </b-dropdown-form>
                                             <b-dropdown-text v-if="{foreign_entity}.length === 0">
                                                 There are no {has_many.lower()}s available to select
                                             </b-dropdown-text>
