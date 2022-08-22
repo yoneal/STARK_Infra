@@ -23,6 +23,7 @@ def create(data):
         col_values = col_type.get("values", "")
         if isinstance(col_values, list):
             col_type['type'] = "multi select combo"
+            col_type['dropup'] = "true"
             html_code= cg_coltype.create({
                 "col": col,
                 "col_type": col_type,
