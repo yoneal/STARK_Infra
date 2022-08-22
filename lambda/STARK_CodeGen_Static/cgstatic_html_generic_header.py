@@ -71,7 +71,7 @@ def create(data, special="none"):
         source_code += f"""
             <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.24.min.js"></script>"""
 
-    if(special == "none"):
+    if(special in ['none', 'New', 'Edit']):
         source_code += f"""
             <script src="js/generic_root_get.js" defer></script>"""
     elif(special == "Listview"):
