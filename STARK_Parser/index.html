@@ -66,6 +66,7 @@
                   size="sm"
                   v-model="form.data_model_temp"
                   readonly
+                  v-if="deploy_visibility == 'visible' && yaml_file != ''"
                 ></b-form-textarea>
                 <b-button id="btn_generate" variant="primary" class="mt-2" v-on:click="validate_form()">Generate</b-button>
                 <b-button id="btn_deploy" variant="success" class="mt-2" v-on:click="deploy_STARK()" :style="{visibility: deploy_visibility}">Deploy</b-button>
