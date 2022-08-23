@@ -5,18 +5,26 @@
 import json
 import os
 import textwrap
+import importlib
 
 #Extra modules
 import yaml
 
 #Private modules
-import cgdynamic_login as cg_login
-import cgdynamic_logout as cg_logout
-import cgdynamic_modules as cg_mod
-import cgdynamic_dynamodb as cg_ddb
-import cgdynamic_buildspec as cg_build
-import cgdynamic_sam_template as cg_sam
-import cgdynamic_template_conf as cg_conf
+prepend_dir = ""
+if 'libstark' in os.listdir():
+    prepend_dir = "libstark.STARK_CodeGen_Dynamic."
+
+cg_ddb     = importlib.import_module(f"{prepend_dir}cgdynamic_dynamodb")
+cg_sam     = importlib.import_module(f"{prepend_dir}cgdynamic_sam_template")
+
+# import cgdynamic_dynamodb as cg_ddb
+# import cgdynamic_sam_template as cg_sam
+
+##unused imports
+# import cgdynamic_logout as cg_logout
+# import cgdynamic_buildspec as cg_build
+# import cgdynamic_template_conf as cg_conf
 import convert_friendly_to_system as converter
 import get_relationship as get_rel
 
@@ -56,30 +64,6 @@ def create(cloud_resources, project_basedir):
             'fileContent': source_code.encode()
         })
 
-
-    ####################################################
-    #Update the /sys_modules modules.yml file
-    #   This is essentially the directory of system modules
-    #First, get existing yml file, turn to dict
-    with open("../lambda/sys_modules/modules.yml", "r") as f:
-        modules_yml = yaml.safe_load(f.read())
-    #Now, just update with our new modules, conveniently overwriting
-    #   any that already exist (they could have been re-defined)
-    for entity in entities:
-        entity_varname = converter.convert_to_system_name(entity)
-        graphic = cg_mod.suggest_graphic(entity)
-        modules_yml[entity] = {
-            "image": f"images/{graphic}",
-            "image_alt": f"{entity} graphic",
-            "href": f"{entity_varname}.html",
-            "group": "Default",
-            "priority": 0
-        }
-
-    files_to_commit.append({
-        'filePath': f"lambda/sys_modules/modules.yml",
-        'fileContent': yaml.dump(modules_yml, encoding='utf-8', sort_keys=False)
-    })
 
     ##################################################
     #Write files

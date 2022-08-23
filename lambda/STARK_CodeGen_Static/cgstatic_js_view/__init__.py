@@ -4,9 +4,14 @@
 #Python Standard Library
 import textwrap
 import os
+import importlib
 
 #Private modules
-import cgstatic_controls_coltype as cg_coltype
+prepend_dir = ""
+if 'libstark' in os.listdir():
+    prepend_dir = "libstark.STARK_CodeGen_Static."
+
+cg_coltype = importlib.import_module(f"{prepend_dir}cgstatic_controls_coltype")  
 import convert_friendly_to_system as converter
 
 def create(data):

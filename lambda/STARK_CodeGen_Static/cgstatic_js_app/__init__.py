@@ -5,7 +5,6 @@
 import textwrap
 
 #Private modules
-import cgstatic_controls_coltype as cg_coltype
 import convert_friendly_to_system as converter
 
 def create(data):
