@@ -6,7 +6,7 @@ var root = new Vue({
             data_model_temp: "",
         },
         project_name: "",
-        yaml_file: [],
+        yaml_file: null,
         api_key: '',
         current_stack: 0,
         deploy_time_end: '',
@@ -31,7 +31,7 @@ var root = new Vue({
                 if(ext != 'yml')
                 {
                     root.success_message = "Sorry, but you uploaded a non YAML file. Please make sure to upload the correct file type."
-                    root.yaml_file = ""
+                    root.yaml_file = null
                     root.form.data_model_temp = "";
                     root.form.data_model = "";
                     return false
