@@ -198,10 +198,6 @@ def create(data):
                     this.visibility = 'hidden';
                 }},
 
-                reset_input: function(field) {{
-                    field.value = ''
-                }},
-
                 add: function () {{
                     loading_modal.show()
                     console.log("VIEW: Inserting!")"""

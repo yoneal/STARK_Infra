@@ -146,7 +146,7 @@ def create(data):
                                     <template v-slot="{{ tags, disabled, addTag, removeTag, inputAttrs, inputHandlers}}">
                                         <b-form-tags style="border:0px" no-outer-focus input-id="{col_varname}" v-model="multi_select_values.{col_varname}" remove-on-delete :input-attrs="{{autocomplete: 'off' }}" add-on-change>
                                             <b-input-group>
-                                                <input v-bind="inputAttrs" v-on="inputHandlers" class="form-control" v-model= "custom_report.{col_varname}.value" id="Input_{col_varname}" no-outer-focus @keyup.enter="root.reset_input(Input_{col_varname})">
+                                                <input v-bind="inputAttrs" v-on="inputHandlers" class="form-control" v-model= "custom_report.{col_varname}.value" no-outer-focus @keyup.enter="custom_report.{col_varname}.value=''">
                                                 <b-input-group-append>
                                                     <b-dropdown variant="outline-secondary" :dropup="{dropup_flag}" right no-flip ref="{col_varname}" >
                                                         <template #button-content>
