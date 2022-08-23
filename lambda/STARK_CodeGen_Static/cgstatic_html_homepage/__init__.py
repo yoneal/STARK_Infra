@@ -3,12 +3,19 @@
 
 #Python Standard Library
 import textwrap
+import os
+import importlib
 
-import cgstatic_html_generic_header as cg_header
-import cgstatic_html_generic_footer as cg_footer
-import cgstatic_html_generic_bodyhead as cg_bodyhead
-import cgstatic_html_generic_loadingmodal as cg_loadmod
-import cgstatic_html_generic_loadingspinner as cg_loadspin
+#Private modules
+prepend_dir = ""
+if 'libstark' in os.listdir():
+    prepend_dir = "libstark.STARK_CodeGen_Static."
+
+cg_header   = importlib.import_module(f"{prepend_dir}cgstatic_html_generic_header")
+cg_footer   = importlib.import_module(f"{prepend_dir}cgstatic_html_generic_footer")
+cg_bodyhead = importlib.import_module(f"{prepend_dir}cgstatic_html_generic_bodyhead")
+cg_loadmod  = importlib.import_module(f"{prepend_dir}cgstatic_html_generic_loadingmodal")
+cg_loadspin = importlib.import_module(f"{prepend_dir}cgstatic_html_generic_loadingspinner")
 
 def create(data):
 

@@ -7,6 +7,7 @@ import json
 import pickle
 import os
 import textwrap
+import importlib
 
 #Extra modules
 import yaml
@@ -14,14 +15,19 @@ import boto3
 from crhelper import CfnResource
 
 #Private modules
-import cgdynamic_login as cg_login
-import cgdynamic_logout as cg_logout
-import cgdynamic_builder as cg_builder
-import cgdynamic_dynamodb as cg_ddb
-import cgdynamic_buildspec as cg_build
-import cgdynamic_authorizer as cg_auth
-import cgdynamic_sam_template as cg_sam
-import cgdynamic_template_conf as cg_conf
+prepend_dir = ""
+if 'libstark' in os.listdir():
+    prepend_dir = "libstark.STARK_CodeGen_Dynamic."
+
+cg_login   = importlib.import_module(f"{prepend_dir}cgdynamic_login")
+cg_logout  = importlib.import_module(f"{prepend_dir}cgdynamic_logout")
+cg_builder = importlib.import_module(f"{prepend_dir}cgdynamic_builder")
+cg_ddb     = importlib.import_module(f"{prepend_dir}cgdynamic_dynamodb")
+cg_build   = importlib.import_module(f"{prepend_dir}cgdynamic_buildspec")
+cg_auth    = importlib.import_module(f"{prepend_dir}cgdynamic_authorizer")
+cg_sam     = importlib.import_module(f"{prepend_dir}cgdynamic_sam_template")
+cg_conf    = importlib.import_module(f"{prepend_dir}cgdynamic_template_conf")
+
 import convert_friendly_to_system as converter
 import get_relationship as get_rel
 

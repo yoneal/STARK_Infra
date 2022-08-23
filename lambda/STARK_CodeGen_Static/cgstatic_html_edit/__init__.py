@@ -4,14 +4,19 @@
 #Python Standard Library
 import base64
 import textwrap
+import os
+import importlib
 
 #Private modules
-import cgstatic_relationships as cg_rel
-import cgstatic_controls_coltype as cg_coltype
-import cgstatic_html_generic_header as cg_header
-import cgstatic_html_generic_footer as cg_footer
-import cgstatic_html_generic_bodyhead as cg_bodyhead
-import cgstatic_html_generic_loadingmodal as cg_loadmod
+prepend_dir = ""
+if 'libstark' in os.listdir():
+    prepend_dir = "libstark.STARK_CodeGen_Static."
+
+cg_coltype  = importlib.import_module(f"{prepend_dir}cgstatic_controls_coltype")
+cg_header   = importlib.import_module(f"{prepend_dir}cgstatic_html_generic_header")
+cg_footer   = importlib.import_module(f"{prepend_dir}cgstatic_html_generic_footer")
+cg_bodyhead = importlib.import_module(f"{prepend_dir}cgstatic_html_generic_bodyhead")
+cg_loadmod  = importlib.import_module(f"{prepend_dir}cgstatic_html_generic_loadingmodal")
 import convert_friendly_to_system as converter
 
 def create(data):
@@ -25,12 +30,13 @@ def create(data):
     entity_varname = converter.convert_to_system_name(entity)
     pk_varname     = converter.convert_to_system_name(pk)
 
-    source_code  = cg_header.create(data, "New")
-    source_code += cg_bodyhead.create(data, "New")
+    source_code  = cg_header.create(data, "Edit")
+    source_code += cg_bodyhead.create(data, "Edit")
 
     source_code += f"""\
-        <!--<div class="container-unauthorized" v-if="!stark_permissions['{entity}|Add']">UNAUTHORIZED!</div>
-        <div class="main-continer" v-if="stark_permissions['{entity}|Add']">-->
+        
+        <!--<div class="container-unauthorized" v-if="!stark_permissions['{entity}|Edit']">UNAUTHORIZED!</div>
+        <div class="main-continer" v-if="stark_permissions['{entity}|Edit']">-->
             <div class="container hidden" :style="{{visibility: visibility}}">
                 <div class="row">
                     <div class="col">
@@ -60,7 +66,7 @@ def create(data):
 
     source_code += f"""
                             <button type="button" class="btn btn-secondary" onClick="window.location.href='{entity_varname}.html'">Back</button>
-                            <button type="button" class="btn btn-primary float-right" onClick="root.add()">Add</button>
+                            <button type="button" class="btn btn-primary float-right" onClick="root.update()">Update</button>
                             </form>
                         </div>
                     </div>

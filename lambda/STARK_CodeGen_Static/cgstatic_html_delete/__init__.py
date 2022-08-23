@@ -5,13 +5,19 @@
 from asyncio import constants
 import base64
 import textwrap
+import os
+import importlib
 
 #Private modules
-import cgstatic_relationships as cg_rel
-import cgstatic_html_generic_header as cg_header
-import cgstatic_html_generic_footer as cg_footer
-import cgstatic_html_generic_bodyhead as cg_bodyhead
-import cgstatic_html_generic_loadingmodal as cg_loadmod
+prepend_dir = ""
+if 'libstark' in os.listdir():
+    prepend_dir = "libstark.STARK_CodeGen_Static."
+
+cg_header   = importlib.import_module(f"{prepend_dir}cgstatic_html_generic_header")
+cg_footer   = importlib.import_module(f"{prepend_dir}cgstatic_html_generic_footer")
+cg_bodyhead = importlib.import_module(f"{prepend_dir}cgstatic_html_generic_bodyhead")
+cg_loadmod  = importlib.import_module(f"{prepend_dir}cgstatic_html_generic_loadingmodal")
+
 import convert_friendly_to_system as converter
 
 def create(data):

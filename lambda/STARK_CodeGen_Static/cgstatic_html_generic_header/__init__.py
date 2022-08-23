@@ -4,9 +4,15 @@
 #Python Standard Library
 import base64
 import textwrap
+import os
+import importlib
 
 #Private modules
-import cgstatic_relationships as cg_rel
+prepend_dir = ""
+if 'libstark' in os.listdir():
+    prepend_dir = "libstark.STARK_CodeGen_Static."
+
+cg_rel  = importlib.import_module(f"{prepend_dir}cgstatic_relationships")
 import convert_friendly_to_system as converter
 
 def create(data, special="none"):
