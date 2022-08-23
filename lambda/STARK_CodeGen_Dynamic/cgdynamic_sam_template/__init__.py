@@ -173,6 +173,15 @@ def create(data, cli_mode=False):
             Type: AWS::S3::Bucket
             Properties:
                 AccessControl: {s3_access_control}
+                LifecycleConfiguration:
+                Rules:
+                    - Id: clean_up_tmp
+                      ExpirationInDays: 1
+                      NoncurrentVersionExpiration:
+                          NewerNoncurrentVersions: 1
+                          NoncurrentDays: 1
+                      Prefix: tmp/
+                      Status: Enabled
                 CorsConfiguration:
                     CorsRules:
                         - AllowedHeaders:
