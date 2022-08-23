@@ -117,22 +117,18 @@ if construct_type == "module":
 
     #1-2) STARK Parser
     #Add STARK_Parser folder to the beginning of sys.path
-    STARK_folder = os.getcwd() + '/libstark/STARK_Parser'
-    sys.path = [STARK_folder] + sys.path
-    import parser_cli as stark_parser
+    import libstark.STARK_Parser.parser_cli as stark_parser
     cloud_resources, current_cloud_resources = stark_parser.parse(construct_file)
     print(cloud_resources)
 
     #3) CGDynamic
     #Replace STARK_Parser folder in sys.path with STARK_CodeGen_Dynamic
-    sys.path[0] = os.getcwd() + '/libstark/STARK_CodeGen_Dynamic'
-    import cgdynamic_cli as cgdynamic
+    import libstark.STARK_CodeGen_Dynamic.cgdynamic_cli as cgdynamic
     cgdynamic.create(cloud_resources, project_basedir)
 
     #4) CGStatic
     #Replace CGDynamic folder in sys.path with CGStatic
-    sys.path[0] = os.getcwd() + '/libstark/STARK_CodeGen_Static'
-    import cgstatic_cli as cgstatic
+    import libstark.STARK_CodeGen_Static.cgstatic_cli as cgstatic
     cgstatic.create(cloud_resources, current_cloud_resources, project_basedir)
 
     #5) Updating cloud resources doc
