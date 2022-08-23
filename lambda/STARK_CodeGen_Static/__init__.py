@@ -14,22 +14,28 @@ import boto3
 from crhelper import CfnResource
 
 #Private modules
-import cgstatic_js_app as cg_js_app
-import cgstatic_js_view as cg_js_view
-import cgstatic_js_login as cg_js_login
-import cgstatic_js_homepage as cg_js_home
-import cgstatic_js_stark as cg_js_stark
-import cgstatic_css_login as cg_css_login
-import cgstatic_gitignore as cg_git
-import cgstatic_html_add  as cg_add
-import cgstatic_html_edit as cg_edit
-import cgstatic_html_view as cg_view
-import cgstatic_html_login as cg_login
-import cgstatic_html_delete as cg_delete
-import cgstatic_html_listview as cg_listview
-import cgstatic_html_homepage as cg_homepage
+import importlib
+prepend_dir = ""
+if 'libstark' in os.listdir():
+    prepend_dir = "libstark.STARK_CodeGen_Static."
+
+cg_js_app    = importlib.import_module(f"{prepend_dir}cgstatic_js_app")  
+cg_js_view   = importlib.import_module(f"{prepend_dir}cgstatic_js_view")  
+cg_js_login  = importlib.import_module(f"{prepend_dir}cgstatic_js_login")  
+cg_js_home   = importlib.import_module(f"{prepend_dir}cgstatic_js_homepage")  
+cg_js_stark  = importlib.import_module(f"{prepend_dir}cgstatic_js_stark")  
+cg_css_login = importlib.import_module(f"{prepend_dir}cgstatic_css_login")  
+cg_git       = importlib.import_module(f"{prepend_dir}cgstatic_gitignore")  
+cg_add       = importlib.import_module(f"{prepend_dir}cgstatic_html_add")   
+cg_edit      = importlib.import_module(f"{prepend_dir}cgstatic_html_edit")  
+cg_view      = importlib.import_module(f"{prepend_dir}cgstatic_html_view")  
+cg_login     = importlib.import_module(f"{prepend_dir}cgstatic_html_login")  
+cg_delete    = importlib.import_module(f"{prepend_dir}cgstatic_html_delete")  
+cg_listview  = importlib.import_module(f"{prepend_dir}cgstatic_html_listview")  
+cg_homepage  = importlib.import_module(f"{prepend_dir}cgstatic_html_homepage")  
+cg_report    = importlib.import_module(f"{prepend_dir}cgstatic_html_report")   
+
 import convert_friendly_to_system as converter
-import cgstatic_html_report  as cg_report
 
 s3   = boto3.client('s3')
 api  = boto3.client('apigatewayv2')

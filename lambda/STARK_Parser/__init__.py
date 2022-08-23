@@ -11,17 +11,24 @@ import yaml
 import boto3
 
 #Private modules
-import parse_stark_settings as stark_settings_parser
-import convert_friendly_to_system as converter
-import parse_api_gateway as api_gateway_parser
-import parse_cloudfront as cloudfront_parser
-import parse_dynamodb as dynamodb_parser
-import parse_datamodel as model_parser
-import parse_lambda as lambda_parser
-import parse_layers as layer_parser
+import importlib
+prepend_dir = ""
+if 'libstark' in os.listdir():
+    prepend_dir = "libstark.STARK_Parser."
+
+api_gateway_parser = importlib.import_module(f"{prepend_dir}parse_api_gateway")
+dynamodb_parser    = importlib.import_module(f"{prepend_dir}parse_dynamodb")
+model_parser       = importlib.import_module(f"{prepend_dir}parse_datamodel")
+lambda_parser      = importlib.import_module(f"{prepend_dir}parse_lambda")
+layer_parser       = importlib.import_module(f"{prepend_dir}parse_layers")
+s3_parser          = importlib.import_module(f"{prepend_dir}parse_s3")
+## unused imports
+# import parse_api_gateway as api_gateway_parser
+# import parse_cloudfront as cloudfront_parser
+# import parse_sqs as sqs_parser
+
 import get_relationship as get_rel
-import parse_sqs as sqs_parser
-import parse_s3 as s3_parser
+import convert_friendly_to_system as converter
 
 #Get environment variable - this will allow us to take different branches depending on whether we are LOCAL or PROD (or any other future valid value)
 ENV_TYPE = os.environ['STARK_ENVIRONMENT_TYPE']

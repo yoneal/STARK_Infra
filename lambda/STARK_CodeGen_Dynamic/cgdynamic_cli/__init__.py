@@ -5,17 +5,26 @@
 import json
 import os
 import textwrap
+import importlib
 
 #Extra modules
 import yaml
 
 #Private modules
-import cgdynamic_login as cg_login
-import cgdynamic_logout as cg_logout
-import cgdynamic_dynamodb as cg_ddb
-import cgdynamic_buildspec as cg_build
-import cgdynamic_sam_template as cg_sam
-import cgdynamic_template_conf as cg_conf
+prepend_dir = ""
+if 'libstark' in os.listdir():
+    prepend_dir = "libstark.STARK_CodeGen_Dynamic."
+
+cg_ddb     = importlib.import_module(f"{prepend_dir}cgdynamic_dynamodb")
+cg_sam     = importlib.import_module(f"{prepend_dir}cgdynamic_sam_template")
+
+# import cgdynamic_dynamodb as cg_ddb
+# import cgdynamic_sam_template as cg_sam
+
+##unused imports
+# import cgdynamic_logout as cg_logout
+# import cgdynamic_buildspec as cg_build
+# import cgdynamic_template_conf as cg_conf
 import convert_friendly_to_system as converter
 import get_relationship as get_rel
 
