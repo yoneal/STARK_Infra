@@ -77,10 +77,12 @@
         
             </div>
         </div>
-        <div class="col-md-6 ml-auto" v-if="deploy_visibility == 'visible' && yaml_file != ''">
+        <div class="col-md-6 ml-auto" :style="{display: ui_visibility}">
+            he
             <b-form-group
                         label="Data Model"
                         label-for="model_textarea"
+                        v-if="deploy_visibility == 'visible' && yaml_file != ''"
                     >
                         <b-form-textarea
                             id="model_textarea"
