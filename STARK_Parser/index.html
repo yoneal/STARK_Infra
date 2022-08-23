@@ -16,7 +16,7 @@
 
     <title>STARK Web Parser :: Beta 1</title>
 </head>
-<body class="bg-light">
+<body class="bg-dark">
 <div class="container-fluid" id="vue-root">
 
     <div class="row bg-primary mb-3 p-2 text-white">
@@ -27,57 +27,74 @@
         </h2>
         </div>
     </div>
-
     <div class="row">
-        <div class="col-sm-12 col-lg-6">
-            Status:
-            <div class="message_box">
-                <div class="progress" :style="{visibility: visibility}">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-sm-12">
+                    Status:
+                    <div class="message_box mt-2">
+                        <div class="progress" :style="{visibility: visibility}">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+                        </div>
+                        <div v-html="loading_message" :style="{visibility: visibility}"></div>
+                        <div v-html="success_message"></div>
+                    </div>
                 </div>
-                <div v-html="loading_message" :style="{visibility: visibility}"></div>
-                <div v-html="success_message"></div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12" :style="{display: ui_visibility}">
+                <!-- area for model entry -->
+                    <b-form-group
+                        class="mt-4"
+                        label="Project Name"
+                        label-for="project-name"
+                    >
+                        <b-form-input id="project-name" v-model="project_name" trim :readonly="model_readonly"></b-form-input>
+                    </b-form-group>
+                    <b-form-group
+                      label="Data model (YAML file):"
+                      label-for="textarea-formatter"
+                      description="STARK will use your data model to architect a complete serverless solution. Magic!"
+                    >
+                        <b-form-file v-model="yaml_file"  drop-placeholder="Drop file here..." @input="readAsText" :readonly="model_readonly"></b-form-file>
+                        <b-button id="btn_generate" variant="primary" class="mt-2" v-on:click="validate_form()">Generate</b-button>
+                        <b-button id="btn_deploy" variant="success" class="mt-2" v-on:click="deploy_STARK()" :style="{visibility: deploy_visibility}">Deploy</b-button>
+                    </b-form-group>
+            
+                    <b-tooltip target="model_textarea" triggers="hover">
+                        Data model refers to your tables, columns and related metadata that together define the entities your system will process
+                    </b-tooltip>
+        
+                    <b-tooltip target="btn_generate" triggers="hover">
+                        Submit and process your data model.
+                    </b-tooltip>
+        
+                    <b-tooltip target="btn_deploy" triggers="hover">
+                        Deploy your STARK system!
+                    </b-tooltip>
+        
+                </div>
+        
             </div>
         </div>
-    </div>
-
-    <div class="row">
-        <div class="col-sm-12 col-lg-6 " :style="{display: ui_visibility}">
-        <!-- area for model entry -->
+        <div class="col-md-6 ml-auto" :style="{display: ui_visibility}">
             <b-form-group
-              class="mt-2"
-              label="Data model (YAML):"
-              label-for="textarea-formatter"
-              description="STARK will use your data model to architect a complete serverless solution. Magic!"
-            >
-                <b-form-textarea
-                  id="model_textarea"
-                  placeholder=""
-                  rows="12"
-                  max-rows="12"
-                  class="mt-2"
-                  size="sm"
-                  v-model="form.data_model"
-                  :readonly=model_readonly
-                ></b-form-textarea>
-                <b-button id="btn_generate" variant="primary" class="mt-2" v-on:click="send_to_STARK()">Generate</b-button>
-                <b-button id="btn_deploy" variant="success" class="mt-2" v-on:click="deploy_STARK()" :style="{visibility: deploy_visibility}">Deploy</b-button>
+                        label="Data Model"
+                        label-for="model_textarea"
+                        v-if="deploy_visibility == 'visible' && yaml_file != ''"
+                    >
+                        <b-form-textarea
+                            id="model_textarea"
+                            placeholder=""
+                            rows="23"
+                            max-rows="23"
+                            class="mt-2"
+                            size="md"
+                            v-model="form.data_model_temp"
+                            readonly
+                        ></b-form-textarea>   
             </b-form-group>
-    
-            <b-tooltip target="model_textarea" triggers="hover">
-                Data model refers to your tables, columns and related metadata that together define the entities your system will process
-            </b-tooltip>
-
-            <b-tooltip target="btn_generate" triggers="hover">
-                Submit and process your data model.
-            </b-tooltip>
-
-            <b-tooltip target="btn_deploy" triggers="hover">
-                Deploy your STARK system!
-            </b-tooltip>
-
         </div>
-
     </div>
 
 </div>

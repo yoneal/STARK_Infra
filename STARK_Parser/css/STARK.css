@@ -14,7 +14,19 @@ fieldset {
     overflow-y: none;
     padding:10px;
     font-size: 14px;
-    background-color: #efefef;
+    background-color: #43474b;
     border: 1px solid #dddddd;
     border-radius: 4px;
 }
+
+.custom-file-label {
+  background-color: #000;
+  color:#d3d3d3;
+  border: 1px solid #6c757d !important;
+}
+
+.custom-file-label::after {
+  background-color: #383d41;
+  color:#d3d3d3;
+}
+

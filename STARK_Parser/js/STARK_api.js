@@ -2,65 +2,11 @@ var root = new Vue({
     el: "#vue-root",
     data: {
         form: {
-            data_model: `__STARK_project_name__: 
-Customer:
-    pk: Customer ID
-    data:
-        - Customer Name: string
-        - Gender: [ Male, Female, LGBTQ+ ]
-        - Join Date: date
-        - Preferred Customer: yes-no
-        - Customer Type: 
-            type: relationship
-            has_one: Customer Type
-            value: Customer Type
-            display: Customer Type
-        - Remarks: multi-line-string
-Item:
-    pk: Product Code
-    data:
-        - Title: string
-        - In Stock:
-            type: int-spinner
-            min: 5
-            max: 50
-        - Weight in kg:
-            type: decimal-spinner
-            wrap: no-wrap
-        - Categories:
-            type: tags
-            limit: 3
-            values: [ "Regular", "Deluxe", "Premium" ]
-        - Rating:
-            type: rating
-            max: 10
-        - Variations Available:
-            type: multiple choice
-            values: [ "Small", "Medium", "Large", "XL"]
-        - Description: multi-line-string
-        - Packaging Type:
-            type: radio button
-            values: [ "Traditional Box", "Standard Cardboard", "Eco-Friendly" ]
-        - Max Discount Rate:
-            type: radio bar
-            values: [ "None", "10%", "15%", "20%", "25%" ]
-        - Last Update: time
-Customer Type:
-    pk: Customer Type
-    data:
-        - Description: multi-line-string
-Document:
-    pk: Document ID
-    data:
-        - Title: string
-        - Revision: int
-        - Numerical Code: number
-        - Description: string
-        - Attachments:
-            type: file-upload
-            allowed_ext: jpg, png, csv, pdf
-            max_upload_size: 10 MB`,
+            data_model: "",
+            data_model_temp: "",
         },
+        project_name: "",
+        yaml_file: null,
         api_key: '',
         current_stack: 0,
         deploy_time_end: '',
@@ -77,6 +23,57 @@ Document:
         wait_limit: 12
     },
     methods:{
+        readAsText() {
+            var file = this.yaml_file; 
+            if(this.yaml_file)
+            {
+                var ext = file.name.split('.').pop()
+                if(ext != 'yml')
+                {
+                    root.success_message = "Sorry, but you uploaded a non YAML file. Please make sure to upload the correct file type."
+                    root.yaml_file = null
+                    root.form.data_model_temp = "";
+                    root.form.data_model = "";
+                    return false
+                }
+                var fr=new FileReader();
+                fr.readAsText(this.yaml_file)
+                fr.onload = function() {
+                    root.form.data_model_temp = fr.result;
+                    root.form.data_model = `__STARK_project_name__: ${root.project_name}\n${fr.result}`
+                }; 
+            }
+            else
+            {
+                root.form.data_model_temp = ""
+                root.form.data_model      = ""
+            }
+        },
+        validate_form: function()
+        {
+            var valid_form = true;
+            var message = []
+            if(this.project_name == "")
+            {
+                valid_form = false
+                message.push('Name')
+            }
+
+            if(this.yaml_file == null && this.form.data_model_temp == "")
+            {
+                valid_form = false;
+                message.push('Data Model')
+            }
+
+            if(valid_form)
+            {
+                root.send_to_STARK()
+            }
+            else
+            {
+                root.success_message = `Sorry, but we can't start if you don't provide the ${message.join(" and ")} of your project.`
+            }
+        },
         send_to_STARK: function () {
             root.success_message = ''
             root.loading_message = "STARK is parsing your YAML model..."
