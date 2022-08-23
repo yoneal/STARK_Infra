@@ -178,8 +178,8 @@ def create(data, cli_mode=False):
                         - Id: clean_up_tmp
                           ExpirationInDays: 1
                           NoncurrentVersionExpiration:
-                              NewerNoncurrentVersions: 1
-                              NoncurrentDays: 1
+                            NewerNoncurrentVersions: 1
+                            NoncurrentDays: 1
                           Prefix: tmp/
                           Status: Enabled
                 CorsConfiguration:
