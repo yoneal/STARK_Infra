@@ -1,12 +1,27 @@
 var root = new Vue({
     el: "#vue-root",
     data: {
-        stark_permissions: {
-            'User Permissions|View': false,
-            'User Permissions|Add': false,
-            'User Permissions|Delete': false,
-            'User Permissions|Edit': false,
-            'User Permissions|Report': false,
+        metadata: {
+            'Username': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Permissions': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+        },
+        auth_config: { },
+        auth_list: {
+            'View': {'permission': 'User Permissions|View', 'allowed': false},
+            'Add': {'permission': 'User Permissions|Add', 'allowed': false},
+            'Delete': {'permission': 'User Permissions|Delete', 'allowed': false},
+            'Edit': {'permission': 'User Permissions|Edit', 'allowed': false},
+            'Report': {'permission': 'User Permissions|Report', 'allowed': false}
         },
         listview_table: '',
         STARK_User_Permissions: {

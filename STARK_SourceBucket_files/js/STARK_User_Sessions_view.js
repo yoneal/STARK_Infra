@@ -1,12 +1,45 @@
 var root = new Vue({
     el: "#vue-root",
     data: {
-        stark_permissions: {
-            'User Sessions|View': false,
-            'User Sessions|Add': false,
-            'User Sessions|Delete': false,
-            'User Sessions|Edit': false,
-            'User Sessions|Report': false,
+        metadata: {
+            'Session_ID': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Username':  {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Sess_Start':  {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'TTL':  {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Permissions':  {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+        },            
+        auth_config: { },
+        auth_list: {
+            'View': {'permission': 'User Sessions|View', 'allowed': false},
+            'Add': {'permission': 'User Sessions|Add', 'allowed': false},
+            'Delete': {'permission': 'User Sessions|Delete', 'allowed': false},
+            'Edit': {'permission': 'User Sessions|Edit', 'allowed': false},
+            'Report': {'permission': 'User Sessions|Report', 'allowed': false}
         },
         listview_table: '',
         STARK_report_fields: [],

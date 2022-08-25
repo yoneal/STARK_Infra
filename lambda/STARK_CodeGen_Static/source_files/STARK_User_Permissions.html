@@ -56,8 +56,8 @@
 
     <div class="row">
         <div class="col-6">
-            <button type="button" class="btn btn-primary mb-2" onClick="window.location.href='STARK_User_Permissions_add.html'" v-if="stark_permissions['User Permissions|Add']"> <b>+</b> Add </button>
-            <button type="button" class="btn btn-info mb-2" onClick="window.location.href='STARK_User_Permissions_report.html'" v-if="stark_permissions['User Permissions|Report']"> Reports </button>
+            <button type="button" class="btn btn-primary mb-2" onClick="window.location.href='STARK_User_Permissions_add.html'" v-if="auth_list.Add.allowed"> <b>+</b> Add </button>
+            <button type="button" class="btn btn-info mb-2" onClick="window.location.href='STARK_User_Permissions_report.html'" v-if="auth_list.Report.allowed"> Reports </button>
         </div>
         <div class="col-6 text-right d-inline-block">        
             <button id="prev" type="button" class="btn btn-secondary" :disabled="prev_disabled" onClick="root.list(root.prev_token, 'prev')"> < </button>
@@ -80,18 +80,18 @@
                     <template v-for="STARK_User_Permissions in listview_table" id="listview-table">
                         <tr>
                             <td>
-                                <a :href="'STARK_User_Permissions_edit.html?Username=' + STARK_User_Permissions.Username" v-if="stark_permissions['User Permissions|Edit']"><img src="images/pencil-square.svg" class="bg-info"></a>
+                                <a :href="'STARK_User_Permissions_edit.html?Username=' + STARK_User_Permissions.Username" v-if="auth_list.Edit.allowed"><img src="images/pencil-square.svg" class="bg-info"></a>
                             </td>
                             <th scope="row">
-                                <template id="detail-view" v-if="stark_permissions['User Permissions|View']">
+                                <template id="detail-view" v-if="auth_list.View.allowed">
                                     <a :href="'STARK_User_Permissions_view.html?Username=' + STARK_User_Permissions.Username">{{ STARK_User_Permissions.Username }}</a>
                                 </template>
-                                <template id="detail-view" v-if="!stark_permissions['User Permissions|View']">
+                                <template id="detail-view" v-if="!auth_list.View.allowed">
                                     {{ STARK_User_Permissions.Username }}
                                 </template>
                             </th>
                             <td>{{ STARK_User_Permissions.Permissions }}</td>
-                            <td><a :href="'STARK_User_Permissions_delete.html?Username=' + STARK_User_Permissions.Username" v-if="stark_permissions['User Permissions|Delete']"><img src="images/x-square.svg" class="bg-danger"></a></td>
+                            <td><a :href="'STARK_User_Permissions_delete.html?Username=' + STARK_User_Permissions.Username" v-if="auth_list.Delete.allowed"><img src="images/x-square.svg" class="bg-danger"></a></td>
                         </tr>
                     </template>
             </tbody>

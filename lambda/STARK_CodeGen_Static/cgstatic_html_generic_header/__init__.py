@@ -82,7 +82,8 @@ def create(data, special="none"):
             <script src="js/generic_root_get.js" defer></script>"""
     elif(special == "New"):
         source_code += f"""
-        <script src="js/generic_check_auth_add.js" defer></script>"""
+        <script src="js/generic_check_auth_add.js" defer></script>
+        <script src="js/generic_root_get.js" defer></script>"""
     elif(special == "Edit"):
         source_code += f"""
             <script src="js/generic_root_get.js" defer></script>

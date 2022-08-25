@@ -240,7 +240,7 @@ def create(data):
     
     source_code += f"""
 
-                    let data = {{ '{entity_varname}': this.{entity_varname} }}
+                    let data = {{ {entity_varname}: this.{entity_varname} }}
 
                     {entity_app}.add(data).then( function(data) {{
                         console.log("VIEW: INSERTING DONE!");
@@ -257,7 +257,7 @@ def create(data):
                     loading_modal.show()
                     console.log("VIEW: Deleting!")
 
-                    let data = {{ '{entity_varname}': this.{entity_varname} }}
+                    let data = {{ {entity_varname}: this.{entity_varname} }}
 
                     {entity_app}.delete(data).then( function(data) {{
                         console.log("VIEW: DELETE DONE!");
@@ -284,7 +284,7 @@ def create(data):
                     this.{entity_varname}.{col_varname} = (root.multi_select_values.{col_varname}.sort()).join(', ')"""
     
     source_code += f"""
-                    let data = {{ '{entity_varname}': this.{entity_varname} }}
+                    let data = {{ {entity_varname}: this.{entity_varname} }}
 
                     {entity_app}.update(data).then( function(data) {{
                         console.log("VIEW: UPDATING DONE!");
@@ -361,18 +361,6 @@ def create(data):
 
                list: function (lv_token='', btn='') {{
                     spinner.show()
-                    data = {{}}
-                    data['stark_permissions'] = this.stark_permissions
-                    STARK.auth(data).then( function(data) {{
-                        console.log("Auth Request Done!");
-                        console.log(data);
-                        root.stark_permissions = data;
-                    }})
-                    .catch(function(error) {{
-                        console.log("Encountered an error! [" + error + "]")
-                        alert("Request Failed: System error or you may not have enough privileges")
-                        loading_modal.hide()
-                    }});
                     
                     payload = []
                     if (btn == 'next') {{

@@ -1,12 +1,40 @@
 var root = new Vue({
     el: "#vue-root",
     data: {
-        stark_permissions: {
-            'Module Groups|View': false,
-            'Module Groups|Add': false,
-            'Module Groups|Delete': false,
-            'Module Groups|Edit': false,
-            'Module Groups|Report': false,
+        metadata: {
+            'Group_Name': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Description': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Icon': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Priority': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+        },
+        auth_config: { },
+
+        auth_list: {
+            'View': {'permission': 'Module Groups|View', 'allowed': false},
+            'Add': {'permission': 'Module Groups|Add', 'allowed': false},
+            'Delete': {'permission': 'Module Groups|Delete', 'allowed': false},
+            'Edit': {'permission': 'Module Groups|Edit', 'allowed': false},
+            'Report': {'permission': 'Module Groups|Report', 'allowed': false}
         },
         listview_table: '',
         STARK_Module_Groups: {

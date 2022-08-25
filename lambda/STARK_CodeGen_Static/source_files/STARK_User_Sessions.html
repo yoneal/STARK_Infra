@@ -56,7 +56,7 @@
 
     <div class="row">
         <div class="col-6">
-            <button type="button" class="btn btn-info mb-2" onClick="window.location.href='STARK_User_Sessions_report.html'" v-if="stark_permissions['User Sessions|Report']"> Reports </button>
+            <button type="button" class="btn btn-info mb-2" onClick="window.location.href='STARK_User_Sessions_report.html'" v-if="auth_list.Report.allowed"> Reports </button>
         </div>
         <div class="col-6 text-right d-inline-block">        
             <button id="prev" type="button" class="btn btn-secondary mb-2" :disabled="prev_disabled" onClick="root.list(root.prev_token, 'prev')"> < </button>
@@ -81,10 +81,10 @@
                     <template v-for="STARK_User_Sessions in listview_table" id="listview-table">
                         <tr>
                             <th scope="row">
-                                <template id="detail-view" v-if="stark_permissions['User Sessions|View']">
+                                <template id="detail-view" v-if="auth_list.View.allowed">
                                     <a :href="'STARK_User_Sessions_view.html?Session_ID=' + STARK_User_Sessions.Session_ID">{{ STARK_User_Sessions.Session_ID }}</a>
                                 </template>
-                                <template id="detail-view" v-if="!stark_permissions['User Sessions|View']">
+                                <template id="detail-view" v-if="!auth_list.View.allowed">
                                     {{ STARK_User_Sessions.Session_ID }}
                                 </template>
                             </th>
@@ -92,7 +92,7 @@
                             <td>{{ STARK_User_Sessions.Sess_Start }}</td>
                             <td>{{ STARK_User_Sessions.TTL }}</td>
                             <td>{{ STARK_User_Sessions.Permissions }}</td>
-                            <td><a :href="'STARK_User_Sessions_delete.html?Session_ID=' + STARK_User_Sessions.Session_ID" v-if="stark_permissions['User Sessions|Delete']"><img src="images/x-square.svg" class="bg-danger"></a></td>
+                            <td><a :href="'STARK_User_Sessions_delete.html?Session_ID=' + STARK_User_Sessions.Session_ID" v-if="auth_list.Delete.allowed"><img src="images/x-square.svg" class="bg-danger"></a></td>
                         </tr>
                     </template>
             </tbody>

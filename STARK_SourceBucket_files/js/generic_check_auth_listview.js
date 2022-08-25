@@ -1,2 +1,2 @@
 STARK.set_page_permissions()
-STARK.check_permission(root.auth_config['Listview'])
+STARK.check_permission(root.auth_config['ListView'])

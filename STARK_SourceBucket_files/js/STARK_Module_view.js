@@ -1,12 +1,71 @@
 var root = new Vue({
     el: "#vue-root",
     data: {
-        stark_permissions: {
-            'System Modules|View': false,
-            'System Modules|Add': false,
-            'System Modules|Delete': false,
-            'System Modules|Edit': false,
-            'System Modules|Report': false,
+        metadata: {
+            'Module_Name': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Descriptive_Title': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Target': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Description': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Module_Group': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Is_Menu_Item': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Is_Enabled': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Icon': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Priority': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+        },
+
+        auth_config: { },
+
+        auth_list: {
+            'View': {'permission': 'System Modules|View', 'allowed': false},
+            'Add': {'permission': 'System Modules|Add', 'allowed': false},
+            'Delete': {'permission': 'System Modules|Delete', 'allowed': false},
+            'Edit': {'permission': 'System Modules|Edit', 'allowed': false},
+            'Report': {'permission': 'System Modules|Report', 'allowed': false}
         },
         listview_table: '',
         STARK_Module: {
