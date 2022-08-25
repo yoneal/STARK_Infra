@@ -39,7 +39,9 @@ def create(data):
                         'value': '',
                         'required': true,
                         'max_length': '',
-                        'data_type': ''
+                        'data_type': '',
+                        'state': null,
+                        'feedback': ''
                     }},"""
     
     for col in cols:
@@ -49,7 +51,9 @@ def create(data):
                         'value': '',
                         'required': true,
                         'max_length': '',
-                        'data_type': ''
+                        'data_type': '',
+                        'state': null,
+                        'feedback': ''
                     }},""" 
                     
     source_code += f"""

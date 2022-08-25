@@ -28,10 +28,10 @@ def create(data):
         html_code=f"""<b-form-timepicker id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2" :state="metadata.{col_varname}.state"></b-form-timepicker>"""
 
     elif col_type == "number":
-        html_code=f"""<input type="number" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}" :state="metadata.{col_varname}.state">"""
+        html_code=f"""<b-form-input type="number" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}" :state="metadata.{col_varname}.state"></b-form-input>"""
 
     elif col_type == "int":
-        html_code=f"""<input type="number"  min="0" step="1" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}" :state="metadata.{col_varname}.state">"""
+        html_code=f"""<b-form-input type="number"  min="0" step="1" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}" :state="metadata.{col_varname}.state"></b-form-input>"""
 
     elif col_type in [ "yes-no", "boolean" ]:
         if col_type == "yes-no":
@@ -244,7 +244,7 @@ def create(data):
             
 
     else:
-        html_code=f"""<input type="text" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}" :state="metadata.{col_varname}.state">"""
+        html_code=f"""<b-form-input type="text" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}" :state="metadata.{col_varname}.state"></b-form-input>"""
 
 
                       
