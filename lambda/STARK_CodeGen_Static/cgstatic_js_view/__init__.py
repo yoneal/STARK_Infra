@@ -238,7 +238,7 @@ def create(data):
                     this.{entity_varname}.{col_varname} = (root.multi_select_values.{col_varname}.sort()).join(', ')"""
     
     source_code += f"""
-                    response = this.validate_form(root.metadata, root.{entity_varname}""" 
+                    response = STARK.validate_form(root.metadata, root.{entity_varname}""" 
     if with_upload:
         source_code += f", root.STARK_upload_elements"
 
@@ -290,7 +290,7 @@ def create(data):
                     this.{entity_varname}.{col_varname} = (root.multi_select_values.{col_varname}.sort()).join(', ')"""
     
     source_code += f"""
-                    response = this.validate_form(root.metadata, root.{entity_varname}""" 
+                    response = STARK.validate_form(root.metadata, root.{entity_varname}""" 
     if with_upload:
         source_code += f", root.STARK_upload_elements"
 
