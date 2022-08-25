@@ -1,12 +1,40 @@
 var root = new Vue({
     el: "#vue-root",
     data: {
-        stark_permissions: {
-            'Module Groups|View': false,
-            'Module Groups|Add': false,
-            'Module Groups|Delete': false,
-            'Module Groups|Edit': false,
-            'Module Groups|Report': false,
+        metadata: {
+            'Group_Name': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Description': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Icon': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Priority': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+        },
+        auth_config: { },
+
+        auth_list: {
+            'View': {'permission': 'Module Groups|View', 'allowed': false},
+            'Add': {'permission': 'Module Groups|Add', 'allowed': false},
+            'Delete': {'permission': 'Module Groups|Delete', 'allowed': false},
+            'Edit': {'permission': 'Module Groups|Edit', 'allowed': false},
+            'Report': {'permission': 'Module Groups|Report', 'allowed': false}
         },
         listview_table: '',
         STARK_Module_Groups: {
@@ -153,18 +181,7 @@ var root = new Vue({
 
        list: function (lv_token='', btn='') {
             spinner.show()
-            data = {}
-            data['stark_permissions'] = this.stark_permissions
-            STARK.auth(data).then( function(data) {
-                console.log("Auth Request Done!");
-                console.log(data);
-                root.stark_permissions = data;
-            })
-            .catch(function(error) {
-                console.log("Encountered an error! [" + error + "]")
-                alert("Request Failed: System error or you may not have enough privileges")
-                loading_modal.hide()
-            });
+            
             payload = []
             if (btn == 'next') {
                 root.curr_page++;

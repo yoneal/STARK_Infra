@@ -1,12 +1,45 @@
 var root = new Vue({
     el: "#vue-root",
     data: {
-        stark_permissions: {
-            'Users|View': false,
-            'Users|Add': false,
-            'Users|Delete': false,
-            'Users|Edit': false,
-            'Users|Report': false,
+        metadata: {
+            'Username': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Full_Name': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Nickname': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Password_Hash': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Role': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+        },
+        auth_config: { },
+        auth_list: {
+            'View': {'permission': 'Users|View', 'allowed': false},
+            'Add': {'permission': 'Users|Add', 'allowed': false},
+            'Delete': {'permission': 'Users|Delete', 'allowed': false},
+            'Edit': {'permission': 'Users|Edit', 'allowed': false},
+            'Report': {'permission': 'Users|Report', 'allowed': false}
         },
         listview_table: '',
         STARK_report_fields: [],
@@ -164,18 +197,7 @@ var root = new Vue({
 
        list: function (lv_token='', btn='') {
             spinner.show()
-            data = {}
-            data['stark_permissions'] = this.stark_permissions
-            STARK.auth(data).then( function(data) {
-                console.log("Auth Request Done!");
-                console.log(data);
-                root.stark_permissions = data;
-            })
-            .catch(function(error) {
-                console.log("Encountered an error! [" + error + "]")
-                alert("Request Failed: System error or you may not have enough privileges")
-                loading_modal.hide()
-            });
+           
             payload = []
             if (btn == 'next') {
                 root.curr_page++;

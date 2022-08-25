@@ -1,12 +1,33 @@
 var root = new Vue({
     el: "#vue-root",
     data: {
-        stark_permissions: {
-            'User Roles|View': false,
-            'User Roles|Add': false,
-            'User Roles|Delete': false,
-            'User Roles|Edit': false,
-            'User Roles|Report': false,
+        metadata: {
+            'Role_Name': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Description': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Permissions': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+        },
+        auth_config: { },
+        auth_list: {
+            'View': {'permission': 'User Roles|View', 'allowed': false},
+            'Add': {'permission': 'User Roles|Add', 'allowed': false},
+            'Delete': {'permission': 'User Roles|Delete', 'allowed': false},
+            'Edit': {'permission': 'User Roles|Edit', 'allowed': false},
+            'Report': {'permission': 'User Roles|Report', 'allowed': false}
         },
         listview_table: '',
         STARK_report_fields: [],
@@ -170,18 +191,7 @@ var root = new Vue({
 
        list: function (lv_token='', btn='') {
             spinner.show()
-            data = {}
-            data['stark_permissions'] = this.stark_permissions
-            STARK.auth(data).then( function(data) {
-                console.log("Auth Request Done!");
-                console.log(data);
-                root.stark_permissions = data;
-            })
-            .catch(function(error) {
-                console.log("Encountered an error! [" + error + "]")
-                alert("Request Failed: System error or you may not have enough privileges")
-                loading_modal.hide()
-            });
+            
             payload = []
             if (btn == 'next') {
                 root.curr_page++;

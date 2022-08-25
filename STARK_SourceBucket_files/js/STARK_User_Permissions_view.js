@@ -1,12 +1,27 @@
 var root = new Vue({
     el: "#vue-root",
     data: {
-        stark_permissions: {
-            'User Permissions|View': false,
-            'User Permissions|Add': false,
-            'User Permissions|Delete': false,
-            'User Permissions|Edit': false,
-            'User Permissions|Report': false,
+        metadata: {
+            'Username': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+            'Permissions': {
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            },
+        },
+        auth_config: { },
+        auth_list: {
+            'View': {'permission': 'User Permissions|View', 'allowed': false},
+            'Add': {'permission': 'User Permissions|Add', 'allowed': false},
+            'Delete': {'permission': 'User Permissions|Delete', 'allowed': false},
+            'Edit': {'permission': 'User Permissions|Edit', 'allowed': false},
+            'Report': {'permission': 'User Permissions|Report', 'allowed': false}
         },
         listview_table: '',
         STARK_User_Permissions: {
@@ -170,18 +185,7 @@ var root = new Vue({
        list: function (lv_token='', btn='') {
             
             spinner.show()
-            data = {}
-            data['stark_permissions'] = this.stark_permissions
-            STARK.auth(data).then( function(data) {
-                console.log("Auth Request Done!");
-                console.log(data);
-                root.stark_permissions = data;
-            })
-            .catch(function(error) {
-                console.log("Encountered an error! [" + error + "]")
-                alert("Request Failed: System error or you may not have enough privileges")
-                loading_modal.hide()
-            });
+            
             payload = []
             if (btn == 'next') {
                 root.curr_page++;

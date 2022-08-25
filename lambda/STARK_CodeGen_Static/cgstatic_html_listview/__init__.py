@@ -37,8 +37,8 @@ def create(data):
     source_code += f"""\
             <div class="row">
                 <div class="col-6">
-                    <button type="button" class="btn btn-primary mb-2" onClick="window.location.href='{entity_varname}_add.html'" v-if="stark_permissions['{entity}|Add']"> <b>+</b> Add </button>
-                    <button type="button" class="btn btn-info mb-2" onClick="window.location.href='{entity_varname}_report.html'" v-if="stark_permissions['{entity}|Report']"> Reports </button>
+                    <button type="button" class="btn btn-primary mb-2" onClick="window.location.href='{entity_varname}_add.html'" v-if="auth_list.Add.allowed"> <b>+</b> Add </button>
+                    <button type="button" class="btn btn-info mb-2" onClick="window.location.href='{entity_varname}_report.html'" v-if="auth_list.Report.allowed"> Reports </button>
                 </div>
                 <div class="col-6 text-right d-inline-block">        
                     <button id="prev" type="button" class="btn btn-secondary" :disabled="prev_disabled" onClick="root.list(root.prev_token, 'prev')"> < </button>
@@ -65,13 +65,13 @@ def create(data):
                             <template v-for="{entity_varname} in listview_table" id="listview-table">
                                 <tr>
                                     <td>
-                                        <a :href="'{entity_varname}_edit.html?{pk_varname}=' + {entity_varname}.{pk_varname}"><img src="images/pencil-square.svg" class="bg-info" v-if="stark_permissions['{entity}|Edit']"></a>
+                                        <a :href="'{entity_varname}_edit.html?{pk_varname}=' + {entity_varname}.{pk_varname}"><img src="images/pencil-square.svg" class="bg-info" v-if="auth_list.Edit.allowed"></a>
                                     </td>
                                     <th scope="row">
-                                        <template id="detail-view" v-if="stark_permissions['{entity}|View']">
+                                        <template id="detail-view" v-if="auth_list.View.allowed">
                                             <a :href="'{entity_varname}_view.html?{pk_varname}=' + {entity_varname}.{pk_varname}">{{{{ {entity_varname}.{pk_varname} }}}}</a>
                                         </template>
-                                        <template id="detail-view" v-if="!stark_permissions['{entity}|View']">
+                                        <template id="detail-view" v-if="!auth_list.View.allowed">
                                             {{{{ {entity_varname}.{pk_varname} }}}}
                                         </template>
                                     </th>"""
@@ -82,7 +82,7 @@ def create(data):
                                     <td>{{{{ {entity_varname}.{col_varname} }}}}</td>"""
 
     source_code += f"""
-                                    <td><a :href="'{entity_varname}_delete.html?{pk_varname}=' + {entity_varname}.{pk_varname}"><img src="images/x-square.svg" class="bg-danger" v-if="stark_permissions['{entity}|Delete']"></a></td>
+                                    <td><a :href="'{entity_varname}_delete.html?{pk_varname}=' + {entity_varname}.{pk_varname}"><img src="images/x-square.svg" class="bg-danger" v-if="auth_list.Delete.allowed"></a></td>
                                 </tr>
                             </template>
                     </tbody>
