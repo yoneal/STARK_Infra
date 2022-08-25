@@ -62,6 +62,7 @@ def create(data):
                             <div class="form-group">
                                 <label for="{col_varname}">{col}</label>
                                 {html_control_code}
+                                <b-form-invalid-feedback id="aria-{col_varname}">{{metadata.{col_varname}.feedback}}</b-form-invalid-feedback>
                             </div>"""
 
     source_code += f"""
