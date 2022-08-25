@@ -206,6 +206,73 @@ def create(data):
                     loading_modal.hide()
                 }});
             }},
+
+            validate_form: function (metadata, form_to_validate, form_upload ="")
+            {{
+                var is_valid_form = true;
+                
+                for (var form_element of Object.keys(metadata)) {{
+                    let value = form_to_validate[form_element]
+                    let md_element = metadata[form_element]
+                    let message = ""
+                    // loop through meta data per element)
+                    md_element['feedback'] = ""
+                    md_element['state'] = true
+                    
+                    //required
+                    if(md_element['required']) {{
+                        if(md_element['data_type'] == 'file-upload' ) {{ //need to change checking since file-upload is better to be determined by their upload progress
+                            if (form_upload[form_element]['progress_bar_val'] != 100)
+                            {{  
+                                message = `${{message}} is required`
+                            }}
+                        }}
+                        else {{
+                            if(value == "") {{
+                                message = `${{message}} is required`
+                            }}
+                        }}
+                    }}
+
+                    if(message == "") {{
+                        //maxlength
+                        if(md_element['max_length'] != "") {{
+                            if(value.length > md_element['max_length']) {{
+                                message = ` must not exceed ${{md_element['max_length']}} characters`
+                            }}
+                        }}
+                        
+                        //data type
+                        if(md_element['data_type'] != '') {{
+                            if(md_element['data_type'] == 'number') {{
+                                parsed_value = Number(value)
+                                if(isNaN(value)) {{
+                                    message= ` only accepts numerical values`
+                                }}
+                            }}
+                            else if(md_element['data_type'] == 'boolean') {{
+                                if (value !== true || value !== false) {{
+                                    message= ` only accepts True or False`
+                                }}
+                            }}
+                            else if (md_element['data_type'] == 'string') {{
+                                if(typeof value != 'string') {{
+                                    message= ` only accepts string values`
+                                }}
+                            }}
+                        }}
+                    }}
+                
+                    if (message != "") {{
+                        md_element['feedback'] = `This field${{message}}`
+                        md_element['state'] = false
+                        is_valid_form = false
+                    }}
+                    
+                }}
+                // console.log(metadata)
+                return {{'is_valid_form':is_valid_form, 'new_metadata': metadata}}
+            }},
         }};"""
 
     return textwrap.dedent(source_code)

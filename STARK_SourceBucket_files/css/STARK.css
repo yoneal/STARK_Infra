@@ -59,7 +59,7 @@ select:-webkit-autofill:focus {
 .custom-file-label {
   background-color: #000;
   color:#d3d3d3;
-  border: 1px solid #6c757d !important;
+  border: 1px solid #6c757d;
 }
 
 .custom-file-label::after {
