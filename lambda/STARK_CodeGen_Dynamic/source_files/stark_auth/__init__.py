@@ -26,16 +26,12 @@ def lambda_handler(event, context):
     if request_type == '':
         #Default request: Asking for user permissions check
         #event must contain an array of permissions in payload.get('stark_permissions', [])
-        stark_permissions = payload.get('stark_permissions',[])
+        permissions = payload.get('stark_permissions',[])
 
-        print(stark_permissions)
-
-        for permission in stark_permissions:
-            if(stark_core.sec.is_authorized(permission, event, ddb)):
-                print("permission: " + permission)
-                stark_permissions[permission] = True
-            else:
-                stark_permissions[permission] = False
+        stark_permissions = {}
+        for permission in permissions:
+            print(permission)
+            stark_permissions[permission] = stark_core.sec.is_authorized(permission, event, ddb)
 
         return {
             "isBase64Encoded": False,

@@ -77,12 +77,32 @@ def create(data, special="none"):
         source_code += f"""
             <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.24.min.js"></script>"""
 
-    if(special in ['none', 'New', 'Edit']):
+    if(special in ['none']):
         source_code += f"""
             <script src="js/generic_root_get.js" defer></script>"""
+    elif(special == "New"):
+        source_code += f"""
+        <script src="js/generic_check_auth_add.js" defer></script>"""
+    elif(special == "Edit"):
+        source_code += f"""
+            <script src="js/generic_root_get.js" defer></script>
+            <script src="js/generic_check_auth_edit.js" defer></script>"""
+    elif(special == "Delete"):
+        source_code += f"""
+            <script src="js/generic_root_get.js" defer></script>
+            <script src="js/generic_check_auth_delete.js" defer></script>"""
+    elif(special == "View"):
+        source_code += f"""
+            <script src="js/generic_root_get.js" defer></script>
+            <script src="js/generic_check_auth_view.js" defer></script>"""
+    elif(special == "Report"):
+        source_code += f"""
+        <script src="js/generic_check_auth_report.js" defer></script>
+        """
     elif(special == "Listview"):
         source_code += f"""
-            <script src="js/generic_root_list.js" defer></script>"""
+            <script src="js/generic_root_list.js" defer></script>
+            <script src="js/generic_check_auth_listview.js" defer></script>"""
 
     if special != "HomePage":
         source_code += f"""

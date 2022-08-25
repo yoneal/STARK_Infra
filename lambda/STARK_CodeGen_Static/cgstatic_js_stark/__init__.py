@@ -154,7 +154,58 @@ def create(data):
                 size_setting = field_settings == 0 ? table_settings == 0 ? global_settings : table_settings : field_settings;
                 conversion = size_setting * 1024 * 1024
                 return conversion
-            }}
+            }},
+
+            set_page_permissions: function () {{
+                loading_modal.show();
+                console.log("Hello")
+                root.auth_config = {{
+                    'View': [root.auth_list.View.permission],
+                    'Add': [root.auth_list.Add.permission],
+                    'Delete': [root.auth_list.Delete.permission],
+                    'Edit': [root.auth_list.Edit.permission],
+                    'Report': [ 
+                                root.auth_list.Report.permission, 
+                                root.auth_list.Edit.permission, 
+                                root.auth_list.Delete.permission 
+                            ],
+                    'ListView': [ 
+                                root.auth_list.Report.permission, 
+                                root.auth_list.Edit.permission, 
+                                root.auth_list.Delete.permission, 
+                                root.auth_list.Add.permission, 
+                                root.auth_list.View.permission
+                            ]
+                }}
+            }},
+
+            check_permission: function (data) {{
+                console.log("Checking")
+                console.log(data)
+                STARK.auth({'stark_permissions': data}).then( function(data) {{
+                    console.log(data)
+                    console.log("Auth Request Done!");
+                    console.log(data);
+
+
+                    for (var permission of Object.keys(data)) {{
+                        console.log(permission + " -> " + data[permission])
+
+                        for (var key of Object.keys(root.auth_list)) {{
+                            /*Find a math in auth_list for our current STARK permission key*/
+                            if (root.auth_list[key]['permission'] == permission) {{
+                                root.auth_list[key]['allowed'] = data[permission]
+                            }}
+                        }}
+                    }}
+                    loading_modal.hide()
+                }})
+                .catch(function(error) {{
+                    console.log("Encountered an error! [" + error + "]")
+                    alert("Request Failed: System error or you may not have enough privileges")
+                    loading_modal.hide()
+                }});
+            }},
         }};"""
 
     return textwrap.dedent(source_code)

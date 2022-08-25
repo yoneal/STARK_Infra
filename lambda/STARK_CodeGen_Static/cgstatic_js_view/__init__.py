@@ -34,13 +34,30 @@ def create(data):
         var root = new Vue({{
             el: "#vue-root",
             data: {{
-                stark_permissions: {{
-                    '{entity}|View': false,
-                    '{entity}|Add': false,
-                    '{entity}|Delete': false,
-                    '{entity}|Edit': false,
-                    '{entity}|Report': false,
+                metadata: {{"""
+    
+    for col in cols:
+        col_varname = converter.convert_to_system_name(col)
+        source_code += f"""
+                    '{col_varname}': {
+                        'value': '',
+                        'required': true,
+                        'max_length': '',
+                        'data_type': ''
+                    },""" 
+    source_code += f"""
                 }},
+                
+                auth_config: {{ }},
+
+                auth_list: {{
+                    'View': {{'permission': 'Customer Type|View', 'allowed': false}},
+                    'Add': {{'permission': 'Customer Type|Add', 'allowed': false}},
+                    'Delete': {{'permission': 'Customer Type|Delete', 'allowed': false}},
+                    'Edit': {{'permission': 'Customer Type|Edit', 'allowed': false}},
+                    'Report': {{'permission': 'Customer Type|Report', 'allowed': false}}
+                }},
+
                 listview_table: '',
                 STARK_report_fields: [],
                 {entity_varname}: {{
@@ -216,7 +233,7 @@ def create(data):
     
     source_code += f"""
 
-                    let data = {{ {entity_varname}: this.{entity_varname} }}
+                    let data = {{ '{entity_varname}': this.{entity_varname} }}
 
                     {entity_app}.add(data).then( function(data) {{
                         console.log("VIEW: INSERTING DONE!");
@@ -233,7 +250,7 @@ def create(data):
                     loading_modal.show()
                     console.log("VIEW: Deleting!")
 
-                    let data = {{ {entity_varname}: this.{entity_varname} }}
+                    let data = {{ '{entity_varname}': this.{entity_varname} }}
 
                     {entity_app}.delete(data).then( function(data) {{
                         console.log("VIEW: DELETE DONE!");
@@ -260,7 +277,7 @@ def create(data):
                     this.{entity_varname}.{col_varname} = (root.multi_select_values.{col_varname}.sort()).join(', ')"""
     
     source_code += f"""
-                    let data = {{ {entity_varname}: this.{entity_varname} }}
+                    let data = {{ '{entity_varname}': this.{entity_varname} }}
 
                     {entity_app}.update(data).then( function(data) {{
                         console.log("VIEW: UPDATING DONE!");
