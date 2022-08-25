@@ -191,8 +191,8 @@
                         <template v-for="STARK_Module_Groups in listview_table" id="listview-table">
                             <tr>
                                 <td align="center">
-                                    <a :href="'STARK_Module_Groups_edit.html?Group_Name=' + STARK_Module_Groups.Group_Name" target="_blank"><img src="images/pencil-square.svg" class="bg-info"></a>
-                                    <a :href="'STARK_Module_Groups_delete.html?Group_Name=' + STARK_Module_Groups.Group_Name" target="_blank"><img src="images/x-square.svg" class="bg-danger"></a>
+                                    <a :href="'STARK_Module_Groups_edit.html?Group_Name=' + STARK_Module_Groups.Group_Name" target="_blank" v-if="auth_list.Edit.allowed"><img src="images/pencil-square.svg" class="bg-info"></a>
+                                    <a :href="'STARK_Module_Groups_delete.html?Group_Name=' + STARK_Module_Groups.Group_Name" target="_blank" v-if="auth_list.Delete.allowed"><img src="images/x-square.svg" class="bg-danger"></a>
                                 </td>
                                 <template v-for="column in STARK_report_fields">
                                     <td>{{ STARK_Module_Groups[column.field] }}</td>
