@@ -182,7 +182,7 @@ def create(data):
             check_permission: function (data) {{
                 console.log("Checking")
                 console.log(data)
-                STARK.auth({'stark_permissions': data}).then( function(data) {{
+                STARK.auth({{'stark_permissions': data}}).then( function(data) {{
                     console.log(data)
                     console.log("Auth Request Done!");
                     console.log(data);
