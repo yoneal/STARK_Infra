@@ -39,12 +39,12 @@ def create(data):
     for col in cols:
         col_varname = converter.convert_to_system_name(col)
         source_code += f"""
-                    '{col_varname}': {
+                    '{col_varname}': {{
                         'value': '',
                         'required': true,
                         'max_length': '',
                         'data_type': ''
-                    },""" 
+                    }},""" 
                     
     source_code += f"""
                 }},
