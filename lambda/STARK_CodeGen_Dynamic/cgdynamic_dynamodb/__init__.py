@@ -115,14 +115,14 @@ def create(data):
     for col in columns:
         col_varname = converter.convert_to_system_name(col)
         source_code += f"""
-            '{col_varname}': {{
-                'value': '',
-                'required': true,
-                'max_length': '',
-                'data_type': '',
-                'state': null,
-                'feedback': ''
-            }},""" 
+        '{col_varname}': {{
+            'value': '',
+            'required': true,
+            'max_length': '',
+            'data_type': '',
+            'state': null,
+            'feedback': ''
+        }},""" 
                     
     source_code += f"""
     }}
