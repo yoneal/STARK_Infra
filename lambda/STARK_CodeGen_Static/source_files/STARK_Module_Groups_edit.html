@@ -64,19 +64,23 @@
                     <input type="hidden" id="orig_Group_Name" v-model="STARK_Module_Groups.Group_Name">
                     <div class="form-group">
                         <label for="Group_Name">Group Name</label>
-                        <input type="text" class="form-control" id="Group_Name" placeholder="" v-model="STARK_Module_Groups.Group_Name">
+                        <b-form-input type="text" class="form-control" id="Group_Name" placeholder="" v-model="STARK_Module_Groups.Group_Name" :state="metadata.Group_Name.state"></b-form-input>
+                        <b-form-invalid-feedback id="aria-Group_Name">{{metadata.Group_Name.feedback}}</b-form-invalid-feedback>
                     </div>
                     <div class="form-group">
                         <label for="Description">Description</label>
-                        <input type="text" class="form-control" id="Description" placeholder="" v-model="STARK_Module_Groups.Description">
+                        <b-form-input type="text" class="form-control" id="Description" placeholder="" v-model="STARK_Module_Groups.Description" :state="metadata.Description.state"></b-form-input>
+                        <b-form-invalid-feedback id="aria-Description">{{metadata.Description.feedback}}</b-form-invalid-feedback>
                     </div>
                     <div class="form-group">
                         <label for="Icon">Icon</label>
-                        <input type="text" class="form-control" id="Icon" placeholder="" v-model="STARK_Module_Groups.Icon">
+                        <b-form-input type="text" class="form-control" id="Icon" placeholder="" v-model="STARK_Module_Groups.Icon" :state="metadata.Icon.state"></b-form-input>
+                        <b-form-invalid-feedback id="aria-Icon">{{metadata.Icon.feedback}}</b-form-invalid-feedback>
                     </div>
                     <div class="form-group">
                         <label for="Priority">Priority</label>
-                        <input type="number" class="form-control" id="Priority" placeholder="" v-model="STARK_Module_Groups.Priority">
+                        <b-form-input type="number" class="form-control" id="Priority" placeholder="" v-model="STARK_Module_Groups.Priority" :state="metadata.Priority.state"></b-form-input>
+                        <b-form-invalid-feedback id="aria-Priority">{{metadata.Priority.feedback}}</b-form-invalid-feedback>
                     </div>
                     <button type="button" class="btn btn-secondary" onClick="window.location.href='STARK_Module_Groups.html'">Back</button>
                     <button type="button" class="btn btn-primary float-right" onClick="root.update()">Update</button>

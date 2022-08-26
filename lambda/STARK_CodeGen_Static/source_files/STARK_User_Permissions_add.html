@@ -65,15 +65,14 @@
                     <input type="hidden" id="orig_Username" v-model="STARK_User_Permissions.Username">
                     <div class="form-group">
                         <label for="Username">Username</label>
-                        <input type="text" class="form-control" id="Username" placeholder="" v-model="STARK_User_Permissions.Username">
+                        <b-form-input type="text" class="form-control" id="Username" placeholder="" v-model="STARK_User_Permissions.Username" :state="metadata.Username.state"></b-form-input>
+                        <b-form-invalid-feedback id="aria-Username">{{metadata.Username.feedback}}</b-form-invalid-feedback>
                     </div>
                     <template>
                     <div>
                     <b-form-group label="Permissions" label-for="tags-with-dropdown">
                     <b-form-tags id="tags-with-dropdown" v-model="multi_select_values.Permissions" no-outer-focus class="mb-2">
                         <template v-slot="{ tags, disabled, addTag, removeTag }">
-                        
-                
                         <b-dropdown size="sm" variant="outline-secondary" 
                             block menu-class="w-50" 
                             right no-flip ref="Permissions" 
@@ -128,6 +127,7 @@
                         </template>
                     </b-form-tags>
                     </b-form-group>
+                    <!-- <b-form-invalid-feedback id="aria-Permissions">{{metadata.Permissions.feedback}}</b-form-invalid-feedback> -->
                     </div>
                     </template>
                     <button type="button" class="btn btn-secondary" onClick="window.location.href='STARK_User_Permissions.html'">Back</button>

@@ -6,13 +6,17 @@ var root = new Vue({
                 'value': '',
                 'required': true,
                 'max_length': '',
-                'data_type': ''
+                'data_type': '',
+                'state': null,
+                'feedback': ''
             },
             'Permissions': {
                 'value': '',
-                'required': true,
+                'required': false,
                 'max_length': '',
-                'data_type': ''
+                'data_type': '',
+                'state': null,
+                'feedback': ''
             },
         },
         auth_config: { },
@@ -91,24 +95,25 @@ var root = new Vue({
         },
 
         add: function () {
-													   
-            this.STARK_User_Permissions.Permissions = (root.multi_select_values.Permissions.sort()).join(', ')																					
-			
-            loading_modal.show()
             console.log("VIEW: Inserting!")
-
-            let data = { STARK_User_Permissions: this.STARK_User_Permissions }
-			
-
-            STARK_User_Permissions_app.add(data).then( function(data) {
-                console.log("VIEW: INSERTING DONE!");
-                loading_modal.hide()
-                window.location.href = "STARK_User_Permissions.html";
-            }).catch(function(error) {
-                console.log("Encountered an error! [" + error + "]")
-                alert("Request Failed: System error or you may not have enough privileges")
-                loading_modal.hide()
-            });
+			response = STARK.validate_form(root.metadata, root.STARK_User_Permissions)
+            this.metadata = response['new_metadata']
+            if(response['is_valid_form']) {
+                loading_modal.show()
+													   
+                this.STARK_User_Permissions.Permissions = (root.multi_select_values.Permissions.sort()).join(', ')																					
+                let data = { STARK_User_Permissions: this.STARK_User_Permissions }
+                
+                STARK_User_Permissions_app.add(data).then( function(data) {
+                    console.log("VIEW: INSERTING DONE!");
+                    loading_modal.hide()
+                    window.location.href = "STARK_User_Permissions.html";
+                }).catch(function(error) {
+                    console.log("Encountered an error! [" + error + "]")
+                    alert("Request Failed: System error or you may not have enough privileges")
+                    loading_modal.hide()
+                });
+            }
         },
 
         delete: function () {
@@ -131,23 +136,27 @@ var root = new Vue({
         },
 
         update: function () {
-            loading_modal.show()
             console.log("VIEW: Updating!")
+            response = STARK.validate_form(root.metadata, root.STARK_User_Permissions)
+            this.metadata = response['new_metadata']
+            if(response['is_valid_form']) {
+                loading_modal.show()	
 
-			this.STARK_User_Permissions.Permissions = (root.multi_select_values.Permissions.sort()).join(', ')																		
-            let data = { STARK_User_Permissions: this.STARK_User_Permissions }
+                this.STARK_User_Permissions.Permissions = (root.multi_select_values.Permissions.sort()).join(', ')																		
+                let data = { STARK_User_Permissions: this.STARK_User_Permissions }
 
-            STARK_User_Permissions_app.update(data).then( function(data) {
-                console.log("VIEW: UPDATING DONE!");
-                console.log(data);
-                loading_modal.hide()
-                window.location.href = "STARK_User_Permissions.html";
-            })
-            .catch(function(error) {
-                console.log("Encountered an error! [" + error + "]")
-                alert("Request Failed: System error or you may not have enough privileges")
-                loading_modal.hide()
-            });
+                STARK_User_Permissions_app.update(data).then( function(data) {
+                    console.log("VIEW: UPDATING DONE!");
+                    console.log(data);
+                    loading_modal.hide()
+                    window.location.href = "STARK_User_Permissions.html";
+                })
+                .catch(function(error) {
+                    console.log("Encountered an error! [" + error + "]")
+                    alert("Request Failed: System error or you may not have enough privileges")
+                    loading_modal.hide()
+                });
+            }
         },
 
         get: function () {

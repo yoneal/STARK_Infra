@@ -65,16 +65,18 @@
                     <input type="hidden" id="orig_Role_Name" v-model="STARK_User_Roles.Role_Name">
                     <div class="form-group">
                         <label for="Role_Name">Role Name</label>
-                        <input type="text" class="form-control" id="Role_Name" placeholder="" v-model="STARK_User_Roles.Role_Name">
+                        <b-form-input type="text" class="form-control" id="Role_Name" placeholder="" v-model="STARK_User_Roles.Role_Name"  :state="metadata.Role_Name.state"></b-form-input>
+                        <b-form-invalid-feedback id="aria-Role_Name">{{metadata.Role_Name.feedback}}</b-form-invalid-feedback>
                     </div>
                     <div class="form-group">
                         <label for="Description">Description</label>
-                        <input type="text" class="form-control" id="Description" placeholder="" v-model="STARK_User_Roles.Description">
+                        <b-form-input type="text" class="form-control" id="Description" placeholder="" v-model="STARK_User_Roles.Description"  :state="metadata.Description.state"></b-form-input>
+                        <b-form-invalid-feedback id="aria-Description">{{metadata.Description.feedback}}</b-form-invalid-feedback>
                     </div>
                     <template>
                     <div>
-                    <b-form-group label="Permissions" label-for="tags-with-dropdown">
-                    <b-form-tags id="tags-with-dropdown" v-model="multi_select_values.Permissions" no-outer-focus class="mb-2">
+                    <b-form-group label="Permissions" label-for="tags-with-dropdown" >
+                    <b-form-tags id="tags-with-dropdown" v-model="multi_select_values.Permissions" no-outer-focus class="mb-2" :state="metadata.Permissions.state">
                         <template v-slot="{ tags, disabled, addTag, removeTag }">
                 
                         <b-dropdown size="sm" variant="outline-secondary" 
@@ -85,7 +87,7 @@
                             <template #button-content>
                             <b-icon icon="tag-fill"></b-icon> Choose permissions
                             </template>
-                            <b-dropdown-form @submit.stop.prevent="() => {}">
+                            <b-dropdown-form @submit.stop.prevent="() => {}"  >
                             <b-form-group
                                 label="Search tags"
                                 label-for="tag-search-input"
@@ -101,9 +103,11 @@
                                 type="search"
                                 size="sm"
                                 autocomplete="off"
+                                
                                 ></b-form-input>
                             </b-form-group>
                             </b-dropdown-form>
+
                             <b-dropdown-divider></b-dropdown-divider>
                             <b-dropdown-form style="max-height: 350px; overflow-y: scroll;">
                                 <b-dropdown-item-button
@@ -118,19 +122,26 @@
                             There are no permissions available to select
                             </b-dropdown-text>
                         </b-dropdown>
-                        <ul v-if="tags.length > 0" class="list-inline d-inline-block">
-                            <li v-for="tag in tags" :key="tag" class="list-inline-item mt-2">
-                            <b-form-tag
-                                @remove="removeTag(tag)"
-                                :title="tag"
-                                :disabled="disabled"
-                                variant="info"
-                            >{{ tag_display_text(tag) }}</b-form-tag>
-                            </li>
-                        </ul>
+                        <b-input-group>
+                            <ul v-if="tags.length > 0" class="list-inline d-inline-block" >
+                                <li v-for="tag in tags" :key="tag" class="list-inline-item mt-2">
+                                <b-form-tag
+                                    @remove="removeTag(tag)"
+                                    :title="tag"
+                                    :disabled="disabled"
+                                    variant="info"
+                                    :state="metadata.Permissions.state"
+                                >{{ tag_display_text(tag) }}</b-form-tag>
+                                </li>
+                            </ul>
+                        </b-input-group>
+                        <b-form-invalid-feedback id="aria-Permissions" >{{metadata.Permissions.feedback}}</b-form-invalid-feedback>
+
                         </template>
                     </b-form-tags>
+
                     </b-form-group>
+
                     </div>
                     </template>
                     <button type="button" class="btn btn-secondary" onClick="window.location.href='STARK_User_Roles.html'">Back</button>
