@@ -645,17 +645,37 @@ def create(data):
 
     def prepare_pdf_data(data_to_tuple, master_fields, pdf_filename, report_params):
         #FIXME: PDF GENERATOR: can be outsourced to a layer, for refining 
+        master_fields.insert(0, '#')
+        numerical_columns = {{}}
+        for key, items in metadata.items():
+            if items['data_type'] == 'number':
+                numerical_columns.update({{key: 0}})
         row_list = []
+        counter = 1 
         for key in data_to_tuple:
             column_list = []
             for index in master_fields:
-                column_list.append(key[index])
+                if(index != '#'):
+                    if index in numerical_columns.keys():
+                        numerical_columns[index] += int(key[index])
+                    column_list.append(key[index])
+            column_list.insert(0, str(counter)) 
             row_list.append(tuple(column_list))
+            counter += 1
+
+        if len(numerical_columns) > 0:
+            column_list = []
+            for values in master_fields:
+                if values in numerical_columns:
+                    column_list.append(str(numerical_columns.get(values, '')))
+                else:
+                    column_list.append('')
+            row_list.append(column_list)
 
         header_tuple = tuple(master_fields) 
         data_tuple = tuple(row_list)
         
-        pdf = utilities.create_pdf(header_tuple, data_tuple, report_params, pk_field)
+        pdf = utilities.create_pdf(header_tuple, data_tuple, report_params, pk_field, metadata)
         s3_action = s3.put_object(
             ACL='public-read',
             Body= pdf.output(),
