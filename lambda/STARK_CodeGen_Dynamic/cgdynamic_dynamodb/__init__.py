@@ -101,6 +101,31 @@ def create(data):
     sort_fields       = ["{pk_varname}", ]
     relationships     = {relationships}
     entity_upload_dir = stark_core.upload_dir + "{entity_varname}/"
+    metadata          = {{
+        "{pk_varname}": : {{
+            'value': '',
+            'required': true,
+            'max_length': '',
+            'data_type': '',
+            'state': null,
+            'feedback': ''
+        }},"""
+        
+    
+    for col in columns:
+        col_varname = converter.convert_to_system_name(col)
+        source_code += f"""
+                    '{col_varname}': {{
+                        'value': '',
+                        'required': true,
+                        'max_length': '',
+                        'data_type': '',
+                        'state': null,
+                        'feedback': ''
+                    }},""" 
+                    
+    source_code += f"""
+    }},
 
     ############
     #PERMISSIONS
