@@ -36,7 +36,7 @@ var root = new Vue({
             },
             'Module_Group': {
                 'value': '',
-                'required': false,
+                'required': true,
                 'max_length': '',
                 'data_type': '',
                 'state': null,
@@ -52,7 +52,7 @@ var root = new Vue({
             },
             'Is_Enabled': {
                 'value': '',
-                'required': true,
+                'required': false,
                 'max_length': '',
                 'data_type': '',
                 'state': null,
