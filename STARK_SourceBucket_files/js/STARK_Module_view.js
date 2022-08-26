@@ -6,55 +6,73 @@ var root = new Vue({
                 'value': '',
                 'required': true,
                 'max_length': '',
-                'data_type': ''
+                'data_type': '',
+                'state': null,
+                'feedback': ''
             },
             'Descriptive_Title': {
                 'value': '',
                 'required': true,
                 'max_length': '',
-                'data_type': ''
+                'data_type': '',
+                'state': null,
+                'feedback': ''
             },
             'Target': {
                 'value': '',
                 'required': true,
                 'max_length': '',
-                'data_type': ''
+                'data_type': '',
+                'state': null,
+                'feedback': ''
             },
             'Description': {
                 'value': '',
                 'required': true,
                 'max_length': '',
-                'data_type': ''
+                'data_type': '',
+                'state': null,
+                'feedback': ''
             },
             'Module_Group': {
                 'value': '',
                 'required': true,
                 'max_length': '',
-                'data_type': ''
+                'data_type': '',
+                'state': null,
+                'feedback': ''
             },
             'Is_Menu_Item': {
                 'value': '',
                 'required': true,
                 'max_length': '',
-                'data_type': ''
+                'data_type': '',
+                'state': null,
+                'feedback': ''
             },
             'Is_Enabled': {
                 'value': '',
                 'required': true,
                 'max_length': '',
-                'data_type': ''
+                'data_type': '',
+                'state': null,
+                'feedback': ''
             },
             'Icon': {
                 'value': '',
                 'required': true,
                 'max_length': '',
-                'data_type': ''
+                'data_type': '',
+                'state': null,
+                'feedback': ''
             },
             'Priority': {
                 'value': '',
                 'required': true,
                 'max_length': '',
-                'data_type': ''
+                'data_type': '',
+                'state': null,
+                'feedback': ''
             },
         },
 
@@ -153,20 +171,24 @@ var root = new Vue({
         },
 
         add: function () {
-            loading_modal.show()
             console.log("VIEW: Inserting!")
+            response = STARK.validate_form(root.metadata, root.STARK_Module)
+            this.metadata = response['new_metadata']
+            if(response['is_valid_form']) {
+                loading_modal.show()
 
-            let data = { STARK_Module: this.STARK_Module }
+                let data = { STARK_Module: this.STARK_Module }
 
-            STARK_Module_app.add(data).then( function(data) {
-                console.log("VIEW: INSERTING DONE!");
-                loading_modal.hide()
-                window.location.href = "STARK_Module.html";
-            }).catch(function(error) {
-                console.log("Encountered an error! [" + error + "]")
-                alert("Request Failed: System error or you may not have enough privileges")
-                loading_modal.hide()
-            });
+                STARK_Module_app.add(data).then( function(data) {
+                    console.log("VIEW: INSERTING DONE!");
+                    loading_modal.hide()
+                    window.location.href = "STARK_Module.html";
+                }).catch(function(error) {
+                    console.log("Encountered an error! [" + error + "]")
+                    alert("Request Failed: System error or you may not have enough privileges")
+                    loading_modal.hide()
+                });
+            }
         },
 
         delete: function () {
@@ -189,22 +211,26 @@ var root = new Vue({
         },
 
         update: function () {
-            loading_modal.show()
             console.log("VIEW: Updating!")
+            response = STARK.validate_form(root.metadata, root.STARK_Module)
+            this.metadata = response['new_metadata']
+            if(response['is_valid_form']) {
+                loading_modal.show()
 
-            let data = { STARK_Module: this.STARK_Module }
+                let data = { STARK_Module: this.STARK_Module }
 
-            STARK_Module_app.update(data).then( function(data) {
-                console.log("VIEW: UPDATING DONE!");
-                console.log(data);
-                loading_modal.hide()
-                window.location.href = "STARK_Module.html";
-            })
-            .catch(function(error) {
-                console.log("Encountered an error! [" + error + "]")
-                alert("Request Failed: System error or you may not have enough privileges")
-                loading_modal.hide()
-            });
+                STARK_Module_app.update(data).then( function(data) {
+                    console.log("VIEW: UPDATING DONE!");
+                    console.log(data);
+                    loading_modal.hide()
+                    window.location.href = "STARK_Module.html";
+                })
+                .catch(function(error) {
+                    console.log("Encountered an error! [" + error + "]")
+                    alert("Request Failed: System error or you may not have enough privileges")
+                    loading_modal.hide()
+                });
+            }
         },
 
         get: function () {
