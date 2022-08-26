@@ -104,10 +104,10 @@ def create(data):
     metadata          = {{
         "{pk_varname}": : {{
             'value': '',
-            'required': true,
+            'required': True,
             'max_length': '',
             'data_type': '',
-            'state': null,
+            'state': None,
             'feedback': ''
         }},"""
         
@@ -117,10 +117,10 @@ def create(data):
         source_code += f"""
         '{col_varname}': {{
             'value': '',
-            'required': true,
+            'required': True,
             'max_length': '',
             'data_type': '',
-            'state': null,
+            'state': None,
             'feedback': ''
         }},""" 
                     
