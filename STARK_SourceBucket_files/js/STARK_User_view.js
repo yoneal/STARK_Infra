@@ -6,31 +6,41 @@ var root = new Vue({
                 'value': '',
                 'required': true,
                 'max_length': '',
-                'data_type': ''
+                'data_type': '',
+                'state': null,
+                'feedback': ''
             },
             'Full_Name': {
                 'value': '',
                 'required': true,
                 'max_length': '',
-                'data_type': ''
+                'data_type': '',
+                'state': null,
+                'feedback': ''
             },
             'Nickname': {
                 'value': '',
                 'required': true,
                 'max_length': '',
-                'data_type': ''
+                'data_type': '',
+                'state': null,
+                'feedback': ''
             },
             'Password_Hash': {
                 'value': '',
                 'required': true,
                 'max_length': '',
-                'data_type': ''
+                'data_type': '',
+                'state': null,
+                'feedback': ''
             },
             'Role': {
                 'value': '',
                 'required': true,
                 'max_length': '',
-                'data_type': ''
+                'data_type': '',
+                'state': null,
+                'feedback': ''
             },
         },
         auth_config: { },
@@ -111,20 +121,24 @@ var root = new Vue({
         },
 
         add: function () {
-            loading_modal.show()
             console.log("VIEW: Inserting!")
+            response = STARK.validate_form(root.metadata, root.STARK_User)
+            this.metadata = response['new_metadata']
+            if(response['is_valid_form']) {
+                loading_modal.show()
 
-            let data = { STARK_User: this.STARK_User }
+                let data = { STARK_User: this.STARK_User }
 
-            STARK_User_app.add(data).then( function(data) {
-                console.log("VIEW: INSERTING DONE!");
-                loading_modal.hide()
-                window.location.href = "STARK_User.html";
-            }).catch(function(error) {
-                console.log("Encountered an error! [" + error + "]")
-                alert("Request Failed: System error or you may not have enough privileges")
-                loading_modal.hide()
-            });
+                STARK_User_app.add(data).then( function(data) {
+                    console.log("VIEW: INSERTING DONE!");
+                    loading_modal.hide()
+                    window.location.href = "STARK_User.html";
+                }).catch(function(error) {
+                    console.log("Encountered an error! [" + error + "]")
+                    alert("Request Failed: System error or you may not have enough privileges")
+                    loading_modal.hide()
+                });
+            }
         },
 
         delete: function () {
@@ -147,22 +161,26 @@ var root = new Vue({
         },
 
         update: function () {
-            loading_modal.show()
             console.log("VIEW: Updating!")
+            response = STARK.validate_form(root.metadata, root.STARK_User)
+            this.metadata = response['new_metadata']
+            if(response['is_valid_form']) {
+                loading_modal.show()
 
-            let data = { STARK_User: this.STARK_User }
+                let data = { STARK_User: this.STARK_User }
 
-            STARK_User_app.update(data).then( function(data) {
-                console.log("VIEW: UPDATING DONE!");
-                console.log(data);
-                loading_modal.hide()
-                window.location.href = "STARK_User.html";
-            })
-            .catch(function(error) {
-                console.log("Encountered an error! [" + error + "]")
-                alert("Request Failed: System error or you may not have enough privileges")
-                loading_modal.hide()
-            });
+                STARK_User_app.update(data).then( function(data) {
+                    console.log("VIEW: UPDATING DONE!");
+                    console.log(data);
+                    loading_modal.hide()
+                    window.location.href = "STARK_User.html";
+                })
+                .catch(function(error) {
+                    console.log("Encountered an error! [" + error + "]")
+                    alert("Request Failed: System error or you may not have enough privileges")
+                    loading_modal.hide()
+                });
+            }
         },
 
         get: function () {

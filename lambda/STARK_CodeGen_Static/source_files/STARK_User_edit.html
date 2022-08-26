@@ -65,28 +65,33 @@
                     <input type="hidden" id="orig_Username" v-model="STARK_User.Username">
                     <div class="form-group">
                         <label for="Username">Username</label>
-                        <input type="text" class="form-control" id="Username" placeholder="" v-model="STARK_User.Username">
+                        <b-form-input type="text" class="form-control" id="Username" placeholder="" v-model="STARK_User.Username" :state="metadata.Username.state"></b-form-input>
+                        <b-form-invalid-feedback id="aria-Username">{{metadata.Username.feedback}}</b-form-invalid-feedback>
                     </div>
                     <div class="form-group">
                         <label for="Full_Name">Full Name</label>
-                        <input type="text" class="form-control" id="Full_Name" placeholder="" v-model="STARK_User.Full_Name">
+                        <b-form-input type="text" class="form-control" id="Full_Name" placeholder="" v-model="STARK_User.Full_Name" :state="metadata.Full_Name.state"></b-form-input>
+                        <b-form-invalid-feedback id="aria-Full_Name">{{metadata.Full_Name.feedback}}</b-form-invalid-feedback>
                     </div>
                     <div class="form-group">
                         <label for="Nickname">Nickname</label>
-                        <input type="text" class="form-control" id="Nickname" placeholder="" v-model="STARK_User.Nickname">
+                        <b-form-input type="text" class="form-control" id="Nickname" placeholder="" v-model="STARK_User.Nickname" :state="metadata.Nickname.state"></b-form-input>
+                        <b-form-invalid-feedback id="aria-Nickname">{{metadata.Nickname.feedback}}</b-form-invalid-feedback>
                     </div>
                     <div class="form-group">
                         <label for="Role">Role</label>
-                        <b-form-select id="Role" v-model="STARK_User.Role" :options="lists.Role" onmouseover="root.list_Role()" onfocus="root.list_Role()">
+                        <b-form-select id="Role" v-model="STARK_User.Role" :options="lists.Role" onmouseover="root.list_Role()" onfocus="root.list_Role()" :state="metadata.Role.state">
+                        <b-form-invalid-feedback id="aria-Role">{{metadata.Role.feedback}}</b-form-invalid-feedback>
                             <template v-slot:first>
                                 <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                             </template>
                         </b-form-select>    
                     </div>    
                     <div class="form-group">
-                        <label for="Password_Hash">Reset Password</label>
-                        <input type="password" class="form-control" id="Password_Hash" placeholder="" v-model="STARK_User.Password_Hash">
-                    </div>
+                        <label for="Password_Hash">Password</label>
+                        <b-form-input type="password" class="form-control" id="Password_Hash" placeholder="" v-model="STARK_User.Password_Hash" :state="metadata.Password_Hash.state"></b-form-input>
+                        <b-form-invalid-feedback id="aria-Password_Hash">{{metadata.Password_Hash.feedback}}</b-form-invalid-feedback>
+                    </div> 
                     <button type="button" class="btn btn-secondary" onClick="window.location.href='STARK_User.html'">Back</button>
                     <button type="button" class="btn btn-primary float-right" onClick="root.update()">Update</button>
                     </form>
