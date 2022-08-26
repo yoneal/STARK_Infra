@@ -12,7 +12,7 @@ var root = new Vue({
             },
             'Permissions': {
                 'value': '',
-                'required': false,
+                'required': true,
                 'max_length': '',
                 'data_type': '',
                 'state': null,
