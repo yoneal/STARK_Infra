@@ -143,7 +143,7 @@ def create(data):
                             <table class="table  table-hover table-striped table-dark">
                                 <thead class="thead-dark">
                                     <tr>
-                                        <th scope="col"> Operations </th>
+                                        <th scope="col" width = "20px"> Operations </th>
                                         <template v-for="column in STARK_report_fields" id="STARK_report_fields">
                                             <th scope="col">{{{{column.label}}}}</th>
                                         </template>"""
