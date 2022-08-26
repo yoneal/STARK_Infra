@@ -96,12 +96,12 @@ var root = new Vue({
 
         add: function () {
             console.log("VIEW: Inserting!")
-			response = STARK.validate_form(root.metadata, root.STARK_User_Permissions)
+            this.STARK_User_Permissions.Permissions = (root.multi_select_values.Permissions.sort()).join(', ')																					
+            response = STARK.validate_form(root.metadata, root.STARK_User_Permissions)
             this.metadata = response['new_metadata']
             if(response['is_valid_form']) {
                 loading_modal.show()
 													   
-                this.STARK_User_Permissions.Permissions = (root.multi_select_values.Permissions.sort()).join(', ')																					
                 let data = { STARK_User_Permissions: this.STARK_User_Permissions }
                 
                 STARK_User_Permissions_app.add(data).then( function(data) {
@@ -137,12 +137,12 @@ var root = new Vue({
 
         update: function () {
             console.log("VIEW: Updating!")
+            this.STARK_User_Permissions.Permissions = (root.multi_select_values.Permissions.sort()).join(', ')																		
             response = STARK.validate_form(root.metadata, root.STARK_User_Permissions)
             this.metadata = response['new_metadata']
             if(response['is_valid_form']) {
                 loading_modal.show()	
 
-                this.STARK_User_Permissions.Permissions = (root.multi_select_values.Permissions.sort()).join(', ')																		
                 let data = { STARK_User_Permissions: this.STARK_User_Permissions }
 
                 STARK_User_Permissions_app.update(data).then( function(data) {

@@ -108,12 +108,12 @@ var root = new Vue({
 
         add: function () {
             console.log("VIEW: Inserting!")
+            this.STARK_User_Roles.Permissions = (root.multi_select_values.Permissions.sort()).join(', ')
             response = STARK.validate_form(root.metadata, root.STARK_User_Roles)
             console.log(response)
             this.metadata = response['new_metadata']
             if(response['is_valid_form']) {
                 loading_modal.show()
-                this.STARK_User_Roles.Permissions = (root.multi_select_values.Permissions.sort()).join(', ')
                 let data = { STARK_User_Roles: this.STARK_User_Roles }
 
                 STARK_User_Roles_app.add(data).then( function(data) {
@@ -149,12 +149,12 @@ var root = new Vue({
 
         update: function () {
             console.log("VIEW: Updating!")
+            this.STARK_User_Roles.Permissions = (root.multi_select_values.Permissions.sort()).join(', ')
             response = STARK.validate_form(root.metadata, root.STARK_User_Roles)
             this.metadata = response['new_metadata']
             if(response['is_valid_form']) {
                 loading_modal.show()
 
-                this.STARK_User_Roles.Permissions = (root.multi_select_values.Permissions.sort()).join(', ')
                 let data = { STARK_User_Roles: this.STARK_User_Roles }
 
                 STARK_User_Roles_app.update(data).then( function(data) {
