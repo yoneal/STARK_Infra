@@ -1,5 +1,6 @@
 #Python Standard Library
 import base64
+from importlib.metadata import metadata
 import json
 import sys
 from urllib.parse import unquote
@@ -30,6 +31,40 @@ bucket_tmp        = stark_core.bucket_tmp
 pk_field          = "Group_Name"
 default_sk        = "STARK|module_group"
 sort_fields       = ["Group_Name", ]
+metadata          = {
+    'Group_Name': {
+        'value': '',
+        'required': True,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+    'Description': {
+        'value': '',
+        'required': True,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+    'Icon': {
+        'value': '',
+        'required': True,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+    'Priority': {
+        'value': '',
+        'required': True,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+}
 
 def lambda_handler(event, context):
 

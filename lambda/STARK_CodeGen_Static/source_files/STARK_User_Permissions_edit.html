@@ -71,7 +71,7 @@
                     <template>
                     <div>
                     <b-form-group label="Permissions" label-for="tags-with-dropdown">
-                    <b-form-tags id="tags-with-dropdown" v-model="multi_select_values.Permissions" no-outer-focus class="mb-2">
+                    <b-form-tags id="tags-with-dropdown" v-model="multi_select_values.Permissions" no-outer-focus class="mb-2" :state="metadata.Permissions.state">
                         <template v-slot="{ tags, disabled, addTag, removeTag }">
                         <b-dropdown size="sm" variant="outline-secondary" 
                             block menu-class="w-50" 
@@ -126,8 +126,8 @@
                         </ul>
                         </template>
                     </b-form-tags>
+                    <b-form-invalid-feedback id="aria-Permissions">{{metadata.Permissions.feedback}}</b-form-invalid-feedback>
                     </b-form-group>
-                    <!-- <b-form-invalid-feedback id="aria-Permissions">{{metadata.Permissions.feedback}}</b-form-invalid-feedback> -->
                     </div>
                     </template>
                     <button type="button" class="btn btn-secondary" onClick="window.location.href='STARK_User_Permissions.html'">Back</button>

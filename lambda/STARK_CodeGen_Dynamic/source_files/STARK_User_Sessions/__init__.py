@@ -30,6 +30,48 @@ pk_field          = "Session_ID"
 default_sk        = "STARK|session"
 sort_fields       = ["Session_ID", ]
 relationships     = []
+metadata          = {
+    'Session_ID': {
+        'value': '',
+        'required': True,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+    'Username':  {
+        'value': '',
+        'required': True,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+    'Sess_Start':  {
+        'value': '',
+        'required': True,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+    'TTL':  {
+        'value': '',
+        'required': True,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+    'Permissions':  {
+        'value': '',
+        'required': True,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+} 
 
 def lambda_handler(event, context):
 

@@ -1,6 +1,7 @@
 #Python Standard Library
 import base64
 from email.policy import default
+from importlib.metadata import metadata
 import json
 from urllib.parse import unquote
 import sys
@@ -32,6 +33,80 @@ pk_field          = "Module_Name"
 default_sk        = "STARK|module"
 sort_fields       = ["Module_Name", ]
 relationships     = []
+metadata          = {
+    'Module_Name': {
+        'value': '',
+        'required': True,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+    'Descriptive_Title': {
+        'value': '',
+        'required': True,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+    'Target': {
+        'value': '',
+        'required': True,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+    'Description': {
+        'value': '',
+        'required': True,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+    'Module_Group': {
+        'value': '',
+        'required': True,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+    'Is_Menu_Item': {
+        'value': '',
+        'required': False,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+    'Is_Enabled': {
+        'value': '',
+        'required': False,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+    'Icon': {
+        'value': '',
+        'required': True,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+    'Priority': {
+        'value': '',
+        'required': True,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+}
 
 def lambda_handler(event, context):
 

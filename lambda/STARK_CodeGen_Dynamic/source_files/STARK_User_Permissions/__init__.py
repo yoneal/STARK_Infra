@@ -31,6 +31,24 @@ pk_field          = "Username"
 default_sk        = "STARK|user|permissions"
 sort_fields       = ["Username", ]
 relationships     = []
+metadata          = {
+    'Username': {
+        'value': '',
+        'required': True,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+    'Permissions': {
+        'value': '',
+        'required': False,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+}
 
 def lambda_handler(event, context):
 

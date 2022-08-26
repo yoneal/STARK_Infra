@@ -31,7 +31,32 @@ pk_field          = "Role_Name"
 default_sk        = "STARK|role"
 sort_fields       = ["Role_Name", ]
 relationships     = []
-
+metadata          = {
+    'Role_Name': {
+        'value': '',
+        'required': True,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+    'Description': {
+        'value': '',
+        'required': True,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+    'Permissions': {
+        'value': '',
+        'required': False,
+        'max_length': '',
+        'data_type': '',
+        'state': None,
+        'feedback': ''
+    },
+}
 def lambda_handler(event, context):
 
     #Get request type
