@@ -22,16 +22,16 @@ def create(data):
 
 
     if col_type == "date":
-        html_code=f"""<b-form-datepicker id="{col_varname}" show-decade-nav v-model="{entity_varname}.{col_varname}" class="mb-2"></b-form-datepicker>"""
+        html_code=f"""<b-form-datepicker id="{col_varname}" show-decade-nav v-model="{entity_varname}.{col_varname}" class="mb-2" :state="metadata.{col_varname}.state"></b-form-datepicker>"""
 
     elif col_type == "time":
-        html_code=f"""<b-form-timepicker id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2"></b-form-timepicker>"""
+        html_code=f"""<b-form-timepicker id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2" :state="metadata.{col_varname}.state"></b-form-timepicker>"""
 
     elif col_type == "number":
-        html_code=f"""<input type="number" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}">"""
+        html_code=f"""<b-form-input type="number" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}" :state="metadata.{col_varname}.state"></b-form-input>"""
 
     elif col_type == "int":
-        html_code=f"""<input type="number"  min="0" step="1" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}">"""
+        html_code=f"""<b-form-input type="number"  min="0" step="1" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}" :state="metadata.{col_varname}.state"></b-form-input>"""
 
     elif col_type in [ "yes-no", "boolean" ]:
         if col_type == "yes-no":
@@ -41,13 +41,13 @@ def create(data):
             checked   ="True"
             unchecked ="False"
 
-        html_code=f"""<b-form-checkbox id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2" value="{checked}" unchecked-value="{unchecked}">{{{{ {entity_varname}.{col_varname} }}}}</b-form-checkbox>"""
+        html_code=f"""<b-form-checkbox id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2" value="{checked}" unchecked-value="{unchecked}" :state="metadata.{col_varname}.state">{{{{ {entity_varname}.{col_varname} }}}}</b-form-checkbox>"""
 
     elif col_type == "multi-line-string":
-        html_code=f"""<b-form-textarea id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2" rows="4" max-rows="8"></b-form-textarea>"""
+        html_code=f"""<b-form-textarea id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2" rows="4" max-rows="8" :state="metadata.{col_varname}.state"></b-form-textarea>"""
 
     elif isinstance(col_type, list):
-        html_code=f"""<b-form-select id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}">
+        html_code=f"""<b-form-select id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}" :state="metadata.{col_varname}.state">
                                     <template v-slot:first>
                                         <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                     </template>
@@ -86,7 +86,7 @@ def create(data):
             if col_type.get('wrap','') == "no-wrap":
                 spin_wrap = ""
 
-            html_code=f"""<b-form-spinbutton class="mb-2" id="{col_varname}" v-model="{entity_varname}.{col_varname}" {spin_wrap} min="{spin_min}" max="{spin_max}" step="{spin_step}">"""
+            html_code=f"""<b-form-spinbutton class="mb-2" id="{col_varname}" v-model="{entity_varname}.{col_varname}" {spin_wrap} min="{spin_min}" max="{spin_max}" step="{spin_step}" :state="metadata.{col_varname}.state">"""
 
 
         #Tags input - really user-friendly UX for multiple values in a field (think of the "To:" fields in email)
@@ -104,7 +104,7 @@ def create(data):
                 attribs_for_tags_list = f""":input-attrs="{{ list: '{col_varname}-tags-list', autocomplete: 'off' }}" add-on-change"""
                 datalist_helper = f"""<b-form-datalist id="{col_varname}-tags-list" :options="lists.{col_varname}"></b-form-datalist>"""
 
-            html_code=f"""<b-form-tags input-id="{col_varname}" v-model="{entity_varname}.{col_varname}" :limit="{tag_limit}" remove-on-delete {attribs_for_tags_list}></b-form-tags>"""
+            html_code=f"""<b-form-tags input-id="{col_varname}" v-model="{entity_varname}.{col_varname}" :limit="{tag_limit}" remove-on-delete {attribs_for_tags_list} :state="metadata.{col_varname}.state"></b-form-tags>"""
 
             if datalist_helper != '':
                 html_code+=f"""
@@ -118,14 +118,14 @@ def create(data):
             if int(col_type.get('max', 0)) != 0:
                 rating_max = int(col_type.get('max', 0))
 
-            html_code=f"""<b-form-rating id="{col_varname}" v-model="{entity_varname}.{col_varname}" stars="{rating_max}" show-value></b-form-rating>"""
+            html_code=f"""<b-form-rating id="{col_varname}" v-model="{entity_varname}.{col_varname}" stars="{rating_max}" show-value :state="metadata.{col_varname}.state"></b-form-rating>"""
 
         #A group of check boxes for multiple choice inputs
         elif col_type["type"] == "multiple choice":
 
             values = col_type.get('values', [])
 
-            html_code=f"""<b-form-checkbox-group id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}"></b-form-checkbox-group>"""
+            html_code=f"""<b-form-checkbox-group id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}" :state="metadata.{col_varname}.state"></b-form-checkbox-group>"""
 
         elif col_type["type"] in [ "radio button", "radio bar" ]:
 
@@ -138,11 +138,11 @@ def create(data):
                 buttons = 'buttons button-variant="outline-secondary"'
                 ugly_hack = "<br>"
 
-            html_code=f"""{ugly_hack}<b-form-radio-group id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}" {buttons}></b-form-radio-group>"""
+            html_code=f"""{ugly_hack}<b-form-radio-group id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}" {buttons} :state="metadata.{col_varname}.state"></b-form-radio-group>"""
         elif col_type["type"] == "multi select combo":
             dropup_flag = col_type.get('dropup',"false") #dropup by default is false as for now, only reporting is using this property
             html_code =f"""<b-form-group label-for="tags-with-dropdown">
-                                <b-form-tags id="tags-with-dropdown" v-model="multi_select_values.{col_varname}" no-outer-focus>
+                                <b-form-tags id="tags-with-dropdown" v-model="multi_select_values.{col_varname}" no-outer-focus :state="metadata.{col_varname}.state">
                                     <template v-slot="{{ tags, disabled, addTag, removeTag, inputAttrs, inputHandlers}}">
                                         <b-form-tags style="border:0px" no-outer-focus input-id="{col_varname}" v-model="multi_select_values.{col_varname}" remove-on-delete :input-attrs="{{autocomplete: 'off' }}" add-on-change>
                                             <b-input-group>
@@ -182,7 +182,7 @@ def create(data):
                             </b-form-group>
             """
         elif col_type["type"] == "file-upload":
-            html_code=f"""<b-form-file v-model="STARK_upload_elements.{col_varname}.file" :placeholder="STARK_upload_elements.{col_varname}.file" drop-placeholder="Drop file here..." @input="s3upload('{col_varname}')" v-b-hover="init_s3_access" onfocus="root.init_s3_access()"></b-form-file>      
+            html_code=f"""<b-form-file v-model="STARK_upload_elements.{col_varname}.file" :placeholder="STARK_upload_elements.{col_varname}.file" drop-placeholder="Drop file here..." @input="s3upload('{col_varname}')" v-b-hover="init_s3_access" onfocus="root.init_s3_access()" :state="metadata.{col_varname}.state"></b-form-file>      
                                 <b-progress :value="STARK_upload_elements.{col_varname}.progress_bar_val" :max="100" class="mt-2"></b-progress>"""
         elif col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
@@ -192,7 +192,7 @@ def create(data):
                 #simple 1-1 relationship
                 foreign_entity  = converter.convert_to_system_name(has_one)
 
-                html_code=f"""<b-form-select id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}" onmouseover="root.list_{foreign_entity}()" onfocus="root.list_{foreign_entity}()">
+                html_code=f"""<b-form-select id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}" onmouseover="root.list_{foreign_entity}()" onfocus="root.list_{foreign_entity}()" :state="metadata.{col_varname}.state">
                                 <template v-slot:first>
                                     <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                 </template>
@@ -244,7 +244,7 @@ def create(data):
             
 
     else:
-        html_code=f"""<input type="text" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}">"""
+        html_code=f"""<b-form-input type="text" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}" :state="metadata.{col_varname}.state"></b-form-input>"""
 
 
                       
