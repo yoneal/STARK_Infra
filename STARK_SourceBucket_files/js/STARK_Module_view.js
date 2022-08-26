@@ -36,7 +36,7 @@ var root = new Vue({
             },
             'Module_Group': {
                 'value': '',
-                'required': true,
+                'required': false,
                 'max_length': '',
                 'data_type': '',
                 'state': null,
@@ -44,7 +44,7 @@ var root = new Vue({
             },
             'Is_Menu_Item': {
                 'value': '',
-                'required': true,
+                'required': false,
                 'max_length': '',
                 'data_type': '',
                 'state': null,
