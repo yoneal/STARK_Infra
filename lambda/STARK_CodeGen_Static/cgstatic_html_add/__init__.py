@@ -46,7 +46,7 @@ def create(data):
                             <div class="form-group">
                                 <label for="{pk_varname}">{pk}</label>
                                 <b-form-input type="text" class="form-control" id="{pk_varname}" placeholder="" v-model="{entity_varname}.{pk_varname}" :state="metadata.{pk_varname}.state"></b-form-input>
-                                <b-form-invalid-feedback id="aria-{col_varname}">{{{{metadata.{pk_varname}.feedback}}}}</b-form-invalid-feedback>
+                                <b-form-invalid-feedback id="aria-{pk_varname}">{{{{metadata.{pk_varname}.feedback}}}}</b-form-invalid-feedback>
                             </div>"""
 
     for col, col_type in cols.items():
