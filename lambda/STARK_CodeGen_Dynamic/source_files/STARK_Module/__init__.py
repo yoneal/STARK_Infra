@@ -654,8 +654,8 @@ def map_results(record):
     item['Target'] = record.get('Target',{}).get('S','')
     item['Description'] = record.get('Description',{}).get('S','')
     item['Module_Group'] = record.get('Module_Group',{}).get('S','')
-    item['Is_Menu_Item'] = record.get('Is_Menu_Item',{}).get('S','')
-    item['Is_Enabled'] = record.get('Is_Enabled',{}).get('S','')
+    item['Is_Menu_Item'] = record.get('Is_Menu_Item',{}).get('BOOL','')
+    item['Is_Enabled'] = record.get('Is_Enabled',{}).get('BOOL','')
     item['Icon'] = record.get('Icon',{}).get('S','')
     item['Priority'] = record.get('Priority',{}).get('S','')
     return item
