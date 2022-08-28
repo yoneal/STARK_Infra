@@ -67,6 +67,21 @@ class ValidateConstruct(argparse.Action):
 
         setattr(args, self.dest, (construct_type, yaml_file))
 
+class ValidateUpdateModule(argparse.Action):
+    def __call__(self, parser, args, json_file, option_string=None):
+        #Check if file ends in'*.json'
+        if json_file[-4:].lower() == 'json':
+            #Looks ok, gave a JSON file
+            pass
+        else:
+            raise ValueError(f'Expected a JSON file. (Was given: "{json_file}")')
+
+        #Check if json_file is readable
+        if not os.path.isfile(json_file):
+            raise ValueError(f'cannot read JSON file "{json_file}". Please verify path and filename.')
+
+        setattr(args, self.dest, json_file)
+
 
 ##############################################################################
 #START OF MAIN STARK CLI CODE
@@ -87,6 +102,18 @@ parser.add_argument('--new', '-n',
                     This expects two paramaters:
                         [1] construct type (currently only "module" is accepted)
                         [2] full path and filename of your construct definition YAML''')
+)
+
+parser.add_argument('--update-modules',
+                    required=False,
+                    const='STARK_modules_data.json',
+                    nargs="?",
+                    dest='payload',
+                    action=ValidateUpdateModule,
+                    help=dedent('''\
+                    Update the target database's registry of STARK Modules.
+                    Optional parameter:
+                        [1] full path and filename of your operation payload ''')
 )
 
 args = parser.parse_args()
