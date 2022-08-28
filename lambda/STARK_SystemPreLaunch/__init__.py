@@ -261,7 +261,7 @@ def lambda_handler(event, context):
     helper(event, context)
 
 def suggest_graphic(entity_name):
-    #FIXME: When STARK data modeling grammar is finalized, it should include a way for
+    #FIXME: When STARK data modeling syntax is finalized, it should include a way for
     #   devs to include a type hint for the entity (e.g., "people") to guide the parser
     #   towards choosing a more appropriate default graphic.
     #   Should also include a way to directly specify the desired image name (e.g. "user.png")
