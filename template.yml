@@ -139,7 +139,7 @@ Resources:
         Properties:
             Content:
                 S3Bucket: !Ref UserCodeGenBucketNameParameter
-                S3Key: STARKLambdaLayers/STARK_get_relationship_py39.zip
+                S3Key: STARKLambdaLayers/STARK_suggest_graphic_py39.zip
             Description: STARK module for assigning suggested icons
             LayerName: STARK_suggest_graphic
             CompatibleArchitectures:
