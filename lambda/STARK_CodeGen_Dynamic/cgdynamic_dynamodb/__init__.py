@@ -83,6 +83,7 @@ def create(data):
     #STARK
     import stark_core 
     from stark_core import utilities
+    from stark_core import validation
 
     ddb    = boto3.client('dynamodb')
     s3     = boto3.client("s3")
@@ -220,13 +221,27 @@ def create(data):
 
             elif method == "PUT":
                 if(stark_core.sec.is_authorized(stark_permissions['edit'], event, ddb)):
-                    if data['orig_pk'] == data['pk']:
-                        response = edit(data)
+                    payload = data
+                    payload['Customer_Type'] = data['pk']
+                    invalid_payload = validation.validate_form(payload, metadata)
+                    if len(invalid_payload) > 0:
+                        return {{
+                            "isBase64Encoded": False,
+                            "statusCode": 200,
+                            "body": json.dumps(invalid_payload),
+                            "headers": {{
+                                "Content-Type": "application/json",
+                            }}
+                        }}
+                        
                     else:
-                        #We can't update DDB PK, so if PK is different, we need to do ADD + DELETE
-                        response   = add(data, method)
-                        data['pk'] = data['orig_pk']
-                        response   = delete(data)
+                        if data['orig_pk'] == data['pk']:
+                            response = edit(data)
+                        else:
+                            #We can't update DDB PK, so if PK is different, we need to do ADD + DELETE
+                            response   = add(data, method)
+                            data['pk'] = data['orig_pk']
+                            response   = delete(data)
                 else:
                     responseStatusCode, response = stark_core.sec.authFailResponse
 
@@ -238,7 +253,21 @@ def create(data):
                         responseStatusCode, response = stark_core.sec.authFailResponse
                 else:
                     if(stark_core.sec.is_authorized(stark_permissions['add'], event, ddb)):
-                        response = add(data)
+                        payload = data
+                        payload['Customer_Type'] = data['pk']
+                        invalid_payload = validation.validate_form(payload, metadata)
+                        if len(invalid_payload) > 0:
+                            return {{
+                                "isBase64Encoded": False,
+                                "statusCode": 200,
+                                "body": json.dumps(invalid_payload),
+                                "headers": {{
+                                    "Content-Type": "application/json",
+                                }}
+                            }}
+                            
+                        else:
+                            response = add(data)
                     else:
                         responseStatusCode, response = stark_core.sec.authFailResponse
 
