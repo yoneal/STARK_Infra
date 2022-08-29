@@ -68,8 +68,9 @@ def create_pdf(header_tuple, data_tuple, report_params, pk_field, metadata):
     render_table_header(pdf, header_tuple, col_width, line_height, row_number_width) 
     
     for index in header_tuple:
-        if metadata[index.replace(" ","_")]["data_type"] == 'number':
-            with_total_row = True
+        if index != "#":
+            if metadata[index.replace(" ","_")]["data_type"] == 'number':
+                with_total_row = True
 
     counter = 0
     for row in data_tuple:
@@ -86,8 +87,6 @@ def create_pdf(header_tuple, data_tuple, report_params, pk_field, metadata):
         else:
             pdf.set_fill_color(255,255,255)
         
-
-
         if with_total_row and counter + 1 == len(data_tuple):
             border = 'T'
         else:
