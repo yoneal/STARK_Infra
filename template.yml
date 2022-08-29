@@ -137,6 +137,7 @@ Resources:
     STARKSuggestGraphicLayer:
         Type: AWS::Lambda::LayerVersion
         Properties:
+            Version: "2"
             Content:
                 S3Bucket: !Ref UserCodeGenBucketNameParameter
                 S3Key: STARKLambdaLayers/STARK_suggest_graphic_py39.zip
