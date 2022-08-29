@@ -6,7 +6,6 @@ import json
 import os
 import textwrap
 import importlib
-import suggest_graphic
 
 #Extra modules
 import yaml
@@ -21,6 +20,7 @@ cg_sam     = importlib.import_module(f"{prepend_dir}cgdynamic_sam_template")
 
 import convert_friendly_to_system as converter
 import get_relationship as get_rel
+import suggest_graphic as set_graphic
 
 def create(cloud_resources, project_basedir):
 
@@ -85,7 +85,7 @@ def create(cloud_resources, project_basedir):
                 title = module_type + ' ' + entity
                 is_menu_item = False
                 
-            icon = 'images/' + suggest_graphic(entity)
+            icon = 'images/' + set_graphic.suggest_graphic(entity)
 
             item                      = {}
             item['pk']                = {'S' : pk}

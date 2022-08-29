@@ -5,7 +5,7 @@
 import datetime
 import time
 import os
-import suggest_graphic
+
 
 
 
@@ -17,6 +17,7 @@ import yaml
 #Private modules
 import convert_friendly_to_system as converter
 import stark_scrypt as scrypt
+import suggest_graphic as set_graphic
 
 ddb = boto3.client('dynamodb')
 s3  = boto3.client('s3')
@@ -163,7 +164,7 @@ def create_handler(event, context):
                 title = module_type + ' ' + entity
                 is_menu_item = False
                 
-            icon = 'images/' + suggest_graphic(entity)
+            icon = 'images/' + set_graphic.suggest_graphic(entity)
 
             business_module                      = {}
             business_module['pk']                = {'S' : pk}
