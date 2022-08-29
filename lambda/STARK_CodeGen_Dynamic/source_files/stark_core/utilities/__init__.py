@@ -53,16 +53,25 @@ def compose_report_operators_and_parameters(key, data):
 
     return composed_filter_dict
 
-def create_pdf(header_tuple, data_tuple, report_params, pk_field):
+def create_pdf(header_tuple, data_tuple, report_params, pk_field, metadata):
 
     pdf = FPDF(orientation='L')
     pdf.add_page()
     pdf.set_font("Helvetica", size=10)
+    with_total_row = False
     line_height = pdf.font_size * 2.5
+    row_number_width = 10
     col_width = pdf.epw / len(header_tuple)  # distribute content evenly
+    col_width = col_width + (col_width - row_number_width) / (len(header_tuple) -1)
 
     render_page_header(pdf, line_height, report_params, pk_field)
-    render_table_header(pdf, header_tuple, col_width, line_height) 
+    render_table_header(pdf, header_tuple, col_width, line_height, row_number_width) 
+    
+    for index in header_tuple:
+        if index != "#":
+            if metadata[index.replace(" ","_")]["data_type"] == 'number':
+                with_total_row = True
+
     counter = 0
     for row in data_tuple:
         if pdf.will_page_break(line_height):
@@ -77,21 +86,43 @@ def create_pdf(header_tuple, data_tuple, report_params, pk_field):
             pdf.set_fill_color(222,226,230)
         else:
             pdf.set_fill_color(255,255,255)
+        
+        if with_total_row and counter + 1 == len(data_tuple):
+            border = 'T'
+        else:
+            border = 0
 
+        column_counter = 0
         for datum in row:
-            pdf.multi_cell(col_width, row_height, datum, border=0, new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size, fill = True)
+            width = col_width
+            if column_counter == 0:
+                width = row_number_width
+                text_align = 'R'
+            else:
+                if metadata[header_tuple[column_counter].replace(" ","_")]['data_type'] in ['number', 'date']:
+                    text_align = 'R'
+                else:
+                    text_align = 'L'
+
+            pdf.multi_cell(width, row_height, datum, border=border, new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size, fill = True, align = text_align)
+            column_counter += 1
         pdf.ln(row_height)
         counter += 1
 
     return pdf
 
-def render_table_header(pdf, header_tuple, col_width, line_height):
+def render_table_header(pdf, header_tuple, col_width, line_height, row_number_width):
     pdf.set_font(style="B")  # enabling bold text
     pdf.set_fill_color(52, 58,64)
     pdf.set_text_color(255,255,255)
     row_header_line_height = line_height * 1.5
     for col_name in header_tuple:
-        pdf.multi_cell(col_width, row_header_line_height, col_name, border='TB', align='C',
+        if col_name == '#':
+            width = row_number_width
+        else:
+            width = col_width
+
+        pdf.multi_cell(width, row_header_line_height, col_name, border='TB', align='C',
                 new_x="RIGHT", new_y="TOP",max_line_height=pdf.font_size, fill=True)
     pdf.ln(row_header_line_height)
     pdf.set_font(style="")  # disabling bold text
