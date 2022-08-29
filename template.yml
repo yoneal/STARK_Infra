@@ -134,6 +134,23 @@ Resources:
                 - python3.7
                 - python3.8
                 - python3.9
+    STARKSuggestGraphicLayer:
+        Type: AWS::Lambda::LayerVersion
+        Properties:
+            Content:
+                S3Bucket: !Ref UserCodeGenBucketNameParameter
+                S3Key: STARKLambdaLayers/STARK_suggest_graphic_py39.zip
+            Description: STARK module for assigning suggested icons 
+            LayerName: STARK_suggest_graphic
+            CompatibleArchitectures:
+                - x86_64
+                - arm64
+            CompatibleRuntimes:
+                - python3.6
+                - python3.7
+                - python3.8
+                - python3.9
+
     STARKParserFunc:
         Type: AWS::Serverless::Function
         Properties:
@@ -282,6 +299,7 @@ Resources:
                 - !Ref PyYamlLayer
                 - !Ref STARKFriendlyToSystemNamesLayer
                 - !Ref STARKGetRelationshipLayer
+                - !Ref STARKSuggestGraphicLayer
             Timeout: 60
             Architectures:
                 - arm64
@@ -343,6 +361,7 @@ Resources:
                 - !Ref PyYamlLayer
                 - !Ref STARKFriendlyToSystemNamesLayer
                 - !Ref STARKScryptLayer
+                - !Ref STARKSuggestGraphicLayer
             Architectures:
                 - arm64
             MemorySize: 1760
