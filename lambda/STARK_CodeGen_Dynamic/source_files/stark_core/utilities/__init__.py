@@ -58,6 +58,7 @@ def create_pdf(header_tuple, data_tuple, report_params, pk_field, metadata):
     pdf = FPDF(orientation='L')
     pdf.add_page()
     pdf.set_font("Helvetica", size=10)
+    with_total_row = False
     line_height = pdf.font_size * 2.5
     row_number_width = 10
     col_width = pdf.epw / len(header_tuple)  # distribute content evenly
@@ -65,6 +66,11 @@ def create_pdf(header_tuple, data_tuple, report_params, pk_field, metadata):
 
     render_page_header(pdf, line_height, report_params, pk_field)
     render_table_header(pdf, header_tuple, col_width, line_height, row_number_width) 
+    
+    for index in header_tuple:
+        if metadata[index.replace(" ","_")]["data_type"] == 'number':
+            with_total_row = True
+
     counter = 0
     for row in data_tuple:
         if pdf.will_page_break(line_height):
@@ -79,8 +85,10 @@ def create_pdf(header_tuple, data_tuple, report_params, pk_field, metadata):
             pdf.set_fill_color(222,226,230)
         else:
             pdf.set_fill_color(255,255,255)
+        
 
-        if counter + 1 == len(data_tuple):
+
+        if with_total_row and counter + 1 == len(data_tuple):
             border = 'T'
         else:
             border = 0
