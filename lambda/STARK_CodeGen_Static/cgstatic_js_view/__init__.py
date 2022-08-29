@@ -253,8 +253,18 @@ def create(data):
                         let data = {{ {entity_varname}: this.{entity_varname} }}
 
                         {entity_app}.add(data).then( function(data) {{
-                            console.log("VIEW: INSERTING DONE!");
                             loading_modal.hide()
+                            if(data != "OK")
+                            {{
+                                for (var key in data) {{
+                                    if (data.hasOwnProperty(key)) {{
+                                        root.metadata[key]['state'] = false
+                                        root.metadata[key]['feedback'] = data[key]
+                                    }}
+                                }}
+                                return false
+                            }}
+                            console.log("VIEW: INSERTING DONE!");
                             window.location.href = "{entity_varname}.html";
                         }}).catch(function(error) {{
                             console.log("Encountered an error! [" + error + "]")
@@ -305,9 +315,18 @@ def create(data):
                         let data = {{ {entity_varname}: this.{entity_varname} }}
 
                         {entity_app}.update(data).then( function(data) {{
-                            console.log("VIEW: UPDATING DONE!");
-                            console.log(data);
                             loading_modal.hide()
+                            if(data != "OK")
+                            {{
+                                for (var key in data) {{
+                                    if (data.hasOwnProperty(key)) {{
+                                        root.metadata[key]['state'] = false
+                                        root.metadata[key]['feedback'] = data[key]
+                                    }}
+                                }}
+                                return false
+                            }}
+                            console.log("VIEW: UPDATING DONE!");
                             window.location.href = "{entity_varname}.html";
                         }})
                         .catch(function(error) {{
