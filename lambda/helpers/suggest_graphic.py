@@ -69,7 +69,6 @@ def suggest_graphic(entity_name):
                 if keyword in entity_name:
                     suggested_type = type
 
-
     #If still no match, abstract icons will be assigned to this entity
     if suggested_type == '':
         suggested_type = 'abstract'
