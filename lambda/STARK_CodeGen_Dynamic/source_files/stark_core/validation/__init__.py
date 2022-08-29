@@ -3,10 +3,10 @@ import json
 import base64
 
 name = "STARK Validation"
-bad_request_attributes = {}
 
 def validate_form(payload, metadata):
-
+    
+    bad_request_attributes = {}
     for key, items in metadata.items():
         value = payload[key]
 
