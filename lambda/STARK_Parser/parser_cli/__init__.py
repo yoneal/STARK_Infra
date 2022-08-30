@@ -13,12 +13,12 @@ prepend_dir = ""
 if 'libstark' in os.listdir():
     prepend_dir = "libstark.STARK_Parser."
 
-api_gateway_parser = importlib.import_module(f"{prepend_dir}parse_api_gateway")
 dynamodb_parser    = importlib.import_module(f"{prepend_dir}parse_dynamodb")
 model_parser       = importlib.import_module(f"{prepend_dir}parse_datamodel")
 lambda_parser      = importlib.import_module(f"{prepend_dir}parse_lambda")
 layer_parser       = importlib.import_module(f"{prepend_dir}parse_layers")
 s3_parser          = importlib.import_module(f"{prepend_dir}parse_s3")
+
 ## unused imports
 # import parse_api_gateway as api_gateway_parser
 # import parse_cloudfront as cloudfront_parser
