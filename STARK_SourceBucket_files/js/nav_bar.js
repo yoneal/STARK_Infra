@@ -54,11 +54,18 @@ var sidebar = new Vue({
 sidebar.get_module_list();
 
 function openNav() {
-    document.getElementById("mySidenav").style.width = "250px";
-    document.getElementById("main").style.marginLeft = "250px";
+    // document.getElementById("mySidenav").style.width = "250px";
+    document.getElementById("mySidenav").style.minWidth = "25%";
+    document.getElementById("mySidenav").style.maxWidth = "50%";
+    document.getElementById("vue-root").style.marginLeft = "25%";
+    document.getElementById("main-burger-menu").style.display = "none";
 }
     
 function closeNav() {
-    document.getElementById("mySidenav").style.width = "0";
-    document.getElementById("main").style.marginLeft= "0";
+    
+    // document.getElementById("mySidenav").style.width = "0";
+    document.getElementById("mySidenav").style.minWidth = "0";
+    document.getElementById("mySidenav").style.maxWidth = "0";
+    document.getElementById("vue-root").style.marginLeft= "0";
+    document.getElementById("main-burger-menu").style.display = "inline";
 }

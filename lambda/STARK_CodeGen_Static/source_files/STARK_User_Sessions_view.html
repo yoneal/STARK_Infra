@@ -71,54 +71,53 @@
                 </b-button>
             </div>
         </div>
-        <div id="main">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="home.html">Home</a></li>
-                    <li class="breadcrumb-item"><a href="STARK_User_Sessions.html">User Sessions</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">View</li>
-                </ol>
-            </nav>
+        
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="home.html">Home</a></li>
+                <li class="breadcrumb-item"><a href="STARK_User_Sessions.html">User Sessions</a></li>
+                <li class="breadcrumb-item active" aria-current="page">View</li>
+            </ol>
+        </nav>
 
-            <div class="container hidden" :style="{visibility: visibility}">
-                <div class="row">
-                    <div class="col">
-                        <div class="my-auto">
-                            <form class="border p-3">
-                            <input type="hidden" id="orig_Session_ID" v-model="STARK_User_Sessions.Session_ID">
-                            <div class="form-group row">
-                                <label for="Session_ID" class="col-sm-2 col-form-label">Session ID</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control-plaintext" readonly id="Session_ID" placeholder="" v-model="STARK_User_Sessions.Session_ID">
-                                </div>
+        <div class="container hidden" :style="{visibility: visibility}">
+            <div class="row">
+                <div class="col">
+                    <div class="my-auto">
+                        <form class="border p-3">
+                        <input type="hidden" id="orig_Session_ID" v-model="STARK_User_Sessions.Session_ID">
+                        <div class="form-group row">
+                            <label for="Session_ID" class="col-sm-2 col-form-label">Session ID</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control-plaintext" readonly id="Session_ID" placeholder="" v-model="STARK_User_Sessions.Session_ID">
                             </div>
-                            <div class="form-group row">
-                                <label for="Username" class="col-sm-2 col-form-label">Username</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control-plaintext" readonly id="Username" placeholder="" v-model="STARK_User_Sessions.Username">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="Sess_Start" class="col-sm-2 col-form-label">Sess_Start</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control-plaintext" readonly id="Sess_Start" placeholder="" v-model="STARK_User_Sessions.Sess_Start">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="TTL" class="col-sm-2 col-form-label">TTL</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control-plaintext" readonly id="TTL" placeholder="" v-model="STARK_User_Sessions.TTL">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="Permissions" class="col-sm-2 col-form-label">Permissions</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control-plaintext" readonly id="Permissions" placeholder="" v-model="STARK_User_Sessions.Permissions">
-                                </div>
-                            </div>
-                            <button type="button" class="btn btn-secondary" onClick="window.location.href='STARK_User_Sessions.html'">Back</button>
-                            </form>
                         </div>
+                        <div class="form-group row">
+                            <label for="Username" class="col-sm-2 col-form-label">Username</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control-plaintext" readonly id="Username" placeholder="" v-model="STARK_User_Sessions.Username">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="Sess_Start" class="col-sm-2 col-form-label">Sess_Start</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control-plaintext" readonly id="Sess_Start" placeholder="" v-model="STARK_User_Sessions.Sess_Start">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="TTL" class="col-sm-2 col-form-label">TTL</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control-plaintext" readonly id="TTL" placeholder="" v-model="STARK_User_Sessions.TTL">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="Permissions" class="col-sm-2 col-form-label">Permissions</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control-plaintext" readonly id="Permissions" placeholder="" v-model="STARK_User_Sessions.Permissions">
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-secondary" onClick="window.location.href='STARK_User_Sessions.html'">Back</button>
+                        </form>
                     </div>
                 </div>
             </div>

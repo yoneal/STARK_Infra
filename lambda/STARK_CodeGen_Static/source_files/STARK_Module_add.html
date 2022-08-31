@@ -72,74 +72,73 @@
                 </b-button>
             </div>
         </div>
-        <div id="main">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="home.html">Home</a></li>
-                    <li class="breadcrumb-item"><a href="STARK_Module.html">System Modules</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">New</li>
-                </ol>
-            </nav>
         
-            <div class="container hidden" :style="{visibility: visibility}">
-                <div class="row">
-                    <div class="col">
-                        <div class="my-auto">
-                            <form class="border p-3">
-                            <input type="hidden" id="orig_Module_Name" v-model="STARK_Module.Module_Name">
-                            <div class="form-group">
-                                <label for="Module_Name">Module Name</label>
-                                <b-form-input type="text" class="form-control" id="Module_Name" placeholder="" v-model="STARK_Module.Module_Name" :state="metadata.Module_Name.state"></b-form-input>
-                                <b-form-invalid-feedback id="aria-Module_Name">{{metadata.Module_Name.feedback}}</b-form-invalid-feedback>
-                            </div>
-                            <div class="form-group">
-                                <label for="Descriptive_Title">Descriptive Title</label>
-                                <b-form-input type="text" class="form-control" id="Descriptive_Title" placeholder="" v-model="STARK_Module.Descriptive_Title" :state="metadata.Descriptive_Title.state"></b-form-input>
-                                <b-form-invalid-feedback id="aria-Descriptive_Title">{{metadata.Descriptive_Title.feedback}}</b-form-invalid-feedback>
-                            </div>
-                            <div class="form-group">
-                                <label for="Target">Target</label>
-                                <b-form-input type="text" class="form-control" id="Target" placeholder="" v-model="STARK_Module.Target" :state="metadata.Target.state"></b-form-input>
-                                <b-form-invalid-feedback id="aria-Target">{{metadata.Target.feedback}}</b-form-invalid-feedback>
-                            </div>
-                            <div class="form-group">
-                                <label for="Description">Description</label>
-                                <b-form-textarea id="Description" v-model="STARK_Module.Description" class="mb-2" rows="4" max-rows="8" :state="metadata.Description.state"></b-form-textarea>
-                                <b-form-invalid-feedback id="aria-Description">{{metadata.Description.feedback}}</b-form-invalid-feedback>
-                            </div>
-                            <div class="form-group">
-                                <label for="Module_Group">Module Group</label>
-                                <b-form-select id="Module_Group" v-model="STARK_Module.Module_Group" :options="lists.Module_Group" onmouseover="root.list_Module_Group()" onfocus="root.list_Module_Group()"  :state="metadata.Module_Group.state">
-                                <b-form-invalid-feedback id="aria-Module_Group">{{metadata.Module_Group.feedback}}</b-form-invalid-feedback>
-                                    <template v-slot:first>
-                                        <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
-                                    </template>
-                                </b-form-select>    
-                            </div>
-                            <div class="form-group">
-                                <label for="Is_Menu_Item">Is Menu Item</label>
-                                <br><b-form-radio-group id="Is_Menu_Item" v-model="STARK_Module.Is_Menu_Item" :options="lists.Is_Menu_Item" buttons button-variant="outline-secondary" :state="metadata.Is_Menu_Item.state"></b-form-radio-group>
-                                <b-form-invalid-feedback id="aria-Is_Menu_Item">{{metadata.Is_Menu_Item.feedback}}</b-form-invalid-feedback>
-                            </div>
-                            <div class="form-group">
-                                <label for="Is_Enabled">Is Enabled</label>
-                                <br><b-form-radio-group id="Is_Enabled" v-model="STARK_Module.Is_Enabled" :options="lists.Is_Enabled" buttons button-variant="outline-secondary" :state="metadata.Is_Enabled.state"></b-form-radio-group>
-                                <b-form-invalid-feedback id="aria-Is_Enabled">{{metadata.Is_Enabled.feedback}}</b-form-invalid-feedback>
-                            </div>
-                            <div class="form-group">
-                                <label for="Icon">Icon</label>
-                                <b-form-input type="text" class="form-control" id="Icon" placeholder="" v-model="STARK_Module.Icon" :state="metadata.Icon.state"></b-form-input>
-                                <b-form-invalid-feedback id="aria-Icon">{{metadata.Icon.feedback}}</b-form-invalid-feedback>
-                            </div>
-                            <div class="form-group">
-                                <label for="Priority">Priority</label>
-                                <b-form-input type="number" class="form-control" id="Priority" placeholder="" v-model="STARK_Module.Priority" :state="metadata.Priority.state"></b-form-input>
-                                <b-form-invalid-feedback id="aria-Priority">{{metadata.Priority.feedback}}</b-form-invalid-feedback>
-                            </div>
-                            <button type="button" class="btn btn-secondary" onClick="window.location.href='STARK_Module.html'">Back</button>
-                            <button type="button" class="btn btn-primary float-right" onClick="root.add()">Add</button>
-                            </form>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="home.html">Home</a></li>
+                <li class="breadcrumb-item"><a href="STARK_Module.html">System Modules</a></li>
+                <li class="breadcrumb-item active" aria-current="page">New</li>
+            </ol>
+        </nav>
+    
+        <div class="container hidden" :style="{visibility: visibility}">
+            <div class="row">
+                <div class="col">
+                    <div class="my-auto">
+                        <form class="border p-3">
+                        <input type="hidden" id="orig_Module_Name" v-model="STARK_Module.Module_Name">
+                        <div class="form-group">
+                            <label for="Module_Name">Module Name</label>
+                            <b-form-input type="text" class="form-control" id="Module_Name" placeholder="" v-model="STARK_Module.Module_Name" :state="metadata.Module_Name.state"></b-form-input>
+                            <b-form-invalid-feedback id="aria-Module_Name">{{metadata.Module_Name.feedback}}</b-form-invalid-feedback>
                         </div>
+                        <div class="form-group">
+                            <label for="Descriptive_Title">Descriptive Title</label>
+                            <b-form-input type="text" class="form-control" id="Descriptive_Title" placeholder="" v-model="STARK_Module.Descriptive_Title" :state="metadata.Descriptive_Title.state"></b-form-input>
+                            <b-form-invalid-feedback id="aria-Descriptive_Title">{{metadata.Descriptive_Title.feedback}}</b-form-invalid-feedback>
+                        </div>
+                        <div class="form-group">
+                            <label for="Target">Target</label>
+                            <b-form-input type="text" class="form-control" id="Target" placeholder="" v-model="STARK_Module.Target" :state="metadata.Target.state"></b-form-input>
+                            <b-form-invalid-feedback id="aria-Target">{{metadata.Target.feedback}}</b-form-invalid-feedback>
+                        </div>
+                        <div class="form-group">
+                            <label for="Description">Description</label>
+                            <b-form-textarea id="Description" v-model="STARK_Module.Description" class="mb-2" rows="4" max-rows="8" :state="metadata.Description.state"></b-form-textarea>
+                            <b-form-invalid-feedback id="aria-Description">{{metadata.Description.feedback}}</b-form-invalid-feedback>
+                        </div>
+                        <div class="form-group">
+                            <label for="Module_Group">Module Group</label>
+                            <b-form-select id="Module_Group" v-model="STARK_Module.Module_Group" :options="lists.Module_Group" onmouseover="root.list_Module_Group()" onfocus="root.list_Module_Group()"  :state="metadata.Module_Group.state">
+                            <b-form-invalid-feedback id="aria-Module_Group">{{metadata.Module_Group.feedback}}</b-form-invalid-feedback>
+                                <template v-slot:first>
+                                    <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
+                                </template>
+                            </b-form-select>    
+                        </div>
+                        <div class="form-group">
+                            <label for="Is_Menu_Item">Is Menu Item</label>
+                            <br><b-form-radio-group id="Is_Menu_Item" v-model="STARK_Module.Is_Menu_Item" :options="lists.Is_Menu_Item" buttons button-variant="outline-secondary" :state="metadata.Is_Menu_Item.state"></b-form-radio-group>
+                            <b-form-invalid-feedback id="aria-Is_Menu_Item">{{metadata.Is_Menu_Item.feedback}}</b-form-invalid-feedback>
+                        </div>
+                        <div class="form-group">
+                            <label for="Is_Enabled">Is Enabled</label>
+                            <br><b-form-radio-group id="Is_Enabled" v-model="STARK_Module.Is_Enabled" :options="lists.Is_Enabled" buttons button-variant="outline-secondary" :state="metadata.Is_Enabled.state"></b-form-radio-group>
+                            <b-form-invalid-feedback id="aria-Is_Enabled">{{metadata.Is_Enabled.feedback}}</b-form-invalid-feedback>
+                        </div>
+                        <div class="form-group">
+                            <label for="Icon">Icon</label>
+                            <b-form-input type="text" class="form-control" id="Icon" placeholder="" v-model="STARK_Module.Icon" :state="metadata.Icon.state"></b-form-input>
+                            <b-form-invalid-feedback id="aria-Icon">{{metadata.Icon.feedback}}</b-form-invalid-feedback>
+                        </div>
+                        <div class="form-group">
+                            <label for="Priority">Priority</label>
+                            <b-form-input type="number" class="form-control" id="Priority" placeholder="" v-model="STARK_Module.Priority" :state="metadata.Priority.state"></b-form-input>
+                            <b-form-invalid-feedback id="aria-Priority">{{metadata.Priority.feedback}}</b-form-invalid-feedback>
+                        </div>
+                        <button type="button" class="btn btn-secondary" onClick="window.location.href='STARK_Module.html'">Back</button>
+                        <button type="button" class="btn btn-primary float-right" onClick="root.add()">Add</button>
+                        </form>
                     </div>
                 </div>
             </div>

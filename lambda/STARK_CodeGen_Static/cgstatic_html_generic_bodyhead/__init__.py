@@ -68,8 +68,6 @@ def create(data, breadcrumb):
                     </b-button>
                 </div>
             </div>
-
-            <div id="main">
 """
     if breadcrumb == "_Listview":
         source_code += f"""\

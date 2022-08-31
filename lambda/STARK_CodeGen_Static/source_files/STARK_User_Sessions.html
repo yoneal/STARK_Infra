@@ -71,58 +71,57 @@
                 </b-button>
             </div>
         </div>
-        <div id="main">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="home.html">Home</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">User Sessions</li>
-                </ol>
-            </nav>
+        
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="home.html">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">User Sessions</li>
+            </ol>
+        </nav>
 
-            <div class="row">
-                <div class="col-6">
-                    <button type="button" class="btn btn-info mb-2" onClick="window.location.href='STARK_User_Sessions_report.html'" v-if="auth_list.Report.allowed"> Reports </button>
-                </div>
-                <div class="col-6 text-right d-inline-block">        
-                    <button id="prev" type="button" class="btn btn-secondary mb-2" :disabled="prev_disabled" onClick="root.list(root.prev_token, 'prev')"> < </button>
-                    <button id="next" type="button" class="btn btn-secondary mb-2" :disabled="next_disabled" onClick="root.list(root.next_token, 'next')"> > </button>
-                </div>
+        <div class="row">
+            <div class="col-6">
+                <button type="button" class="btn btn-info mb-2" onClick="window.location.href='STARK_User_Sessions_report.html'" v-if="auth_list.Report.allowed"> Reports </button>
             </div>
+            <div class="col-6 text-right d-inline-block">        
+                <button id="prev" type="button" class="btn btn-secondary mb-2" :disabled="prev_disabled" onClick="root.list(root.prev_token, 'prev')"> < </button>
+                <button id="next" type="button" class="btn btn-secondary mb-2" :disabled="next_disabled" onClick="root.list(root.next_token, 'next')"> > </button>
+            </div>
+        </div>
 
-            <div class="row">
-                <div class="col overflow-auto">
-                    <table class="table table-hover table-striped table-dark">
-                        <thead class="thead-dark">
+        <div class="row">
+            <div class="col overflow-auto">
+                <table class="table table-hover table-striped table-dark">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Session ID</th>
+                            <th scope="col">Username</th>
+                            <th scope="col">Sess_Start</th>
+                            <th scope="col">TTL</th>
+                            <th scope="col">Permissions</th>
+                            <th scope="col">Del</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template v-for="STARK_User_Sessions in listview_table" id="listview-table">
                             <tr>
-                                <th scope="col">Session ID</th>
-                                <th scope="col">Username</th>
-                                <th scope="col">Sess_Start</th>
-                                <th scope="col">TTL</th>
-                                <th scope="col">Permissions</th>
-                                <th scope="col">Del</th>
+                                <th scope="row">
+                                    <template id="detail-view" v-if="auth_list.View.allowed">
+                                        <a :href="'STARK_User_Sessions_view.html?Session_ID=' + STARK_User_Sessions.Session_ID">{{ STARK_User_Sessions.Session_ID }}</a>
+                                    </template>
+                                    <template id="detail-view" v-if="!auth_list.View.allowed">
+                                        {{ STARK_User_Sessions.Session_ID }}
+                                    </template>
+                                </th>
+                                <td>{{ STARK_User_Sessions.Username }}</td>
+                                <td>{{ STARK_User_Sessions.Sess_Start }}</td>
+                                <td>{{ STARK_User_Sessions.TTL }}</td>
+                                <td>{{ STARK_User_Sessions.Permissions }}</td>
+                                <td><a :href="'STARK_User_Sessions_delete.html?Session_ID=' + STARK_User_Sessions.Session_ID" v-if="auth_list.Delete.allowed"><img src="images/x-square.svg" class="bg-danger"></a></td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <template v-for="STARK_User_Sessions in listview_table" id="listview-table">
-                                <tr>
-                                    <th scope="row">
-                                        <template id="detail-view" v-if="auth_list.View.allowed">
-                                            <a :href="'STARK_User_Sessions_view.html?Session_ID=' + STARK_User_Sessions.Session_ID">{{ STARK_User_Sessions.Session_ID }}</a>
-                                        </template>
-                                        <template id="detail-view" v-if="!auth_list.View.allowed">
-                                            {{ STARK_User_Sessions.Session_ID }}
-                                        </template>
-                                    </th>
-                                    <td>{{ STARK_User_Sessions.Username }}</td>
-                                    <td>{{ STARK_User_Sessions.Sess_Start }}</td>
-                                    <td>{{ STARK_User_Sessions.TTL }}</td>
-                                    <td>{{ STARK_User_Sessions.Permissions }}</td>
-                                    <td><a :href="'STARK_User_Sessions_delete.html?Session_ID=' + STARK_User_Sessions.Session_ID" v-if="auth_list.Delete.allowed"><img src="images/x-square.svg" class="bg-danger"></a></td>
-                                </tr>
-                            </template>
-                    </tbody>
-                    </table>
-                </div>
+                        </template>
+                </tbody>
+                </table>
             </div>
         </div>
     </div>
