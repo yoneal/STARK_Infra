@@ -85,3 +85,86 @@ select:-webkit-autofill:focus {
 .filter-fill-svg-link {
   filter: invert(70%) sepia(38%) saturate(6903%) hue-rotate(148deg) brightness(88%) contrast(82%);
 }
+
+.sidenav {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #111;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+}
+
+/* .sidenav .button {
+  appearance: auto;
+  writing-mode: horizontal-tb !important;
+  text-rendering: auto;
+  letter-spacing: normal;
+  word-spacing: normal;
+  line-height: normal;
+  text-transform: none;
+  text-indent: 0px;
+  text-shadow: none;
+  align-items: flex-start;
+  margin: 0em;
+  -webkit-appearance: button;
+} */
+
+.sidenav a {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 20px;
+  /* color: #818181; */
+  display: block;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+}
+
+.sidenav a:hover {
+  color: #f1f1f1;
+}
+
+.dropdown-btn a {
+  color: #f1f1f1;
+
+}
+
+.dropdown-btn a:hover {
+  color: #17a3b9;
+}
+
+.sidenav .closebtn {
+  position: absolute;
+  float: left;
+  top: 0;
+  /* left:100px; */
+  font-size: 36px;
+}
+
+#main {
+  transition: margin-left .5s;
+  padding: 16px;
+}
+
+.dropdown-container {
+  padding-left: 4px;
+}
+
+/* Optional: Style the caret down icon */
+.fa-caret-down {
+  float: left;
+  padding-right: 8px;
+}
+
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
