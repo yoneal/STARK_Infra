@@ -82,8 +82,8 @@ def create(data, special="none"):
             <script src="js/generic_root_get.js" defer></script>"""
     elif(special == "New"):
         source_code += f"""
-        <script src="js/generic_check_auth_add.js" defer></script>
-        <script src="js/generic_root_get.js" defer></script>"""
+            <script src="js/generic_check_auth_add.js" defer></script>
+            <script src="js/generic_root_get.js" defer></script>"""
     elif(special == "Edit"):
         source_code += f"""
             <script src="js/generic_root_get.js" defer></script>
@@ -98,12 +98,14 @@ def create(data, special="none"):
             <script src="js/generic_check_auth_view.js" defer></script>"""
     elif(special == "Report"):
         source_code += f"""
-        <script src="js/generic_check_auth_report.js" defer></script>
-        """
+            <script src="js/generic_check_auth_report.js" defer></script>"""
     elif(special == "Listview"):
         source_code += f"""
             <script src="js/generic_root_list.js" defer></script>
             <script src="js/generic_check_auth_listview.js" defer></script>"""
+
+    source_code += f"""
+            <script src="js/nav_bar.js" defer></script>"""
 
     if special != "HomePage":
         source_code += f"""
