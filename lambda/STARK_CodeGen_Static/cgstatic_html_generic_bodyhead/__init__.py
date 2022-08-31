@@ -32,7 +32,7 @@ def create(data, breadcrumb):
                 <b-collapse :id="'nav-group-collapse-'+index" visible class="mt-0 mb-2 pl-2">
                     <div class="dropdown-container">
                         <template v-for="module in group.modules" id="nav-modules-template">
-                            <div class="dropdown-btn" :onclick="'window.location.href=\''  + module.href + '\''">
+                            <div class="dropdown-btn" :onclick="'window.location.href=\\''  + module.href + '\\''">
                                 <a href="#"><img class="filter-fill-svg" :src="module.image" alt="Card image cap" height="25rem"> {{{{module.title}}}} </a>
                             </div>
                         </template>
