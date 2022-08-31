@@ -19,7 +19,7 @@ def create(data, breadcrumb):
 
     source_code = f"""\
         <body>
-        <div id="mySidenav" class="sidenav" >
+        <div id="mySidenav" class="sidenav">
             <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
             <template v-for="(group, index) in modules" id="nav-groups-template">
                 <h4>

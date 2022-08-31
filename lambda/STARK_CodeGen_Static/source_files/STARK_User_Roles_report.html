@@ -17,16 +17,39 @@
     <script src="js/STARK_User_Roles_app.js" defer></script>
     <script src="js/STARK_User_Roles_view.js" defer></script>
     <script src="js/generic_check_auth_report.js" defer></script>
+    <script src="js/nav_bar.js" defer></script>
 
 
     <title>[[STARK_PROJECT_NAME]] - User Roles</title>
 </head>
 <body>
+    <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <template v-for="(group, index) in modules" id="nav-groups-template">
+            <h4>
+                <a v-b-toggle class="text-decoration-none" :href="'#nav-group-collapse-'+index" @click.prevent>
+                    <span class="when-open"><img src="images/chevron-up.svg" class="filter-fill-svg-link" height="20rem"></span>
+                    <span class="when-closed"><img src="images/chevron-down.svg" class="filter-fill-svg-link" height="20rem"></span>
+                    <span class="align-bottom">{{ group.group_name }}</span>
+                </a>
+            </h4>
+            <b-collapse :id="'nav-group-collapse-'+index" visible class="mt-0 mb-2 pl-2">
+                <div class="dropdown-container">
+                    <template v-for="module in group.modules" id="nav-modules-template">
+                        <div class="dropdown-btn" :onclick="'window.location.href=\''  + module.href + '\''">
+                            <a href="#"><img class="filter-fill-svg" :src="module.image" alt="Card image cap" height="25rem"> {{module.title}} </a>
+                        </div>
+                    </template>
+                </div>
+            </b-collapse>
+        </template>
+    </div>
 <div class="container-fluid" id="vue-root">
 
     <div class="row bg-primary mb-3 p-3 text-white" style="background-image: url('images/banner_generic_blue.png')">
         <div class="col-12 col-md-10">
         <h2>
+            <span style="cursor:pointer;" onclick="openNav()">&#9776;</span>
             [[STARK_PROJECT_NAME]]
         </h2>
         </div>
@@ -48,143 +71,145 @@
             </b-button>
         </div>
     </div>
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="home.html">Home</a></li>
-            <li class="breadcrumb-item"><a href="STARK_User_Roles.html">User Roles</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Report</li>
-        </ol>
-    </nav>
+    <div id="main">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="home.html">Home</a></li>
+                <li class="breadcrumb-item"><a href="STARK_User_Roles.html">User Roles</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Report</li>
+            </ol>
+        </nav>
 
-    <div class="container" v-if="!showReport">
-        <div class="row">
-            <div class="col">
-                <div class="my-auto">
-                    <form class="border p-3">
-                        <div>
-                            <table class="table table-bordered">
+        <div class="container" v-if="!showReport">
+            <div class="row">
+                <div class="col">
+                    <div class="my-auto">
+                        <form class="border p-3">
+                            <div>
+                                <table class="table table-bordered">
 
-                                    <div class="alert alert-danger alert-dismissible fade show" v-if="showError">
-                                        <strong>Error!</strong> Put operator/s on:
-                                        <template v-for="column in no_operator" id="no_operator">
-                                            <tr scope="col"> - {{ column }}</tr>
-                                        </template>
-                                    </div>
+                                        <div class="alert alert-danger alert-dismissible fade show" v-if="showError">
+                                            <strong>Error!</strong> Put operator/s on:
+                                            <template v-for="column in no_operator" id="no_operator">
+                                                <tr scope="col"> - {{ column }}</tr>
+                                            </template>
+                                        </div>
+                                </table>
+                            </div>
+                            <table class="table table-dark table-striped">
+                                <tr>
+                                    <th style="padding: 10px">
+                                        Show Column<br>
+                                        <a href="#" style="font-size: 11px" onClick="root.checkUncheck(true)">Check All</a><br>
+                                        <a href="#" style="font-size: 11px" onClick="root.checkUncheck(false)">Uncheck All</a>
+                                    </th>
+                                    <th style="padding: 10px; min-width: 250px"> Field Name </th>
+                                    <th style="padding: 10px"> Operator </th>
+                                    <th style="padding: 10px"> Filter Value </th>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="check_checkbox" value="Role_Name" id="Role_Name" v-model="checked_fields">
+                                    </td>
+                                    <td>
+                                            <label for="Role_Name">Role Name</label>
+                                    </td>
+                                    <td>
+                                        <b-form-select id="Role_Name_operator" :options="lists.Report_Operator" v-model="custom_report.Role_Name.operator">
+                                            <template v-slot:first>
+                                                <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
+                                            </template>
+                                        </b-form-select>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" id="Role_Name_filter_value" placeholder="" v-model="custom_report.Role_Name.value">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="check_checkbox" value="Description" id="Description" v-model="checked_fields">
+                                    </td>
+                                    <td>
+                                            <label for="Description">Description</label>
+                                    </td>
+                                    <td>
+                                        <b-form-select id="Description_operator" :options="lists.Report_Operator" v-model="custom_report.Description.operator">
+                                            <template v-slot:first>
+                                                <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
+                                            </template>
+                                        </b-form-select>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" id="Description_filter_value" placeholder="" v-model="custom_report.Description.value">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="check_checkbox" value="Permissions" id="Permissions" v-model="checked_fields">
+                                    </td>
+                                    <td>
+                                            <label for="Permissions">Permissions</label>
+                                    </td>
+                                    <td>
+                                        <b-form-select id="Permissions_operator" :options="lists.Report_Operator" v-model="custom_report.Permissions.operator">
+                                            <template v-slot:first>
+                                                <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
+                                            </template>
+                                        </b-form-select>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" id="Permissions_filter_value" placeholder="" v-model="custom_report.Permissions.value">
+                                    </td>
+                                </tr>
                             </table>
-                        </div>
-                        <table class="table table-dark table-striped">
-                            <tr>
-                                <th style="padding: 10px">
-                                    Show Column<br>
-                                    <a href="#" style="font-size: 11px" onClick="root.checkUncheck(true)">Check All</a><br>
-                                    <a href="#" style="font-size: 11px" onClick="root.checkUncheck(false)">Uncheck All</a>
-                                </th>
-                                <th style="padding: 10px; min-width: 250px"> Field Name </th>
-                                <th style="padding: 10px"> Operator </th>
-                                <th style="padding: 10px"> Filter Value </th>
-                            </tr>
-                            <tr>
-                                <td>
-                                     <input type="checkbox" name="check_checkbox" value="Role_Name" id="Role_Name" v-model="checked_fields">
-                                </td>
-                                <td>
-                                        <label for="Role_Name">Role Name</label>
-                                </td>
-                                <td>
-                                    <b-form-select id="Role_Name_operator" :options="lists.Report_Operator" v-model="custom_report.Role_Name.operator">
-                                        <template v-slot:first>
-                                            <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
-                                        </template>
-                                    </b-form-select>
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control" id="Role_Name_filter_value" placeholder="" v-model="custom_report.Role_Name.value">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                     <input type="checkbox" name="check_checkbox" value="Description" id="Description" v-model="checked_fields">
-                                </td>
-                                <td>
-                                        <label for="Description">Description</label>
-                                </td>
-                                <td>
-                                    <b-form-select id="Description_operator" :options="lists.Report_Operator" v-model="custom_report.Description.operator">
-                                        <template v-slot:first>
-                                            <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
-                                        </template>
-                                    </b-form-select>
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control" id="Description_filter_value" placeholder="" v-model="custom_report.Description.value">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                     <input type="checkbox" name="check_checkbox" value="Permissions" id="Permissions" v-model="checked_fields">
-                                </td>
-                                <td>
-                                        <label for="Permissions">Permissions</label>
-                                </td>
-                                <td>
-                                    <b-form-select id="Permissions_operator" :options="lists.Report_Operator" v-model="custom_report.Permissions.operator">
-                                        <template v-slot:first>
-                                            <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
-                                        </template>
-                                    </b-form-select>
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control" id="Permissions_filter_value" placeholder="" v-model="custom_report.Permissions.value">
-                                </td>
-                            </tr>
-                        </table>
-                        <button type="button" class="btn btn-secondary" onClick="window.location.href='STARK_User_Roles.html'">Back</button>
-                        <button type="button" class="btn btn-primary float-right" onClick="root.generate()">Generate</button>
-                    </form>
+                            <button type="button" class="btn btn-secondary" onClick="window.location.href='STARK_User_Roles.html'">Back</button>
+                            <button type="button" class="btn btn-primary float-right" onClick="root.generate()">Generate</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div v-if="showReport">
-        <div class="row">
-            <div class="col-6 text-left d-inline-block">
-                <button id="prev" type="button" class="btn btn-secondary mb-2" onClick="root.showReport = false, root.showError = false"> Back </button>
-                <button type="button" class="btn btn-success mb-2" onClick="root.download_report('csv')" :disabled="listview_table.length < 1"> Export as CSV</button>
-                <button type="button" class="btn btn-danger mb-2" onClick="root.download_report('pdf')" :disabled="listview_table.length < 1"> Export as PDF</button>
-                <button id="refresh" type="button" class="btn btn-primary mb-2" onClick="root.generate()" :disabled="listview_table.length < 1"> Refresh </button>
+        <div v-if="showReport">
+            <div class="row">
+                <div class="col-6 text-left d-inline-block">
+                    <button id="prev" type="button" class="btn btn-secondary mb-2" onClick="root.showReport = false, root.showError = false"> Back </button>
+                    <button type="button" class="btn btn-success mb-2" onClick="root.download_report('csv')" :disabled="listview_table.length < 1"> Export as CSV</button>
+                    <button type="button" class="btn btn-danger mb-2" onClick="root.download_report('pdf')" :disabled="listview_table.length < 1"> Export as PDF</button>
+                    <button id="refresh" type="button" class="btn btn-primary mb-2" onClick="root.generate()" :disabled="listview_table.length < 1"> Refresh </button>
+                </div>
+                <div class="col-6">
+                </div>
             </div>
-            <div class="col-6">
-            </div>
-        </div>
 
-        <div class="row">
-            <div class="col overflow-auto">
-                <table class="table table-dark table-hover table-striped">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th scope="col"> Operations </th>
-                            <template v-for="column in STARK_report_fields" id="STARK_report_fields">
-                                <th scope="col">{{column.label}}</th>
-                            </template>         
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <template v-for="STARK_User_Roles in listview_table" id="listview-table">
+            <div class="row">
+                <div class="col overflow-auto">
+                    <table class="table table-dark table-hover table-striped">
+                        <thead class="thead-dark">
                             <tr>
-                                <td align="center">
-                                    <a :href="'STARK_User_Roles_edit.html?Role_Name=' + STARK_User_Roles.Role_Name" target="_blank" v-if="auth_list.Edit.allowed"><img src="images/pencil-square.svg" class="bg-info"></a>
-                                    <a :href="'STARK_User_Roles_delete.html?Role_Name=' + STARK_User_Roles.Role_Name" target="_blank" v-if="auth_list.Delete.allowed"><img src="images/x-square.svg" class="bg-danger"></a>
-                                </td>
-                                <template v-for="column in STARK_report_fields">
-                                    <td>{{ STARK_User_Roles[column.field] }}</td>
-                                </template>             
+                                <th scope="col"> Operations </th>
+                                <template v-for="column in STARK_report_fields" id="STARK_report_fields">
+                                    <th scope="col">{{column.label}}</th>
+                                </template>         
                             </tr>
-                        </template>
-                        <template v-if="listview_table.length < 1">
-                            No records found
-                        </template>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <template v-for="STARK_User_Roles in listview_table" id="listview-table">
+                                <tr>
+                                    <td align="center">
+                                        <a :href="'STARK_User_Roles_edit.html?Role_Name=' + STARK_User_Roles.Role_Name" target="_blank" v-if="auth_list.Edit.allowed"><img src="images/pencil-square.svg" class="bg-info"></a>
+                                        <a :href="'STARK_User_Roles_delete.html?Role_Name=' + STARK_User_Roles.Role_Name" target="_blank" v-if="auth_list.Delete.allowed"><img src="images/x-square.svg" class="bg-danger"></a>
+                                    </td>
+                                    <template v-for="column in STARK_report_fields">
+                                        <td>{{ STARK_User_Roles[column.field] }}</td>
+                                    </template>             
+                                </tr>
+                            </template>
+                            <template v-if="listview_table.length < 1">
+                                No records found
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
