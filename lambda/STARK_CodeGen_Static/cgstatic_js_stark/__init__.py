@@ -160,7 +160,6 @@ def create(data):
             }},
 
             set_page_permissions: function () {{
-                loading_modal.show();
                 console.log("Hello")
                 root.auth_config = {{
                     'View': [root.auth_list.View.permission],
