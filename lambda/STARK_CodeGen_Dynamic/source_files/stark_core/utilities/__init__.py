@@ -104,7 +104,7 @@ def create_pdf(header_tuple, data_tuple, report_params, pk_field, metadata):
                 else:
                     text_align = 'L'
 
-            pdf.multi_cell(width, row_height, datum, border=border, new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size, fill = True, align = text_align)
+            pdf.multi_cell(width, row_height, str(datum), border=border, new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size, fill = True, align = text_align)
             column_counter += 1
         pdf.ln(row_height)
         counter += 1
