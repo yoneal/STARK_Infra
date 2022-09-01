@@ -96,12 +96,10 @@
                                     </div>
                             </table>
                         </div>
-                        <table class="table table-dark table-striped">
+                        <table class="table table-dark table-striped report">
                             <tr>
-                                <th style="padding: 10px">
-                                    Show Column<br>
-                                    <a href="#" style="font-size: 11px" onClick="root.checkUncheck(true)">Check All</a><br>
-                                    <a href="#" style="font-size: 11px" onClick="root.checkUncheck(false)">Uncheck All</a>
+                                <th>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" v-model="all_selected" onchange="root.toggle_all(!root.all_selected)">
                                 </th>
                                 <th style="padding: 10px; min-width: 250px"> Field Name </th>
                                 <th style="padding: 10px"> Operator </th>
@@ -109,7 +107,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                     <input type="checkbox" name="check_checkbox" value="Module_Name" id="Module_Name" v-model="checked_fields">
+                                     <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Module_Name" id="Module_Name" v-model="checked_fields">
                                 </td>
                                 <td>
                                         <label for="Module_Name">Module Name</label>
@@ -127,7 +125,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                     <input type="checkbox" name="check_checkbox" value="Descriptive_Title" id="Descriptive_Title" v-model="checked_fields">
+                                     <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Descriptive_Title" id="Descriptive_Title" v-model="checked_fields">
                                 </td>
                                 <td>
                                         <label for="Descriptive_Title">Descriptive Title</label>
@@ -145,7 +143,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                     <input type="checkbox" name="check_checkbox" value="Target" id="Target" v-model="checked_fields">
+                                     <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Target" id="Target" v-model="checked_fields">
                                 </td>
                                 <td>
                                         <label for="Target">Target</label>
@@ -163,7 +161,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                     <input type="checkbox" name="check_checkbox" value="Description" id="Description" v-model="checked_fields">
+                                     <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Description" id="Description" v-model="checked_fields">
                                 </td>
                                 <td>
                                         <label for="Description">Description</label>
@@ -181,7 +179,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                     <input type="checkbox" name="check_checkbox" value="Module_Group" id="Module_Group" v-model="checked_fields">
+                                     <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Module_Group" id="Module_Group" v-model="checked_fields">
                                 </td>
                                 <td>
                                         <label for="Module_Group">Module Group</label>
@@ -199,7 +197,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                     <input type="checkbox" name="check_checkbox" value="Is_Menu_Item" id="Is_Menu_Item" v-model="checked_fields">
+                                     <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Is_Menu_Item" id="Is_Menu_Item" v-model="checked_fields">
                                 </td>
                                 <td>
                                         <label for="Is_Menu_Item">Is Menu Item</label>
@@ -217,7 +215,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                     <input type="checkbox" name="check_checkbox" value="Is_Enabled" id="Is_Enabled" v-model="checked_fields">
+                                     <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Is_Enabled" id="Is_Enabled" v-model="checked_fields">
                                 </td>
                                 <td>
                                         <label for="Is_Enabled">Is Enabled</label>
@@ -235,7 +233,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                     <input type="checkbox" name="check_checkbox" value="Icon" id="Icon" v-model="checked_fields">
+                                     <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Icon" id="Icon" v-model="checked_fields">
                                 </td>
                                 <td>
                                         <label for="Icon">Icon</label>
@@ -253,7 +251,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                     <input type="checkbox" name="check_checkbox" value="Priority" id="Priority" v-model="checked_fields">
+                                     <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Priority" id="Priority" v-model="checked_fields">
                                 </td>
                                 <td>
                                         <label for="Priority">Priority</label>
@@ -291,10 +289,10 @@
 
         <div class="row">
             <div class="col overflow-auto">
-                <table class="table table-dark table-hover table-striped">
+                <table class="table  table-hover table-striped table-dark">
                     <thead class="thead-dark">
                         <tr>
-                            <th scope="col"> Operations </th>
+                            <th scope="col" width = "20px"> Operations </th>
                             <template v-for="column in STARK_report_fields" id="STARK_report_fields">
                                 <th scope="col">{{column.label}}</th>
                             </template>         

@@ -27,6 +27,7 @@ var root = new Vue({
             'Edit': {'permission': 'User Permissions|Edit', 'allowed': false},
             'Report': {'permission': 'User Permissions|Report', 'allowed': false}
         },
+        STARK_report_fields: [],
         listview_table: '',
         STARK_User_Permissions: {
             'Username': '',
@@ -79,6 +80,9 @@ var root = new Vue({
         error_message: '',
         authFailure: false,
         authTry: false,
+        all_selected: true,
+        temp_checked_fields: ['Username','Permissions',],
+        checked_fields: ['Username','Permissions',],
         search:{
             'Permissions': '',
         },
@@ -315,7 +319,7 @@ var root = new Vue({
 
         generate: function () {
             let temp_show_fields = []
-            checked_fields.forEach(element => {
+            root.checked_fields.forEach(element => {
                 let temp_index = {'field': element, label: element.replaceAll("_"," ")}
                 temp_show_fields.push(temp_index)
             });
@@ -344,21 +348,9 @@ var root = new Vue({
             let link = "https://" + (file_type == "csv" ? root.temp_csv_link : root.temp_pdf_link)
             window.location.href = link
         },
-        checkUncheck: function (checked) {
-            arrCheckBoxes = document.getElementsByName('check_checkbox');
-            for (var i = 0; i < arrCheckBoxes.length; i++)
-            {
-                arrCheckBoxes[i].checked = checked;
-            }
-
-            if(checked)
-            {
-                checked_fields = temp_checked_fields
-            }
-            else
-            {
-                checked_fields = []
-            }
+        toggle_all(checked) {
+            root.checked_fields = checked ? root.temp_checked_fields.slice() : []
+            root.all_selected = checked
         },
         onOptionClick({ option, addTag }, reference) {
             addTag(option.value)
