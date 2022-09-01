@@ -186,21 +186,11 @@ def create(data):
                 console.log(data)
                 entity_varname =  data[0].split('|')[0].replaceAll(" ","_")
 
-                var permissions = STARK.get_local_storage_item('Permissions', 'per_module')
-                var fetch_from_db = false
+                var permissions = STARK.get_local_storage_item('Permissions', entity_varname)
                 if(permissions) {{
-                    if(Object.keys(permissions).find(elem => elem == entity_varname)) {{
-                        STARK.map_permissions(permissions[entity_varname])
-                    }}
-                    else {{
-                        fetch_from_db = true
-                    }}
+                    STARK.map_permissions(permissions)
                 }}
                 else {{
-                    fetch_from_db = true
-                }}
-
-                if(fetch_from_db) {{
                     STARK.get_permission(data, entity_varname)
                 }}
             }},
@@ -210,9 +200,7 @@ def create(data):
                 STARK.auth({{'stark_permissions': module_auth_config}}).then( function(data) {{
                     console.log(data)
                     console.log("Auth Request Done!");
-                    var data_to_store = {{}}
-                    data_to_store[entity_varname] = data
-                    STARK.set_local_storage_item('Permissions', 'per_module', data_to_store)
+                    STARK.set_local_storage_item('Permissions', entity_varname, data)
                     STARK.map_permissions(data)
                     loading_modal.hide()
                 }})
