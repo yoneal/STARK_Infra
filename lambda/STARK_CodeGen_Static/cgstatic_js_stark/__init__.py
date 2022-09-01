@@ -106,6 +106,7 @@ def create(data):
                     STARK.request('POST', fetchUrl, payload).then( function(data) {{
                             loading_modal.hide()
                             console.log("Server-side log out successful!");
+                            localStorage.clear()
                             window.location.href = "index.html";
                     }})
                     .catch(function(error) {{

@@ -48,7 +48,7 @@ def create(data, special="none"):
             """
 
     if special == "HomePage":
-        source_code += f"""\
+        source_code += f"""
             <script src="js/STARK_home.js" defer></script>
             """
 
