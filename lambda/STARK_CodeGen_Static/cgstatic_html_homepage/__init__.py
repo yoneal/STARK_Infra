@@ -47,7 +47,6 @@ def create(data):
                 <hr><br>
             </template>
 
-        </div>
     <!-- </div>-->
 """
     source_code += cg_loadspin.create()

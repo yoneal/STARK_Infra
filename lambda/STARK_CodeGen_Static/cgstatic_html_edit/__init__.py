@@ -74,7 +74,6 @@ def create(data):
                     </div>
                 </div>
             </div>
-        </div>
     <!-- </div>-->
 """
 
