@@ -46,6 +46,11 @@ def create(data):
                                 'odt','ods','odp','txt','rtf','pdf',
                                 'zip','rar','7z','bz2','tar','gz'],
             'max_upload_size': 10,//in MB,
+            'local_storage_item_ttl': {{ //in minutes
+                                        'default': 1,
+                                        'Permissions': 360,
+                                        'Listviews': 10
+                                    }}, 
 
             request: function(method, fetchURL, payload='') {{
 
@@ -103,6 +108,7 @@ def create(data):
                     STARK.request('POST', fetchUrl, payload).then( function(data) {{
                             loading_modal.hide()
                             console.log("Server-side log out successful!");
+                            localStorage.clear()
                             window.location.href = "index.html";
                     }})
                     .catch(function(error) {{
@@ -133,16 +139,13 @@ def create(data):
                 //           mix       = combines the all the whitelist
                 whitelist = ""
                 global_settings = STARK.file_ext_whitelist.join(', ')
-                if(mode == "overwrite")
-                {{
+                if(mode == "overwrite") {{
                     whitelist = field_settings == "" ? table_settings == "" ? global_settings : table_settings : field_settings
                 }}
-                else if (mode == "mix")
-                {{
+                else if (mode == "mix") {{
                     whitelist = table_settings == "" ? global_settings: table_settings
 
-                    if(field_settings != "")
-                    {{
+                    if(field_settings != "") {{
                         whitelist.concat(`, ${{field_settings}}`)
                     }}
 
@@ -157,7 +160,6 @@ def create(data):
             }},
 
             set_page_permissions: function () {{
-                loading_modal.show();
                 console.log("Hello")
                 root.auth_config = {{
                     'View': [root.auth_list.View.permission],
@@ -180,24 +182,26 @@ def create(data):
             }},
 
             check_permission: function (data) {{
-                console.log("Checking")
+                console.log("Checking if locally available or not")
                 console.log(data)
-                STARK.auth({{'stark_permissions': data}}).then( function(data) {{
+                entity_varname =  data[0].split('|')[0].replaceAll(" ","_")
+
+                var permissions = STARK.get_local_storage_item('Permissions', entity_varname)
+                if(permissions) {{
+                    STARK.map_permissions(permissions)
+                }}
+                else {{
+                    STARK.get_permission(data, entity_varname)
+                }}
+            }},
+
+            get_permission: function(module_auth_config, entity_varname) {{
+                loading_modal.show();
+                STARK.auth({{'stark_permissions': module_auth_config}}).then( function(data) {{
                     console.log(data)
                     console.log("Auth Request Done!");
-                    console.log(data);
-
-
-                    for (var permission of Object.keys(data)) {{
-                        console.log(permission + " -> " + data[permission])
-
-                        for (var key of Object.keys(root.auth_list)) {{
-                            /*Find a math in auth_list for our current STARK permission key*/
-                            if (root.auth_list[key]['permission'] == permission) {{
-                                root.auth_list[key]['allowed'] = data[permission]
-                            }}
-                        }}
-                    }}
+                    STARK.set_local_storage_item('Permissions', entity_varname, data)
+                    STARK.map_permissions(data)
                     loading_modal.hide()
                 }})
                 .catch(function(error) {{
@@ -207,8 +211,21 @@ def create(data):
                 }});
             }},
 
-            validate_form: function (metadata, form_to_validate, form_upload ="")
-            {{
+            map_permissions: function(permissions) {{
+
+                for (var permission of Object.keys(permissions)) {{
+                    console.log(permission + " -> " + permissions[permission])
+
+                    for (var key of Object.keys(root.auth_list)) {{
+                        /*Find a math in auth_list for our current STARK permission key*/
+                        if (root.auth_list[key]['permission'] == permission) {{
+                            root.auth_list[key]['allowed'] = permissions[permission]
+                        }}
+                    }}
+                }}
+            }},
+
+            validate_form: function (metadata, form_to_validate, form_upload ="") {{
                 var is_valid_form = true;
                 
                 for (var form_element of Object.keys(metadata)) {{
@@ -222,8 +239,7 @@ def create(data):
                     //required
                     if(md_element['required']) {{
                         if(md_element['data_type'] == 'file-upload' ) {{ //need to change checking since file-upload is better to be determined by their upload progress
-                            if (form_upload[form_element]['progress_bar_val'] != 100)
-                            {{  
+                            if (form_upload[form_element]['progress_bar_val'] != 100) {{  
                                 message = `${{message}} is required`
                             }}
                         }}
@@ -273,6 +289,71 @@ def create(data):
                 // console.log(metadata)
                 return {{'is_valid_form':is_valid_form, 'new_metadata': metadata}}
             }},
+
+            set_local_storage_item: function(item, key, data, ttl_in_min="") {{
+                var item_ttl = ''
+                var ttl_type = Object.keys(STARK.local_storage_item_ttl).find(elem => elem == item)
+                ttl_type = ttl_type ? ttl_type :STARK.local_storage_item_ttl['default']
+                item_ttl = ttl_in_min == "" ? this.local_storage_item_ttl[ttl_type] : ttl_in_min
+                
+                var expiry_time = Date.now() + (1000 * 60 * item_ttl)
+                console.log(`${{item}}: ${{key}} expiry:`, new Date(expiry_time))
+                
+                //check item first if there is already a stored data to avoid overwriting
+                var temp = JSON.parse(localStorage.getItem(item))
+                var data_to_store = {{}}
+                data_to_store[`${{key}}`] = {{'data': data}}
+                data_to_store[`${{key}}`]['expiry_time'] = expiry_time
+                localStorage.setItem(item, JSON.stringify({{ ...temp, ...data_to_store}}))
+
+            }},
+
+            get_local_storage_item: function(item, key) {{
+                // returns false or the requested stored data
+                fetched_data = JSON.parse(localStorage.getItem(item))
+                if(fetched_data) {{
+                    arr_keys = Object.keys(fetched_data)
+                    if(arr_keys.filter(elem => elem == key).length > 0) {{
+                        var expiry_time = fetched_data[key]['expiry_time']
+                        if(Date.now() < expiry_time) {{
+                            return fetched_data[key]['data']
+                        }}
+                        // localStorage.removeItem only deletes the 'item' of the storage,
+                        // it can't select nested objects stored in the 'item'. 
+                        // but since we fetched the entire item we can create a workaround
+                        // 1. Assign the data from storage in fetched_data
+                        // 2. Trigger removeItem for the selected item to remove everything
+                        // 3. Remove the key that expires from the fetched_data
+                        // 4. Trigger setItem again using the fetched_data
+            
+                        localStorage.removeItem(item)
+                        delete fetched_data[key]
+                        localStorage.setItem(item,JSON.stringify(fetched_data))
+                        console.log(`${{item}} ${{key}} expired.. fetch again.`)
+                    }}
+                    
+                }}
+                else {{
+                    console.log(`${{item}} ${{key}} not yet set.`)
+
+                }}
+                
+                return false
+            }},
+
+            local_storage_delete_key: function(item, key) {{
+                fetched_data = JSON.parse(localStorage.getItem(item))
+                if(fetched_data) {{
+                    arr_keys = Object.keys(fetched_data)
+                    if(arr_keys.filter(elem => elem == key).length > 0) {{
+                        localStorage.removeItem(item)
+                        delete fetched_data[key]
+                        localStorage.setItem(item,JSON.stringify(fetched_data))
+                        console.log(`${{item}} ${{key}} deleted.`)
+                    }}
+                }}
+            }}
+            
         }};"""
 
     return textwrap.dedent(source_code)

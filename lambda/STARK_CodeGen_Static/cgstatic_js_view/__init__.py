@@ -62,11 +62,11 @@ def create(data):
                 auth_config: {{ }},
 
                 auth_list: {{
-                    'View': {{'permission': 'Customer Type|View', 'allowed': false}},
-                    'Add': {{'permission': 'Customer Type|Add', 'allowed': false}},
-                    'Delete': {{'permission': 'Customer Type|Delete', 'allowed': false}},
-                    'Edit': {{'permission': 'Customer Type|Edit', 'allowed': false}},
-                    'Report': {{'permission': 'Customer Type|Report', 'allowed': false}}
+                    'View': {{'permission': '{entity}|View', 'allowed': false}},
+                    'Add': {{'permission': '{entity}|Add', 'allowed': false}},
+                    'Delete': {{'permission': '{entity}|Delete', 'allowed': false}},
+                    'Edit': {{'permission': '{entity}|Edit', 'allowed': false}},
+                    'Report': {{'permission': '{entity}|Report', 'allowed': false}}
                 }},
 
                 listview_table: '',
@@ -265,6 +265,7 @@ def create(data):
                                 return false
                             }}
                             console.log("VIEW: INSERTING DONE!");
+                            STARK.local_storage_delete_key('Listviews', '{entity_varname}');
                             window.location.href = "{entity_varname}.html";
                         }}).catch(function(error) {{
                             console.log("Encountered an error! [" + error + "]")
@@ -282,6 +283,7 @@ def create(data):
 
                     {entity_app}.delete(data).then( function(data) {{
                         console.log("VIEW: DELETE DONE!");
+                        STARK.local_storage_delete_key('Listviews', '{entity_varname}');
                         console.log(data);
                         loading_modal.hide()
                         window.location.href = "{entity_varname}.html";
@@ -327,6 +329,7 @@ def create(data):
                                 return false
                             }}
                             console.log("VIEW: UPDATING DONE!");
+                            STARK.local_storage_delete_key('Listviews', '{entity_varname}');
                             window.location.href = "{entity_varname}.html";
                         }})
                         .catch(function(error) {{
@@ -438,7 +441,20 @@ def create(data):
                         }}
                     }}
 
-                    {entity_app}.list(payload).then( function(data) {{"""
+                    var listview_data = STARK.get_local_storage_item('Listviews', '{entity_varname}')
+                    var fetch_from_db = false;
+                    console.log(listview_data)
+                    if(listview_data) {{
+                        root.listview_table = listview_data[root.curr_page]
+                        root.next_token = listview_data['next_token'];
+                        spinner.hide()
+                    }}
+                    else {{
+                        fetch_from_db = true
+                    }}
+                    
+                    if(fetch_from_db) {{
+                        {entity_app}.list(payload).then( function(data) {{"""
 
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
@@ -447,31 +463,36 @@ def create(data):
             if has_many != "":
                 foreign_entity  = converter.convert_to_system_name(has_many)
                 source_code += f"""
-                        for (let x = 0; x < (data['Items']).length; x++) {{
-                            data['Items'][x]['{foreign_entity}'] = ((data['Items'][x]['{foreign_entity}'].split(', ')).sort()).join(', ')      
-                        }}
+                            for (let x = 0; x < (data['Items']).length; x++) {{
+                                data['Items'][x]['{foreign_entity}'] = ((data['Items'][x]['{foreign_entity}'].split(', ')).sort()).join(', ')      
+                            }}
                 """
                         
     source_code += f"""
-                        token = data['Next_Token'];
-                        root.listview_table = data['Items'];
-                        console.log("DONE! Retrieved list.");
-                        spinner.hide()
+                            token = data['Next_Token'];
+                            root.listview_table = data['Items'];
+                            var data_to_store = {{}}
+                            data_to_store[root.curr_page] = data['Items']
+                            data_to_store['next_token'] = token
+                            STARK.set_local_storage_item('Listviews', '{entity_varname}', data_to_store)
+                            console.log("DONE! Retrieved list.");
+                            spinner.hide()
 
-                        if (token != "null") {{
-                            root.next_disabled = false;
-                            root.next_token = token;
-                        }}
-                        else {{
-                            root.next_disabled = true;
-                        }}
+                            if (token != "null") {{
+                                root.next_disabled = false;
+                                root.next_token = token;
+                            }}
+                            else {{
+                                root.next_disabled = true;
+                            }}
 
-                    }})
-                    .catch(function(error) {{
-                        console.log("Encountered an error! [" + error + "]")
-                        alert("Request Failed: System error or you may not have enough privileges")
-                        spinner.hide()
-                    }});
+                        }})
+                        .catch(function(error) {{
+                            console.log("Encountered an error! [" + error + "]")
+                            alert("Request Failed: System error or you may not have enough privileges")
+                            spinner.hide()
+                        }});
+                    }}
                 }},
 
                 formValidation: function () {{
@@ -663,6 +684,11 @@ def create(data):
                     this.search[reference] = ''
                     this.$refs[reference].show(true)
                 }},
+                refresh_list () {{
+                    root.listview_table = ''
+                    STARK.local_storage_delete_key('Listviews', '{entity_varname}');
+                    root.list()
+                }}
                 """
 
     for col, col_type in cols.items():

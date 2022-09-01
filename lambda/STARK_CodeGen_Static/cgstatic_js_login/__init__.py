@@ -47,6 +47,7 @@ def create(data):
                         //Else, show error message
                         if(data['message'] == 'AuthSuccess') {{
                             console.log('Legit!')
+                            localStorage.clear()
                             window.location.href = "home.html";
                         }}
                         else {{
