@@ -40,6 +40,7 @@ var sidebar = new Vue({
                 console.log("Hi")
 
                 sidebar.modules = grouped_modules;
+                root.modules = grouped_modules
                 STARK.set_local_storage_item('Permissions', 'modules', grouped_modules)
                 console.log(sidebar.modules)
                 console.log("DONE! Retrieved list of modules.")
