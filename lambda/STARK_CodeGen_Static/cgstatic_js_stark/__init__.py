@@ -187,11 +187,21 @@ def create(data):
                 console.log(data)
                 entity_varname =  data[0].split('|')[0]
 
-                var permissions = STARK.get_local_storage_item('per_module', entity_varname)
+                var permissions = STARK.get_local_storage_item('Permissions', 'per_module')
+                var fetch_from_db = false
                 if(permissions) {{
-                    STARK.map_permissions(permissions)
+                    if(Object.keys(permissions).find(elem => elem == entity_varname)) {{
+                        STARK.map_permissions(permissions[entity_varname])
+                    }}
+                    else {{
+                        fetch_from_db = true
+                    }}
                 }}
                 else {{
+                    fetch_from_db = true
+                }}
+
+                if(fetch_from_db) {{
                     STARK.get_permission(data, entity_varname)
                 }}
             }},
@@ -201,7 +211,9 @@ def create(data):
                 STARK.auth({{'stark_permissions': module_auth_config}}).then( function(data) {{
                     console.log(data)
                     console.log("Auth Request Done!");
-                    STARK.set_local_storage_item('per_module', entity_varname, data)
+                    var data_to_store = {{}}
+                    data_to_store[entity_varname] = data
+                    STARK.set_local_storage_item('Permissions', 'per_module', data_to_store)
                     STARK.map_permissions(data)
                     loading_modal.hide()
                 }})
@@ -292,8 +304,10 @@ def create(data):
             }},
 
             set_local_storage_item: function(item, key, data, ttl_in_min="") {{
-                var ttl_type = Object.keys(STARK.local_storage_item_ttl).find(elem => (elem == item) ? elem : 'default')
-                var item_ttl = ttl_in_min == "" ? this.local_storage_item_ttl[ttl_type] : ttl_in_min
+                var item_ttl = ''
+                var ttl_type = Object.keys(STARK.local_storage_item_ttl).find(elem => elem == item)
+                ttl_type = ttl_type ? ttl_type :STARK.local_storage_item_ttl['default']
+                item_ttl = ttl_in_min == "" ? this.local_storage_item_ttl[ttl_type] : ttl_in_min
                 
                 var expiry_time = Date.now() + (1000 * 60 * item_ttl)
                 console.log(`${{item}}: ${{key}} expiry:`, new Date(expiry_time))
@@ -318,7 +332,7 @@ def create(data):
                             return fetched_data[key]['data']
                         }}
                         // localStorage.removeItem only deletes the 'item' of the storage,
-                        // it can't select deeper in the object stored in the 'item'. 
+                        // it can't select nested objects stored in the 'item'. 
                         // but since we fetched the entire item we can create a workaround
                         // 1. Assign the data from storage in fetched_data
                         // 2. Trigger removeItem for the selected item to remove everything
