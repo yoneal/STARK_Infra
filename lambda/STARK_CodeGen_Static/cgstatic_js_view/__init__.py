@@ -438,7 +438,20 @@ def create(data):
                         }}
                     }}
 
-                    {entity_app}.list(payload).then( function(data) {{"""
+                    var listview_data = STARK.get_local_storage_item('Listviews', '{entity_varname}')
+                    var fetch_from_db = false;
+                    console.log(listview_data)
+                    if(listview_data) {{
+                        root.listview_table = listview_data[root.curr_page]
+                        root.next_token = listview_data['next_token'];
+                        spinner.hide()
+                    }}
+                    else {{
+                        fetch_from_db = true
+                    }}
+                    
+                    if(fetch_from_db) {{
+                        {entity_app}.list(payload).then( function(data) {{"""
 
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
@@ -447,31 +460,36 @@ def create(data):
             if has_many != "":
                 foreign_entity  = converter.convert_to_system_name(has_many)
                 source_code += f"""
-                        for (let x = 0; x < (data['Items']).length; x++) {{
-                            data['Items'][x]['{foreign_entity}'] = ((data['Items'][x]['{foreign_entity}'].split(', ')).sort()).join(', ')      
-                        }}
+                            for (let x = 0; x < (data['Items']).length; x++) {{
+                                data['Items'][x]['{foreign_entity}'] = ((data['Items'][x]['{foreign_entity}'].split(', ')).sort()).join(', ')      
+                            }}
                 """
                         
     source_code += f"""
-                        token = data['Next_Token'];
-                        root.listview_table = data['Items'];
-                        console.log("DONE! Retrieved list.");
-                        spinner.hide()
+                            token = data['Next_Token'];
+                            root.listview_table = data['Items'];
+                            var data_to_store = {{}}
+                            data_to_store[root.curr_page] = data['Items']
+                            data_to_store['next_token'] = token
+                            STARK.set_local_storage_item('Listviews', '{entity_varname}', data_to_store)
+                            console.log("DONE! Retrieved list.");
+                            spinner.hide()
 
-                        if (token != "null") {{
-                            root.next_disabled = false;
-                            root.next_token = token;
-                        }}
-                        else {{
-                            root.next_disabled = true;
-                        }}
+                            if (token != "null") {{
+                                root.next_disabled = false;
+                                root.next_token = token;
+                            }}
+                            else {{
+                                root.next_disabled = true;
+                            }}
 
-                    }})
-                    .catch(function(error) {{
-                        console.log("Encountered an error! [" + error + "]")
-                        alert("Request Failed: System error or you may not have enough privileges")
-                        spinner.hide()
-                    }});
+                        }})
+                        .catch(function(error) {{
+                            console.log("Encountered an error! [" + error + "]")
+                            alert("Request Failed: System error or you may not have enough privileges")
+                            spinner.hide()
+                        }});
+                    }}
                 }},
 
                 formValidation: function () {{
