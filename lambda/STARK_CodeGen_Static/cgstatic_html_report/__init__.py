@@ -161,14 +161,13 @@ def create(data):
                                                 <td>{{{{ {entity_varname}[column.field] }}}}</td>
                                             </template>"""
     source_code += f"""             
-                                        </tr>
-                                    </template>
-                                    <template v-if="listview_table.length < 1">
-                                        No records found
-                                    </template>
-                                </tbody>
-                            </table>
-                        </div>
+                                    </tr>
+                                </template>
+                                <template v-if="listview_table.length < 1">
+                                    No records found
+                                </template>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
