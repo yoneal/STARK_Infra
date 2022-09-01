@@ -46,7 +46,7 @@ def create(data, breadcrumb):
             <div class="row bg-primary mb-3 p-3 text-white" style="background-image: url('images/banner_generic_blue.png')">
                 <div class="col-12 col-md-10">
                 <h2>
-                    <span style="cursor:pointer;" onclick="openNav()">&#9776;</span>
+                    <span id="main-burger-menu" style="cursor:pointer;" onclick="openNav()">&#9776;</span>
                     {project}
                 </h2>
                 </div>
@@ -68,8 +68,6 @@ def create(data, breadcrumb):
                     </b-button>
                 </div>
             </div>
-
-            <div id="main">
 """
     if breadcrumb == "_Listview":
         source_code += f"""\
