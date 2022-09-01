@@ -58,6 +58,6 @@ def create(data):
             }}
         }})
 
-        root.get_module_list();
+        //root.get_module_list();
     """
     return textwrap.dedent(source_code)

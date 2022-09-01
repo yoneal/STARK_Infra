@@ -46,6 +46,9 @@ def create(data):
                                 'odt','ods','odp','txt','rtf','pdf',
                                 'zip','rar','7z','bz2','tar','gz'],
             'max_upload_size': 10,//in MB,
+            'local_storage_item_ttl': 1, //in minutes
+            'local_storage_permission_ttl': 360,
+            'local_storage_listview_ttl': 10,
 
             request: function(method, fetchURL, payload='') {{
 
@@ -273,6 +276,66 @@ def create(data):
                 // console.log(metadata)
                 return {{'is_valid_form':is_valid_form, 'new_metadata': metadata}}
             }},
+
+            set_local_storage_item: function(item, key, data, ttl_in_min="") {{
+                var item_ttl = ''
+
+                if(item == 'Permissions') {{
+                    item_ttl = this.local_storage_permission_ttl
+                }}
+                else if (item == 'Listviews') {{
+                    item_ttl = this.local_storage_listview_ttl
+                }}
+                else {{
+                    item_ttl = ttl_in_min == "" ? this.local_storage_item_ttl : ttl_in_min
+                }}
+                
+                var expiry_time = Date.now() + (1000 * 60 * item_ttl)
+                console.log(`${{item}}: ${{key}} expiry:`, new Date(expiry_time))
+                
+                //check item first if there is already a stored data to avoid overwriting
+                var temp = JSON.parse(localStorage.getItem(item))
+                console.log(temp)
+                var data_to_store = {{}}
+                data_to_store[`${{key}}`] = {{'data': data}}
+                data_to_store[`${{key}}`]['expiry_time'] = expiry_time
+                localStorage.setItem(item, JSON.stringify({{ ...temp, ...data_to_store}}))
+
+            }},
+
+            get_local_storage_item: function(item, key) {{
+                // returns false or the requested stored data
+                fetched_data = JSON.parse(localStorage.getItem(item))
+                if(fetched_data) {{
+                    arr_keys = Object.keys(fetched_data)
+                    if(arr_keys.filter(elem => elem == key).length > 0) {{
+                        var expiry_time = fetched_data[key]['expiry_time']
+                        if(Date.now() < expiry_time) {{
+                            return fetched_data[key]['data']
+                        }}
+                        // localStorage.removeItem only deletes the 'item' of the storage,
+                        // it can't select deeper in the object stored in the 'item'. 
+                        // but since we fetched the entire item we can create a workaround
+                        // 1. Assign the data from storage in fetched_data
+                        // 2. Trigger removeItem for the selected item to remove everything
+                        // 3. Remove the key that expires from the fetched_data
+                        // 4. Trigger setItem again using the fetched_data
+            
+                        localStorage.removeItem(item)
+                        delete fetched_data[key]
+                        localStorage.setItem(item,JSON.stringify(fetched_data))
+                        console.log(`${{item}} ${{key}} expired.. fetch again.`)
+                    }}
+                    
+                }}
+                else {{
+                    console.log(`${{item}} ${{key}} not yet set.`)
+
+                }}
+                
+                return false
+            }},
+
         }};"""
 
     return textwrap.dedent(source_code)
