@@ -39,6 +39,7 @@ def create(data):
                 <div class="col-6">
                     <button type="button" class="btn btn-primary mb-2" onClick="window.location.href='{entity_varname}_add.html'" v-if="auth_list.Add.allowed"> <b>+</b> Add </button>
                     <button type="button" class="btn btn-info mb-2" onClick="window.location.href='{entity_varname}_report.html'" v-if="auth_list.Report.allowed"> Reports </button>
+                    <button type="button" class="btn btn-secondary mb-2" onClick="root.refresh_list()"> Refresh </button>
                 </div>
                 <div class="col-6 text-right d-inline-block">        
                     <button id="prev" type="button" class="btn btn-secondary" :disabled="prev_disabled" onClick="root.list(root.prev_token, 'prev')"> < </button>

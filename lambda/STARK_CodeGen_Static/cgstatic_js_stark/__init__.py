@@ -354,6 +354,19 @@ def create(data):
                 return false
             }},
 
+            local_storage_delete_key: function(item, key) {{
+                fetched_data = JSON.parse(localStorage.getItem(item))
+                if(fetched_data) {{
+                    arr_keys = Object.keys(fetched_data)
+                    if(arr_keys.filter(elem => elem == key).length > 0) {{
+                        localStorage.removeItem(item)
+                        delete fetched_data[key]
+                        localStorage.setItem(item,JSON.stringify(fetched_data))
+                        console.log(`${{item}} ${{key}} deleted.`)
+                    }}
+                }}
+            }}
+            
         }};"""
 
     return textwrap.dedent(source_code)

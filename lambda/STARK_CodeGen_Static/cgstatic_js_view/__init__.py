@@ -265,6 +265,7 @@ def create(data):
                                 return false
                             }}
                             console.log("VIEW: INSERTING DONE!");
+                            STARK.local_storage_delete_key('Listviews', '{entity_varname}');
                             window.location.href = "{entity_varname}.html";
                         }}).catch(function(error) {{
                             console.log("Encountered an error! [" + error + "]")
@@ -282,6 +283,7 @@ def create(data):
 
                     {entity_app}.delete(data).then( function(data) {{
                         console.log("VIEW: DELETE DONE!");
+                        STARK.local_storage_delete_key('Listviews', '{entity_varname}');
                         console.log(data);
                         loading_modal.hide()
                         window.location.href = "{entity_varname}.html";
@@ -327,6 +329,7 @@ def create(data):
                                 return false
                             }}
                             console.log("VIEW: UPDATING DONE!");
+                            STARK.local_storage_delete_key('Listviews', '{entity_varname}');
                             window.location.href = "{entity_varname}.html";
                         }})
                         .catch(function(error) {{
@@ -681,6 +684,11 @@ def create(data):
                     this.search[reference] = ''
                     this.$refs[reference].show(true)
                 }},
+                refresh_list () {{
+                    root.listview_table = ''
+                    STARK.local_storage_delete_key('Listviews', '{entity_varname}');
+                    root.list()
+                }}
                 """
 
     for col, col_type in cols.items():
