@@ -185,7 +185,7 @@ def create(data):
             check_permission: function (data) {{
                 console.log("Checking if locally available or not")
                 console.log(data)
-                entity_varname =  data[0].split('|')[0]
+                entity_varname =  data[0].split('|')[0].replaceAll(" ","_")
 
                 var permissions = STARK.get_local_storage_item('Permissions', 'per_module')
                 var fetch_from_db = false

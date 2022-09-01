@@ -62,11 +62,11 @@ def create(data):
                 auth_config: {{ }},
 
                 auth_list: {{
-                    'View': {{'permission': '{entity_varname}|View', 'allowed': false}},
-                    'Add': {{'permission': '{entity_varname}|Add', 'allowed': false}},
-                    'Delete': {{'permission': '{entity_varname}|Delete', 'allowed': false}},
-                    'Edit': {{'permission': '{entity_varname}|Edit', 'allowed': false}},
-                    'Report': {{'permission': '{entity_varname}|Report', 'allowed': false}}
+                    'View': {{'permission': '{entity}|View', 'allowed': false}},
+                    'Add': {{'permission': '{entity}|Add', 'allowed': false}},
+                    'Delete': {{'permission': '{entity}|Delete', 'allowed': false}},
+                    'Edit': {{'permission': '{entity}|Edit', 'allowed': false}},
+                    'Report': {{'permission': '{entity}|Report', 'allowed': false}}
                 }},
 
                 listview_table: '',
