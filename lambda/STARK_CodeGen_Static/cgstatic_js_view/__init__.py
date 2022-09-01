@@ -688,7 +688,7 @@ def create(data):
                     root.listview_table = ''
                     STARK.local_storage_delete_key('Listviews', '{entity_varname}');
                     root.list()
-                }}
+                }},
                 """
 
     for col, col_type in cols.items():
