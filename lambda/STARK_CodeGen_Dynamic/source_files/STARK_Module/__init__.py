@@ -1,7 +1,6 @@
 #Python Standard Library
 import base64
 from email.policy import default
-from importlib.metadata import metadata
 import json
 from urllib.parse import unquote
 import sys
@@ -771,7 +770,7 @@ def create_pdf(data_to_tuple, master_fields, pdf_filename, report_params):
             pdf.set_fill_color(255,255,255)
 
         for datum in row:
-            pdf.multi_cell(col_width, row_height, datum, border=0, new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size, fill = True)
+            pdf.multi_cell(col_width, row_height, str(datum), border=0, new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size, fill = True)
         pdf.ln(row_height)
         counter += 1
 
