@@ -89,6 +89,7 @@ def create(data):
                     </table>
                 </div>
             </div>
+        </div>
 
     """
     source_code += cg_loadspin.create()
