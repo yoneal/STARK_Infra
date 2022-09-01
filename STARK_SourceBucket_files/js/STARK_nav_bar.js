@@ -40,7 +40,6 @@ var sidebar = new Vue({
                 console.log("Hi")
 
                 sidebar.modules = grouped_modules;
-                root.modules = grouped_modules
                 STARK.set_local_storage_item('Permissions', 'modules', grouped_modules)
                 console.log(sidebar.modules)
                 console.log("DONE! Retrieved list of modules.")
@@ -55,7 +54,7 @@ var sidebar = new Vue({
 
 var modules = STARK.get_local_storage_item('Permissions','modules')
 if (modules) {
-    root.modules = modules
+    sidebar.modules = modules
     spinner.hide();
 }
 else {
