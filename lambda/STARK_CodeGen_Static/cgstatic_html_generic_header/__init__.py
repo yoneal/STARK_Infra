@@ -44,10 +44,11 @@ def create(data, special="none"):
             <script src="js/STARK.js" defer></script>
             <script src="js/STARK_spinner.js" defer></script>
             <script src="js/STARK_loading_modal.js" defer></script>
+            <script src="js/STARK_nav_bar.js" defer></script>
             """
 
     if special == "HomePage":
-        source_code += f"""\
+        source_code += f"""
             <script src="js/STARK_home.js" defer></script>
             """
 
@@ -103,9 +104,6 @@ def create(data, special="none"):
         source_code += f"""
             <script src="js/generic_root_list.js" defer></script>
             <script src="js/generic_check_auth_listview.js" defer></script>"""
-
-    source_code += f"""
-            <script src="js/nav_bar.js" defer></script>"""
 
     if special != "HomePage":
         source_code += f"""

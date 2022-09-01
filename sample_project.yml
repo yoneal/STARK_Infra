@@ -51,3 +51,7 @@ Document:
         - Revision: int
         - Numerical Code: number
         - Description: string
+        - Attachments:
+            type: file-upload
+            allowed_ext: jpg, png, csv, pdf, txt, doc
+            max_upload_size: 10 MB

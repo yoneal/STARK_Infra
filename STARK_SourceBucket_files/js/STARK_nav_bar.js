@@ -40,6 +40,8 @@ var sidebar = new Vue({
                 console.log("Hi")
 
                 sidebar.modules = grouped_modules;
+                root.modules = grouped_modules
+                STARK.set_local_storage_item('Permissions', 'modules', grouped_modules)
                 console.log(sidebar.modules)
                 console.log("DONE! Retrieved list of modules.")
                 spinner.hide();
@@ -51,7 +53,14 @@ var sidebar = new Vue({
     }
 })
 
-sidebar.get_module_list();
+var modules = STARK.get_local_storage_item('Permissions','modules')
+if (modules) {
+    sidebar.modules = modules
+    spinner.hide();
+}
+else {
+    sidebar.get_module_list();
+}
 
 function openNav() {
     // document.getElementById("mySidenav").style.width = "250px";
