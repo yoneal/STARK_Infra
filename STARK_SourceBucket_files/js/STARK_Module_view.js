@@ -85,6 +85,7 @@ var root = new Vue({
             'Edit': {'permission': 'System Modules|Edit', 'allowed': false},
             'Report': {'permission': 'System Modules|Report', 'allowed': false}
         },
+        STARK_report_fields: [],
         listview_table: '',
         STARK_Module: {
             'Module_Name': '',
@@ -158,6 +159,9 @@ var root = new Vue({
         error_message: '',
         authFailure: false,
         authTry: false,
+        all_selected: true,
+        temp_checked_fields: ['Module_Name','Descriptive_Title','Target','Description','Module_Group','Is_Menu_Item','Is_Enabled','Icon','Priority',],
+        checked_fields: ['Module_Name','Descriptive_Title','Target','Description','Module_Group','Is_Menu_Item','Is_Enabled','Icon','Priority',]
 
     },
     methods: {
@@ -363,13 +367,13 @@ var root = new Vue({
 
         generate: function () {
             let temp_show_fields = []
-            checked_fields.forEach(element => {
+            root.checked_fields.forEach(element => {
                 let temp_index = {'field': element, label: element.replaceAll("_"," ")}
                 temp_show_fields.push(temp_index)
             });
             root.STARK_report_fields = temp_show_fields;
-            this.custom_report['STARK_report_fields'] = root.STARK_report_fields
-            let report_payload = { STARK_Module: this.custom_report }
+            root.custom_report['STARK_report_fields'] = root.STARK_report_fields
+            let report_payload = { STARK_Module: root.custom_report }
             if(root.formValidation())
             {
                 loading_modal.show()
@@ -392,21 +396,9 @@ var root = new Vue({
             let link = "https://" + (file_type == "csv" ? root.temp_csv_link : root.temp_pdf_link)
             window.location.href = link
         },
-        checkUncheck: function (checked) {
-            arrCheckBoxes = document.getElementsByName('check_checkbox');
-            for (var i = 0; i < arrCheckBoxes.length; i++)
-            {
-                arrCheckBoxes[i].checked = checked;
-            }
-
-            if(checked)
-            {
-                checked_fields = temp_checked_fields
-            }
-            else
-            {
-                checked_fields = []
-            }
+        toggle_all(checked) {
+            root.checked_fields = checked ? root.temp_checked_fields.slice() : []
+            root.all_selected = checked
         },
         list_Module_Group: function () {
             if (this.list_status.Module_Group == 'empty') {
@@ -431,8 +423,3 @@ var root = new Vue({
         },
     }
 })
-
-//for selecting individually, select all or uncheck all of checkboxes
-var temp_checked_fields = ['Module_Name','Descriptive_Title','Target','Description','Module_Group','Is_Menu_Item','Is_Enabled','Icon','Priority',]
-var checked_fields = ['Module_Name','Descriptive_Title','Target','Description','Module_Group','Is_Menu_Item','Is_Enabled','Icon','Priority',]
-

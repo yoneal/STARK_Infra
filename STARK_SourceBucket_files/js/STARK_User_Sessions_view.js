@@ -96,7 +96,9 @@ var root = new Vue({
         error_message: '',
         authFailure: false,
         authTry: false,
-
+        all_selected: true,
+        temp_checked_fields: ['Session_ID','Username','Sess_Start','TTL','Permissions',],
+        checked_fields: ['Session_ID','Username','Sess_Start','TTL','Permissions',]
     },
     methods: {
 
@@ -279,13 +281,13 @@ var root = new Vue({
         },
         generate: function () {
             let temp_show_fields = []
-            checked_fields.forEach(element => {
+            root.checked_fields.forEach(element => {
                 let temp_index = {'field': element, label: element.replaceAll("_"," ")}
                 temp_show_fields.push(temp_index)
             });
             root.STARK_report_fields = temp_show_fields;
-            this.custom_report['STARK_report_fields'] = root.STARK_report_fields
-            let report_payload = { STARK_User_Sessions: this.custom_report }
+            root.custom_report['STARK_report_fields'] = root.STARK_report_fields
+            let report_payload = { STARK_User_Sessions: root.custom_report }
             if(root.formValidation())
             {
                 loading_modal.show()
@@ -308,26 +310,10 @@ var root = new Vue({
             let link = "https://" + (file_type == "csv" ? root.temp_csv_link : root.temp_pdf_link)
             window.location.href = link
         },
-        checkUncheck: function (checked) {
-            arrCheckBoxes = document.getElementsByName('check_checkbox');
-            for (var i = 0; i < arrCheckBoxes.length; i++)
-            {
-                arrCheckBoxes[i].checked = checked;
-            }
-
-            if(checked)
-            {
-                checked_fields = temp_checked_fields
-            }
-            else
-            {
-                checked_fields = []
-            }
+        toggle_all(checked) {
+            root.checked_fields = checked ? root.temp_checked_fields.slice() : []
+            root.all_selected = checked
         },
     }
 })
-
-//for selecting individually, select all or uncheck all of checkboxes
-var temp_checked_fields = ['Session_ID','Username','Sess_Start','TTL','Permissions',]
-var checked_fields = ['Session_ID','Username','Sess_Start','TTL','Permissions',]
 
