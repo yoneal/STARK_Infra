@@ -1,6 +1,7 @@
 #Python Standard Library
 import base64
 from email.policy import default
+from importlib.metadata import metadata
 import json
 from urllib.parse import unquote
 import sys
