@@ -222,7 +222,7 @@ def create(data):
             elif method == "PUT":
                 if(stark_core.sec.is_authorized(stark_permissions['edit'], event, ddb)):
                     payload = data
-                    payload['Customer_Type'] = data['pk']
+                    payload['{pk_varname}'] = data['pk']
                     invalid_payload = validation.validate_form(payload, metadata)
                     if len(invalid_payload) > 0:
                         return {{
@@ -254,7 +254,7 @@ def create(data):
                 else:
                     if(stark_core.sec.is_authorized(stark_permissions['add'], event, ddb)):
                         payload = data
-                        payload['Customer_Type'] = data['pk']
+                        payload['{pk_varname}'] = data['pk']
                         invalid_payload = validation.validate_form(payload, metadata)
                         if len(invalid_payload) > 0:
                             return {{

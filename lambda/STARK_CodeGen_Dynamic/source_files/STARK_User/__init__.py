@@ -2,6 +2,7 @@
 import base64
 import json
 import sys
+import importlib
 from urllib.parse import unquote
 import math
 
@@ -16,9 +17,12 @@ from fpdf import FPDF
 
 #STARK
 import stark_core 
+from stark_core import utilities
+from stark_core import validation
 
 ddb = boto3.client('dynamodb')
 s3 = boto3.client("s3")
+s3_res = boto3.resource('s3')
 
 #######
 #CONFIG
@@ -32,6 +36,8 @@ pk_field          = "Username"
 default_sk        = "STARK|user|info"
 sort_fields       = ["Username", ]
 relationships     = []
+# relationships     = [{'parent': 'Users', 'child': 'STARK_User_Permissions', 'attribute': 'Users'}]
+entity_upload_dir = stark_core.upload_dir + "STARK_User/"
 metadata          = {
     'Username': {
         'value': '',
@@ -75,7 +81,18 @@ metadata          = {
     },
 }
 
+############
+#PERMISSIONS
+stark_permissions = {
+    'view': 'Users|View',
+    'add': 'Users|Add',
+    'delete': 'Users|Delete',
+    'edit': 'Users|Edit',
+    'report': 'Users|Report'
+}
+
 def lambda_handler(event, context):
+    responseStatusCode = 200
 
     #Get request type
     request_type = event.get('queryStringParameters',{}).get('rt','')
@@ -134,24 +151,79 @@ def lambda_handler(event, context):
                 data['STARK_report_fields'] = temp_report_fields
                 data['STARK_isReport'] = payload.get('STARK_isReport', False)
 
+            data['STARK_uploaded_s3_keys'] = payload.get('STARK_uploaded_s3_keys',{})
+
+            if isInvalidPayload:
+                return {
+                    "isBase64Encoded": False,
+                    "statusCode": 400,
+                    "body": json.dumps("Missing operators"),
+                    "headers": {
+                        "Content-Type": "application/json",
+                    }
+                }
+
         if method == "DELETE":
-            response = delete(data)
+            if(stark_core.sec.is_authorized(stark_permissions['delete'], event, ddb)):
+                response = delete(data)
+            else:
+                responseStatusCode, response = stark_core.sec.authFailResponse
 
         elif method == "PUT":
-
-            #We can't update DDB PK, so if PK is different, we need to do ADD + DELETE
-            if data['orig_pk'] == data['pk']:
-                response = edit(data)
+            if(stark_core.sec.is_authorized(stark_permissions['edit'], event, ddb)):
+                payload = data
+                payload['Username'] = data['pk']
+                invalid_payload = validation.validate_form(payload, metadata)
+                if len(invalid_payload) > 0:
+                    return {
+                        "isBase64Encoded": False,
+                        "statusCode": responseStatusCode,
+                        "body": json.dumps(invalid_payload),
+                        "headers": {
+                            "Content-Type": "application/json",
+                        }
+                    }
+                else:
+                #We can't update DDB PK, so if PK is different, we need to do ADD + DELETE
+                    if data['orig_pk'] == data['pk']:
+                        response = edit(data)
+                    else:
+                        response   = add(data, method)
+                        data['pk'] = data['orig_pk']
+                        response   = delete(data)
             else:
-                response   = add(data)
-                data['pk'] = data['orig_pk']
-                response   = delete(data)
+                responseStatusCode, response = stark_core.sec.authFailResponse
+
 
         elif method == "POST":
             if 'STARK_isReport' in data:
-                response = report(data, default_sk)
+                if(stark_core.sec.is_authorized(stark_permissions['report'], event, ddb)):
+                    response = report(data, default_sk)
+                else:
+                    responseStatusCode, response = stark_core.sec.authFailResponse
             else:
-                response = add(data)
+                if(stark_core.sec.is_authorized(stark_permissions['add'], event, ddb)):
+                    payload = data
+                    payload['Username'] = data['pk']
+                    print(payload)
+                    print(metadata)
+                    invalid_payload = validation.validate_form(payload, metadata)
+                    
+                    if len(invalid_payload) > 0:
+                        return {
+                            "isBase64Encoded": False,
+                            "statusCode": responseStatusCode,
+                            "body": json.dumps(invalid_payload),
+                            "headers": {
+                                "Content-Type": "application/json",
+                            }
+                        }
+
+                    else:
+                        response = add(data)
+                else:
+                    responseStatusCode, response = stark_core.sec.authFailResponse
+
 
         else:
             return {
@@ -244,21 +316,15 @@ def get_all(sk=default_sk, lv_token=None):
     #FIXME: this is duplicated code, make this DRY by outsourcing the mapping to a different function.
     items = []
     for record in raw:
-        item = {}
-        item['Username'] = record.get('pk', {}).get('S','')
-        item['sk'] = record.get('sk',{}).get('S','')
-        item['Full_Name'] = record.get('Full_Name',{}).get('S','')
-        item['Nickname'] = record.get('Nickname',{}).get('S','')
-        item['Role'] = record.get('Role',{}).get('S','')
+        items.append(map_results(record))
 
-        items.append(item)
     #NOTE: We explicitly left out the password hash. Since this is the generic "get all records" function, there's really no
     #   legitimate reason to get something as sensitive as the passwordh hash. Functionality that actually has to mass list
     #   users alongside their password hashes will have to use a function specifically made for that. Safety first.
 
     #Get the "next" token, pass to calling function. This enables a "next page" request later.
     next_token = response.get('LastEvaluatedKey')
-
+    print(items)
     return items, next_token
 
 def get_by_pk(pk, sk=default_sk):
@@ -278,21 +344,11 @@ def get_by_pk(pk, sk=default_sk):
 
     raw = response.get('Items')
 
-    #FIXME: Mapping is duplicated code, make this DRY
     #Map to expected structure
-    items = []
-    for record in raw:
-        item = {}
-        item['Username'] = record.get('pk', {}).get('S','')
-        item['sk'] = record.get('sk',{}).get('S','')
-        item['Full_Name'] = record.get('Full_Name',{}).get('S','')
-        item['Nickname'] = record.get('Nickname',{}).get('S','')
-        item['Role'] = record.get('Role',{}).get('S','')
-        items.append(item)
-    #NOTE: We explicitly left out the password hash. Functionality that requires the user record along with the password hash should use 
-    #       a specialized function instead of the generic "get" function.
+    response = {}
+    response['item'] = map_results(raw[0])
 
-    return items
+    return response
 
 def delete(data):
     pk = data.get('pk','')
@@ -355,11 +411,14 @@ def edit(data):
         ExpressionAttributeValues=ExpressionAttributeValuesDict
     )
 
+    # for relation in relationships:
+    #     cascade_pk_change_to_child(data, relation['parent'], relation['child'], relation['attribute'])
+
     assign_role_permissions({'Username': pk, 'Role': Role })
 
     return "OK"
 
-def add(data):
+def add(data, method='POST'):
     pk = data.get('pk', '')
     sk = data.get('sk', '')
     if sk == '': sk = default_sk
@@ -380,13 +439,18 @@ def add(data):
         item['STARK-ListView-sk'] = {'S' : create_listview_index_value(data)}
     else:
         item['STARK-ListView-sk'] = {'S' : data['STARK-ListView-sk']}
+
     response = ddb.put_item(
         TableName=ddb_table,
         Item=item,
     )
-
+    print(pk)
+    print(Role)
     assign_role_permissions({'Username': pk, 'Role': Role })
+    print(assign_role_permissions({'Username': pk, 'Role': Role }))
 
+    # for relation in relationships:
+    #     cascade_pk_change_to_child(data, relation['parent'], relation['child'], relation['attribute'])
     return "OK"
 
 def report(data, sk=default_sk):
@@ -529,107 +593,52 @@ def generate_reports(mapped_results = [], display_fields=[], report_params = {})
         Key='tmp/'+csv_file
     )
 
-    create_pdf(report_list, csv_header, pdf_file, report_params)
+    prepare_pdf_data(report_list, csv_header, pdf_file, report_params)
 
     csv_bucket_key = bucket_tmp + csv_file
     pdf_bucket_key = bucket_tmp + pdf_file
 
     return csv_bucket_key, pdf_bucket_key
 
-def create_pdf(data_to_tuple, master_fields, pdf_filename, report_params):
+def prepare_pdf_data(data_to_tuple, master_fields, pdf_filename, report_params):
     #FIXME: PDF GENERATOR: can be outsourced to a layer, for refining 
+    master_fields.insert(0, '#')
+    numerical_columns = {}
+    for key, items in metadata.items():
+        if items['data_type'] == 'number':
+            numerical_columns.update({key: 0})
     row_list = []
+    counter = 1 
     for key in data_to_tuple:
         column_list = []
         for index in master_fields:
-            column_list.append(key[index])
+            if(index != '#'):
+                if index in numerical_columns.keys():
+                    numerical_columns[index] += int(key[index])
+                column_list.append(key[index])
+        column_list.insert(0, str(counter)) 
         row_list.append(tuple(column_list))
+        counter += 1
+
+    if len(numerical_columns) > 0:
+        column_list = []
+        for values in master_fields:
+            if values in numerical_columns:
+                column_list.append(str(numerical_columns.get(values, '')))
+            else:
+                column_list.append('')
+        row_list.append(column_list)
 
     header_tuple = tuple(master_fields) 
     data_tuple = tuple(row_list)
-    pdf = FPDF(orientation='L')
-    pdf.add_page()
-    pdf.set_font("Helvetica", size=10)
-    line_height = pdf.font_size * 2.5
-    col_width = pdf.epw / len(master_fields)  # distribute content evenly
 
-    render_page_header(pdf, line_height, report_params)
-    render_table_header(pdf, header_tuple,  col_width, line_height) 
-    counter = 0
-    for row in data_tuple:
-        if pdf.will_page_break(line_height):
-            render_table_header(pdf, header_tuple,  col_width, line_height) 
-        row_height = pdf.font_size * estimate_lines_needed(pdf, row, col_width)
-        if row_height < line_height: #min height
-            row_height = line_height
-        elif row_height > 120: #max height tested, beyond this value will distort the table
-            row_height = 120
-
-        if counter % 2 ==0:
-            pdf.set_fill_color(222,226,230)
-        else:
-            pdf.set_fill_color(255,255,255)
-
-        for datum in row:
-            pdf.multi_cell(col_width, row_height, datum, border=0, new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size, fill = True)
-        pdf.ln(row_height)
-        counter += 1
-
+    pdf = utilities.create_pdf(header_tuple, data_tuple, report_params, pk_field, metadata)
     s3_action = s3.put_object(
         ACL='public-read',
         Body= pdf.output(),
         Bucket=bucket_name,
         Key='tmp/'+pdf_filename
     )
-
-def render_table_header(pdf, header_tuple, col_width, line_height):
-    pdf.set_font(style="B")  # enabling bold text
-    pdf.set_fill_color(52, 58,64)
-    pdf.set_text_color(255,255,255)
-    row_header_line_height = line_height * 1.5
-    for col_name in header_tuple:
-        pdf.multi_cell(col_width, row_header_line_height, col_name, border='TB', align='C',
-                new_x="RIGHT", new_y="TOP",max_line_height=pdf.font_size, fill=True)
-    pdf.ln(row_header_line_height)
-    pdf.set_font(style="")  # disabling bold text
-    pdf.set_text_color(0, 0, 0)
-    pdf.set_fill_color(0, 0, 0)
-
-def render_page_header(pdf, line_height, report_params):
-    param_width = pdf.epw / 4
-    #Report Title
-    pdf.set_font("Helvetica", size=14, style="B")
-    pdf.multi_cell(0,line_height, "User Report", 0, 'C',
-                    new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
-    pdf.ln()
-
-    #Report Parameters
-    newline_print_counter = 1
-    pdf.set_font("Helvetica", size=12, style="B")
-    pdf.multi_cell(0,line_height, "Report Parameters:", 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
-    pdf.ln(pdf.font_size *1.5)
-    if len(report_params) > 0:
-        pdf.set_font("Helvetica", size=10)
-        for key, value in report_params.items():
-            if key == 'pk':
-                key = pk_field
-            pdf.multi_cell(30,line_height, key.replace("_", " "), 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
-            pdf.multi_cell(param_width,line_height, value, 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
-            if newline_print_counter == 2:
-                pdf.ln(pdf.font_size *1.5)
-                newline_print_counter = 0
-            newline_print_counter += 1
-    else:
-        pdf.multi_cell(30,line_height, "N/A", 0, "L", new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
-    pdf.ln()
-
-
-def estimate_lines_needed(self, iter, col_width: float) -> int:
-    font_width_in_mm = (
-        self.font_size_pt * 0.33 * 0.6
-    )  # assumption: a letter is half his height in width, the 0.5 is the value you want to play with
-    max_cell_text_len_header = max([len(str(col)) for col in iter])  # how long is the longest string?
-    return math.ceil(max_cell_text_len_header * font_width_in_mm / col_width)
 
 def create_listview_index_value(data):
     ListView_index_values = []
@@ -642,6 +651,8 @@ def create_listview_index_value(data):
     return STARK_ListView_sk
 
 def assign_role_permissions(data):
+    print("Line 643")
+
     username  = data['Username']
     role_name = data['Role']
  
@@ -651,7 +662,9 @@ def assign_role_permissions(data):
     import STARK_User_Roles as user_roles
 
     response = user_roles.get_by_pk(role_name)
-    permissions = response[0]['Permissions']
+    print("Line 652")
+    print(response)
+    permissions = response["item"]['Permissions']
     
     sys.path[0] = getcwd() + '/STARK_User_Permissions'
     import STARK_User_Permissions as user_permissions
@@ -659,6 +672,7 @@ def assign_role_permissions(data):
         'pk': username,
         'Permissions': permissions
     }
+    print(data)
     response = user_permissions.add(data)
 
     return "OK"
@@ -684,13 +698,24 @@ def get_all_by_old_parent_value(old_pk_val, sk = default_sk):
     raw = response.get('Items')
     items = []
     for record in raw:
-        item = {}
+        item = map_results(record)
+        #add pk as literal 'pk' value
+        #and STARK-ListView-Sk
         item['pk'] = record.get('pk', {}).get('S','')
-        item['sk'] = record.get('sk',{}).get('S','')
-        item['Full_Name'] = record.get('Full_Name',{}).get('S','')
-        item['Nickname'] = record.get('Nickname',{}).get('S','')
-        item['Role'] = record.get('Role',{}).get('S','')
         item['STARK-ListView-sk'] = record.get('STARK-ListView-sk',{}).get('S','')
         items.append(item)
 
     return items
+
+# def cascade_pk_change_to_child(params, parent_entity_name, child_entity_name, attribute):
+#     temp_import = importlib.import_module(child_entity_name)
+
+#     #fetch all records from child using old pk value
+#     response = temp_import.get_all_by_old_parent_value(params['orig_pk'], attribute)
+
+#     #loop through response and update each record
+#     for record in response:
+#         record[attribute] = params['pk']
+#         temp_import.edit(record)
+
+#     return "OK"

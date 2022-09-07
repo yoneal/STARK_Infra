@@ -115,10 +115,21 @@ var root = new Vue({
             console.log("VIEW: Inserting!")
 
             let data = { STARK_User_Sessions: this.STARK_User_Sessions }
-
+            response = STARK.validate_form(root.metadata, root.STARK_User_Sessions)
             STARK_User_Sessions_app.add(data).then( function(data) {
-                console.log("VIEW: INSERTING DONE!");
                 loading_modal.hide()
+                if(data != "OK")
+                {
+                    for (var key in data) {
+                        if (data.hasOwnProperty(key)) {
+                            root.metadata[key]['state'] = false
+                            root.metadata[key]['feedback'] = data[key]
+                        }
+                    }
+                    return false
+                }
+                console.log("VIEW: INSERTING DONE!");
+                STARK.local_storage_delete_key('Listviews', 'STARK_User_Sessions');
                 window.location.href = "STARK_User_Sessions.html";
             }).catch(function(error) {
                 console.log("Encountered an error! [" + error + "]")
@@ -135,6 +146,7 @@ var root = new Vue({
 
             STARK_User_Sessions_app.delete(data).then( function(data) {
                 console.log("VIEW: DELETE DONE!");
+                STARK.local_storage_delete_key('Listviews', 'STARK_User_Sessions');
                 console.log(data);
                 loading_modal.hide()
                 window.location.href = "STARK_User_Sessions.html";
@@ -153,9 +165,20 @@ var root = new Vue({
             let data = { STARK_User_Sessions: this.STARK_User_Sessions }
 
             STARK_User_Sessions_app.update(data).then( function(data) {
-                console.log("VIEW: UPDATING DONE!");
                 console.log(data);
                 loading_modal.hide()
+                if(data != "OK")
+                {
+                    for (var key in data) {
+                        if (data.hasOwnProperty(key)) {
+                            root.metadata[key]['state'] = false
+                            root.metadata[key]['feedback'] = data[key]
+                        }
+                    }
+                    return false
+                }
+                console.log("VIEW: UPDATING DONE!");
+                STARK.local_storage_delete_key('Listviews', 'STARK_User_Sessions');
                 window.location.href = "STARK_User_Sessions.html";
             })
             .catch(function(error) {
@@ -180,7 +203,7 @@ var root = new Vue({
                 console.log("VIEW: Getting!")
 
                 STARK_User_Sessions_app.get(data).then( function(data) {
-                    root.STARK_User_Sessions = data[0]; //We need 0, because API backed func always returns a list for now
+                    root.STARK_User_Sessions = data["item"]; //We need 0, because API backed func always returns a list for now
                     root.STARK_User_Sessions.orig_Session_ID = root.STARK_User_Sessions.Session_ID;
                     console.log("VIEW: Retreived module data.")
                     root.show()
@@ -235,26 +258,45 @@ var root = new Vue({
                 }
             }
 
-            STARK_User_Sessions_app.list(payload).then( function(data) {
-                token = data['Next_Token'];
-                root.listview_table = data['Items'];
-                console.log("DONE! Retrieved list.");
+            var listview_data = STARK.get_local_storage_item('Listviews', 'STARK_User_Sessions')
+            var fetch_from_db = false;
+            console.log(listview_data)
+            if(listview_data) {
+                root.listview_table = listview_data[root.curr_page]
+                root.next_token = listview_data['next_token'];
                 spinner.hide()
+            }
+            else {
+                fetch_from_db = true
+            }
 
-                if (token != "null") {
-                    root.next_disabled = false;
-                    root.next_token = token;
-                }
-                else {
-                    root.next_disabled = true;
-                }
+            if(fetch_from_db) {
 
-            })
-            .catch(function(error) {
-                console.log("Encountered an error! [" + error + "]")
-                alert("Request Failed: System error or you may not have enough privileges")
-                spinner.hide()
-            });
+                STARK_User_Sessions_app.list(payload).then( function(data) {
+                    token = data['Next_Token'];
+                    root.listview_table = data['Items'];
+                    var data_to_store = {}
+                    data_to_store[root.curr_page] = data['Items']
+                    data_to_store['next_token'] = token
+                    STARK.set_local_storage_item('Listviews', 'STARK_User_Sessions', data_to_store)
+                    console.log("DONE! Retrieved list.");
+                    spinner.hide()
+
+                    if (token != "null") {
+                        root.next_disabled = false;
+                        root.next_token = token;
+                    }
+                    else {
+                        root.next_disabled = true;
+                    }
+
+                })
+                .catch(function(error) {
+                    console.log("Encountered an error! [" + error + "]")
+                    alert("Request Failed: System error or you may not have enough privileges")
+                    spinner.hide()
+                });
+            }
         },
 
         formValidation: function () {
@@ -313,6 +355,12 @@ var root = new Vue({
         toggle_all(checked) {
             root.checked_fields = checked ? root.temp_checked_fields.slice() : []
             root.all_selected = checked
+        },
+
+        refresh_list () {
+            root.listview_table = ''
+            STARK.local_storage_delete_key('Listviews', 'STARK_User_Sessions'); //localStorage
+            root.list()
         },
     }
 })
