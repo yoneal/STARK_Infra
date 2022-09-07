@@ -184,8 +184,19 @@ var root = new Vue({
                 let data = { STARK_Module: this.STARK_Module }
 
                 STARK_Module_app.add(data).then( function(data) {
-                    console.log("VIEW: INSERTING DONE!");
                     loading_modal.hide()
+                    if(data != "OK")
+                    {
+                        for (var key in data) {
+                            if (data.hasOwnProperty(key)) {
+                                root.metadata[key]['state'] = false
+                                root.metadata[key]['feedback'] = data[key]
+                            }
+                        }
+                        return false
+                    }
+                    console.log("VIEW: INSERTING DONE!");
+                    STARK.local_storage_delete_key('Listviews', 'STARK_Module'); 
                     window.location.href = "STARK_Module.html";
                 }).catch(function(error) {
                     console.log("Encountered an error! [" + error + "]")
@@ -203,6 +214,7 @@ var root = new Vue({
 
             STARK_Module_app.delete(data).then( function(data) {
                 console.log("VIEW: DELETE DONE!");
+                STARK.local_storage_delete_key('Listviews', 'STARK_Module'); 
                 console.log(data);
                 loading_modal.hide()
                 window.location.href = "STARK_Module.html";
@@ -224,9 +236,20 @@ var root = new Vue({
                 let data = { STARK_Module: this.STARK_Module }
 
                 STARK_Module_app.update(data).then( function(data) {
-                    console.log("VIEW: UPDATING DONE!");
                     console.log(data);
                     loading_modal.hide()
+                    if(data != "OK")
+                    {
+                        for (var key in data) {
+                            if (data.hasOwnProperty(key)) {
+                                root.metadata[key]['state'] = false
+                                root.metadata[key]['feedback'] = data[key]
+                            }
+                        }
+                        return false
+                    }
+                    console.log("VIEW: UPDATING DONE!");
+                    STARK.local_storage_delete_key('Listviews', 'STARK_Module'); 
                     window.location.href = "STARK_Module.html";
                 })
                 .catch(function(error) {
@@ -252,7 +275,7 @@ var root = new Vue({
                 console.log("VIEW: Getting!")
 
                 STARK_Module_app.get(data).then( function(data) {
-                    root.STARK_Module = data[0]; //We need 0, because API backed func always returns a list for now
+                    root.STARK_Module = data["item"]; //We need 0, because API backed func always returns a list for now
                     // if(root.STARK_Module.Is_Enabled == true) {
                     //     root.STARK_Module.Is_Enabled = "Y"
                     // }
@@ -320,26 +343,45 @@ var root = new Vue({
                 }
             }
 
-            STARK_Module_app.list(payload).then( function(data) {
-                token = data['Next_Token'];
-                root.listview_table = data['Items'];
-                console.log("DONE! Retrieved list.");
+            var listview_data = STARK.get_local_storage_item('Listviews', 'STARK_Module')
+            var fetch_from_db = false;
+            console.log(listview_data)
+            if(listview_data) {
+                root.listview_table = listview_data[root.curr_page]
+                root.next_token = listview_data['next_token'];
                 spinner.hide()
+            }
+            else {
+                fetch_from_db = true
+            }
 
-                if (token != "null") {
-                    root.next_disabled = false;
-                    root.next_token = token;
-                }
-                else {
-                    root.next_disabled = true;
-                }
+            if(fetch_from_db) {
 
-            })
-            .catch(function(error) {
-                console.log("Encountered an error! [" + error + "]")
-                alert("Request Failed: System error or you may not have enough privileges")
-                spinner.hide()
-            });
+                STARK_Module_app.list(payload).then( function(data) {
+                    token = data['Next_Token'];
+                    root.listview_table = data['Items'];
+                    var data_to_store = {}
+                    data_to_store[root.curr_page] = data['Items']
+                    data_to_store['next_token'] = token
+                    STARK.set_local_storage_item('Listviews', 'STARK_Module', data_to_store)
+                    console.log("DONE! Retrieved list.");
+                    spinner.hide()
+
+                    if (token != "null") {
+                        root.next_disabled = false;
+                        root.next_token = token;
+                    }
+                    else {
+                        root.next_disabled = true;
+                    }
+
+                })
+                .catch(function(error) {
+                    console.log("Encountered an error! [" + error + "]")
+                    alert("Request Failed: System error or you may not have enough privileges")
+                    spinner.hide()
+                });
+            }
         },
 
         formValidation: function () {
@@ -392,6 +434,7 @@ var root = new Vue({
                 });
             }
         },
+
         download_report(file_type = "csv") {
             let link = "https://" + (file_type == "csv" ? root.temp_csv_link : root.temp_pdf_link)
             window.location.href = link
@@ -400,6 +443,13 @@ var root = new Vue({
             root.checked_fields = checked ? root.temp_checked_fields.slice() : []
             root.all_selected = checked
         },
+
+        refresh_list () {
+            root.listview_table = ''
+            STARK.local_storage_delete_key('Listviews', 'STARK_Module'); //localStorage
+            root.list()
+        }, 
+        
         list_Module_Group: function () {
             if (this.list_status.Module_Group == 'empty') {
                 loading_modal.show();

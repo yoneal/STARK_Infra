@@ -109,8 +109,19 @@ var root = new Vue({
                 let data = { STARK_User_Permissions: this.STARK_User_Permissions }
                 
                 STARK_User_Permissions_app.add(data).then( function(data) {
-                    console.log("VIEW: INSERTING DONE!");
                     loading_modal.hide()
+                    if(data != "OK")
+                    {
+                        for (var key in data) {
+                            if (data.hasOwnProperty(key)) {
+                                root.metadata[key]['state'] = false
+                                root.metadata[key]['feedback'] = data[key]
+                            }
+                        }
+                        return false
+                    }
+                    console.log("VIEW: INSERTING DONE!");
+                    STARK.local_storage_delete_key('Listviews', 'STARK_User_Permissions'); 
                     window.location.href = "STARK_User_Permissions.html";
                 }).catch(function(error) {
                     console.log("Encountered an error! [" + error + "]")
@@ -128,6 +139,7 @@ var root = new Vue({
 
             STARK_User_Permissions_app.delete(data).then( function(data) {
                 console.log("VIEW: DELETE DONE!");
+                STARK.local_storage_delete_key('Listviews', 'STARK_User_Permissions');
                 console.log(data);
                 loading_modal.hide()
                 window.location.href = "STARK_User_Permissions.html";
@@ -150,9 +162,20 @@ var root = new Vue({
                 let data = { STARK_User_Permissions: this.STARK_User_Permissions }
 
                 STARK_User_Permissions_app.update(data).then( function(data) {
-                    console.log("VIEW: UPDATING DONE!");
                     console.log(data);
                     loading_modal.hide()
+                    if(data != "OK")
+                    {
+                        for (var key in data) {
+                            if (data.hasOwnProperty(key)) {
+                                root.metadata[key]['state'] = false
+                                root.metadata[key]['feedback'] = data[key]
+                            }
+                        }
+                        return false
+                    }
+                    console.log("VIEW: UPDATING DONE!");
+                    STARK.local_storage_delete_key('Listviews', 'STARK_User_Permissions');
                     window.location.href = "STARK_User_Permissions.html";
                 })
                 .catch(function(error) {
@@ -178,7 +201,7 @@ var root = new Vue({
                 console.log("VIEW: Getting!")
 
                 STARK_User_Permissions_app.get(data).then( function(data) {
-                    root.STARK_User_Permissions = data[0]; //We need 0, because API backed func always returns a list for now
+                    root.STARK_User_Permissions = data["item"]; //We need 0, because API backed func always returns a list for now
                     root.STARK_User_Permissions.orig_Username = root.STARK_User_Permissions.Username;
 					permission_list = root.STARK_User_Permissions.Permissions 
                     root.multi_select_values.Permissions = (root.STARK_User_Permissions.Permissions.split(', ')).sort()		
@@ -237,29 +260,55 @@ var root = new Vue({
                 }
             }
 
-            STARK_User_Permissions_app.list(payload).then( function(data) {
-                for (let x = 0; x < (data['Items']).length; x++) {
-                    data['Items'][x]['Permissions'] = ((data['Items'][x]['Permissions'].split(', ')).sort()).join(', ')      
-                }
-                token = data['Next_Token'];
-                root.listview_table = data['Items'];
-                console.log("DONE! Retrieved list.");
+            var listview_data = STARK.get_local_storage_item('Listviews', 'STARK_User_Permissions')
+            var fetch_from_db = false;
+            console.log(listview_data)
+            if(listview_data) {
+                root.listview_table = listview_data[root.curr_page]
+                root.next_token = listview_data['next_token'];
                 spinner.hide()
+            }
+            else {
+                fetch_from_db = true
+            }
 
-                if (token != "null") {
-                    root.next_disabled = false;
-                    root.next_token = token;
-                }
-                else {
-                    root.next_disabled = true;
-                }
+            if(fetch_from_db) {
 
-            })
-            .catch(function(error) {
-                console.log("Encountered an error! [" + error + "]")
-                alert("Request Failed: System error or you may not have enough privileges")
-                spinner.hide()
-            });
+                STARK_User_Permissions_app.list(payload).then( function(data) {
+                    console.log(data)
+                    for (let x = 0; x < (data['Items']).length; x++) {
+                        data['Items'][x]['Permissions'] = ((data['Items'][x]['Permissions'].split(', ')).sort()).join(', ')      
+                    }
+                    token = data['Next_Token'];
+                    root.listview_table = data['Items'];
+                    var data_to_store = {}
+                    data_to_store[root.curr_page] = data['Items']
+                    data_to_store['next_token'] = token
+                    STARK.set_local_storage_item('Listviews', 'STARK_User_Permissions', data_to_store)
+                    console.log("DONE! Retrieved list.");
+                    spinner.hide()
+
+                    if (token != "null") {
+                        root.next_disabled = false;
+                        root.next_token = token;
+                    }
+                    else {
+                        root.next_disabled = true;
+                    }
+                    console.log(root.listview_table)
+                })
+                .catch(function(error) {
+                    console.log("Encountered an error! [" + error + "]")
+                    alert("Request Failed: System error or you may not have enough privileges")
+                    spinner.hide()
+                });
+            }
+        },
+
+        refresh_list () {
+            root.listview_table = ''
+            STARK.local_storage_delete_key('Listviews', 'STARK_User_Permissions'); //localStorage
+            root.list()
         },
 
         list_Permissions: function () {
