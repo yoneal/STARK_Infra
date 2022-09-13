@@ -176,8 +176,6 @@ def create(data):
                     <div class="row">
                         <div class="col-6 text-left d-inline-block">
                             <button id="prev" type="button" class="btn btn-secondary mb-2" onClick="root.showGraph = false, root.showError = false"> Back </button>
-                            <!-- <button type="button" class="btn btn-success mb-2" onClick="root.download_report('csv')" :disabled="listview_table.length < 1"> Export as CSV</button>
-                            <button type="button" class="btn btn-danger mb-2" onClick="root.download_report('pdf')" :disabled="listview_table.length < 1"> Export as PDF</button> -->
                             <button id="refresh" type="button" class="btn btn-primary mb-2" onClick="root.generate()" :disabled="listview_table.length < 1"> Refresh </button>
                         </div>
                         <div class="col-6">
