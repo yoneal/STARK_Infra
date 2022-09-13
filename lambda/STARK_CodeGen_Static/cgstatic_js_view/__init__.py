@@ -153,7 +153,8 @@ def create(data):
                         {{ value: 'Tabular', text: 'Tabular' }},
                         {{ value: 'Graph', text: 'Graph' }},
                     ],
-                    'Data_Source': ["""
+                    'Data_Source': [
+                        {{ value: '{pk_varname}', text: '{pk_varname}' }},"""
 
     for col in cols:
         source_code += f"""
