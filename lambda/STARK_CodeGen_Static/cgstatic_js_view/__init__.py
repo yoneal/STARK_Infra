@@ -156,9 +156,8 @@ def create(data):
                     'Data_Source': ["""
 
     for col in cols:
-        col_varname = converter.convert_to_system_name(col)
         source_code += f"""
-                        {{ value: '{col_varname}', text: '{col_varname}' }},""" 
+                        {{ value: '{col}', text: '{col}' }},""" 
 
     source_code += f"""
                     ],"""
@@ -926,7 +925,7 @@ def create(data):
                     
                     option = {{
                         title: {{
-                            text: {entity}' Report',
+                            text: '{entity} Report',
                             subtext: '',
                             right: 'center'
                         }},
@@ -968,7 +967,7 @@ def create(data):
                     
                     option = {{
                         title: {{
-                            text: {entity}' Report',
+                            text: '{entity} Report',
                             subtext: '',
                             right: 'center'
                         }},
@@ -1026,7 +1025,7 @@ def create(data):
                             }}
                         ],
                         title: {{
-                            text: {entity}' Report',
+                            text: '{entity} Report',
                             subtext: '',
                             right: 'center'
                         }},
@@ -1084,7 +1083,7 @@ def create(data):
                             field = element.replace("_", " ")
                             operator = (root.custom_report[element].operator).replace("_", " ")
                             val = root.custom_report[element].value
-                            conso_subtext = conso_subtext.concat(field, " ", operator, " ", val, "'\n")
+                            conso_subtext = conso_subtext.concat(field, " ", operator, " ", val, "\\n")
                         }}
                     }}
                     return conso_subtext

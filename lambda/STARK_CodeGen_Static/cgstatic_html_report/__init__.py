@@ -114,10 +114,10 @@ def create(data):
                                                 </div>
                                             </td>
                                         </tr>
-                                    </table>"""
+                                    """
 
     source_code += f"""
-                                        
+                                    </table>    
                                     <table class="table table-dark table-striped report">
                                         <tr>
                                             <hr>
@@ -188,7 +188,7 @@ def create(data):
                     </div>
                     <div id="chart-container"></div>
                 </div>
-                <div v-if="showReport" && "!showGraph">
+                <div v-if="showReport && !showGraph">
                     <div class="row">
                         <div class="col-6 text-left d-inline-block">
                             <button id="prev" type="button" class="btn btn-secondary mb-2" onClick="root.showReport = false, root.showError = false"> Back </button>
