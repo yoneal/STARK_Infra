@@ -143,7 +143,8 @@ def create(data):
                         {{ value: 'begins_with', text: 'BEGINS WITH (..%)' }},
                         {{ value: 'IN', text: 'IN (value1, value2, value3, ... valueN)' }},
                         {{ value: 'between', text: 'BETWEEN (value1, value2)' }},
-                    ],'Chart_Type': [
+                    ],
+                    'Chart_Type': [
                         {{ value: 'Bar Chart', text: 'Bar Chart' }},
                         {{ value: 'Pie Chart', text: 'Pie Chart' }},
                         {{ value: 'Line Chart', text: 'Line Chart' }},
@@ -152,15 +153,15 @@ def create(data):
                         {{ value: 'Tabular', text: 'Tabular' }},
                         {{ value: 'Graph', text: 'Graph' }},
                     ],
-                    'Data_Source': {{"""
+                    'Data_Source': ["""
 
     for col in cols:
         col_varname = converter.convert_to_system_name(col)
         source_code += f"""
-                    {{ value: '{{col_varname}}', text: '{{col_varname}}' }},""" 
+                        {{ value: '{col_varname}', text: '{col_varname}' }},""" 
 
     source_code += f"""
-                    }},"""
+                    ],"""
 
                     
 
@@ -660,7 +661,7 @@ def create(data):
                                         }});
                                     }}
 
-                                    var subtext = root.get_filters()
+                                    var subtext = root.conso_subtext()
                                     
 
                                     if(root.custom_report.Chart_Type == 'Pie Chart') {{
@@ -890,10 +891,10 @@ def create(data):
 
     source_code += f"""
                 //Charting ------------------------------------------------
-                checkOccurrence: function (array, element) {{ 
+                checkOccurrence: function (array, element) {{
                     counter = 0;
                     for (item of array.flat()) {{
-                        
+
                         if (typeof item === "string") {{
                             newItem = item.toLowerCase();
                             newElement = element.toLowerCase();
@@ -902,10 +903,10 @@ def create(data):
                             }}
                         }} else {{
                             if (item == element) {{
-                                counter++;}}
+                                counter++;
                             }}
                         }}
-                    }};
+                    }}
                     return counter;
                 }},
 
@@ -925,7 +926,7 @@ def create(data):
                     
                     option = {{
                         title: {{
-                            text: 'Customer Report',
+                            text: {entity}' Report',
                             subtext: '',
                             right: 'center'
                         }},
@@ -967,7 +968,7 @@ def create(data):
                     
                     option = {{
                         title: {{
-                            text: 'Customer Report',
+                            text: {entity}' Report',
                             subtext: '',
                             right: 'center'
                         }},
@@ -1025,7 +1026,7 @@ def create(data):
                             }}
                         ],
                         title: {{
-                            text: 'Customer Report',
+                            text: {entity}' Report',
                             subtext: '',
                             right: 'center'
                         }},
@@ -1074,7 +1075,7 @@ def create(data):
                     }}
                 }},
 
-                get_filters: function () {{
+                conso_subtext: function () {{
                     conso_subtext = ''
                     for (element in root.custom_report) {{
                         
@@ -1083,7 +1084,7 @@ def create(data):
                             field = element.replace("_", " ")
                             operator = (root.custom_report[element].operator).replace("_", " ")
                             val = root.custom_report[element].value
-                            conso_subtext = conso_subtext.concat(field, " ", operator, " ", val, "\n")
+                            conso_subtext = conso_subtext.concat(field, " ", operator, " ", val, "'\n")
                         }}
                     }}
                     return conso_subtext
