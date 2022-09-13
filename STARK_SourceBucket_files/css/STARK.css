@@ -170,3 +170,10 @@ select:-webkit-autofill:focus {
   .sidenav {padding-top: 15px;}
   .sidenav a {font-size: 18px;}
 }
+
+#chart-container {
+  position: relative;
+  height: 75vh;
+  overflow: hidden;
+  background-color: #ffffff;
+}
