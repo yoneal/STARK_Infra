@@ -154,7 +154,7 @@ def create(data):
                         {{ value: 'Graph', text: 'Graph' }},
                     ],
                     'Data_Source': [
-                        {{ value: '{pk_varname}', text: '{pk_varname}' }},"""
+                        {{ value: '{pk}', text: '{pk}' }},"""
 
     for col in cols:
         source_code += f"""
