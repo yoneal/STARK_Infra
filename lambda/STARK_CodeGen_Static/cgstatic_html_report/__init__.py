@@ -38,7 +38,7 @@ def create(data):
     source_code += f"""\
             <!-- <div class="container-unauthorized" v-if="!stark_permissions['{entity}|Report']">UNAUTHORIZED!</div>
             <div class="main-continer" v-if="stark_permissions['{entity}|Report']"> -->
-                <div class="container" v-if="!showReport">
+                <div class="container" v-if="!showReport && !showGraph">
                     <div class="row">
                         <div class="col">
                             <div class="my-auto">
@@ -116,6 +116,52 @@ def create(data):
                                         </tr>"""
 
     source_code += f"""
+                                        <tr>
+                                            <td></td>
+                                            <td>Report Type</td>
+                                            <td>
+                                                <b-form-group class="form-group" label="" label-for="Report_Type" :state="metadata.Report_Type.state" :invalid-feedback="metadata.Report_Type.feedback" >
+                                                    <b-form-select id="Report_Type" v-model="custom_report.Report_Type" :options="lists.Report_Type" :state="metadata.Report_Type.state" @change="root.showChartWizard()">
+                                                    <template v-slot:first>
+                                                        <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
+                                                    </template>
+                                                </b-form-select>
+                                                </b-form-group>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table v-if="showChartFields" class="table table-dark table-striped report">
+                                        <tr>
+                                            <hr v-if="showChartFields"> <h5 v-if="showChartFields">Chart Wizard</h5> <hr v-if="showChartFields">
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>Chart Type</td>
+                                            <td>
+                                            <b-form-group class="form-group" label="" label-for="Chart_Type" :state="metadata.Chart_Type.state" :invalid-feedback="metadata.Chart_Type.feedback" >
+                                                <b-form-select id="Chart_Type" v-model="custom_report.Chart_Type" :options="lists.Chart_Type" :state="metadata.Chart_Type.state" @change="root.showFields()">
+                                                <template v-slot:first>
+                                                    <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
+                                                </template>
+                                            </b-form-select>
+                                            </b-form-group>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>Data Source</td>
+                                            <td>
+                                                <b-form-group class="form-group" label-for="Data_Source" :state="metadata.Data_Source.state" :invalid-feedback="metadata.Data_Source.feedback">
+                                                    <b-form-select id="Data_Source" v-model="custom_report.Data_Source" :options="lists.Data_Source" :state="metadata.Data_Source.state">
+                                                    <template v-slot:first>
+                                                        <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
+                                                    </template>
+                                                </b-form-select>
+                                                </b-form-group>
+                                            </td>
+                                            <td></td>
+                                        </tr>
                                     </table>
                                     <button type="button" class="btn btn-secondary" onClick="window.location.href='{entity_varname}.html'">Back</button>
                                     <button type="button" class="btn btn-primary float-right" onClick="root.generate()">Generate</button>
@@ -126,7 +172,20 @@ def create(data):
                 </div>"""
 
     source_code += f"""
-                <div v-if="showReport">
+                <div v-if="!showReport && showGraph">
+                    <div class="row">
+                        <div class="col-6 text-left d-inline-block">
+                            <button id="prev" type="button" class="btn btn-secondary mb-2" onClick="root.showGraph = false, root.showError = false"> Back </button>
+                            <!-- <button type="button" class="btn btn-success mb-2" onClick="root.download_report('csv')" :disabled="listview_table.length < 1"> Export as CSV</button>
+                            <button type="button" class="btn btn-danger mb-2" onClick="root.download_report('pdf')" :disabled="listview_table.length < 1"> Export as PDF</button> -->
+                            <button id="refresh" type="button" class="btn btn-primary mb-2" onClick="root.generate()" :disabled="listview_table.length < 1"> Refresh </button>
+                        </div>
+                        <div class="col-6">
+                        </div>
+                    </div>
+                    <div id="chart-container"></div>
+                </div>
+                <div v-if="showReport" && !showGraph">
                     <div class="row">
                         <div class="col-6 text-left d-inline-block">
                             <button id="prev" type="button" class="btn btn-secondary mb-2" onClick="root.showReport = false, root.showError = false"> Back </button>

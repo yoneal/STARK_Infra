@@ -41,6 +41,7 @@ def create(data, special="none"):
 
             <script src="js/vue.js" defer></script>
             <script src="js/bootstrap-vue.min.js" defer></script>
+            <script src="js/echarts.min.js" defer></script>
             <script src="js/STARK.js" defer></script>
             <script src="js/STARK_spinner.js" defer></script>
             <script src="js/STARK_loading_modal.js" defer></script>
