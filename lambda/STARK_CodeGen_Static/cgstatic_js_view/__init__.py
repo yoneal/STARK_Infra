@@ -57,38 +57,38 @@ def create(data):
                     }},""" 
                     
     source_code += f"""
-                    'Report_Type': {
+                    'Report_Type': {{
                         'value': '',
                         'required': true,
                         'max_length': '',
                         'data_type': '',
                         'state': null,
                         'feedback': ''
-                    },
-                    'Chart_Type': {
+                    }},
+                    'Chart_Type': {{
                         'value': '',
                         'required': true,
                         'max_length': '',
                         'data_type': '',
                         'state': null,
                         'feedback': ''
-                    },
-                    'Data_Table': {
+                    }},
+                    'Data_Table': {{
                         'value': '',
                         'required': true,
                         'max_length': '',
                         'data_type': '',
                         'state': null,
                         'feedback': ''
-                    },
-                    'Data_Source': {
+                    }},
+                    'Data_Source': {{
                         'value': '',
                         'required': true,
                         'max_length': '',
                         'data_type': '',
                         'state': null,
                         'feedback': ''
-            },
+                    }},
                 }},
                 
                 auth_config: {{ }},
