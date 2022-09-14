@@ -829,9 +829,9 @@ def create(data):
                 refresh_child () {{
                     //NOTE: this is empty if this entity does not have a child, might need refactoring
                 """
-    for key, item in relationships.items():
+    for relation in relationships:
         source_code += f""" 
-                    STARK.local_storage_delete_key('Listviews', '{item.get('child')}');"""
+                    STARK.local_storage_delete_key('Listviews', '{relation.get('child')}');"""
     source_code += f"""
                 }},
                 """
