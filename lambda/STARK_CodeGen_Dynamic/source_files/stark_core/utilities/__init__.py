@@ -253,5 +253,5 @@ def copy_object_to_bucket(filename, destination_dir, bucket_name = None, source_
         extra_args = {
             'ACL': 'public-read'
         }
-        s3_res.meta.client.copy(copy_source, bucket_name, destination_dir + filename, extra_args)
+        s3_res.meta.client.copy(copy_source, bucket, destination_dir + filename, extra_args)
 
