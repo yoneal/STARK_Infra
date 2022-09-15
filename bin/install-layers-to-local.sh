@@ -16,6 +16,9 @@ fi
 
 echo "Will install third-party packages..."
 pip install boto3 pyyaml crhelper requests
+pip install -U pytest
+pip install pytest-cov
+pip install 'moto[s3,dynamodb]'
 
 echo "Will now proceed to install lambda layers for local access."
 echo "These are the detected python system paths:"
