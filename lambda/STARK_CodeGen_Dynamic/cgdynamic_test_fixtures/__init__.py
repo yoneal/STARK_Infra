@@ -62,7 +62,7 @@ def create(data):
 
 def generate_test_data(col_type):
 
-    string_test_data = ['Nico', 'Kim', 'JV', 'Jen', 'Ryan', 'Lorem Ipsum', 'John Doe', 'Sample', 'Test Data 1', 'Test Data 2'],
+    string_test_data = ['Nico', 'Kim', 'JV', 'Jen', 'Ryan', 'Lorem Ipsum', 'John Doe', 'Sample', 'Test Data 1', 'Test Data 2']
     limit = len(string_test_data) - 1
     data = ""
     if isinstance(col_type, dict):
