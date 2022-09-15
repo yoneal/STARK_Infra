@@ -37,7 +37,7 @@ def create(data):
         test_data   = generate_test_data(col_type)
         source_code += f"""
         data['{col_varname}']: {{'{col_type_id}': '{test_data}'}}"""
-    source_code = f"""
+    source_code += f"""
 
         return data
 
@@ -52,7 +52,7 @@ def create(data):
         test_data   = generate_test_data(col_type)
         if col != pk:
             source_code += f"""
-        data['{col_varname}']: {{'{col_type_id}': '{test_data}'}}"""
+        payload['{col_varname}']: {{'{col_type_id}': '{test_data}'}}"""
     source_code += f"""
         payload['STARK-ListView-sk'] = '{pk_varname}'
         return payload
@@ -77,6 +77,8 @@ def generate_test_data(col_type):
         data = randint(0, 100)
     
     else:
+        print("Nico Test")
+        print(randint(0, limit))
         data = string_test_data[randint(0, limit)]
     return str(data)
 
