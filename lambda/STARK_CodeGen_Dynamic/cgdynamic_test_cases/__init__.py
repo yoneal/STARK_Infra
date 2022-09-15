@@ -87,7 +87,7 @@ def create(data):
         ddb = boto3.client('dynamodb', region_name=core.test_region)
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         set_{entity_to_lower}_payload['{col_to_edit}'] = "Testing Edit"
-        customer.edit(set_{entity_to_lower}_payload, ddb)
+        {entity_to_lower}.edit(set_{entity_to_lower}_payload, ddb)
 
         assert set_{entity_to_lower}_payload['{col_to_edit}'] == {entity_to_lower}.resp_obj['Attributes']['{col_to_edit}']['S']
 

@@ -53,7 +53,7 @@ def create(data):
         if col != pk:
             source_code += f"""
         data['{col_varname}']: {{'{col_type_id}': '{test_data}'}}"""
-    source_code = f"""
+    source_code += f"""
         payload['STARK-ListView-sk'] = '{pk_varname}'
         return payload
         """
