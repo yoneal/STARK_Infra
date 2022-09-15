@@ -27,8 +27,7 @@ def create(data):
 
         #Entity Fixtures
         STARK_folder = os.getcwd() + '/lambda/test_cases'
-        sys.path = [STARK_folder] + sys.path
-        """
+        sys.path = [STARK_folder] + sys.path"""
     for entity in entities:
         entity_varname  = converter.convert_to_system_name(entity)
         source_code += f"""
@@ -100,13 +99,12 @@ def create(data):
     for entity in entities:
         entity_varname  = converter.convert_to_system_name(entity)
         source_code += f"""
+        @pytest.fixture
+        def get_{entity_varname.lower()}_data():
+            return {entity_varname.lower()}.get_data()
 
-            @pytest.fixture
-            def get_{entity_varname.lower()}_data():
-                return {entity_varname.lower()}.get_data()
-
-            @pytest.fixture
-            def set_{entity_varname.lower()}_payload():
-                return {entity_varname.lower()}.set_payload()
-            """
+        @pytest.fixture
+        def set_{entity_varname.lower()}_payload():
+            return {entity_varname.lower()}.set_payload()
+        """
     return textwrap.dedent(source_code)
