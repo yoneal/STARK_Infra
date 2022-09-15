@@ -1,7 +1,6 @@
 import pytest
 
 pytest_args = [
-    '../lambda/test_cases',
     '-v',
     '--cov'
 ]
