@@ -26,7 +26,9 @@ def create(data):
     default_sk     = entity_varname + "|info"
     with_upload    = False
     
-    col_list = columns.keys()
+    col_list = []
+    for keys in columns:
+        col_list.append(keys)
     col_to_edit = col_list[randint(0,len(col_list) - 1)]
     source_code = f"""\
     #Python Standard Library
