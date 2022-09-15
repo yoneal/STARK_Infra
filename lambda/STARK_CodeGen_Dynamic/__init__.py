@@ -116,7 +116,7 @@ def create_handler(event, context):
     #Create necessary files for test_cases directories
     data = {
         "Entities": entities,
-        "Model": models,
+        "Models": models,
         "DynamoDB Name": ddb_table_name,
         "Bucket Name": website_bucket,
     }
