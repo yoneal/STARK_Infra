@@ -30,7 +30,7 @@ def create(data):
     for keys in columns:
         col_list.append(keys)
     print(col_list)
-    col_to_edit = col_list[randint(0,len(col_list) - 1)]
+    col_to_edit = converter.convert_to_system_name(col_list[randint(0,len(col_list) - 1)])
     source_code = f"""\
     #Python Standard Library
     import json
