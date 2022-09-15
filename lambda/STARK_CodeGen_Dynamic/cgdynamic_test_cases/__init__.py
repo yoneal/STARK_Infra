@@ -87,10 +87,10 @@ def create(data):
         use_moto()
         ddb = boto3.client('dynamodb', region_name=core.test_region)
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
-        set_{entity_to_lower}_payload['{col_to_edit}'] = "Testing Edit"
+        set_{entity_to_lower}_payload['{col_to_edit_varname}'] = "Testing Edit"
         {entity_to_lower}.edit(set_{entity_to_lower}_payload, ddb)
 
-        assert set_{entity_to_lower}_payload['{col_to_edit}'] == {entity_to_lower}.resp_obj['Attributes']['{col_to_edit_varname}']['{col_type}']
+        assert set_{entity_to_lower}_payload['{col_to_edit_varname}'] == {entity_to_lower}.resp_obj['Attributes']['{col_to_edit_varname}']['{col_type}']
 
     @mock_dynamodb
     def test_delete(use_moto,set_{entity_to_lower}_payload):
