@@ -120,7 +120,7 @@ def create_handler(event, context):
         "DynamoDB Name": ddb_table_name,
         "Bucket Name": website_bucket,
     }
-    conftest_code = cg_conf.create(data)
+    conftest_code = cg_conftest.create(data)
 
     files_to_commit.append({
         'filePath': f"lambda/test_cases/conftest.py",
