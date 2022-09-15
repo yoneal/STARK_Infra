@@ -50,9 +50,8 @@ def create(data):
         col_varname = converter.convert_to_system_name(col)
         col_type_id = set_type(col_type)
         test_data   = generate_test_data(col_type)
-        if col != pk:
-            source_code += f"""
-        payload['{col_varname}'] = {{'{col_type_id}': '{test_data}'}}"""
+        source_code += f"""
+        payload['{col_varname}'] = '{test_data}'"""
     source_code += f"""
         payload['STARK-ListView-sk'] = '{pk_varname}'
         return payload
@@ -71,16 +70,17 @@ def generate_test_data(col_type):
             data = randint(0, 100)
         
         if col_type["type"] in [ "tags", "multiple choice" ]:
-            data = string_test_data[randint(0, limit)]
-    
+            data = list(string_test_data[randint(0, limit)]
+)    
     elif col_type in [ "int", "number" ]:
         data = randint(0, 100)
     
     else:
-        print("Nico Test")
-        print(randint(0, limit))
         data = string_test_data[randint(0, limit)]
-    return str(data)
+          
+    if isinstance(data, str):
+        data = f"'{data}'"
+    return data
 
 def set_type(col_type):
 

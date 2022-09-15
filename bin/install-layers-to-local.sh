@@ -15,7 +15,7 @@ else
 fi
 
 echo "Will install third-party packages..."
-pip install boto3 pyyaml crhelper requests
+pip install boto3 pyyaml crhelper requests fpdf2
 pip install -U pytest
 pip install pytest-cov
 pip install 'moto[s3,dynamodb]'
