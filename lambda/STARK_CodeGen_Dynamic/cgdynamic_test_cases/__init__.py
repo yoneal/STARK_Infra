@@ -43,7 +43,7 @@ def create(data):
 
     def test_map_results(get_{entity_to_lower}_data):
 
-        item = {entity_to_lower}.map_results(get_{entity_to_lower}_data)
+        mapped_item = {entity_to_lower}.map_results(get_{entity_to_lower}_data)
         pass
         
     def test_create_listview_index_value(set_{entity_to_lower}_payload):
