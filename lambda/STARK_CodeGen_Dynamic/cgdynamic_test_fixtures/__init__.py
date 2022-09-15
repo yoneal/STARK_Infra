@@ -36,7 +36,7 @@ def create(data):
         col_type_id = set_type(col_type)
         test_data   = generate_test_data(col_type)
         source_code += f"""
-        data['{col_varname}'] = {{'{col_type_id}': '{test_data}'}}"""
+        data['{col_varname}'] = {{'{col_type_id}': {test_data}}}"""
     source_code += f"""
 
         return data
@@ -51,7 +51,7 @@ def create(data):
         col_type_id = set_type(col_type)
         test_data   = generate_test_data(col_type)
         source_code += f"""
-        payload['{col_varname}'] = '{test_data}'"""
+        payload['{col_varname}'] = {test_data}"""
     source_code += f"""
         payload['STARK-ListView-sk'] = '{pk_varname}'
         return payload

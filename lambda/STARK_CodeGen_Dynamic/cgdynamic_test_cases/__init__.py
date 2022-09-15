@@ -25,12 +25,13 @@ def create(data):
 
     default_sk     = entity_varname + "|info"
     with_upload    = False
-    print(columns)
     col_list = []
     for keys in columns:
         col_list.append(keys)
-    print(col_list)
-    col_to_edit = converter.convert_to_system_name(col_list[randint(0,len(col_list) - 1)])
+    col_to_edit = col_list[randint(0,len(col_list) - 1)]
+    col_type = set_type(columns[col_to_edit])
+    col_to_edit_varname = converter.convert_to_system_name(col_to_edit)
+    
     source_code = f"""\
     #Python Standard Library
     import json
@@ -89,7 +90,7 @@ def create(data):
         set_{entity_to_lower}_payload['{col_to_edit}'] = "Testing Edit"
         {entity_to_lower}.edit(set_{entity_to_lower}_payload, ddb)
 
-        assert set_{entity_to_lower}_payload['{col_to_edit}'] == {entity_to_lower}.resp_obj['Attributes']['{col_to_edit}']['S']
+        assert set_{entity_to_lower}_payload['{col_to_edit}'] == {entity_to_lower}.resp_obj['Attributes']['{col_to_edit_varname}']['{col_type}']
 
     @mock_dynamodb
     def test_delete(use_moto,set_{entity_to_lower}_payload):
@@ -102,3 +103,21 @@ def create(data):
     """
 
     return textwrap.dedent(source_code)
+
+def set_type(col_type):
+
+    #Default is 'S'. Defined here so we don't need duplicate Else statements below
+    col_type_id = 'S'
+
+    if isinstance(col_type, dict):
+        #special/complex types
+        if col_type["type"] in [ "int-spinner", "decimal-spinner" ]:
+            col_type_id = 'N'
+        
+        if col_type["type"] in [ "tags", "multiple choice" ]:
+            col_type_id = 'SS'
+    
+    elif col_type in [ "int", "number" ]:
+        col_type_id = 'N'
+
+    return col_type_id
