@@ -11,7 +11,7 @@ import convert_friendly_to_system as converter
 def create(data):
   
     entities       = data["Entities"]
-    models         = data["MOdels"]
+    models         = data["Models"]
     ddb_table_name = data["DynamoDB Name"]
     bucket_name    = data['Bucket Name']
     
@@ -34,7 +34,7 @@ def create(data):
         source_code += f"""
         from fixtures import {entity_varname} as {entity_varname.lower()}"""
     source_code += f"""
-    
+
         @pytest.fixture
         def use_moto():
             @mock_dynamodb
