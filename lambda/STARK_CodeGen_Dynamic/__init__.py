@@ -132,7 +132,7 @@ def create_handler(event, context):
         'fileContent': "#blank init for test_cases folder"
     })
     files_to_commit.append({
-        'filePath': f"lambda/test_cases/fixtures/{entity_varname}/__init__.py",
+        'filePath': f"lambda/test_cases/fixtures/__init__.py",
         'fileContent': "#blank init for fixtures folder"
     })
 
