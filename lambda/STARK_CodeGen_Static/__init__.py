@@ -15,6 +15,7 @@ from crhelper import CfnResource
 
 #Private modules
 import importlib
+
 prepend_dir = ""
 if 'libstark' in os.listdir():
     prepend_dir = "libstark.STARK_CodeGen_Static."
@@ -36,6 +37,7 @@ cg_homepage  = importlib.import_module(f"{prepend_dir}cgstatic_html_homepage")
 cg_report    = importlib.import_module(f"{prepend_dir}cgstatic_html_report")   
 
 import convert_friendly_to_system as converter
+import get_relationship as get_rel
 
 s3   = boto3.client('s3')
 api  = boto3.client('apigatewayv2')
@@ -84,7 +86,8 @@ def create_handler(event, context):
     for entity in models:
         pk   = models[entity]["pk"]
         cols = models[entity]["data"]
-        cgstatic_data = { "Entity": entity, "PK": pk, "Columns": cols, "Project Name": project_name}
+        relationships = get_rel.get_relationship(models, entity)
+        cgstatic_data = { "Entity": entity, "PK": pk, "Columns": cols, "Project Name": project_name, "Relationships": relationships}
         entity_varname = converter.convert_to_system_name(entity)
 
         add_to_commit(source_code=cg_add.create(cgstatic_data), key=f"{entity_varname}_add.html", files_to_commit=files_to_commit, file_path='static')

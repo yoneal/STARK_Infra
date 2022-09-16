@@ -274,6 +274,7 @@ Resources:
                 - !Ref CFCustomResourceHelperLayer
                 - !Ref PyYamlLayer
                 - !Ref STARKFriendlyToSystemNamesLayer
+                - !Ref STARKGetRelationshipLayer
             Timeout: 60
             Architectures:
                 - arm64
