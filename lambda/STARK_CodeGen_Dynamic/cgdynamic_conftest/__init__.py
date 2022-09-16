@@ -34,6 +34,28 @@ def create(data):
         from fixtures import {entity_varname} as {entity_varname.lower()}"""
     source_code += f"""
 
+        def pytest_terminal_summary(terminalreporter, exitstatus, config):
+
+            passed_tests  = len(terminalreporter.stats['passed'])
+            failed_tests  = 0
+            xfailed_tests = 0
+            skipped_tests = 0
+
+            if terminalreporter.stats.get('failed', '') != '':
+                failed_tests = len(terminalreporter.stats['failed'])
+            if terminalreporter.stats.get('xfailed', '') != '':
+                xfailed_tests = len(terminalreporter.stats['xfailed'])
+            if terminalreporter.stats.get('skipped', '') != '':
+                skipped_tests = len(terminalreporter.stats['skipped'])
+
+            total_tests = passed_tests + failed_tests + xfailed_tests + skipped_tests
+            passed_percentage = (passed_tests / total_tests) * 100 
+            print("TOTAL TESTS:", total_tests)
+            print("PASSED:", passed_tests)
+            print("FAILED:", failed_tests)
+            print("XFAILED:", xfailed_tests)
+            print("SKIPPED:", skipped_tests)
+
         @pytest.fixture
         def use_moto():
             @mock_dynamodb
