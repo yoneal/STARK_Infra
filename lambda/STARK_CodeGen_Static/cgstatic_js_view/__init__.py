@@ -625,6 +625,7 @@ def create(data):
                                     root.showReport = true
                                 }}
                                 else {{
+                                    root.activate_graph_download()
                                     Data_Source = (root.custom_report.Data_Source).replace(/ /g,"_")
                                     // root.get_all_data_source(Data_Source)
                                     // console.log('root.a_All_Data_Source')
@@ -692,6 +693,42 @@ def create(data):
                     let link = "https://" + (file_type == "csv" ? root.temp_csv_link : root.temp_pdf_link)
                     window.location.href = link
                 }},
+
+                loadImage: function(src) {{
+                    return new Promise((resolve, reject) => {{
+                    const img = new Image();
+                    img.onload = () => resolve(img);
+                    img.onerror = reject;
+                    img.src = src;
+                    }});
+                }},
+
+                activate_graph_download: function () {{
+                    window.html2canvas = html2canvas
+                    window.jsPDF = window.jspdf.jsPDF
+                    filename = STARK.create_UUID()
+
+                    const btnExportHTML = document.getElementById("exportByHTML")
+                    btnExportHTML.addEventListener("click", async () => {{
+                        console.log("exporting...");
+                        try {{
+                            const doc = new jsPDF({{
+                                unit: "px",
+                                orientation: "l",
+                                hotfixes: ["px_scaling"]
+                            }});
+
+                            const canvas = await html2canvas(document.querySelector("#chart-container"))
+                            const img = await root.loadImage(canvas.toDataURL())
+                            doc.addImage(img.src, 'PNG', 50, 100, 1000, 500)
+                            await doc.save(filename)
+                        }} catch (e) {{
+                            console.error("failed to export", e);
+                        }}
+                        console.log("exported");
+                    }})
+                }},
+
                 toggle_all(checked) {{
                     root.checked_fields = checked ? root.temp_checked_fields.slice() : []
                     root.all_selected = checked
@@ -928,7 +965,9 @@ def create(data):
                         title: {{
                             text: '{entity} Report',
                             subtext: '',
-                            right: 'center'
+                            right: 'center',
+                            top: 20,
+                            bottom: 20
                         }},
                         xAxis: {{
                             type: 'category',
@@ -942,7 +981,11 @@ def create(data):
                                 data: [],
                                 type: 'bar'
                             }}
-                        ]
+                        ],
+                        grid: {{
+                            y: 120,
+                            y2: 60,
+                        }}
                     }};
                     option.xAxis.data = x_data
                     option.series[0].data = y_data
@@ -970,7 +1013,9 @@ def create(data):
                         title: {{
                             text: '{entity} Report',
                             subtext: '',
-                            right: 'center'
+                            right: 'center',
+                            top: 20,
+                            bottom: 20
                         }},
                         xAxis: {{
                             type: 'category',
@@ -984,7 +1029,11 @@ def create(data):
                                 data: [],
                                 type: 'line'
                             }}
-                        ]
+                        ],
+                        grid: {{
+                            y: 120,
+                            y2: 60,
+                        }}
                     }};
                     option.xAxis.data = x_data
                     option.series[0].data = y_data
@@ -1028,7 +1077,9 @@ def create(data):
                         title: {{
                             text: '{entity} Report',
                             subtext: '',
-                            right: 'center'
+                            right: 'center',
+                            top: 20,
+                            bottom: 20
                         }},
                         tooltip: {{
                             trigger: 'item'
@@ -1038,6 +1089,10 @@ def create(data):
                             left: 'left',
                             
                         }},
+                        grid: {{
+                            y: 120,
+                            y2: 60,
+                        }}
                     }};
                     //Pass new value for data series
                     option.series[0].data = y_data
@@ -1077,14 +1132,23 @@ def create(data):
 
                 conso_subtext: function () {{
                     conso_subtext = ''
+                    subtext_length = 0
+                    subtext = ''
                     for (element in root.custom_report) {{
-                        
+
                         if(root.custom_report[element].operator != '' && root.custom_report[element].operator != undefined)
                         {{
                             field = element.replace("_", " ")
                             operator = (root.custom_report[element].operator).replace("_", " ")
                             val = root.custom_report[element].value
-                            conso_subtext = conso_subtext.concat(field, " ", operator, " ", val, "\\n")
+                            subtext = field + " " + operator + " " + val + " | "
+                            conso_subtext = conso_subtext.concat(subtext)
+                            
+                            subtext_length += subtext.length
+                            if(subtext_length >= 100) {{
+                                conso_subtext += '\n'
+                                subtext_length = 0
+                            }}
                         }}
                     }}
                     return conso_subtext
