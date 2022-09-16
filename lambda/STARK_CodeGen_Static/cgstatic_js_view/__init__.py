@@ -16,9 +16,10 @@ import convert_friendly_to_system as converter
 
 def create(data):
 
-    entity = data["Entity"]
-    cols   = data["Columns"]
-    pk     = data['PK']
+    entity         = data["Entity"]
+    cols           = data["Columns"]
+    pk             = data['PK']
+    relationships  = data["Relationships"]
 
     entity_varname = converter.convert_to_system_name(entity)
     entity_app     = entity_varname + '_app'
@@ -327,6 +328,7 @@ def create(data):
                             }}
                             console.log("VIEW: INSERTING DONE!");
                             STARK.local_storage_delete_key('Listviews', '{entity_varname}');
+                            root.refresh_child()
                             window.location.href = "{entity_varname}.html";
                         }}).catch(function(error) {{
                             console.log("Encountered an error! [" + error + "]")
@@ -345,7 +347,7 @@ def create(data):
                     {entity_app}.delete(data).then( function(data) {{
                         console.log("VIEW: DELETE DONE!");
                         STARK.local_storage_delete_key('Listviews', '{entity_varname}');
-                        console.log(data);
+                        root.refresh_child()
                         loading_modal.hide()
                         window.location.href = "{entity_varname}.html";
                     }})
@@ -391,6 +393,7 @@ def create(data):
                             }}
                             console.log("VIEW: UPDATING DONE!");
                             STARK.local_storage_delete_key('Listviews', '{entity_varname}');
+                            root.refresh_child()
                             window.location.href = "{entity_varname}.html";
                         }})
                         .catch(function(error) {{
@@ -617,8 +620,8 @@ def create(data):
                             loading_modal.show()
                             {entity_app}.report(report_payload).then( function(data) {{
                                 root.listview_table = data[0];
-                                root.temp_csv_link = data[2][0];
-                                root.temp_pdf_link = data[2][1];
+                                root.temp_csv_link = data[1];
+                                root.temp_pdf_link = data[2];
                                 console.log("DONE! Retrieved report.");
                                 loading_modal.hide()
                                 if(root.custom_report.Report_Type == 'Tabular') {{
@@ -859,6 +862,14 @@ def create(data):
                     root.listview_table = ''
                     STARK.local_storage_delete_key('Listviews', '{entity_varname}');
                     root.list()
+                }},
+                refresh_child () {{
+                    //NOTE: this is empty if this entity does not have a child, might need refactoring
+                """
+    for relation in relationships:
+        source_code += f""" 
+                    STARK.local_storage_delete_key('Listviews', '{relation.get('child')}');"""
+    source_code += f"""
                 }},
                 """
 

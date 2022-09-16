@@ -1,0 +1,132 @@
+#STARK Code Generator component.
+#Produces the config test file of a STARK system
+
+#Python Standard Library
+import base64
+import textwrap
+
+#Private modules
+import convert_friendly_to_system as converter
+
+def create(data):
+  
+    entities       = data["Entities"]
+    models         = data["Models"]
+    ddb_table_name = data["DynamoDB Name"]
+    bucket_name    = data['Bucket Name']
+    
+    #Convert human-friendly names to variable-friendly names
+
+    source_code = f"""\
+        import pytest
+        from moto import mock_dynamodb
+        import boto3
+        import os
+        import sys
+        import stark_core as core
+
+        #Entity Fixtures
+        STARK_folder = os.getcwd() + '/lambda/test_cases'
+        sys.path = [STARK_folder] + sys.path"""
+    for entity in entities:
+        entity_varname  = converter.convert_to_system_name(entity)
+        source_code += f"""
+        from fixtures import {entity_varname} as {entity_varname.lower()}"""
+    source_code += f"""
+
+        def pytest_terminal_summary(terminalreporter, exitstatus, config):
+
+            passed_tests  = len(terminalreporter.stats['passed'])
+            failed_tests  = 0
+            xfailed_tests = 0
+            skipped_tests = 0
+
+            if terminalreporter.stats.get('failed', '') != '':
+                failed_tests = len(terminalreporter.stats['failed'])
+            if terminalreporter.stats.get('xfailed', '') != '':
+                xfailed_tests = len(terminalreporter.stats['xfailed'])
+            if terminalreporter.stats.get('skipped', '') != '':
+                skipped_tests = len(terminalreporter.stats['skipped'])
+
+            total_tests = passed_tests + failed_tests + xfailed_tests + skipped_tests
+            passed_percentage = (passed_tests / total_tests) * 100 
+            print("TOTAL TESTS:", total_tests)
+            print("PASSED:", passed_tests)
+            print("FAILED:", failed_tests)
+            print("XFAILED:", xfailed_tests)
+            print("SKIPPED:", skipped_tests)
+
+        @pytest.fixture
+        def use_moto():
+            @mock_dynamodb
+            def ddb_client():
+                ddb = boto3.resource('dynamodb', region_name=core.test_region)
+                ddb.create_table(
+                    TableName=core.ddb_table,
+                    GlobalSecondaryIndexes=[
+                        {{
+                            'IndexName': 'STARK-ListView-Index',
+                            'KeySchema':[
+                            {{
+                                'AttributeName': 'sk',
+                                'KeyType': 'HASH'
+                            }},
+                            {{
+                                'AttributeName': 'STARK-ListView-sk',
+                                'KeyType': 'RANGE'
+                            }}],
+                            'Projection': 
+                                {{'ProjectionType': 'ALL'}}
+                        }}
+                    ],
+                    AttributeDefinitions=[
+                        {{
+                            'AttributeName': 'pk',
+                            'AttributeType': 'S'
+                        }},
+                        {{
+                            'AttributeName': 'sk',
+                            'AttributeType': 'S'
+                        }},
+                        {{
+                            'AttributeName': 'STARK-ListView-sk',
+                            'AttributeType': 'S'
+                        }},
+                    ],
+                    KeySchema=[
+                            {{
+                                'AttributeName': 'pk',
+                                'KeyType': 'HASH'
+                            }},
+                            {{
+                                'AttributeName': 'sk',
+                                'KeyType': 'RANGE'
+                            }},
+
+                    ],
+                    BillingMode='PAY_PER_REQUEST'
+                )
+                return ddb
+            return ddb_client
+
+        # @pytest.fixture(scope='function')
+        # def aws_credentials():
+        ##     Mocked AWS Credentials for moto.
+        #     os.environ['AWS_ACCESS_KEY_ID'] = 'testing'
+        #     os.environ['AWS_SECRET_ACCESS_KEY'] = 'testing'
+        #     os.environ['AWS_SECURITY_TOKEN'] = 'testing'
+        #     os.environ['AWS_SESSION_TOKEN'] = 'testing'
+        #     os.environ['AWS_DEFAULT_REGION'] = 'us-east-1'
+        """
+    for entity in entities:
+        entity_varname  = converter.convert_to_system_name(entity)
+        source_code += f"""
+        @pytest.fixture
+        def get_{entity_varname.lower()}_data():
+            return {entity_varname.lower()}.get_data()
+
+        @pytest.fixture
+        def set_{entity_varname.lower()}_payload():
+            return {entity_varname.lower()}.set_payload()
+        """
+    return textwrap.dedent(source_code)

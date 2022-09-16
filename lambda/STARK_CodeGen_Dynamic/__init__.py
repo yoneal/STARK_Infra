@@ -28,6 +28,10 @@ cg_auth    = importlib.import_module(f"{prepend_dir}cgdynamic_authorizer")
 cg_sam     = importlib.import_module(f"{prepend_dir}cgdynamic_sam_template")
 cg_conf    = importlib.import_module(f"{prepend_dir}cgdynamic_template_conf")
 
+cg_conftest = importlib.import_module(f"{prepend_dir}cgdynamic_conftest")
+cg_test     = importlib.import_module(f"{prepend_dir}cgdynamic_test_cases")
+cg_fixtures = importlib.import_module(f"{prepend_dir}cgdynamic_test_fixtures")
+
 import convert_friendly_to_system as converter
 import get_relationship as get_rel
 
@@ -66,7 +70,7 @@ def create_handler(event, context):
     for entity in models: entities.append(entity)
 
     ##########################################
-    #Create code for our entity Lambdas (API endpoint backing)
+    #Create code for our entity Lambdas (API endpoint backing and test cases)
     files_to_commit = []
     for entity in entities:
         entity_varname = converter.convert_to_system_name(entity) 
@@ -77,7 +81,7 @@ def create_handler(event, context):
             index['parent']    = converter.convert_to_system_name(index['parent'])
             index['child']     = converter.convert_to_system_name(index['child'])
             index['attribute'] = converter.convert_to_system_name(index['attribute'])
-        print(relationships)
+        # print(relationships)
         data = {
             "Entity": entity, 
             "Columns": models[entity]["data"], 
@@ -86,13 +90,52 @@ def create_handler(event, context):
             "Bucket Name": website_bucket,
             "Relationships": relationships
             }
-        source_code = cg_ddb.create(data)
+        source_code          = cg_ddb.create(data)
+        test_source_code     = cg_test.create(data)
+        fixtures_source_code = cg_fixtures.create(data)
 
         #Step 2: Add source code to our commit list to the project repo
         files_to_commit.append({
             'filePath': f"lambda/{entity_varname}/__init__.py",
             'fileContent': source_code.encode()
         })
+
+        # test cases
+        files_to_commit.append({
+            'filePath': f"lambda/test_cases/test_{entity_varname.lower()}.py",
+            'fileContent': test_source_code.encode()
+        })
+
+        # fixtures
+        files_to_commit.append({
+            'filePath': f"lambda/test_cases/fixtures/{entity_varname}/__init__.py",
+            'fileContent': fixtures_source_code.encode()
+        })
+
+    ###########################################################
+    #Create necessary files for test_cases directories
+    data = {
+        "Entities": entities,
+        "Models": models,
+        "DynamoDB Name": ddb_table_name,
+        "Bucket Name": website_bucket,
+    }
+    conftest_code = cg_conftest.create(data)
+
+    files_to_commit.append({
+        'filePath': f"lambda/test_cases/conftest.py",
+        'fileContent': conftest_code.encode()
+    })
+
+    files_to_commit.append({
+        'filePath': f"lambda/test_cases/__init__.py",
+        'fileContent': "#blank init for test_cases folder"
+    })
+    files_to_commit.append({
+        'filePath': f"lambda/test_cases/fixtures/__init__.py",
+        'fileContent': "#blank init for fixtures folder"
+    })
+
 
     ###########################################################
     #Create our Lambda for the /login and /logout API endpoints
