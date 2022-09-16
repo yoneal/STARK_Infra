@@ -1146,7 +1146,7 @@ def create(data):
                             
                             subtext_length += subtext.length
                             if(subtext_length >= 100) {{
-                                conso_subtext += '\n'
+                                conso_subtext += "\\n"
                                 subtext_length = 0
                             }}
                         }}
