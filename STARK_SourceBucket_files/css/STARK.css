@@ -173,7 +173,8 @@ select:-webkit-autofill:focus {
 
 #chart-container {
   position: relative;
-  height: 75vh;
+  height: 69vh;
+  width: 1000px;
   overflow: hidden;
   background-color: #ffffff;
 }
