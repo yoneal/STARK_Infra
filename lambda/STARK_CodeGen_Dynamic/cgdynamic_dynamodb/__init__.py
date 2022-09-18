@@ -644,16 +644,25 @@ def create(data):
         ddb_arguments['ExpressionAttributeValues'] = object_expression_value
         ddb_arguments['ExpressionAttributeNames'] = ExpressionAttributeNamesDict
 
-        response = ddb.query(**ddb_arguments)
-        raw = response.get('Items')
+        next_token = 'initial'
         items = []
-        for record in raw:
-            item = map_results(record)
-            #add pk as literal 'pk' value
-            #and STARK-ListView-Sk
-            item['pk'] = record.get('pk', {{}}).get('S','')
-            item['STARK-ListView-sk'] = record.get('STARK-ListView-sk',{{}}).get('S','')
-            items.append(item)
+        while next_token != None:
+            next_token = '' if next_token == 'initial' else next_token
+
+            if next_token != '':
+                ddb_arguments['ExclusiveStartKey']=next_token
+
+            response = ddb.query(**ddb_arguments)
+            raw = response.get('Items')
+            next_token = response.get('LastEvaluatedKey')
+            for record in raw:
+                item = map_results(record)
+                #add pk as literal 'pk' value
+                #and STARK-ListView-Sk
+                item['pk'] = record.get('pk', {{}}).get('S','')
+                item['STARK-ListView-sk'] = record.get('STARK-ListView-sk',{{}}).get('S','')
+                items.append(item)
+                
         return items
     """
     
