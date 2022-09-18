@@ -340,33 +340,33 @@ def create(data):
                     object_expression_value.update(processed_operator_and_parameter_dict['expression_values'])
                     report_param_dict.update(processed_operator_and_parameter_dict['report_params'])
         string_filter = temp_string_filter[1:-3]
-        
-        if temp_string_filter == "":
-            response = ddb.query(
-                TableName=ddb_table,
-                IndexName="STARK-ListView-Index",
-                Select='ALL_ATTRIBUTES',
-                ReturnConsumedCapacity='TOTAL',
-                KeyConditionExpression='sk = :sk',
-                ExpressionAttributeValues=object_expression_value
-            )
-        else:
-            response = ddb.query(
-                TableName=ddb_table,
-                IndexName="STARK-ListView-Index",
-                Select='ALL_ATTRIBUTES',
-                ReturnConsumedCapacity='TOTAL',
-                FilterExpression=string_filter,
-                KeyConditionExpression='sk = :sk',
-                ExpressionAttributeValues=object_expression_value
-            )
-        raw = response.get('Items')
 
-        #Map to expected structure
-        #FIXME: this is duplicated code, make this DRY by outsourcing the mapping to a different function.
+        next_token = 'initial'
         items = []
-        for record in raw:
-            items.append(map_results(record))
+        ddb_arguments = {{}}
+        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['IndexName'] = "STARK-ListView-Index"
+        ddb_arguments['Select'] = "ALL_ATTRIBUTES"
+        ddb_arguments['Limit'] = 2
+        ddb_arguments['ReturnConsumedCapacity'] = 'TOTAL'
+        ddb_arguments['KeyConditionExpression'] = 'sk = :sk'
+        ddb_arguments['ExpressionAttributeValues'] = object_expression_value
+
+        if temp_string_filter != "":
+            ddb_arguments['FilterExpression'] = string_filter
+            
+        while next_token != None:
+            next_token = '' if next_token == 'initial' else next_token
+
+            if next_token != '':
+                ddb_arguments['ExclusiveStartKey']=next_token
+
+            response = ddb.query(**ddb_arguments)
+            raw = response.get('Items')
+            next_token = response.get('LastEvaluatedKey')
+
+            for record in raw:
+                items.append(map_results(record))
 
         display_fields = data['STARK_report_fields']
         master_fields = []
@@ -399,33 +399,20 @@ def create(data):
     def get_all(sk=default_sk, lv_token=None, db_handler = None):
         if db_handler == None:
             db_handler = ddb
+    
+        ddb_arguments = {{}}
+        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['IndexName'] = "STARK-ListView-Index"
+        ddb_arguments['Select'] = "ALL_ATTRIBUTES"
+        ddb_arguments['ReturnConsumedCapacity'] = 'TOTAL'
+        ddb_arguments['Limit'] = page_limit
+        ddb_arguments['KeyConditionExpression'] = 'sk = :sk'
+        ddb_arguments['ExpressionAttributeValues'] = {{ ':sk' : {{'S' : sk }} }}
 
-        if lv_token == None:
-            response = db_handler.query(
-                TableName=ddb_table,
-                IndexName="STARK-ListView-Index",
-                Select='ALL_ATTRIBUTES',
-                Limit=page_limit,
-                ReturnConsumedCapacity='TOTAL',
-                KeyConditionExpression='sk = :sk',
-                ExpressionAttributeValues={{
-                    ':sk' : {{'S' : sk}}
-                }}
-            )
-        else:
-            response = db_handler.query(
-                TableName=ddb_table,
-                IndexName="STARK-ListView-Index",
-                Select='ALL_ATTRIBUTES',
-                Limit=page_limit,
-                ExclusiveStartKey=lv_token,
-                ReturnConsumedCapacity='TOTAL',
-                KeyConditionExpression='sk = :sk',
-                ExpressionAttributeValues={{
-                    ':sk' : {{'S' : sk}}
-                }}
-            )
+        if lv_token != None:
+            ddb_arguments['ExclusiveStartKey'] = lv_token
 
+        response = db_handler.query(**ddb_arguments)    
         raw = response.get('Items')
 
         #Map to expected structure
@@ -442,21 +429,20 @@ def create(data):
     def get_by_pk(pk, sk=default_sk, db_handler = None):
         if db_handler == None:
             db_handler = ddb
-        
-        response = db_handler.query(
-            TableName=ddb_table,
-            Select='ALL_ATTRIBUTES',
-            KeyConditionExpression="#pk = :pk and #sk = :sk",
-            ExpressionAttributeNames={{
-                '#pk' : 'pk',
-                '#sk' : 'sk'
-            }},
-            ExpressionAttributeValues={{
-                ':pk' : {{'S' : pk }},
-                ':sk' : {{'S' : sk }}
-            }}
-        )
 
+        ddb_arguments = {{}}
+        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['Select'] = "ALL_ATTRIBUTES"
+        ddb_arguments['KeyConditionExpression'] = "#pk = :pk and #sk = :sk"
+        ddb_arguments['ExpressionAttributeNames'] = {{
+                                                    '#pk' : 'pk',
+                                                    '#sk' : 'sk'
+                                                }}
+        ddb_arguments['ExpressionAttributeValues'] = {{
+                                                    ':pk' : {{'S' : pk }},
+                                                    ':sk' : {{'S' : sk }}
+                                                }}
+        response = db_handler.query(**ddb_arguments)
         raw = response.get('Items')
 
         #Map to expected structure
@@ -477,13 +463,14 @@ def create(data):
         sk = data.get('sk','')
         if sk == '': sk = default_sk
 
-        response = db_handler.delete_item(
-            TableName=ddb_table,
-            Key={{
+        ddb_arguments = {{}}
+        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['Key'] = {{
                 'pk' : {{'S' : pk}},
                 'sk' : {{'S' : sk}}
             }}
-        )
+
+        response = db_handler.delete_item(**ddb_arguments)
         global resp_obj
         resp_obj = response
 
@@ -533,17 +520,18 @@ def create(data):
             ':STARKListViewsk' : {{'S' : data['STARK-ListView-sk']}}
         }}
 
-        response = db_handler.update_item(
-            TableName=ddb_table,
-            Key={{
+        ddb_arguments = {{}}
+        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['Key'] = {{
                 'pk' : {{'S' : pk}},
                 'sk' : {{'S' : sk}}
-            }},
-            ReturnValues='UPDATED_NEW',
-            UpdateExpression=UpdateExpressionString,
-            ExpressionAttributeNames=ExpressionAttributeNamesDict,
-            ExpressionAttributeValues=ExpressionAttributeValuesDict
-        )
+            }}
+        ddb_arguments['ReturnValues'] = 'UPDATED_NEW'
+        ddb_arguments['UpdateExpression'] = UpdateExpressionString
+        ddb_arguments['ExpressionAttributeNames'] = ExpressionAttributeNamesDict
+        ddb_arguments['ExpressionAttributeValues'] = ExpressionAttributeValuesDict
+
+        response = db_handler.update_item(**ddb_arguments)
         """
     if len(relationships) > 0:
         source_code += f"""
@@ -592,11 +580,10 @@ def create(data):
         else:
             item['STARK-ListView-sk'] = {{'S' : data['STARK-ListView-sk']}}
 
-
-        response = db_handler.put_item(
-            TableName=ddb_table,
-            Item=item,
-        )
+        ddb_arguments = {{}}
+        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['Item'] = item
+        response = db_handler.put_item(**ddb_arguments)
         """
     if len(relationships) > 0:
         source_code += f"""
@@ -646,16 +633,18 @@ def create(data):
         ExpressionAttributeNamesDict = {{
             '#Attribute' : attribute,
         }}
-        response = ddb.query(
-            TableName=ddb_table,
-            IndexName="STARK-ListView-Index",
-            Select='ALL_ATTRIBUTES',
-            ReturnConsumedCapacity='TOTAL',
-            FilterExpression=string_filter,
-            KeyConditionExpression='sk = :sk',
-            ExpressionAttributeValues=object_expression_value,
-            ExpressionAttributeNames=ExpressionAttributeNamesDict
-        )
+
+        ddb_arguments = {{}}
+        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['IndexName'] = "STARK-ListView-Index"
+        ddb_arguments['Select'] = "ALL_ATTRIBUTES"
+        ddb_arguments['ReturnConsumedCapacity'] = 'TOTAL'
+        ddb_arguments['FilterExpression'] = string_filter
+        ddb_arguments['KeyConditionExpression'] = 'sk = :sk'
+        ddb_arguments['ExpressionAttributeValues'] = object_expression_value
+        ddb_arguments['ExpressionAttributeNames'] = ExpressionAttributeNamesDict
+
+        response = ddb.query(**ddb_arguments)
         raw = response.get('Items')
         items = []
         for record in raw:

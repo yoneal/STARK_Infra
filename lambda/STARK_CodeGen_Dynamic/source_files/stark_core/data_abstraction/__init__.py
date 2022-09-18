@@ -10,24 +10,24 @@ def whoami():
 
 def get_fields(fields, pk_field, sk):
 
-    dd_arguments = {}
+    ddb_arguments = {}
     next_token = 'initial'
     items = []
     while next_token != None:
         next_token = '' if next_token == 'initial' else next_token
-        dd_arguments['TableName'] = stark_core.ddb_table
-        dd_arguments['IndexName'] = "STARK-ListView-Index"
-        dd_arguments['Limit'] = stark_core.page_limit
-        dd_arguments['ReturnConsumedCapacity'] ='TOTAL'
-        dd_arguments['KeyConditionExpression'] = 'sk = :sk'
-        dd_arguments['ExpressionAttributeValues'] = {
+        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['IndexName'] = "STARK-ListView-Index"
+        ddb_arguments['Limit'] = stark_core.page_limit
+        ddb_arguments['ReturnConsumedCapacity'] ='TOTAL'
+        ddb_arguments['KeyConditionExpression'] = 'sk = :sk'
+        ddb_arguments['ExpressionAttributeValues'] = {
             ':sk' : {'S' : sk}
         }
 
         if next_token != '':
-            dd_arguments['ExclusiveStartKey']=next_token
+            ddb_arguments['ExclusiveStartKey']=next_token
 
-        response = ddb.query(**dd_arguments)
+        response = ddb.query(**ddb_arguments)
         raw = response.get('Items')
 
         for record in raw:
