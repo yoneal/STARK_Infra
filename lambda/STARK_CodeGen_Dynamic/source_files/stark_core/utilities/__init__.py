@@ -1,8 +1,14 @@
-
-from fpdf import FPDF
 import math
+import uuid
+import boto3
+
+from io import StringIO
+from fpdf import FPDF
+import csv
 
 import stark_core
+s3     = boto3.client("s3")
+s3_res = boto3.resource('s3')
 
 name = "STARK Utilities"
 
@@ -53,6 +59,64 @@ def compose_report_operators_and_parameters(key, data):
 
     return composed_filter_dict
 
+def create_csv(report_list, csv_header, diff_list):
+    
+    file_buff = StringIO()
+    writer = csv.DictWriter(file_buff, fieldnames=csv_header)
+    writer.writeheader()
+    for rows in report_list:
+        for index in diff_list:
+            rows.pop(index)
+        writer.writerow(rows)
+
+    filename = f"{str(uuid.uuid4())}"
+    csv_file = f"{filename}.csv"
+    
+    save_object_to_bucket(file_buff.getvalue(), csv_file)
+
+    return csv_file
+
+def prepare_pdf_data(data_to_tuple, master_fields, report_params, metadata, pk_field):
+    #FIXME: PDF GENERATOR: can be outsourced to a layer, for refining 
+    master_fields.insert(0, '#')
+    numerical_columns = {}
+    for key, items in metadata.items():
+        if items['data_type'] == 'number':
+            numerical_columns.update({key: 0})
+    row_list = []
+    counter = 1 
+    for key in data_to_tuple:
+        column_list = []
+        for index in master_fields:
+            if(index != '#'):
+                if index in numerical_columns.keys():
+                    numerical_columns[index] += int(key[index])
+                column_list.append(key[index])
+        column_list.insert(0, str(counter)) 
+        row_list.append(tuple(column_list))
+        counter += 1
+
+    if len(numerical_columns) > 0:
+        column_list = []
+        for values in master_fields:
+            if values in numerical_columns:
+                column_list.append(str(numerical_columns.get(values, '')))
+            else:
+                column_list.append('')
+        row_list.append(column_list)
+
+    header_tuple = tuple(master_fields) 
+    data_tuple = tuple(row_list)
+
+    filename = f"{str(uuid.uuid4())}"
+    pdf_file = f"{filename}.pdf"
+
+    pdf = create_pdf(header_tuple, data_tuple, report_params, pk_field, metadata)
+    save_object_to_bucket(pdf.output(), pdf_file)
+
+    return pdf_file
+
+
 def create_pdf(header_tuple, data_tuple, report_params, pk_field, metadata):
 
     pdf = FPDF(orientation='L')
@@ -75,7 +139,7 @@ def create_pdf(header_tuple, data_tuple, report_params, pk_field, metadata):
     counter = 0
     for row in data_tuple:
         if pdf.will_page_break(line_height):
-            render_table_header(pdf, header_tuple, col_width, line_height, row_number_width)
+            render_table_header(pdf, header_tuple, col_width, line_height, row_number_width) 
         row_height = pdf.font_size * estimate_lines_needed(pdf, row, col_width)
         if row_height < line_height: #min height
             row_height = line_height
@@ -161,6 +225,32 @@ def render_page_header(pdf, line_height, report_params, pk_field):
 def estimate_lines_needed(self, iter, col_width: float) -> int:
     font_width_in_mm = (
         self.font_size_pt * 0.33 * 0.6
-    )  # assumption: a letter is half his height in width, the 0.5 is the value you want to play with
+    )  # assumption: a letter is half his height in width, the 0.6 is the value you want to play with
     max_cell_text_len_header = max([len(str(col)) for col in iter])  # how long is the longest string?
     return math.ceil(max_cell_text_len_header * font_width_in_mm / col_width)
+
+def save_object_to_bucket(body, filename, bucket_name = None):
+    if bucket_name == None:
+        bucket = stark_core.bucket_name
+
+    s3_action = s3.put_object(
+        ACL='public-read',
+        Body= body,
+        Bucket=bucket,
+        Key='tmp/'+filename
+    )
+
+def copy_object_to_bucket(filename, destination_dir, bucket_name = None, source_dir='tmp'):
+    if bucket_name == None:
+        bucket = stark_core.bucket_name
+
+        copy_source = {
+            'Bucket': bucket,
+            'Key': source_dir + '/' + filename
+        }
+
+        extra_args = {
+            'ACL': 'public-read'
+        }
+        s3_res.meta.client.copy(copy_source, bucket, destination_dir + filename, extra_args)
+

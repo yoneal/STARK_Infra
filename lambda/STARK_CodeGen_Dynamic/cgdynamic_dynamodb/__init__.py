@@ -67,26 +67,20 @@ def create(data):
     #Python Standard Library
     import base64
     import json
-    import sys
     import importlib
     from urllib.parse import unquote
-    import math
 
     #Extra modules
     import boto3
-    import csv
     import uuid
-    from io import StringIO
-    import os
-    from fpdf import FPDF
 
     #STARK
     import stark_core 
     from stark_core import utilities
     from stark_core import validation
+    from stark_core import data_abstraction
 
     ddb    = boto3.client('dynamodb')
-    s3     = boto3.client("s3")
     s3_res = boto3.resource('s3')
 
     #######
@@ -103,30 +97,31 @@ def create(data):
     relationships     = {relationships}
     entity_upload_dir = stark_core.upload_dir + "{entity_varname}/"
     metadata          = {{
-        "{pk_varname}": {{
-            'value': '',
-            'required': True,
-            'max_length': '',
-            'data_type': '',
-            'state': None,
-            'feedback': ''
-        }},"""
+                "{pk_varname}": {{
+                    'value': '',
+                    'required': True,
+                    'max_length': '',
+                    'data_type': '',
+                    'state': None,
+                    'feedback': ''
+                }},"""
         
     
     for col in columns:
         col_varname = converter.convert_to_system_name(col)
         source_code += f"""
-        '{col_varname}': {{
-            'value': '',
-            'required': True,
-            'max_length': '',
-            'data_type': '',
-            'state': None,
-            'feedback': ''
-        }},""" 
+                '{col_varname}': {{
+                    'value': '',
+                    'required': True,
+                    'max_length': '',
+                    'data_type': '',
+                    'state': None,
+                    'feedback': ''
+                }},""" 
                     
     source_code += f"""
     }}
+    resp_obj = None
 
     ############
     #PERMISSIONS
@@ -222,7 +217,7 @@ def create(data):
             elif method == "PUT":
                 if(stark_core.sec.is_authorized(stark_permissions['edit'], event, ddb)):
                     payload = data
-                    payload['{pk_varname}'] = data['pk']
+                    payload[pk_field] = data['pk']
                     invalid_payload = validation.validate_form(payload, metadata)
                     if len(invalid_payload) > 0:
                         return {{
@@ -254,7 +249,7 @@ def create(data):
                 else:
                     if(stark_core.sec.is_authorized(stark_permissions['add'], event, ddb)):
                         payload = data
-                        payload['{pk_varname}'] = data['pk']
+                        payload[pk_field] = data['pk']
                         invalid_payload = validation.validate_form(payload, metadata)
                         if len(invalid_payload) > 0:
                             return {{
@@ -301,7 +296,7 @@ def create(data):
             elif request_type == "get_fields":
                 fields = event.get('queryStringParameters').get('fields','')
                 fields = fields.split(",")
-                response = get_fields(fields, default_sk)
+                response = data_abstraction.get_fields(fields, pk_field, default_sk)
 
             elif request_type == "detail":
 
@@ -345,68 +340,79 @@ def create(data):
                     object_expression_value.update(processed_operator_and_parameter_dict['expression_values'])
                     report_param_dict.update(processed_operator_and_parameter_dict['report_params'])
         string_filter = temp_string_filter[1:-3]
-        
-        if temp_string_filter == "":
-            response = ddb.query(
-                TableName=ddb_table,
-                IndexName="STARK-ListView-Index",
-                Select='ALL_ATTRIBUTES',
-                ReturnConsumedCapacity='TOTAL',
-                KeyConditionExpression='sk = :sk',
-                ExpressionAttributeValues=object_expression_value
-            )
-        else:
-            response = ddb.query(
-                TableName=ddb_table,
-                IndexName="STARK-ListView-Index",
-                Select='ALL_ATTRIBUTES',
-                ReturnConsumedCapacity='TOTAL',
-                FilterExpression=string_filter,
-                KeyConditionExpression='sk = :sk',
-                ExpressionAttributeValues=object_expression_value
-            )
-        raw = response.get('Items')
 
-        #Map to expected structure
-        #FIXME: this is duplicated code, make this DRY by outsourcing the mapping to a different function.
+        next_token = 'initial'
         items = []
-        for record in raw:
-            items.append(map_results(record))
+        ddb_arguments = {{}}
+        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['IndexName'] = "STARK-ListView-Index"
+        ddb_arguments['Select'] = "ALL_ATTRIBUTES"
+        ddb_arguments['Limit'] = 2
+        ddb_arguments['ReturnConsumedCapacity'] = 'TOTAL'
+        ddb_arguments['KeyConditionExpression'] = 'sk = :sk'
+        ddb_arguments['ExpressionAttributeValues'] = object_expression_value
 
-        report_filenames = generate_reports(items, data['STARK_report_fields'], report_param_dict)
-        #Get the "next" token, pass to calling function. This enables a "next page" request later.
-        next_token = response.get('LastEvaluatedKey')
+        if temp_string_filter != "":
+            ddb_arguments['FilterExpression'] = string_filter
+            
+        while next_token != None:
+            next_token = '' if next_token == 'initial' else next_token
 
-        return items, next_token, report_filenames
+            if next_token != '':
+                ddb_arguments['ExclusiveStartKey']=next_token
 
-    def get_all(sk=default_sk, lv_token=None):
+            response = ddb.query(**ddb_arguments)
+            raw = response.get('Items')
+            next_token = response.get('LastEvaluatedKey')
 
-        if lv_token == None:
-            response = ddb.query(
-                TableName=ddb_table,
-                IndexName="STARK-ListView-Index",
-                Select='ALL_ATTRIBUTES',
-                Limit=page_limit,
-                ReturnConsumedCapacity='TOTAL',
-                KeyConditionExpression='sk = :sk',
-                ExpressionAttributeValues={{
-                    ':sk' : {{'S' : sk}}
-                }}
-            )
+            for record in raw:
+                items.append(map_results(record))
+
+        display_fields = data['STARK_report_fields']
+        master_fields = []
+        for key in metadata.keys():
+            master_fields.append(key.replace("_"," "))
+        diff_list = []
+        if len(display_fields) > 0:
+            report_header = display_fields
+            diff_list = list(set(master_fields) - set(display_fields))
         else:
-            response = ddb.query(
-                TableName=ddb_table,
-                IndexName="STARK-ListView-Index",
-                Select='ALL_ATTRIBUTES',
-                Limit=page_limit,
-                ExclusiveStartKey=lv_token,
-                ReturnConsumedCapacity='TOTAL',
-                KeyConditionExpression='sk = :sk',
-                ExpressionAttributeValues={{
-                    ':sk' : {{'S' : sk}}
-                }}
-            )
+            report_header = master_fields
 
+        report_list = []
+        for key in items:
+            temp_dict = {{}}
+            #remove primary identifiers and STARK attributes
+            key.pop("sk")
+            for index, value in key.items():
+                temp_dict[index.replace("_"," ")] = value
+            report_list.append(temp_dict)
+
+        csv_file = utilities.create_csv(report_list, report_header, diff_list)
+        pdf_file = utilities.prepare_pdf_data(report_list, report_header, report_param_dict, metadata, pk_field)
+
+        csv_bucket_key = bucket_tmp + csv_file
+        pdf_bucket_key = bucket_tmp + pdf_file
+
+        return items, csv_bucket_key, pdf_bucket_key
+
+    def get_all(sk=default_sk, lv_token=None, db_handler = None):
+        if db_handler == None:
+            db_handler = ddb
+    
+        ddb_arguments = {{}}
+        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['IndexName'] = "STARK-ListView-Index"
+        ddb_arguments['Select'] = "ALL_ATTRIBUTES"
+        ddb_arguments['ReturnConsumedCapacity'] = 'TOTAL'
+        ddb_arguments['Limit'] = page_limit
+        ddb_arguments['KeyConditionExpression'] = 'sk = :sk'
+        ddb_arguments['ExpressionAttributeValues'] = {{ ':sk' : {{'S' : sk }} }}
+
+        if lv_token != None:
+            ddb_arguments['ExclusiveStartKey'] = lv_token
+
+        response = db_handler.query(**ddb_arguments)    
         raw = response.get('Items')
 
         #Map to expected structure
@@ -420,21 +426,23 @@ def create(data):
 
         return items, next_token
 
-    def get_by_pk(pk, sk=default_sk):
-        response = ddb.query(
-            TableName=ddb_table,
-            Select='ALL_ATTRIBUTES',
-            KeyConditionExpression="#pk = :pk and #sk = :sk",
-            ExpressionAttributeNames={{
-                '#pk' : 'pk',
-                '#sk' : 'sk'
-            }},
-            ExpressionAttributeValues={{
-                ':pk' : {{'S' : pk }},
-                ':sk' : {{'S' : sk }}
-            }}
-        )
+    def get_by_pk(pk, sk=default_sk, db_handler = None):
+        if db_handler == None:
+            db_handler = ddb
 
+        ddb_arguments = {{}}
+        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['Select'] = "ALL_ATTRIBUTES"
+        ddb_arguments['KeyConditionExpression'] = "#pk = :pk and #sk = :sk"
+        ddb_arguments['ExpressionAttributeNames'] = {{
+                                                    '#pk' : 'pk',
+                                                    '#sk' : 'sk'
+                                                }}
+        ddb_arguments['ExpressionAttributeValues'] = {{
+                                                    ':pk' : {{'S' : pk }},
+                                                    ':sk' : {{'S' : sk }}
+                                                }}
+        response = db_handler.query(**ddb_arguments)
         raw = response.get('Items')
 
         #Map to expected structure
@@ -447,22 +455,30 @@ def create(data):
 
         return response
 
-    def delete(data):
+    def delete(data, db_handler = None):
+        if db_handler == None:
+            db_handler = ddb
+
         pk = data.get('pk','')
         sk = data.get('sk','')
         if sk == '': sk = default_sk
 
-        response = ddb.delete_item(
-            TableName=ddb_table,
-            Key={{
+        ddb_arguments = {{}}
+        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['Key'] = {{
                 'pk' : {{'S' : pk}},
                 'sk' : {{'S' : sk}}
             }}
-        )
+
+        response = db_handler.delete_item(**ddb_arguments)
+        global resp_obj
+        resp_obj = response
 
         return "OK"
 
-    def edit(data):                
+    def edit(data, db_handler = None):
+        if db_handler == None:
+            db_handler = ddb           
         {dict_to_var_code}"""
 
     if with_upload:
@@ -471,15 +487,7 @@ def create(data):
         STARK_uploaded_s3_keys = {{}}
         for key, items in temp_s3_keys.items():
             STARK_uploaded_s3_keys[key] = {{ 'S' : items }}
-            copy_source = {{
-                'Bucket': bucket_name,
-                'Key': 'tmp/' + items
-            }}
-            
-            extra_args = {{
-                'ACL': 'public-read'
-            }}
-            s3_res.meta.client.copy(copy_source, bucket_name, entity_upload_dir + items, extra_args)
+            utilities.copy_object_to_bucket(items, entity_upload_dir)
         """
     source_code += f"""
         UpdateExpressionString = "SET {update_expression}" 
@@ -512,16 +520,18 @@ def create(data):
             ':STARKListViewsk' : {{'S' : data['STARK-ListView-sk']}}
         }}
 
-        response = ddb.update_item(
-            TableName=ddb_table,
-            Key={{
+        ddb_arguments = {{}}
+        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['Key'] = {{
                 'pk' : {{'S' : pk}},
                 'sk' : {{'S' : sk}}
-            }},
-            UpdateExpression=UpdateExpressionString,
-            ExpressionAttributeNames=ExpressionAttributeNamesDict,
-            ExpressionAttributeValues=ExpressionAttributeValuesDict
-        )
+            }}
+        ddb_arguments['ReturnValues'] = 'UPDATED_NEW'
+        ddb_arguments['UpdateExpression'] = UpdateExpressionString
+        ddb_arguments['ExpressionAttributeNames'] = ExpressionAttributeNamesDict
+        ddb_arguments['ExpressionAttributeValues'] = ExpressionAttributeValuesDict
+
+        response = db_handler.update_item(**ddb_arguments)
         """
     if len(relationships) > 0:
         source_code += f"""
@@ -530,9 +540,13 @@ def create(data):
         """
     source_code += f"""
 
+        global resp_obj
+        resp_obj = response
         return "OK"
 
-    def add(data, method='POST'):
+    def add(data, method='POST', db_handler=None):
+        if db_handler == None:
+            db_handler = ddb
         {dict_to_var_code}"""
 
     if with_upload:
@@ -541,15 +555,7 @@ def create(data):
         STARK_uploaded_s3_keys = {{}}
         for key, items in temp_s3_keys.items():
             STARK_uploaded_s3_keys[key] = {{ 'S' : items }}
-            copy_source = {{
-                'Bucket': bucket_name,
-                'Key': 'tmp/' + items,
-            }}
-            
-            extra_args = {{
-                'ACL': 'public-read'
-            }}
-            s3_res.meta.client.copy(copy_source, bucket_name, entity_upload_dir + items, extra_args)
+            utilities.copy_object_to_bucket(items, entity_upload_dir)
         """
     source_code += f"""
         item={{}}
@@ -574,11 +580,10 @@ def create(data):
         else:
             item['STARK-ListView-sk'] = {{'S' : data['STARK-ListView-sk']}}
 
-
-        response = ddb.put_item(
-            TableName=ddb_table,
-            Item=item,
-        )
+        ddb_arguments = {{}}
+        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['Item'] = item
+        response = db_handler.put_item(**ddb_arguments)
         """
     if len(relationships) > 0:
         source_code += f"""
@@ -589,6 +594,8 @@ def create(data):
             cascade_pk_change_to_child(data, relation['parent'], relation['child'], relation['attribute'])
         """
     source_code += f"""
+        global resp_obj
+        resp_obj = response
         return "OK"
     
     def create_listview_index_value(data):
@@ -618,56 +625,6 @@ def create(data):
     source_code += f"""
         return item
 
-    def generate_reports(mapped_results = [], display_fields=[], report_params = {{}}): 
-        diff_list = []
-        master_fields = ['{pk}', """
-    for col in columns:
-        source_code += f"'{col}', "    
-    source_code += f"""]
-        if len(display_fields) > 0:
-            csv_header = display_fields
-            diff_list = list(set(master_fields) - set(display_fields))
-        else:
-            csv_header = master_fields
-
-        report_list = []
-        for key in mapped_results:
-            temp_dict = {{}}
-            #remove primary identifiers and STARK attributes
-            key.pop("sk")"""
-
-    if with_upload:
-        source_code += f"""
-            key.pop("STARK_uploaded_s3_keys")"""
-    source_code += f"""
-            for index, value in key.items():
-                temp_dict[index.replace("_"," ")] = value
-            report_list.append(temp_dict)
-
-        file_buff = StringIO()
-        writer = csv.DictWriter(file_buff, fieldnames=csv_header)
-        writer.writeheader()
-        for rows in report_list:
-            for index in diff_list:
-                rows.pop(index)
-            writer.writerow(rows)
-        filename = f"{{str(uuid.uuid4())}}"
-        csv_file = f"{{filename}}.csv"
-        pdf_file = f"{{filename}}.pdf"
-        s3_action = s3.put_object(
-            ACL='public-read',
-            Body= file_buff.getvalue(),
-            Bucket=bucket_name,
-            Key='tmp/'+csv_file
-        )
-
-        prepare_pdf_data(report_list, csv_header, pdf_file, report_params)
-
-        csv_bucket_key = bucket_tmp + csv_file
-        pdf_bucket_key = bucket_tmp + pdf_file
-
-        return csv_bucket_key, pdf_bucket_key
-
     def get_all_by_old_parent_value(old_pk_val, attribute, sk = default_sk):
     
         string_filter = " #Attribute = :old_parent_value"
@@ -676,104 +633,36 @@ def create(data):
         ExpressionAttributeNamesDict = {{
             '#Attribute' : attribute,
         }}
-        response = ddb.query(
-            TableName=ddb_table,
-            IndexName="STARK-ListView-Index",
-            Select='ALL_ATTRIBUTES',
-            ReturnConsumedCapacity='TOTAL',
-            FilterExpression=string_filter,
-            KeyConditionExpression='sk = :sk',
-            ExpressionAttributeValues=object_expression_value,
-            ExpressionAttributeNames=ExpressionAttributeNamesDict
-        )
-        raw = response.get('Items')
-        items = []
-        for record in raw:
-            item = map_results(record)
-            #add pk as literal 'pk' value
-            #and STARK-ListView-Sk
-            item['pk'] = record.get('pk', {{}}).get('S','')
-            item['STARK-ListView-sk'] = record.get('STARK-ListView-sk',{{}}).get('S','')
-            items.append(item)
-        return items
 
-    def prepare_pdf_data(data_to_tuple, master_fields, pdf_filename, report_params):
-        #FIXME: PDF GENERATOR: can be outsourced to a layer, for refining 
-        master_fields.insert(0, '#')
-        numerical_columns = {{}}
-        for key, items in metadata.items():
-            if items['data_type'] == 'number':
-                numerical_columns.update({{key: 0}})
-        row_list = []
-        counter = 1 
-        for key in data_to_tuple:
-            column_list = []
-            for index in master_fields:
-                if(index != '#'):
-                    if index in numerical_columns.keys():
-                        numerical_columns[index] += int(key[index])
-                    column_list.append(key[index])
-            column_list.insert(0, str(counter)) 
-            row_list.append(tuple(column_list))
-            counter += 1
+        ddb_arguments = {{}}
+        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['IndexName'] = "STARK-ListView-Index"
+        ddb_arguments['Select'] = "ALL_ATTRIBUTES"
+        ddb_arguments['ReturnConsumedCapacity'] = 'TOTAL'
+        ddb_arguments['FilterExpression'] = string_filter
+        ddb_arguments['KeyConditionExpression'] = 'sk = :sk'
+        ddb_arguments['ExpressionAttributeValues'] = object_expression_value
+        ddb_arguments['ExpressionAttributeNames'] = ExpressionAttributeNamesDict
 
-        if len(numerical_columns) > 0:
-            column_list = []
-            for values in master_fields:
-                if values in numerical_columns:
-                    column_list.append(str(numerical_columns.get(values, '')))
-                else:
-                    column_list.append('')
-            row_list.append(column_list)
-
-        header_tuple = tuple(master_fields) 
-        data_tuple = tuple(row_list)
-        
-        pdf = utilities.create_pdf(header_tuple, data_tuple, report_params, pk_field, metadata)
-        s3_action = s3.put_object(
-            ACL='public-read',
-            Body= pdf.output(),
-            Bucket=bucket_name,
-            Key='tmp/'+pdf_filename
-        )
-
-
-    def get_fields(fields, sk = default_sk):
-            
-        dd_arguments = {{}}
         next_token = 'initial'
         items = []
         while next_token != None:
             next_token = '' if next_token == 'initial' else next_token
-            dd_arguments['TableName']=ddb_table
-            dd_arguments['IndexName']="STARK-ListView-Index"
-            dd_arguments['Limit']=5
-            dd_arguments['ReturnConsumedCapacity']='TOTAL'
-            dd_arguments['KeyConditionExpression']='sk = :sk'
-            dd_arguments['ExpressionAttributeValues']={{
-                ':sk' : {{'S' : sk}}
-            }}
 
             if next_token != '':
-                dd_arguments['ExclusiveStartKey']=next_token
+                ddb_arguments['ExclusiveStartKey']=next_token
 
-            response = ddb.query(**dd_arguments)
+            response = ddb.query(**ddb_arguments)
             raw = response.get('Items')
-
-            for record in raw:
-                
-                item = {{}}
-                for field in fields:
-                    if field == pk_field:
-                        get_record = record.get('pk',{{}}).get('S','')
-                    else:
-                        get_record = record.get(field,{{}}).get('S','')
-                        
-                    item[field] = get_record
-                items.append(item)
-            #Get the "next" token, pass to calling function. This enables a "next page" request later.
             next_token = response.get('LastEvaluatedKey')
-
+            for record in raw:
+                item = map_results(record)
+                #add pk as literal 'pk' value
+                #and STARK-ListView-Sk
+                item['pk'] = record.get('pk', {{}}).get('S','')
+                item['STARK-ListView-sk'] = record.get('STARK-ListView-sk',{{}}).get('S','')
+                items.append(item)
+                
         return items
     """
     
