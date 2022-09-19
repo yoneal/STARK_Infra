@@ -1,7 +1,3 @@
-#Python Standard Library
-import json
-import base64
-
 name = "STARK Validation"
 
 def validate_form(payload, metadata):
