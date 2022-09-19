@@ -18,7 +18,7 @@ var root = new Vue({
                 'state': null,
                 'feedback': ''
             },
-            'Report_Type': {
+            'STARK_Report_Type': {
                 'value': '',
                 'required': true,
                 'max_length': '',
@@ -26,7 +26,7 @@ var root = new Vue({
                 'state': null,
                 'feedback': ''
             },
-            'Chart_Type': {
+            'STARK_Chart_Type': {
                 'value': '',
                 'required': true,
                 'max_length': '',
@@ -34,15 +34,7 @@ var root = new Vue({
                 'state': null,
                 'feedback': ''
             },
-            'Data_Table': {
-                'value': '',
-                'required': true,
-                'max_length': '',
-                'data_type': '',
-                'state': null,
-                'feedback': ''
-            },
-            'Data_Source': {
+            'STARK_Data_Source': {
                 'value': '',
                 'required': true,
                 'max_length': '',
@@ -71,9 +63,9 @@ var root = new Vue({
             'Permissions':  {"operator": "", "value": "", "type":"S"},
             'STARK_isReport':true,
             'STARK_report_fields':[],
-            'Report_Type': '',
-            'Chart_Type': '',
-            'Data_Source': '',
+            'STARK_Report_Type': '',
+            'STARK_Chart_Type': '',
+            'STARK_Data_Source': '',
         },
         lists: {
             'Permissions': [
@@ -421,19 +413,19 @@ var root = new Vue({
         },
 
         generate: function () {
-            if(root.custom_report.Report_Type == 'Tabular') {
-                root.metadata['Chart_Type'].required = false
-                root.metadata['Data_Source'].required = false
+            if(root.custom_report.STARK_Report_Type == 'Tabular') {
+                root.metadata['STARK_Chart_Type'].required = false
+                root.metadata['STARK_Data_Source'].required = false
             }
             else {
-                root.metadata['Chart_Type'].required = true
-                root.metadata['Data_Source'].required = true
+                root.metadata['STARK_Chart_Type'].required = true
+                root.metadata['STARK_Data_Source'].required = true
             }
             response = STARK.validate_form(root.metadata, root.custom_report)
             this.metadata = response['new_metadata']
             // console.log(response['is_valid_form'])
             if(response['is_valid_form']) {
-                if(root.custom_report.Report_Type == 'Graph') {
+                if(root.custom_report.STARK_Report_Type == 'Graph') {
                     root.showGraph = true
                 }
                 let temp_show_fields = []
@@ -453,12 +445,12 @@ var root = new Vue({
                         root.temp_pdf_link = data[2][1];
                         console.log("DONE! Retrieved report.");
                         loading_modal.hide()
-                        if(root.custom_report.Report_Type == 'Tabular') {
+                        if(root.custom_report.STARK_Report_Type == 'Tabular') {
                             root.showReport = true
                         }
                         else {
                             root.activate_graph_download()
-                            Data_Source = (root.custom_report.Data_Source).replace(/ /g,"_")
+                            Data_Source = (root.custom_report.STARK_Data_Source).replace(/ /g,"_")
                             // root.get_all_data_source(Data_Source)
                             // console.log('root.a_All_Data_Source')
                             // console.log(Object(root.a_All_Data_Source))
@@ -475,7 +467,7 @@ var root = new Vue({
                             // console.log(Data_Source_Series)
 
 
-                            if(root.custom_report.Chart_Type == 'Pie Chart') {
+                            if(root.custom_report.STARK_Chart_Type == 'Pie Chart') {
                                 //Check Occurrence per Data Source for Pie Chart
                                 Y_Data_Source_Series = []
                                 Data_Source_Series.forEach(element => {
@@ -496,22 +488,19 @@ var root = new Vue({
 
                             var subtext = root.conso_subtext()
 
-
-                            if(root.custom_report.Chart_Type == 'Pie Chart') {
+                            if(root.custom_report.STARK_Chart_Type == 'Pie Chart') {
                                 // console.log('Pie')
                                 root.pieChart(Y_Data_Source_Series, subtext)
                             }
-                            else if(root.custom_report.Chart_Type == 'Bar Chart') {
+                            else if(root.custom_report.STARK_Chart_Type == 'Bar Chart') {
                                 // console.log('Bar')
                                 root.barChart(Data_Source_Series, Y_Data_Source_Series, subtext)
                             }
-                            else if(root.custom_report.Chart_Type == 'Line Chart') {
+                            else if(root.custom_report.STARK_Chart_Type == 'Line Chart') {
                                 // console.log('Line')
                                 root.lineChart(Data_Source_Series, Y_Data_Source_Series, subtext)
                             }
-
                         }
-
                     })
                     .catch(function(error) {
                         console.log("Encountered an error! [" + error + "]")
@@ -570,7 +559,7 @@ var root = new Vue({
 
             option = {
                 title: {
-                    text: 'Customer Report',
+                    text: 'User Permissions Report',
                     subtext: '',
                     right: 'center',
                     top: 20,
@@ -618,7 +607,7 @@ var root = new Vue({
 
             option = {
                 title: {
-                    text: 'Customer Report',
+                    text: 'User Permissions Report',
                     subtext: '',
                     right: 'center',
                     top: 20,
@@ -682,7 +671,7 @@ var root = new Vue({
                     }
                 ],
                 title: {
-                    text: 'Customer Report',
+                    text: 'User Permissions Report',
                     subtext: '',
                     right: 'center',
                     top: 20,
@@ -750,12 +739,12 @@ var root = new Vue({
 
         showFields: function () {
             // console.log(root.custom_report.Report_Type)
-            if(root.custom_report.Chart_Type == 'Pie Chart') {
+            if(root.custom_report.STARK_Chart_Type == 'Pie Chart') {
                 root.showChartFields = true
                 root.fieldLabel = 'Pie Data Source'
                 // root.showXAxisFields = false
             }
-            else if (root.custom_report.Chart_Type == 'Bar Chart' || root.custom_report.Chart_Type == 'Line Chart') {
+            else if (root.custom_report.STARK_Chart_Type == 'Bar Chart' || root.custom_report.STARK_Chart_Type == 'Line Chart') {
                 // root.showXAxisFields = true
                 root.showChartFields = true
                 root.fieldLabel = 'X Axis Data Source'
@@ -764,7 +753,7 @@ var root = new Vue({
         },
 
         showChartWizard: function () {
-            if(root.custom_report.Report_Type == 'Graph') {
+            if(root.custom_report.STARK_Report_Type == 'Graph') {
                 root.showChartFields = true
             }
             else {
