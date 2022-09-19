@@ -83,16 +83,16 @@ var root = new Vue({
                 { value: 'IN', text: 'IN (value1, value2, value3, ... valueN)' },
                 { value: 'between', text: 'BETWEEN (value1, value2)' },
             ],
-            'Chart_Type': [
+            'STARK_Chart_Type': [
                 { value: 'Bar Chart', text: 'Bar Chart' },
                 { value: 'Pie Chart', text: 'Pie Chart' },
                 { value: 'Line Chart', text: 'Line Chart' },
             ],
-            'Report_Type': [
+            'STARK_Report_Type': [
                 { value: 'Tabular', text: 'Tabular' },
                 { value: 'Graph', text: 'Graph' },
             ],
-            'Data_Source': [
+            'STARK_Data_Source': [
                 { value: 'Username', text: 'Username' },
                 { value: 'Permissions', text: 'Permissions' },
             ],
