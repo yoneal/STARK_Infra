@@ -28,7 +28,7 @@ var root = new Vue({
             },
             'Password_Hash': {
                 'value': '',
-                'required': true,
+                'required': false,
                 'max_length': '',
                 'data_type': '',
                 'state': null,
