@@ -60,7 +60,7 @@ var root = new Vue({
             },
             'Icon': {
                 'value': '',
-                'required': true,
+                'required': false,
                 'max_length': '',
                 'data_type': '',
                 'state': null,
