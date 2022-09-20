@@ -58,7 +58,7 @@ def create(data):
                     }},""" 
                     
     source_code += f"""
-                    'Report_Type': {{
+                    'STARK_Report_Type': {{
                         'value': '',
                         'required': true,
                         'max_length': '',
@@ -67,14 +67,6 @@ def create(data):
                         'feedback': ''
                     }},
                     'STARK_Chart_Type': {{
-                        'value': '',
-                        'required': true,
-                        'max_length': '',
-                        'data_type': '',
-                        'state': null,
-                        'feedback': ''
-                    }},
-                    'STARK_Data_Table': {{
                         'value': '',
                         'required': true,
                         'max_length': '',
