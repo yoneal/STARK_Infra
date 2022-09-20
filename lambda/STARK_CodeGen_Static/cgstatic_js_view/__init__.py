@@ -66,7 +66,7 @@ def create(data):
                         'state': null,
                         'feedback': ''
                     }},
-                    'Chart_Type': {{
+                    'STARK_Chart_Type': {{
                         'value': '',
                         'required': true,
                         'max_length': '',
@@ -74,7 +74,7 @@ def create(data):
                         'state': null,
                         'feedback': ''
                     }},
-                    'Data_Table': {{
+                    'STARK_Data_Table': {{
                         'value': '',
                         'required': true,
                         'max_length': '',
@@ -82,7 +82,7 @@ def create(data):
                         'state': null,
                         'feedback': ''
                     }},
-                    'Data_Source': {{
+                    'STARK_Data_Source': {{
                         'value': '',
                         'required': true,
                         'max_length': '',
@@ -127,9 +127,12 @@ def create(data):
     source_code += f"""
                     'STARK_isReport':true,
                     'STARK_report_fields':[],
-                    'Report_Type': '',
-                    'Chart_Type': '',
-                    'Data_Source': '',
+                    'STARK_Report_Type': '',
+                    'STARK_Chart_Type': '',
+                    'STARK_Data_Source': '',
+                    'STARK_sum_fields': [],
+                    'STARK_count_fields': [],
+                    'STARK_group_by_1': '',
                 }},
                 lists: {{
                     'Report_Operator': [
@@ -145,16 +148,16 @@ def create(data):
                         {{ value: 'IN', text: 'IN (value1, value2, value3, ... valueN)' }},
                         {{ value: 'between', text: 'BETWEEN (value1, value2)' }},
                     ],
-                    'Chart_Type': [
+                    'STARK_Chart_Type': [
                         {{ value: 'Bar Chart', text: 'Bar Chart' }},
                         {{ value: 'Pie Chart', text: 'Pie Chart' }},
                         {{ value: 'Line Chart', text: 'Line Chart' }},
                     ],
-                    'Report_Type': [
+                    'STARK_Report_Type': [
                         {{ value: 'Tabular', text: 'Tabular' }},
                         {{ value: 'Graph', text: 'Graph' }},
                     ],
-                    'Data_Source': [
+                    'STARK_Data_Source': [
                         {{ value: '{pk}', text: '{pk}' }},"""
 
     for col in cols:
@@ -282,6 +285,9 @@ def create(data):
                 series_data: [],
                 graphOption: [],
                 fieldLabel: '',
+                STARK_sum_fields: [],
+                STARK_count_fields: [],
+                STARK_group_by_1: '',
             }},
             methods: {{
 
@@ -583,19 +589,19 @@ def create(data):
                 }},
 
                 generate: function () {{
-                    if(root.custom_report.Report_Type == 'Tabular') {{
-                        root.metadata['Chart_Type'].required = false
-                        root.metadata['Data_Source'].required = false
+                    if(root.custom_report.STARK_Report_Type == 'Tabular') {{
+                        root.metadata['STARK_Chart_Type'].required = false
+                        root.metadata['STARK_Data_Source'].required = false
                     }}
                     else {{
-                        root.metadata['Chart_Type'].required = true
-                        root.metadata['Data_Source'].required = true
+                        root.metadata['STARK_Chart_Type'].required = true
+                        root.metadata['STARK_Data_Source'].required = true
                     }}
                     response = STARK.validate_form(root.metadata, root.custom_report)
                     this.metadata = response['new_metadata']
                     // console.log(response['is_valid_form'])
                     if(response['is_valid_form']) {{
-                        if(root.custom_report.Report_Type == 'Graph') {{
+                        if(root.custom_report.STARK_Report_Type == 'Graph') {{
                             root.showGraph = true
                         }}
 
@@ -624,12 +630,12 @@ def create(data):
                                 root.temp_pdf_link = data[2];
                                 console.log("DONE! Retrieved report.");
                                 loading_modal.hide()
-                                if(root.custom_report.Report_Type == 'Tabular') {{
+                                if(root.custom_report.STARK_Report_Type == 'Tabular') {{
                                     root.showReport = true
                                 }}
                                 else {{
                                     root.activate_graph_download()
-                                    Data_Source = (root.custom_report.Data_Source).replace(/ /g,"_")
+                                    Data_Source = (root.custom_report.STARK_Data_Source).replace(/ /g,"_")
                                     // root.get_all_data_source(Data_Source)
                                     // console.log('root.a_All_Data_Source')
                                     // console.log(Object(root.a_All_Data_Source))
@@ -646,7 +652,7 @@ def create(data):
                                     // console.log(Data_Source_Series)
                                     
 
-                                    if(root.custom_report.Chart_Type == 'Pie Chart') {{
+                                    if(root.custom_report.STARK_Chart_Type == 'Pie Chart') {{
                                         //Check Occurrence per Data Source for Pie Chart
                                         Y_Data_Source_Series = []
                                         Data_Source_Series.forEach(element => {{
@@ -668,15 +674,15 @@ def create(data):
                                     var subtext = root.conso_subtext()
                                     
 
-                                    if(root.custom_report.Chart_Type == 'Pie Chart') {{
+                                    if(root.custom_report.STARK_Chart_Type == 'Pie Chart') {{
                                         // console.log('Pie')
                                         root.pieChart(Y_Data_Source_Series, subtext)
                                     }}
-                                    else if(root.custom_report.Chart_Type == 'Bar Chart') {{
+                                    else if(root.custom_report.STARK_Chart_Type == 'Bar Chart') {{
                                         // console.log('Bar')
                                         root.barChart(Data_Source_Series, Y_Data_Source_Series, subtext)
                                     }}
-                                    else if(root.custom_report.Chart_Type == 'Line Chart') {{
+                                    else if(root.custom_report.STARK_Chart_Type == 'Line Chart') {{
                                         // console.log('Line')
                                         root.lineChart(Data_Source_Series, Y_Data_Source_Series, subtext)
                                     }}
@@ -1118,13 +1124,13 @@ def create(data):
                 }}, 
 
                 showFields: function () {{
-                    // console.log(root.custom_report.Report_Type)
-                    if(root.custom_report.Chart_Type == 'Pie Chart') {{
+                    // console.log(root.custom_report.STARK_Report_Type)
+                    if(root.custom_report.STARK_Chart_Type == 'Pie Chart') {{
                         root.showChartFields = true
                         root.fieldLabel = 'Pie Data Source'
                         // root.showXAxisFields = false
                     }}
-                    else if (root.custom_report.Chart_Type == 'Bar Chart' || root.custom_report.Chart_Type == 'Line Chart') {{
+                    else if (root.custom_report.STARK_Chart_Type == 'Bar Chart' || root.custom_report.STARK_Chart_Type == 'Line Chart') {{
                         // root.showXAxisFields = true
                         root.showChartFields = true
                         root.fieldLabel = 'X Axis Data Source'
@@ -1133,7 +1139,7 @@ def create(data):
                 }},
 
                 showChartWizard: function () {{
-                    if(root.custom_report.Report_Type == 'Graph') {{
+                    if(root.custom_report.STARK_Report_Type == 'Graph') {{
                         root.showChartFields = true
                     }}
                     else {{
