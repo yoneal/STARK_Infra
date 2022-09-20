@@ -47,13 +47,7 @@ def create(data):
     
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
-        col_type_id = set_type(col_type)
-        if col_type_id == 'S':
-            data_type = 'String'
-        elif col_type_id == 'N':
-            data_type = 'Number'
-        elif col_type_id == 'SS':
-            data_type = 'List'
+        data_type = set_data_type(col_type)
         source_code += f"""
                     '{col_varname}': {{
                         'value': '',
@@ -1223,3 +1217,24 @@ def set_type(col_type):
         col_type_id = 'N'
 
     return col_type_id
+
+def set_data_type(col_type):
+
+    #Default is 'S'. Defined here so we don't need duplicate Else statements below
+    data_type = 'String'
+
+    if isinstance(col_type, dict):
+        #special/complex types
+        if col_type["type"] in [ "int-spinner" ]:
+            data_type = 'Number'
+
+        if col_type["type"] in [ "decimal-spinner" ]:
+            data_type = 'Float'
+        
+        if col_type["type"] in [ "tags", "multiple choice" ]:
+            data_type = 'List'
+    
+    elif col_type in [ "int", "number" ]:
+        data_type = 'Number'
+
+    return data_type
