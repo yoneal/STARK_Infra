@@ -374,12 +374,12 @@ def create(data):
                     if aggregate_key_value in aggregated_results:
                         for field in data['STARK_count_fields']:
                             count_index_name = f"Count of {{field}}"
-                            sum_value = float(item.get(field))
-                            aggregated_results[aggregate_key_value][sum_index_name] = round(aggregated_results[aggregate_key_value][sum_index_name], 1) + sum_value
+                            aggregated_results[aggregate_key_value][count_index_name] += 1
 
                         for field in data['STARK_sum_fields']:
                             sum_index_name = f"Sum of {{field}}"
-                            aggregated_results[aggregate_key_value][sum_index_name] += int(item.get(field))
+                            sum_value = float(item.get(field))
+                            aggregated_results[aggregate_key_value][sum_index_name] = round(aggregated_results[aggregate_key_value][sum_index_name], 1) + sum_value
 
                         for column in data['STARK_report_fields']:
                             if column != aggregate_key:  
