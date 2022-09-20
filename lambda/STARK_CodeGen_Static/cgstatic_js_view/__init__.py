@@ -229,7 +229,7 @@ def create(data):
                 authFailure: false,
                 authTry: false,
                 all_selected: true,"""
-    field_strings = f"['{pk_varname}',"
+    field_strings = f"['{pk}',"
     for col in cols:
         field_strings += f"""'{col}',"""
     field_strings += f"""]"""
