@@ -83,6 +83,15 @@ def create(data):
                                             <td>
                                                 <input type="text" class="form-control" id="{pk_varname}_filter_value" placeholder="" v-model="custom_report.{pk_varname}.value">
                                             </td>
+                                            <td>
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col_varname} id="{col_varname} v-model="custom_report.STARK_sum_fields">
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col_varname} id="{col_varname} v-model="custom_report.STARK_count_fields">
+                                            </td>
+                                            <td>
+                                                <input type="radio" class="checkbox-med" name="check_checkbox" value="{col_varname} id="{col_varname} v-model="custom_report.STARK_group_by_1">
+                                            </td>
                                         </tr>"""
     
 
