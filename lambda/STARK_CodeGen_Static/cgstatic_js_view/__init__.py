@@ -40,19 +40,20 @@ def create(data):
                         'value': '',
                         'required': true,
                         'max_length': '',
-                        'data_type': '',
+                        'data_type': 'S',
                         'state': null,
                         'feedback': ''
                     }},"""
     
-    for col in cols:
+    for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
+        col_type_id = set_type(col_type)
         source_code += f"""
                     '{col_varname}': {{
                         'value': '',
                         'required': true,
                         'max_length': '',
-                        'data_type': '',
+                        'data_type': '{col_type_id}',
                         'state': null,
                         'feedback': ''
                     }},""" 
