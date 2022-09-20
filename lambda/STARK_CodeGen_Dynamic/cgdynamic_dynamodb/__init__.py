@@ -374,7 +374,8 @@ def create(data):
                     if aggregate_key_value in aggregated_results:
                         for field in data['STARK_count_fields']:
                             count_index_name = f"Count of {{field}}"
-                            aggregated_results[aggregate_key_value][count_index_name] += 1
+                            sum_value = float(item.get(field))
+                            aggregated_results[aggregate_key_value][sum_index_name] = round(aggregated_results[aggregate_key_value][sum_index_name], 1) + sum_value
 
                         for field in data['STARK_sum_fields']:
                             sum_index_name = f"Sum of {{field}}"
@@ -394,8 +395,9 @@ def create(data):
                             
                         for field in data['STARK_sum_fields']:
                             sum_index_name = f"Sum of {{field}}"
+                            sum_value = float(item.get(field))
                             temp_dict.update({{
-                                sum_index_name: int(item.get(field))
+                                sum_index_name: sum_value
                             }})
                         
                         for column in data['STARK_report_fields']:
