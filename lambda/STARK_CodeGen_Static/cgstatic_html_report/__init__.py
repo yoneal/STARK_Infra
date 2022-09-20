@@ -68,7 +68,7 @@ def create(data):
                                         </tr>
                                         <tr>
                                             <td>
-                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{pk_varname}" id="{pk_varname}" v-model="checked_fields">
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{pk}" id="{pk_varname}" v-model="checked_fields">
                                             </td>
                                             <td>
                                                     <label for="{pk_varname}">{pk}</label>
@@ -108,7 +108,7 @@ def create(data):
         source_code += f"""
                                         <tr>
                                             <td>
-                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="{col_varname}" v-model="checked_fields">
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col}" id="{col_varname}" v-model="checked_fields">
                                             </td>
                                             <td>
                                                     <label for="{col_varname}">{col}</label>
@@ -229,7 +229,7 @@ def create(data):
                                     <tr>
                                         <th scope="col" width = "20px"> Operations </th>
                                         <template v-for="column in STARK_report_fields" id="STARK_report_fields">
-                                            <th scope="col">{{{{column.label}}}}</th>
+                                            <th scope="col">{{{{column}}}}</th>
                                         </template>"""
     source_code += f"""         
                                     </tr>
@@ -242,7 +242,7 @@ def create(data):
                                                 <a :href="'{entity_varname}_delete.html?{pk_varname}=' + {entity_varname}.{pk_varname}" target="_blank" v-if="auth_list.Delete.allowed"><img src="images/x-square.svg" class="bg-danger"></a>
                                             </td>
                                             <template v-for="column in STARK_report_fields">
-                                                <td>{{{{ {entity_varname}[column.field] }}}}</td>
+                                                <td>{{{{ {entity_varname}[column] }}}}</td>
                                             </template>"""
     source_code += f"""             
                                     </tr>

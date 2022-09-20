@@ -185,16 +185,15 @@ def create(data):
                     #FIXME: Reporting payload processing:
                     # - identifying filter fields
                     # - operators validator
-                    temp = payload.get('STARK_report_fields',[])
-                    temp_report_fields = []
-                    for index in temp:
-                        temp_report_fields.append(index['label'])
                     for index, attributes in data.items():
                         if attributes['value'] != "":
                             if attributes['operator'] == "":
                                 isInvalidPayload = True
-                    data['STARK_report_fields'] = temp_report_fields
+                    data['STARK_report_fields'] = payload.get('STARK_report_fields',[])
                     data['STARK_isReport'] = payload.get('STARK_isReport', False)
+                    data['STARK_sum_fields'] = payload.get('STARK_sum_fields', [])
+                    data['STARK_count_fields'] = payload.get('STARK_count_fields', [])
+                    data['STARK_group_by_1'] = payload.get('STARK_group_by_1', '')
 
                 data['STARK_uploaded_s3_keys'] = payload.get('STARK_uploaded_s3_keys',{{}})
 
@@ -333,7 +332,8 @@ def create(data):
         object_expression_value = {{':sk' : {{'S' : sk}}}}
         report_param_dict = {{}}
         for key, index in data.items():
-            if key not in ["STARK_isReport", "STARK_report_fields", "STARK_uploaded_s3_keys"]:
+            if key not in ["STARK_isReport", "STARK_report_fields", "STARK_uploaded_s3_keys", 
+                            "STARK_sum_fields", 'STARK_count_fields', 'STARK_group_by_1']:
                 if index['value'] != "":
                     processed_operator_and_parameter_dict = utilities.compose_report_operators_and_parameters(key, index) 
                     temp_string_filter += processed_operator_and_parameter_dict['filter_string']
@@ -344,6 +344,7 @@ def create(data):
         next_token = 'initial'
         items = []
         ddb_arguments = {{}}
+        aggregated_results = {{}}
         ddb_arguments['TableName'] = stark_core.ddb_table
         ddb_arguments['IndexName'] = "STARK-ListView-Index"
         ddb_arguments['Select'] = "ALL_ATTRIBUTES"
@@ -364,26 +365,79 @@ def create(data):
             response = ddb.query(**ddb_arguments)
             raw = response.get('Items')
             next_token = response.get('LastEvaluatedKey')
-
+            aggregate_report = False if data['STARK_group_by_1'] == '' else True
             for record in raw:
-                items.append(map_results(record))
+                item = map_results(record)
+                if aggregate_report:
+                    aggregate_key = data['STARK_group_by_1']
+                    aggregate_key_value = item.get(aggregate_key)
+                    if aggregate_key_value in aggregated_results:
+                        for field in data['STARK_count_fields']:
+                            count_index_name = f"Count of {{field}}"
+                            aggregated_results[aggregate_key_value][count_index_name] += 1
 
-        display_fields = data['STARK_report_fields']
-        master_fields = []
-        for key in metadata.keys():
-            master_fields.append(key.replace("_"," "))
-        diff_list = []
-        if len(display_fields) > 0:
-            report_header = display_fields
-            diff_list = list(set(master_fields) - set(display_fields))
-        else:
-            report_header = master_fields
+                        for field in data['STARK_sum_fields']:
+                            sum_index_name = f"Sum of {{field}}"
+                            sum_value = float(item.get(field))
+                            aggregated_results[aggregate_key_value][sum_index_name] = round(aggregated_results[aggregate_key_value][sum_index_name], 1) + sum_value
+
+                        for column in data['STARK_report_fields']:
+                            if column != aggregate_key:  
+                                aggregated_results[aggregate_key_value][column] = item.get(column.replace(" ","_"))
+
+                    else:
+                        temp_dict = {{ aggregate_key : aggregate_key_value}}
+                        for field in data['STARK_count_fields']:
+                            count_index_name = f"Count of {{field}}"
+                            temp_dict.update({{
+                                count_index_name:  1
+                            }})
+                            
+                        for field in data['STARK_sum_fields']:
+                            sum_index_name = f"Sum of {{field}}"
+                            sum_value = float(item.get(field))
+                            temp_dict.update({{
+                                sum_index_name: sum_value
+                            }})
+                        
+                        for column in data['STARK_report_fields']:
+                            if column != aggregate_key:  
+                                temp_dict.update({{
+                                    column: item.get(column.replace(" ","_"))
+                                }})
+
+                        aggregated_results[aggregate_key_value] = temp_dict
+                else:
+                    items.append(item)
 
         report_list = []
+        report_header = []
+        diff_list = []
+        if aggregate_report:
+            temp_list = []
+            for key, val in aggregated_results.items():
+                temp_header = []
+                for index in val.keys():
+                    temp_header.append(index.replace("_"," "))
+                temp_list.append(val)
+            items = temp_list
+            report_header = temp_header
+        else:
+            display_fields = data['STARK_report_fields']
+            master_fields = []
+            for key in metadata.keys():
+                master_fields.append(key.replace("_"," "))
+            if len(display_fields) > 0:
+                report_header = display_fields
+                diff_list = list(set(master_fields) - set(display_fields))
+            else:
+                report_header = master_fields
+
         for key in items:
             temp_dict = {{}}
             #remove primary identifiers and STARK attributes
-            key.pop("sk")
+            if not aggregate_report:
+                key.pop("sk")
             for index, value in key.items():
                 temp_dict[index.replace("_"," ")] = value
             report_list.append(temp_dict)
@@ -394,7 +448,7 @@ def create(data):
         csv_bucket_key = bucket_tmp + csv_file
         pdf_bucket_key = bucket_tmp + pdf_file
 
-        return items, csv_bucket_key, pdf_bucket_key
+        return report_list, csv_bucket_key, pdf_bucket_key
 
     def get_all(sk=default_sk, lv_token=None, db_handler = None):
         if db_handler == None:
