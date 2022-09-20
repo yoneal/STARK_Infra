@@ -61,7 +61,10 @@ def create(data):
                                             </th>
                                             <th style="padding: 10px; min-width: 250px"> Field Name </th>
                                             <th style="padding: 10px"> Operator </th>
-                                            <th style="padding: 10px"> Filter Value </th>
+                                            <th style="padding: 10px"> Filter Value </th>    
+                                            <th style="padding: 10px"> Sum </th>
+                                            <th style="padding: 10px"> Count </th>
+                                            <th style="padding: 10px"> Group By</th>
                                         </tr>
                                         <tr>
                                             <td>
@@ -79,6 +82,15 @@ def create(data):
                                             </td>
                                             <td>
                                                 <input type="text" class="form-control" id="{pk_varname}_filter_value" placeholder="" v-model="custom_report.{pk_varname}.value">
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{pk_varname}" id="{pk_varname}" v-model="custom_report.STARK_sum_fields">
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{pk_varname}" id="{pk_varname}" v-model="custom_report.STARK_count_fields">
+                                            </td>
+                                            <td>
+                                                <input type="radio" class="checkbox-med" name="check_checkbox" value="{pk_varname}" id="{pk_varname}" v-model="custom_report.STARK_group_by_1">
                                             </td>
                                         </tr>"""
     
@@ -113,6 +125,15 @@ def create(data):
                                                     {html_control_code}
                                                 </div>
                                             </td>
+                                            <td>
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="{col_varname}" v-model="custom_report.STARK_sum_fields">
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="{col_varname}" v-model="custom_report.STARK_count_fields">
+                                            </td>
+                                            <td>
+                                                <input type="radio" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="{col_varname}" v-model="custom_report.STARK_group_by_1">
+                                            </td>
                                         </tr>
                                     """
 
@@ -124,8 +145,8 @@ def create(data):
                                             <td></td>
                                             <td>Report Type</td>
                                             <td>
-                                                <b-form-group class="form-group" label="" label-for="Report_Type" :state="metadata.Report_Type.state" :invalid-feedback="metadata.Report_Type.feedback" >
-                                                    <b-form-select id="Report_Type" v-model="custom_report.Report_Type" :options="lists.Report_Type" :state="metadata.Report_Type.state" @change="root.showChartWizard()">
+                                                <b-form-group class="form-group" label="" label-for="Report_Type" :state="metadata.STARK_Report_Type.state" :invalid-feedback="metadata.STARK_Report_Type.feedback" >
+                                                    <b-form-select id="Report_Type" v-model="custom_report.STARK_Report_Type" :options="lists.STARK_Report_Type" :state="metadata.STARK_Report_Type.state" @change="root.showChartWizard()">
                                                     <template v-slot:first>
                                                         <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                                     </template>
@@ -143,8 +164,8 @@ def create(data):
                                             <td></td>
                                             <td>Chart Type</td>
                                             <td>
-                                            <b-form-group class="form-group" label="" label-for="Chart_Type" :state="metadata.Chart_Type.state" :invalid-feedback="metadata.Chart_Type.feedback" >
-                                                <b-form-select id="Chart_Type" v-model="custom_report.Chart_Type" :options="lists.Chart_Type" :state="metadata.Chart_Type.state" @change="root.showFields()">
+                                            <b-form-group class="form-group" label="" label-for="Chart_Type" :state="metadata.STARK_Chart_Type.state" :invalid-feedback="metadata.STARK_Chart_Type.feedback" >
+                                                <b-form-select id="Chart_Type" v-model="custom_report.STARK_Chart_Type" :options="lists.STARK_Chart_Type" :state="metadata.STARK_Chart_Type.state" @change="root.showFields()">
                                                 <template v-slot:first>
                                                     <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                                 </template>
@@ -157,8 +178,8 @@ def create(data):
                                             <td></td>
                                             <td>Data Source</td>
                                             <td>
-                                                <b-form-group class="form-group" label-for="Data_Source" :state="metadata.Data_Source.state" :invalid-feedback="metadata.Data_Source.feedback">
-                                                    <b-form-select id="Data_Source" v-model="custom_report.Data_Source" :options="lists.Data_Source" :state="metadata.Data_Source.state">
+                                                <b-form-group class="form-group" label-for="Data_Source" :state="metadata.STARK_Data_Source.state" :invalid-feedback="metadata.STARK_Data_Source.feedback">
+                                                    <b-form-select id="Data_Source" v-model="custom_report.STARK_Data_Source" :options="lists.STARK_Data_Source" :state="metadata.STARK_Data_Source.state">
                                                     <template v-slot:first>
                                                         <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                                     </template>
