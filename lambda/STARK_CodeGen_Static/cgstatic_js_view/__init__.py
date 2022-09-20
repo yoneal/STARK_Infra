@@ -230,10 +230,9 @@ def create(data):
                 authFailure: false,
                 authTry: false,
                 all_selected: true,"""
-    field_strings = f"['{pk_varname}',"
+    field_strings = f"['{pk}',"
     for col in cols:
-        col_varname = converter.convert_to_system_name(col)
-        field_strings += f"""'{col_varname}',"""
+        field_strings += f"""'{col}',"""
     field_strings += f"""]"""
     source_code += f"""
                 temp_checked_fields: {field_strings},
@@ -598,13 +597,7 @@ def create(data):
                             root.showGraph = true
                         }}
 
-                        let temp_show_fields = []
-                        root.checked_fields.forEach(element => {{
-                            let temp_index = {{'field': element, label: element.replaceAll("_"," ")}}
-                            temp_show_fields.push(temp_index)
-                        }});
-                        root.STARK_report_fields = temp_show_fields;
-                        root.custom_report['STARK_report_fields'] = root.STARK_report_fields"""
+                        root.custom_report['STARK_report_fields'] = root.checked_fields"""
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
         if isinstance(col_type, dict):
@@ -619,6 +612,7 @@ def create(data):
                             loading_modal.show()
                             {entity_app}.report(report_payload).then( function(data) {{
                                 root.listview_table = data[0];
+                                root.STARK_report_fields = Object.keys(root.listview_table[0]) 
                                 root.temp_csv_link = data[1];
                                 root.temp_pdf_link = data[2];
                                 console.log("DONE! Retrieved report.");
