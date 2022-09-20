@@ -126,13 +126,13 @@ def create(data):
                                                 </div>
                                             </td>
                                             <td>
-                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col_varname} id="{col_varname} v-model="custom_report.STARK_sum_fields">
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="{col_varname}" v-model="custom_report.STARK_sum_fields">
                                             </td>
                                             <td>
-                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col_varname} id="{col_varname} v-model="custom_report.STARK_count_fields">
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="{col_varname}" v-model="custom_report.STARK_count_fields">
                                             </td>
                                             <td>
-                                                <input type="radio" class="checkbox-med" name="check_checkbox" value="{col_varname} id="{col_varname} v-model="custom_report.STARK_group_by_1">
+                                                <input type="radio" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="{col_varname}" v-model="custom_report.STARK_group_by_1">
                                             </td>
                                         </tr>
                                     """
