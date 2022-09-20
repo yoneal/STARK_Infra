@@ -132,7 +132,7 @@ def create_pdf(header_tuple, data_tuple, report_params, pk_field, metadata):
     render_table_header(pdf, header_tuple, col_width, line_height, row_number_width) 
     
     for index in header_tuple:
-        if index != "#":
+        if index != "#" and ("Count of" not in index and "Sum of" not in index):
             if metadata[index.replace(" ","_")]["data_type"] == 'number':
                 with_total_row = True
 
@@ -163,10 +163,13 @@ def create_pdf(header_tuple, data_tuple, report_params, pk_field, metadata):
                 width = row_number_width
                 text_align = 'R'
             else:
-                if metadata[header_tuple[column_counter].replace(" ","_")]['data_type'] in ['number', 'date']:
-                    text_align = 'R'
+                if ("Count of" not in header_tuple[column_counter] and "Sum of" not in header_tuple[column_counter]): 
+                    if metadata[header_tuple[column_counter].replace(" ","_")]['data_type'] in ['number', 'date']:
+                        text_align = 'R'
+                    else:
+                        text_align = 'L'
                 else:
-                    text_align = 'L'
+                    text_align = 'R'
 
             pdf.multi_cell(width, row_height, str(datum), border=border, new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size, fill = True, align = text_align)
             column_counter += 1
