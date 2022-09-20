@@ -472,7 +472,7 @@ def edit(data):
     # else:
     #     Is_Enabled = False
 
-    UpdateExpressionString = "SET #Descriptive_Title = :Descriptive_Title, #Target = :Target, #Description = :Description, #Module_Group = :Module_Group, #Is_Menu_Item = :Is_Menu_Item, #Is_Enabled = :Is_Enabled, #Icon = :Icon, #Priority = :Priority" 
+    UpdateExpressionString = "SET #Descriptive_Title = :Descriptive_Title, #Target = :Target, #Description = :Description, #Module_Group = :Module_Group, #Is_Menu_Item = :Is_Menu_Item, #Is_Enabled = :Is_Enabled, #Icon = :Icon, #Priority = :Priority, #STARKListViewsk = :STARKListViewsk" 
     ExpressionAttributeNamesDict = {
         '#Descriptive_Title' : 'Descriptive_Title',
         '#Target' : 'Target',
@@ -482,6 +482,7 @@ def edit(data):
         '#Is_Enabled' : 'Is_Enabled',
         '#Icon' : 'Icon',
         '#Priority' : 'Priority',
+        '#STARKListViewsk' : 'STARK-ListView-sk'
     }
     ExpressionAttributeValuesDict = {
         ':Descriptive_Title' : {'S' : Descriptive_Title },
