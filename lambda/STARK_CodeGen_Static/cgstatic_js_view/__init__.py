@@ -48,12 +48,18 @@ def create(data):
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
         col_type_id = set_type(col_type)
+        if col_type_id == 'S':
+            data_type = 'String'
+        elif col_type_id == 'N':
+            data_type = 'Number'
+        elif col_type_id == 'SS':
+            data_type = 'List'
         source_code += f"""
                     '{col_varname}': {{
                         'value': '',
                         'required': true,
                         'max_length': '',
-                        'data_type': '{col_type_id}',
+                        'data_type': '{data_type}',
                         'state': null,
                         'feedback': ''
                     }},""" 
