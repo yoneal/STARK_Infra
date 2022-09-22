@@ -618,33 +618,36 @@ def create(data):
                                     root.showReport = true
                                 }}
                                 else {{
-                                    root.activate_graph_download()
-                                    X_Data = root.custom_report.STARK_X_Data_Source
-                                    Y_Data = root.custom_report.STARK_Y_Data_Source
+                                    if(root.listview_table.length > 0)
+                                    {{   
+                                        root.activate_graph_download()
+                                        X_Data = root.custom_report.STARK_X_Data_Source
+                                        Y_Data = root.custom_report.STARK_Y_Data_Source
 
-                                    X_Data_Source = []
-                                    Y_Data_Source = []
-                                    Data_Source_Series = []
-                                    data[0].forEach(function(arrayItem) {{
+                                        X_Data_Source = []
+                                        Y_Data_Source = []
+                                        Data_Source_Series = []
+                                        data[0].forEach(function(arrayItem) {{
+                                            if(root.custom_report.STARK_Chart_Type == 'Pie Chart') {{
+                                                value  = arrayItem[Y_Data]
+                                                text   = arrayItem[X_Data]
+                                                Data_Source_Series.push({{ value: value, name: text }}) 
+                                            }}
+                                            else {{
+                                                X_Data_Source.push(arrayItem[X_Data])
+                                                Y_Data_Source.push(arrayItem[Y_Data])
+                                            }}
+                                        }})
+                                        var subtext = root.conso_subtext()
                                         if(root.custom_report.STARK_Chart_Type == 'Pie Chart') {{
-                                            value  = arrayItem[Y_Data]
-                                            text   = arrayItem[X_Data]
-                                            Data_Source_Series.push({{ value: value, name: text }}) 
+                                            root.pieChart(Data_Source_Series, subtext)
                                         }}
-                                        else {{
-                                            X_Data_Source.push(arrayItem[X_Data])
-                                            Y_Data_Source.push(arrayItem[Y_Data])
+                                        else if(root.custom_report.STARK_Chart_Type == 'Bar Chart') {{
+                                            root.barChart(X_Data_Source, Y_Data_Source, subtext)
                                         }}
-                                    }})
-                                    var subtext = root.conso_subtext()
-                                    if(root.custom_report.STARK_Chart_Type == 'Pie Chart') {{
-                                        root.pieChart(Data_Source_Series, subtext)
-                                    }}
-                                    else if(root.custom_report.STARK_Chart_Type == 'Bar Chart') {{
-                                        root.barChart(X_Data_Source, Y_Data_Source, subtext)
-                                    }}
-                                    else if(root.custom_report.STARK_Chart_Type == 'Line Chart') {{
-                                        root.lineChart(X_Data_Source, Y_Data_Source, subtext)
+                                        else if(root.custom_report.STARK_Chart_Type == 'Line Chart') {{
+                                            root.lineChart(X_Data_Source, Y_Data_Source, subtext)
+                                        }}
                                     }}
                                 }}
                             }})

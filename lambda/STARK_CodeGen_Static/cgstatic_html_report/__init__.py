@@ -215,10 +215,16 @@ def create(data):
                             <button type="button" id="exportByHTML" class="btn btn-danger mb-2" :disabled="listview_table.length < 1"> Export as PDF</button>
                             <button id="refresh" type="button" class="btn btn-primary mb-2" onClick="root.generate()" :disabled="listview_table.length < 1"> Refresh </button>
                         </div>
-                        <div class="col-6">
+                        <div class="col-6"></div>
+                        <div class="col-6 text-left d-inline-block">
+                            <table class="table">
+                                <template v-if="listview_table.length < 1">
+                                    No records found
+                                </template>
+                            </table>
                         </div>
                     </div>
-                    <div id="chart-container"></div>
+                    <div v-if="listview_table.length > 1" id="chart-container"></div>
                 </div>
                 <div v-if="showReport && !showGraph">
                     <div class="row">
