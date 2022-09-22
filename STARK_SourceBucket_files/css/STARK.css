@@ -176,5 +176,6 @@ select:-webkit-autofill:focus {
   height: 69vh;
   width: 1000px;
   overflow: hidden;
-  background-color: #ffffff;
+  background-color: transparent;
+  /* background-color: #ffffff; */
 }
