@@ -474,32 +474,13 @@ def create(data):
                         root.curr_page++;
                         console.log(root.curr_page);
                         payload['Next_Token'] = lv_token;
-
-                        //When Next button is clicked, we should:
-                        // - save Next Token to new page in page_token_map
-                        // - hide Next button - it will be visible again if API call returns a new Next Token
-                        // - if new_page is > 2, assign {{new_page - 1}} token to prev_token
                         root.prev_disabled = false;    
                         root.next_disabled = true;
-
-                        root.page_token_map[root.curr_page] = lv_token;
-
-                        if (root.curr_page > 1) {{
-                            root.prev_token = root.page_token_map[root.curr_page - 1];
-                        }}
-                        console.log(root.page_token_map)
-                        console.log(root.prev_token)
                     }}
                     else if (btn == "prev") {{
                         root.curr_page--;
-
-                        if (root.prev_token != "") {{
-                            payload['Next_Token'] = root.page_token_map[root.curr_page];
-                        }}
-
                         if (root.curr_page > 1) {{
                             root.prev_disabled = false
-                            root.prev_token = root.page_token_map[root.curr_page - 1]
                         }}
                         else {{
                             root.prev_disabled = true
@@ -509,10 +490,18 @@ def create(data):
 
                     var listview_data = STARK.get_local_storage_item('Listviews', '{entity_varname}')
                     var fetch_from_db = false;
-                    console.log(listview_data)
+                    
                     if(listview_data) {{
                         root.listview_table = listview_data[root.curr_page]
                         root.next_token = listview_data['next_token'];
+                
+                        if(listview_data[root.curr_page + 1]) {{
+                            root.next_disabled = false
+                        }}
+                        if(root.next_token != "null") {{
+                            fetch_from_db = true
+                        }}
+                        
                         spinner.hide()
                     }}
                     else {{
@@ -618,9 +607,11 @@ def create(data):
                             loading_modal.show()
                             {entity_app}.report(report_payload).then( function(data) {{
                                 root.listview_table = data[0];
-                                root.STARK_report_fields = Object.keys(root.listview_table[0]) 
-                                root.temp_csv_link = data[1];
-                                root.temp_pdf_link = data[2];
+                                if(root.listview_table.length > 0) {{
+                                    root.STARK_report_fields = Object.keys(root.listview_table[0]) 
+                                    root.temp_csv_link = data[1];
+                                    root.temp_pdf_link = data[2];
+                                }}
                                 console.log("DONE! Retrieved report.");
                                 loading_modal.hide()
                                 if(root.custom_report.STARK_Report_Type == 'Tabular') {{
