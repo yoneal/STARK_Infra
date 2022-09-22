@@ -302,6 +302,16 @@ def create(data):
                 //check item first if there is already a stored data to avoid overwriting
                 var temp = JSON.parse(localStorage.getItem(item))
                 var data_to_store = {{}}
+
+                if(item == "Listviews") {{
+                    if(temp) {{
+                        if(temp.hasOwnProperty(key)) {{
+                            let old_data = temp[key]["data"]
+                            let new_data = data 
+                            data = {{...old_data, ...new_data}}
+                        }}
+                    }}
+                }}
                 data_to_store[`${{key}}`] = {{'data': data}}
                 data_to_store[`${{key}}`]['expiry_time'] = expiry_time
                 localStorage.setItem(item, JSON.stringify({{ ...temp, ...data_to_store}}))
