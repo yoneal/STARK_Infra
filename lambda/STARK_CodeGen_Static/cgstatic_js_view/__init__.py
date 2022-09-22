@@ -620,6 +620,8 @@ def create(data):
                                 else {{
                                     if(root.listview_table.length > 0)
                                     {{   
+                                        var element = document.getElementById("chart-container");
+                                        element.style.backgroundColor = "#ffffff";
                                         root.activate_graph_download()
                                         X_Data = root.custom_report.STARK_X_Data_Source
                                         Y_Data = root.custom_report.STARK_Y_Data_Source
@@ -648,10 +650,6 @@ def create(data):
                                         else if(root.custom_report.STARK_Chart_Type == 'Line Chart') {{
                                             root.lineChart(X_Data_Source, Y_Data_Source, subtext)
                                         }}
-                                    }}
-                                    else {{
-                                        var element = document.getElementById("chart-container");
-                                        element.style.backgroundColor = "transparent";
                                     }}
                                 }}
                             }})

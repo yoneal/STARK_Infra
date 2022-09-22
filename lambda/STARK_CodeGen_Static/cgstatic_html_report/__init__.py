@@ -224,7 +224,7 @@ def create(data):
                             </table>
                         </div>
                     </div>
-                    <div v-if="listview_table.length > 1" id="chart-container"></div>
+                    <div id="chart-container"></div>
                 </div>
                 <div v-if="showReport && !showGraph">
                     <div class="row">
