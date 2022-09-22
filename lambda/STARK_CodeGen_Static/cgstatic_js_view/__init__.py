@@ -649,6 +649,10 @@ def create(data):
                                             root.lineChart(X_Data_Source, Y_Data_Source, subtext)
                                         }}
                                     }}
+                                    else {{
+                                        var element = document.getElementById("chart-container");
+                                        element.style.backgroundColor = "transparent";
+                                    }}
                                 }}
                             }})
                             .catch(function(error) {{
