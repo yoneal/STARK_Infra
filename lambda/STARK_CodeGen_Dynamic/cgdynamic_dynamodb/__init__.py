@@ -413,29 +413,29 @@ def create(data):
         report_list = []
         csv_file = ''
         pdf_file = ''
-        if len(items) > 0:
-            report_header = []
-            diff_list = []
-            if aggregate_report:
-                temp_list = []
-                for key, val in aggregated_results.items():
-                    temp_header = []
-                    for index in val.keys():
-                        temp_header.append(index.replace("_"," "))
-                    temp_list.append(val)
-                    report_header = temp_header
-                items = temp_list
+        report_header = []
+        diff_list = []
+        if aggregate_report:
+            temp_list = []
+            for key, val in aggregated_results.items():
+                temp_header = []
+                for index in val.keys():
+                    temp_header.append(index.replace("_"," "))
+                temp_list.append(val)
+                report_header = temp_header
+            items = temp_list
+        else:
+            display_fields = data['STARK_report_fields']
+            master_fields = []
+            for key in metadata.keys():
+                master_fields.append(key.replace("_"," "))
+            if len(display_fields) > 0:
+                report_header = display_fields
+                diff_list = list(set(master_fields) - set(display_fields))
             else:
-                display_fields = data['STARK_report_fields']
-                master_fields = []
-                for key in metadata.keys():
-                    master_fields.append(key.replace("_"," "))
-                if len(display_fields) > 0:
-                    report_header = display_fields
-                    diff_list = list(set(master_fields) - set(display_fields))
-                else:
-                    report_header = master_fields
+                report_header = master_fields
 
+        if len(items) > 0:
             for key in items:
                 temp_dict = {{}}
                 #remove primary identifiers and STARK attributes
