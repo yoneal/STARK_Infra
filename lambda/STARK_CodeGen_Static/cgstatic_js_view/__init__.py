@@ -482,20 +482,14 @@ def create(data):
                         if (root.curr_page > 1) {{
                             root.prev_token = root.page_token_map[root.curr_page - 1];
                         }}
-                        console.log(root.page_token_map)
-                        console.log(root.prev_token)
                     }}
                     else if (btn == "prev") {{
                         root.curr_page--;
 
-                        if (root.prev_token != "") {{
-                            payload['Next_Token'] = root.page_token_map[root.curr_page];
-                        }}
-
                         if (root.curr_page > 1) {{
                             root.prev_disabled = false
-                            root.prev_token = root.page_token_map[root.curr_page - 1]
                         }}
+
                         else {{
                             root.prev_disabled = true
                             root.prev_token = ""
@@ -504,10 +498,18 @@ def create(data):
 
                     var listview_data = STARK.get_local_storage_item('Listviews', '{entity_varname}')
                     var fetch_from_db = false;
-                    console.log(listview_data)
+                    
                     if(listview_data) {{
                         root.listview_table = listview_data[root.curr_page]
                         root.next_token = listview_data['next_token'];
+                
+                        if(listview_data[root.curr_page] + 1) {{
+                            root.next_disabled = false
+                        }}
+                        if(root.next_token != "null") {{
+                            fetch_from_db = true
+                        }}
+                        
                         spinner.hide()
                     }}
                     else {{

@@ -345,7 +345,7 @@ def create(data):
         items = []
         ddb_arguments = {{}}
         aggregated_results = {{}}
-        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['TableName'] = ddb_table
         ddb_arguments['IndexName'] = "STARK-ListView-Index"
         ddb_arguments['Select'] = "ALL_ATTRIBUTES"
         ddb_arguments['Limit'] = 2
@@ -453,27 +453,31 @@ def create(data):
     def get_all(sk=default_sk, lv_token=None, db_handler = None):
         if db_handler == None:
             db_handler = ddb
-    
+
+        
+        items = []
         ddb_arguments = {{}}
-        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['TableName'] = ddb_table
         ddb_arguments['IndexName'] = "STARK-ListView-Index"
         ddb_arguments['Select'] = "ALL_ATTRIBUTES"
         ddb_arguments['ReturnConsumedCapacity'] = 'TOTAL'
-        ddb_arguments['Limit'] = page_limit
         ddb_arguments['KeyConditionExpression'] = 'sk = :sk'
         ddb_arguments['ExpressionAttributeValues'] = {{ ':sk' : {{'S' : sk }} }}
 
         if lv_token != None:
             ddb_arguments['ExclusiveStartKey'] = lv_token
 
-        response = db_handler.query(**ddb_arguments)    
-        raw = response.get('Items')
+        next_token = ''
+        while len(items) <= page_limit and next_token is not None:
+            if next_token != '':
+                ddb_arguments['ExclusiveStartKey']=next_token
 
-        #Map to expected structure
-        #FIXME: this is duplicated code, make this DRY by outsourcing the mapping to a different function.
-        items = []
-        for record in raw:
-            items.append(map_results(record))
+            response = ddb.query(**ddb_arguments)
+            raw = response.get('Items')
+            next_token = response.get('LastEvaluatedKey')
+
+            for record in raw:
+                items.append(map_results(record))
 
         #Get the "next" token, pass to calling function. This enables a "next page" request later.
         next_token = response.get('LastEvaluatedKey')
@@ -485,7 +489,7 @@ def create(data):
             db_handler = ddb
 
         ddb_arguments = {{}}
-        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['TableName'] = ddb_table
         ddb_arguments['Select'] = "ALL_ATTRIBUTES"
         ddb_arguments['KeyConditionExpression'] = "#pk = :pk and #sk = :sk"
         ddb_arguments['ExpressionAttributeNames'] = {{
@@ -518,7 +522,7 @@ def create(data):
         if sk == '': sk = default_sk
 
         ddb_arguments = {{}}
-        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['TableName'] = ddb_table
         ddb_arguments['Key'] = {{
                 'pk' : {{'S' : pk}},
                 'sk' : {{'S' : sk}}
@@ -575,7 +579,7 @@ def create(data):
         }}
 
         ddb_arguments = {{}}
-        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['TableName'] = ddb_table
         ddb_arguments['Key'] = {{
                 'pk' : {{'S' : pk}},
                 'sk' : {{'S' : sk}}
@@ -635,7 +639,7 @@ def create(data):
             item['STARK-ListView-sk'] = {{'S' : data['STARK-ListView-sk']}}
 
         ddb_arguments = {{}}
-        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['TableName'] = ddb_table
         ddb_arguments['Item'] = item
         response = db_handler.put_item(**ddb_arguments)
         """
@@ -689,7 +693,7 @@ def create(data):
         }}
 
         ddb_arguments = {{}}
-        ddb_arguments['TableName'] = stark_core.ddb_table
+        ddb_arguments['TableName'] = ddb_table
         ddb_arguments['IndexName'] = "STARK-ListView-Index"
         ddb_arguments['Select'] = "ALL_ATTRIBUTES"
         ddb_arguments['ReturnConsumedCapacity'] = 'TOTAL'
