@@ -75,14 +75,22 @@ def create(data):
                         'state': null,
                         'feedback': ''
                     }},
-                    'STARK_Data_Source': {{
+                    'STARK_X_Data_Source': {
                         'value': '',
                         'required': true,
                         'max_length': '',
                         'data_type': '',
                         'state': null,
                         'feedback': ''
-                    }},
+                    },
+                    'STARK_Y_Data_Source': {
+                        'value': '',
+                        'required': true,
+                        'max_length': '',
+                        'data_type': '',
+                        'state': null,
+                        'feedback': ''
+                    },
                 }},
                 
                 auth_config: {{ }},
@@ -122,7 +130,8 @@ def create(data):
                     'STARK_report_fields':[],
                     'STARK_Report_Type': '',
                     'STARK_Chart_Type': '',
-                    'STARK_Data_Source': '',
+                    'STARK_X_Data_Source': '',
+                    'STARK_Y_Data_Source': '',
                     'STARK_sum_fields': [],
                     'STARK_count_fields': [],
                     'STARK_group_by_1': '',
@@ -151,13 +160,7 @@ def create(data):
                         {{ value: 'Graph', text: 'Graph' }},
                     ],
                     'STARK_Data_Source': [
-                        {{ value: '{pk}', text: '{pk}' }},"""
 
-    for col in cols:
-        source_code += f"""
-                        {{ value: '{col}', text: '{col}' }},""" 
-
-    source_code += f"""
                     ],"""
 
                     
@@ -280,6 +283,7 @@ def create(data):
                 STARK_sum_fields: [],
                 STARK_count_fields: [],
                 STARK_group_by_1: '',
+                Y_Data: []
             }},
             methods: {{
 
@@ -583,11 +587,13 @@ def create(data):
                 generate: function () {{
                     if(root.custom_report.STARK_Report_Type == 'Tabular') {{
                         root.metadata['STARK_Chart_Type'].required = false
-                        root.metadata['STARK_Data_Source'].required = false
+                        root.metadata['STARK_X_Data_Source'].required = false
+                        root.metadata['STARK_Y_Data_Source'].required = false
                     }}
                     else {{
                         root.metadata['STARK_Chart_Type'].required = true
-                        root.metadata['STARK_Data_Source'].required = true
+                        root.metadata['STARK_X_Data_Source'].required = true
+                        root.metadata['STARK_Y_Data_Source'].required = true
                     }}
                     response = STARK.validate_form(root.metadata, root.custom_report)
                     this.metadata = response['new_metadata']
@@ -622,60 +628,34 @@ def create(data):
                                 }}
                                 else {{
                                     root.activate_graph_download()
-                                    Data_Source = (root.custom_report.STARK_Data_Source).replace(/ /g,"_")
-                                    // root.get_all_data_source(Data_Source)
-                                    // console.log('root.a_All_Data_Source')
-                                    // console.log(Object(root.a_All_Data_Source))
+                                    X_Data = root.custom_report.STARK_X_Data_Source
+                                    Y_Data = root.custom_report.STARK_Y_Data_Source
 
-                                    All_Data_Source = []
-                                    data[0].forEach(function(arrayItem) {{
-                                        All_Data_Source.push(arrayItem[Data_Source])
-                                    }})
-                                    
-                                    //List of Unique Customer Type
+                                    X_Data_Source = []
+                                    Y_Data_Source = []
                                     Data_Source_Series = []
-                                    Data_Source_Series = All_Data_Source.filter(root.uniqueArr);
-                                    // console.log('Data_Source_Series')
-                                    // console.log(Data_Source_Series)
-                                    
-
-                                    if(root.custom_report.STARK_Chart_Type == 'Pie Chart') {{
-                                        //Check Occurrence per Data Source for Pie Chart
-                                        Y_Data_Source_Series = []
-                                        Data_Source_Series.forEach(element => {{
-                                            value  = root.checkOccurrence(All_Data_Source, element)
-                                            text   = element
-                                            Y_Data_Source_Series.push({{ value: value, name: text }}) 
-                                        }});
-                                    }} else {{
-
-                                        // Check Occurrence per Data Source
-                                        Y_Data_Source_Series = []
-                                        Data_Source_Series.forEach(element => {{
-                                            value  = root.checkOccurrence(All_Data_Source, element)
-                                            // text   = element
-                                            Y_Data_Source_Series.push(value) 
-                                        }});
-                                    }}
-
+                                    data[0].forEach(function(arrayItem) {{
+                                        if(root.custom_report.STARK_Chart_Type == 'Pie Chart') {{
+                                            value  = arrayItem[Y_Data]
+                                            text   = arrayItem[X_Data]
+                                            Data_Source_Series.push({{ value: value, name: text }}) 
+                                        }}
+                                        else {{
+                                            X_Data_Source.push(arrayItem[X_Data])
+                                            Y_Data_Source.push(arrayItem[Y_Data])
+                                        }}
+                                    }})
                                     var subtext = root.conso_subtext()
-                                    
-
                                     if(root.custom_report.STARK_Chart_Type == 'Pie Chart') {{
-                                        // console.log('Pie')
-                                        root.pieChart(Y_Data_Source_Series, subtext)
+                                        root.pieChart(Data_Source_Series, subtext)
                                     }}
                                     else if(root.custom_report.STARK_Chart_Type == 'Bar Chart') {{
-                                        // console.log('Bar')
-                                        root.barChart(Data_Source_Series, Y_Data_Source_Series, subtext)
+                                        root.barChart(X_Data_Source, Y_Data_Source, subtext)
                                     }}
                                     else if(root.custom_report.STARK_Chart_Type == 'Line Chart') {{
-                                        // console.log('Line')
-                                        root.lineChart(Data_Source_Series, Y_Data_Source_Series, subtext)
+                                        root.lineChart(X_Data_Source, Y_Data_Source, subtext)
                                     }}
-
                                 }}
-                
                             }})
                             .catch(function(error) {{
                                 console.log("Encountered an error! [" + error + "]")
@@ -932,23 +912,21 @@ def create(data):
 
     source_code += f"""
                 //Charting ------------------------------------------------
-                checkOccurrence: function (array, element) {{
-                    counter = 0;
-                    for (item of array.flat()) {{
+                set_x_data_source: function (field) {{
+                    X_Data_Source = (field).replace(/_/g," ")
+                    root.custom_report.STARK_X_Data_Source = X_Data_Source
+                }},
 
-                        if (typeof item === "string") {{
-                            newItem = item.toLowerCase();
-                            newElement = element.toLowerCase();
-                            if (newItem == newElement) {{
-                                counter++;
-                            }}
-                        }} else {{
-                            if (item == element) {{
-                                counter++;
-                            }}
-                        }}
+                set_y_data_source: function (field) {{
+                    Y_Data_Source = (field).replace(/_/g," ")
+                    data = {{ value: Y_Data_Source, text: Y_Data_Source }}
+                    if(document.querySelector('#'+field).checked == true) {{
+                        (root.Y_Data).push(data)
                     }}
-                    return counter;
+                    else {{
+                        (root.Y_Data).pop(data)
+                    }}
+                    root.lists.STARK_Data_Source = root.Y_Data
                 }},
 
                 uniqueArr: function(value, index, self) {{
@@ -989,6 +967,9 @@ def create(data):
                         grid: {{
                             y: 120,
                             y2: 60,
+                        }},
+                        tooltip: {{
+
                         }}
                     }};
                     option.xAxis.data = x_data
@@ -1037,6 +1018,9 @@ def create(data):
                         grid: {{
                             y: 120,
                             y2: 60,
+                        }},
+                        tooltip: {{
+                            
                         }}
                     }};
                     option.xAxis.data = x_data

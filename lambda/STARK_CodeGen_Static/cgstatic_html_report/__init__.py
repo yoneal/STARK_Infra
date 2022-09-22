@@ -84,13 +84,13 @@ def create(data):
                                                 <input type="text" class="form-control" id="{pk_varname}_filter_value" placeholder="" v-model="custom_report.{pk_varname}.value">
                                             </td>
                                             <td>
-                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{pk_varname}" id="{pk_varname}" v-model="custom_report.STARK_sum_fields" :disabled="metadata.{pk_varname}.data_type != 'Number' && metadata.{pk_varname}.data_type != 'Float'">
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{pk_varname}" id="Sum_of_Pr{pk_varname}" v-model="custom_report.STARK_sum_fields" :disabled="metadata.{pk_varname}.data_type != 'Number' && metadata.{pk_varname}.data_type != 'Float'" onchange="root.set_y_data_source('Sum_of_{pk_varname}')">
                                             </td>
                                             <td>
-                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{pk_varname}" id="{pk_varname}" v-model="custom_report.STARK_count_fields">
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{pk_varname}" id="Count_of_{pk_varname}" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_{pk_varname}')">
                                             </td>
                                             <td>
-                                                <input type="radio" class="checkbox-med" name="check_checkbox" value="{pk_varname}" id="{pk_varname}" v-model="custom_report.STARK_group_by_1">
+                                                <input type="radio" class="checkbox-med" name="check_checkbox" value="{pk_varname}" id="{pk_varname}" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('{pk_varname}')">
                                             </td>
                                         </tr>"""
     
@@ -126,13 +126,13 @@ def create(data):
                                                 </div>
                                             </td>
                                             <td>
-                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="{col_varname}" v-model="custom_report.STARK_sum_fields" :disabled="metadata.{col_varname}.data_type != 'Number' && metadata.{col_varname}.data_type != 'Float'">
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="Sum_of_{col_varname}" v-model="custom_report.STARK_sum_fields" :disabled="metadata.{col_varname}.data_type != 'Number' && metadata.{col_varname}.data_type != 'Float'" onchange="root.set_y_data_source('Sum_of_{col_varname}')">
                                             </td>
                                             <td>
-                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="{col_varname}" v-model="custom_report.STARK_count_fields">
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="Count_of_{col_varname}" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_{col_varname}')">
                                             </td>
                                             <td>
-                                                <input type="radio" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="{col_varname}" v-model="custom_report.STARK_group_by_1">
+                                                <input type="radio" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="{col_varname}" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('{col_varname}')">
                                             </td>
                                         </tr>
                                     """
@@ -176,10 +176,20 @@ def create(data):
                                         </tr>
                                         <tr>
                                             <td></td>
-                                            <td>Data Source</td>
+                                            <td>X Data Source</td>
                                             <td>
-                                                <b-form-group class="form-group" label-for="Data_Source" :state="metadata.STARK_Data_Source.state" :invalid-feedback="metadata.STARK_Data_Source.feedback">
-                                                    <b-form-select id="Data_Source" v-model="custom_report.STARK_Data_Source" :options="lists.STARK_Data_Source" :state="metadata.STARK_Data_Source.state">
+                                            <b-form-group class="form-group" label-for="" :state="metadata.STARK_X_Data_Source.state" :invalid-feedback="metadata.STARK_X_Data_Source.feedback">
+                                                <b-form-input type="text" class="form-control" id="STARK_X_Data_Source" placeholder="" v-model="custom_report.STARK_X_Data_Source" :state="metadata.STARK_X_Data_Source.state" disabled></b-form-input>
+                                            </b-form-group>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>Y Data Source</td>
+                                            <td>
+                                                <b-form-group class="form-group" label-for="Data_Source" :state="metadata.STARK_Y_Data_Source.state" :invalid-feedback="metadata.STARK_Y_Data_Source.feedback">
+                                                    <b-form-select id="Data_Source" v-model="custom_report.STARK_Y_Data_Source" :options="lists.STARK_Data_Source" :state="metadata.STARK_Y_Data_Source.state">
                                                     <template v-slot:first>
                                                         <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                                     </template>
