@@ -75,22 +75,22 @@ def create(data):
                         'state': null,
                         'feedback': ''
                     }},
-                    'STARK_X_Data_Source': {
+                    'STARK_X_Data_Source': {{
                         'value': '',
                         'required': true,
                         'max_length': '',
                         'data_type': '',
                         'state': null,
                         'feedback': ''
-                    },
-                    'STARK_Y_Data_Source': {
+                    }},
+                    'STARK_Y_Data_Source': {{
                         'value': '',
                         'required': true,
                         'max_length': '',
                         'data_type': '',
                         'state': null,
                         'feedback': ''
-                    },
+                    }},
                 }},
                 
                 auth_config: {{ }},
