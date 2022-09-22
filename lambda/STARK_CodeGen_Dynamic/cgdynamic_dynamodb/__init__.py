@@ -411,39 +411,42 @@ def create(data):
                     items.append(item)
 
         report_list = []
-        report_header = []
-        diff_list = []
-        if aggregate_report:
-            temp_list = []
-            for key, val in aggregated_results.items():
-                temp_header = []
-                for index in val.keys():
-                    temp_header.append(index.replace("_"," "))
-                temp_list.append(val)
-            items = temp_list
-            report_header = temp_header
-        else:
-            display_fields = data['STARK_report_fields']
-            master_fields = []
-            for key in metadata.keys():
-                master_fields.append(key.replace("_"," "))
-            if len(display_fields) > 0:
-                report_header = display_fields
-                diff_list = list(set(master_fields) - set(display_fields))
+        csv_file = ''
+        pdf_file = ''
+        if len(items) > 0:
+            report_header = []
+            diff_list = []
+            if aggregate_report:
+                temp_list = []
+                for key, val in aggregated_results.items():
+                    temp_header = []
+                    for index in val.keys():
+                        temp_header.append(index.replace("_"," "))
+                    temp_list.append(val)
+                    report_header = temp_header
+                items = temp_list
             else:
-                report_header = master_fields
+                display_fields = data['STARK_report_fields']
+                master_fields = []
+                for key in metadata.keys():
+                    master_fields.append(key.replace("_"," "))
+                if len(display_fields) > 0:
+                    report_header = display_fields
+                    diff_list = list(set(master_fields) - set(display_fields))
+                else:
+                    report_header = master_fields
 
-        for key in items:
-            temp_dict = {{}}
-            #remove primary identifiers and STARK attributes
-            if not aggregate_report:
-                key.pop("sk")
-            for index, value in key.items():
-                temp_dict[index.replace("_"," ")] = value
-            report_list.append(temp_dict)
+            for key in items:
+                temp_dict = {{}}
+                #remove primary identifiers and STARK attributes
+                if not aggregate_report:
+                    key.pop("sk")
+                for index, value in key.items():
+                    temp_dict[index.replace("_"," ")] = value
+                report_list.append(temp_dict)
 
-        csv_file = utilities.create_csv(report_list, report_header, diff_list)
-        pdf_file = utilities.prepare_pdf_data(report_list, report_header, report_param_dict, metadata, pk_field)
+            csv_file = utilities.create_csv(report_list, report_header, diff_list)
+            pdf_file = utilities.prepare_pdf_data(report_list, report_header, report_param_dict, metadata, pk_field)
 
         csv_bucket_key = bucket_tmp + csv_file
         pdf_bucket_key = bucket_tmp + pdf_file
@@ -460,6 +463,7 @@ def create(data):
         ddb_arguments['TableName'] = ddb_table
         ddb_arguments['IndexName'] = "STARK-ListView-Index"
         ddb_arguments['Select'] = "ALL_ATTRIBUTES"
+        ddb_arguments['Limit'] = page_limit
         ddb_arguments['ReturnConsumedCapacity'] = 'TOTAL'
         ddb_arguments['KeyConditionExpression'] = 'sk = :sk'
         ddb_arguments['ExpressionAttributeValues'] = {{ ':sk' : {{'S' : sk }} }}
@@ -468,7 +472,7 @@ def create(data):
             ddb_arguments['ExclusiveStartKey'] = lv_token
 
         next_token = ''
-        while len(items) <= page_limit and next_token is not None:
+        while len(items) < page_limit and next_token is not None:
             if next_token != '':
                 ddb_arguments['ExclusiveStartKey']=next_token
 
