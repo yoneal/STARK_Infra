@@ -106,14 +106,17 @@
                                 </th>
                                 <th style="padding: 10px; min-width: 250px"> Field Name </th>
                                 <th style="padding: 10px"> Operator </th>
-                                <th style="padding: 10px"> Filter Value </th>
+                                <th style="padding: 10px"> Filter Value </th>   
+                                <th style="padding: 10px"> Sum </th>
+                                <th style="padding: 10px"> Count </th>
+                                <th style="padding: 10px"> Group By</th>
                             </tr>
                             <tr>
                                 <td>
-                                     <input type="checkbox" class="checkbox-med" value="Group_Name" id="Group_Name" v-model="checked_fields">
+                                     <input type="checkbox" class="checkbox-med" value="Group_Name" id="Group Name" v-model="checked_fields">
                                 </td>
                                 <td>
-                                        <label for="Group_Name">Groups Name</label>
+                                        <label for="Group_Name">Group Name</label>
                                 </td>
                                 <td>
                                     <b-form-select id="Group_Name_operator" :options="lists.Report_Operator" v-model="custom_report.Group_Name.operator">
@@ -124,6 +127,15 @@
                                 </td>
                                 <td>
                                     <input type="text" class="form-control" id="Group_Name_filter_value" placeholder="" v-model="custom_report.Group_Name.value">
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Group_Name" id="Sum_of_Group_Name" v-model="custom_report.STARK_sum_fields" :disabled="metadata.Group_Name.data_type != 'Number' && metadata.Group_Name.data_type != 'Float'" onchange="root.set_y_data_source('Sum_of_Group_Name')">
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Group_Name" id="Count_of_Group_Name" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_Group_Name')">
+                                </td>
+                                <td>
+                                    <input type="radio" class="checkbox-med" name="check_checkbox" value="Group_Name" id="Group_Name" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('Group_Name')">
                                 </td>
                             </tr>
                             <tr>
@@ -143,6 +155,15 @@
                                 <td>
                                     <input type="text" class="form-control" id="Description_filter_value" placeholder="" v-model="custom_report.Description.value">
                                 </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Description" id="Sum_of_Description" v-model="custom_report.STARK_sum_fields" :disabled="metadata.Description.data_type != 'Number' && metadata.Description.data_type != 'Float'" onchange="root.set_y_data_source('Sum_of_Description')">
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Description" id="Count_of_Description" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_Description')">
+                                </td>
+                                <td>
+                                    <input type="radio" class="checkbox-med" name="check_checkbox" value="Description" id="Description" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('Description')">
+                                </td>
                             </tr>
                             <tr>
                                 <td>
@@ -161,6 +182,15 @@
                                 <td>
                                     <input type="text" class="form-control" id="Icon_filter_value" placeholder="" v-model="custom_report.Icon.value">
                                 </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Icon" id="Sum_of_Icon" v-model="custom_report.STARK_sum_fields" :disabled="metadata.Icon.data_type != 'Number' && metadata.Icon.data_type != 'Float'" onchange="root.set_y_data_source('Sum_of_Icon')">
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Icon" id="Count_of_Icon" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_Icon')">
+                                </td>
+                                <td>
+                                    <input type="radio" class="checkbox-med" name="check_checkbox" value="Icon" id="Icon" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('Icon')">
+                                </td>
                             </tr>
                             <tr>
                                 <td>
@@ -178,6 +208,15 @@
                                 </td>
                                 <td>
                                     <input type="text" class="form-control" id="Priority_filter_value" placeholder="" v-model="custom_report.Priority.value">
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Priority" id="Sum_of_Priority" v-model="custom_report.STARK_sum_fields" :disabled="metadata.Priority.data_type != 'Number' && metadata.Priority.data_type != 'Float'" onchange="root.set_y_data_source('Sum_of_Priority')">
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Priority" id="Count_of_Priority" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_Priority')">
+                                </td>
+                                <td>
+                                    <input type="radio" class="checkbox-med" name="check_checkbox" value="Priority" id="Priority" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('Priority')">
                                 </td>
                             </tr>
                         </table>
@@ -218,10 +257,20 @@
                             </tr>
                             <tr>
                                 <td></td>
-                                <td>Data Source</td>
+                                <td>X Data Source</td>
                                 <td>
-                                    <b-form-group class="form-group" label-for="Data_Source" :state="metadata.STARK_Data_Source.state" :invalid-feedback="metadata.STARK_Data_Source.feedback">
-                                        <b-form-select id="Data_Source" v-model="custom_report.STARK_Data_Source" :options="lists.STARK_Data_Source" :state="metadata.STARK_Data_Source.state">
+                                <b-form-group class="form-group" label-for="" :state="metadata.STARK_X_Data_Source.state" :invalid-feedback="metadata.STARK_X_Data_Source.feedback">
+                                    <b-form-input type="text" class="form-control" id="STARK_X_Data_Source" placeholder="" v-model="custom_report.STARK_X_Data_Source" :state="metadata.STARK_X_Data_Source.state" disabled></b-form-input>
+                                </b-form-group>
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>Y Data Source</td>
+                                <td>
+                                    <b-form-group class="form-group" label-for="Data_Source" :state="metadata.STARK_Y_Data_Source.state" :invalid-feedback="metadata.STARK_Y_Data_Source.feedback">
+                                        <b-form-select id="Data_Source" v-model="custom_report.STARK_Y_Data_Source" :options="lists.STARK_Data_Source" :state="metadata.STARK_Y_Data_Source.state">
                                         <template v-slot:first>
                                             <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                         </template>
@@ -245,7 +294,13 @@
                 <button type="button" id="exportByHTML" class="btn btn-danger mb-2" :disabled="listview_table.length < 1"> Export as PDF</button>
                 <button id="refresh" type="button" class="btn btn-primary mb-2" onClick="root.generate()" :disabled="listview_table.length < 1"> Refresh </button>
             </div>
-            <div class="col-6">
+            <div class="col-6"></div>
+            <div class="col-6 text-left d-inline-block">
+                <table class="table">
+                    <template v-if="listview_table.length < 1">
+                        No records found
+                    </template>
+                </table>
             </div>
         </div>
         <div id="chart-container"></div>
@@ -269,7 +324,7 @@
                         <tr>
                             <th scope="col" width = "20px"> Operations </th>
                             <template v-for="column in STARK_report_fields" id="STARK_report_fields">
-                                <th scope="col">{{column.label}}</th>
+                                <th scope="col">{{column}}</th>
                             </template>         
                         </tr>
                     </thead>
@@ -277,11 +332,11 @@
                         <template v-for="STARK_Module_Groups in listview_table" id="listview-table">
                             <tr>
                                 <td align="center">
-                                    <a :href="'STARK_Module_Groups_edit.html?Group_Name=' + STARK_Module_Groups.Group_Name" target="_blank" v-if="auth_list.Edit.allowed"><img src="images/pencil-square.svg" class="bg-info"></a>
-                                    <a :href="'STARK_Module_Groups_delete.html?Group_Name=' + STARK_Module_Groups.Group_Name" target="_blank" v-if="auth_list.Delete.allowed"><img src="images/x-square.svg" class="bg-danger"></a>
+                                    <a :href="'STARK_Module_Groups_edit.html?Group_Name=' + STARK_Module_Groups['Group Name']" target="_blank" v-if="auth_list.Edit.allowed"><img src="images/pencil-square.svg" class="bg-info"></a>
+                                    <a :href="'STARK_Module_Groups_delete.html?Group_Name=' + STARK_Module_Groups['Group Name']" target="_blank" v-if="auth_list.Delete.allowed"><img src="images/x-square.svg" class="bg-danger"></a>
                                 </td>
                                 <template v-for="column in STARK_report_fields">
-                                    <td>{{ STARK_Module_Groups[column.field] }}</td>
+                                    <td>{{ STARK_Module_Groups[column] }}</td>
                                 </template>             
                             </tr>
                         </template>

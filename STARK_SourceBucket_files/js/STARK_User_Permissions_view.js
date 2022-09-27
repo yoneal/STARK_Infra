@@ -6,7 +6,7 @@ var root = new Vue({
                 'value': '',
                 'required': true,
                 'max_length': '',
-                'data_type': '',
+                'data_type': 'String',
                 'state': null,
                 'feedback': ''
             },
@@ -14,7 +14,7 @@ var root = new Vue({
                 'value': '',
                 'required': true,
                 'max_length': '',
-                'data_type': '',
+                'data_type': 'String',
                 'state': null,
                 'feedback': ''
             },
@@ -22,7 +22,7 @@ var root = new Vue({
                 'value': '',
                 'required': true,
                 'max_length': '',
-                'data_type': '',
+                'data_type': 'String',
                 'state': null,
                 'feedback': ''
             },
@@ -30,11 +30,19 @@ var root = new Vue({
                 'value': '',
                 'required': true,
                 'max_length': '',
+                'data_type': 'String',
+                'state': null,
+                'feedback': ''
+            },
+            'STARK_X_Data_Source': {
+                'value': '',
+                'required': true,
+                'max_length': '',
                 'data_type': '',
                 'state': null,
                 'feedback': ''
             },
-            'STARK_Data_Source': {
+            'STARK_Y_Data_Source': {
                 'value': '',
                 'required': true,
                 'max_length': '',
@@ -65,7 +73,11 @@ var root = new Vue({
             'STARK_report_fields':[],
             'STARK_Report_Type': '',
             'STARK_Chart_Type': '',
-            'STARK_Data_Source': '',
+            'STARK_X_Data_Source': '',
+            'STARK_Y_Data_Source': '',
+            'STARK_sum_fields': [],
+            'STARK_count_fields': [],
+            'STARK_group_by_1': '',
         },
         lists: {
             'Permissions': [
@@ -132,6 +144,10 @@ var root = new Vue({
         series_data: [],
         graphOption: [],
         fieldLabel: '',
+        STARK_sum_fields: [],
+        STARK_count_fields: [],
+        STARK_group_by_1: '',
+        Y_Data: []
 
     },
     methods: {
@@ -273,32 +289,13 @@ var root = new Vue({
                 root.curr_page++;
                 console.log(root.curr_page);
                 payload['Next_Token'] = lv_token;
-
-                //When Next button is clicked, we should:
-                // - save Next Token to new page in page_token_map
-                // - hide Next button - it will be visible again if API call returns a new Next Token
-                // - if new_page is > 2, assign {new_page - 1} token to prev_token
                 root.prev_disabled = false;    
                 root.next_disabled = true;
-
-                root.page_token_map[root.curr_page] = lv_token;
-
-                if (root.curr_page > 1) {
-                    root.prev_token = root.page_token_map[root.curr_page - 1];
-                }
-                console.log(root.page_token_map)
-                console.log(root.prev_token)
             }
             else if (btn == "prev") {
                 root.curr_page--;
-
-                if (root.prev_token != "") {
-                    payload['Next_Token'] = root.page_token_map[root.curr_page];
-                }
-
                 if (root.curr_page > 1) {
                     root.prev_disabled = false
-                    root.prev_token = root.page_token_map[root.curr_page - 1]
                 }
                 else {
                     root.prev_disabled = true
@@ -308,10 +305,17 @@ var root = new Vue({
 
             var listview_data = STARK.get_local_storage_item('Listviews', 'STARK_User_Permissions')
             var fetch_from_db = false;
-            console.log(listview_data)
             if(listview_data) {
                 root.listview_table = listview_data[root.curr_page]
                 root.next_token = listview_data['next_token'];
+
+                if(listview_data[root.curr_page + 1]) {
+                    root.next_disabled = false
+                }
+                if(root.next_token != "null") {
+                    fetch_from_db = true
+                }
+
                 spinner.hide()
             }
             else {
@@ -415,11 +419,13 @@ var root = new Vue({
         generate: function () {
             if(root.custom_report.STARK_Report_Type == 'Tabular') {
                 root.metadata['STARK_Chart_Type'].required = false
-                root.metadata['STARK_Data_Source'].required = false
+                root.metadata['STARK_X_Data_Source'].required = false
+                root.metadata['STARK_Y_Data_Source'].required = false
             }
             else {
                 root.metadata['STARK_Chart_Type'].required = true
-                root.metadata['STARK_Data_Source'].required = true
+                root.metadata['STARK_X_Data_Source'].required = true
+                root.metadata['STARK_Y_Data_Source'].required = true
             }
             response = STARK.validate_form(root.metadata, root.custom_report)
             this.metadata = response['new_metadata']
@@ -428,87 +434,70 @@ var root = new Vue({
                 if(root.custom_report.STARK_Report_Type == 'Graph') {
                     root.showGraph = true
                 }
-                let temp_show_fields = []
-                root.checked_fields.forEach(element => {
-                    let temp_index = {'field': element, label: element.replaceAll("_"," ")}
-                    temp_show_fields.push(temp_index)
-                });
-                root.STARK_report_fields = temp_show_fields;
-                this.custom_report['STARK_report_fields'] = root.STARK_report_fields
-                let report_payload = { STARK_User_Permissions: this.custom_report }
+
+                root.custom_report['STARK_report_fields'] = root.checked_fields
+                let report_payload = { STARK_User_Permissions: root.custom_report }
                 if(root.formValidation())
                 {
                     loading_modal.show()
                     STARK_User_Permissions_app.report(report_payload).then( function(data) {
                         root.listview_table = data[0];
-                        root.temp_csv_link = data[2][0];
-                        root.temp_pdf_link = data[2][1];
+                        if(root.listview_table.length > 0) {
+                            root.STARK_report_fields = Object.keys(root.listview_table[0]) 
+                            root.temp_csv_link = data[1];
+                            root.temp_pdf_link = data[2];
+                        }
                         console.log("DONE! Retrieved report.");
                         loading_modal.hide()
                         if(root.custom_report.STARK_Report_Type == 'Tabular') {
                             root.showReport = true
                         }
                         else {
-                            root.activate_graph_download()
-                            Data_Source = (root.custom_report.STARK_Data_Source).replace(/ /g,"_")
-                            // root.get_all_data_source(Data_Source)
-                            // console.log('root.a_All_Data_Source')
-                            // console.log(Object(root.a_All_Data_Source))
+                            if(root.listview_table.length > 0)
+                            {   
+                                var element = document.getElementById("chart-container");
+                                element.style.backgroundColor = "#ffffff";
+                                root.activate_graph_download()
+                                X_Data = root.custom_report.STARK_X_Data_Source
+                                Y_Data = root.custom_report.STARK_Y_Data_Source
 
-                            All_Data_Source = []
-                            data[0].forEach(function(arrayItem) {
-                                All_Data_Source.push(arrayItem[Data_Source])
-                            })
-
-                            //List of Unique Customer Type
-                            Data_Source_Series = []
-                            Data_Source_Series = All_Data_Source.filter(root.uniqueArr);
-                            // console.log('Data_Source_Series')
-                            // console.log(Data_Source_Series)
-
-
-                            if(root.custom_report.STARK_Chart_Type == 'Pie Chart') {
-                                //Check Occurrence per Data Source for Pie Chart
-                                Y_Data_Source_Series = []
-                                Data_Source_Series.forEach(element => {
-                                    value  = root.checkOccurrence(All_Data_Source, element)
-                                    text   = element
-                                    Y_Data_Source_Series.push({ value: value, name: text }) 
-                                });
-                            } else {
-
-                                // Check Occurrence per Data Source
-                                Y_Data_Source_Series = []
-                                Data_Source_Series.forEach(element => {
-                                    value  = root.checkOccurrence(All_Data_Source, element)
-                                    // text   = element
-                                    Y_Data_Source_Series.push(value) 
-                                });
-                            }
-
-                            var subtext = root.conso_subtext()
-
-                            if(root.custom_report.STARK_Chart_Type == 'Pie Chart') {
-                                // console.log('Pie')
-                                root.pieChart(Y_Data_Source_Series, subtext)
-                            }
-                            else if(root.custom_report.STARK_Chart_Type == 'Bar Chart') {
-                                // console.log('Bar')
-                                root.barChart(Data_Source_Series, Y_Data_Source_Series, subtext)
-                            }
-                            else if(root.custom_report.STARK_Chart_Type == 'Line Chart') {
-                                // console.log('Line')
-                                root.lineChart(Data_Source_Series, Y_Data_Source_Series, subtext)
+                                X_Data_Source = []
+                                Y_Data_Source = []
+                                Data_Source_Series = []
+                                data[0].forEach(function(arrayItem) {
+                                    if(root.custom_report.STARK_Chart_Type == 'Pie Chart') {
+                                        value  = arrayItem[Y_Data]
+                                        text   = arrayItem[X_Data]
+                                        Data_Source_Series.push({ value: value, name: text }) 
+                                    }
+                                    else {
+                                        X_Data_Source.push(arrayItem[X_Data])
+                                        Y_Data_Source.push(arrayItem[Y_Data])
+                                    }
+                                })
+                                var subtext = root.conso_subtext()
+                                if(root.custom_report.STARK_Chart_Type == 'Pie Chart') {
+                                    root.pieChart(Data_Source_Series, subtext)
+                                }
+                                else if(root.custom_report.STARK_Chart_Type == 'Bar Chart') {
+                                    root.barChart(X_Data_Source, Y_Data_Source, subtext)
+                                }
+                                else if(root.custom_report.STARK_Chart_Type == 'Line Chart') {
+                                    root.lineChart(X_Data_Source, Y_Data_Source, subtext)
+                                }
                             }
                         }
+
                     })
                     .catch(function(error) {
                         console.log("Encountered an error! [" + error + "]")
+                        alert("Request Failed: System error or you may not have enough privileges")
                         loading_modal.hide()
                     });
                 }
             }
         },
+
         download_report(file_type = "csv") {
             let link = "https://" + (file_type == "csv" ? root.temp_csv_link : root.temp_pdf_link)
             window.location.href = link
@@ -524,23 +513,21 @@ var root = new Vue({
         },
 
         //Charting ------------------------------------------------
-        checkOccurrence: function (array, element) {
-            counter = 0;
-            for (item of array.flat()) {
+        set_x_data_source: function (field) {
+            X_Data_Source = (field).replace(/_/g," ")
+            root.custom_report.STARK_X_Data_Source = X_Data_Source
+        },
 
-                if (typeof item === "string") {
-                    newItem = item.toLowerCase();
-                    newElement = element.toLowerCase();
-                    if (newItem == newElement) {
-                        counter++;
-                    }
-                } else {
-                    if (item == element) {
-                        counter++;
-                    }
-                }
+        set_y_data_source: function (field) {
+            Y_Data_Source = (field).replace(/_/g," ")
+            data = { value: Y_Data_Source, text: Y_Data_Source }
+            if(document.querySelector('#'+field).checked == true) {
+                (root.Y_Data).push(data)
             }
-            return counter;
+            else {
+                (root.Y_Data).pop(data)
+            }
+            root.lists.STARK_Data_Source = root.Y_Data
         },
 
         uniqueArr: function(value, index, self) {
@@ -581,6 +568,9 @@ var root = new Vue({
                 grid: {
                     y: 120,
                     y2: 60,
+                },
+                tooltip: {
+
                 }
             };
             option.xAxis.data = x_data
@@ -629,6 +619,9 @@ var root = new Vue({
                 grid: {
                     y: 120,
                     y2: 60,
+                },
+                tooltip: {
+
                 }
             };
             option.xAxis.data = x_data

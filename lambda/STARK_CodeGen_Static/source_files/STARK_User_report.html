@@ -106,7 +106,10 @@
                                 </th>
                                 <th style="padding: 10px; min-width: 250px"> Field Name </th>
                                 <th style="padding: 10px"> Operator </th>
-                                <th style="padding: 10px"> Filter Value </th>
+                                <th style="padding: 10px"> Filter Value </th>  
+                                <th style="padding: 10px"> Sum </th>
+                                <th style="padding: 10px"> Count </th>
+                                <th style="padding: 10px"> Group By</th>
                             </tr>
                             <tr>
                                 <td>
@@ -125,10 +128,19 @@
                                 <td>
                                     <input type="text" class="form-control" id="Username_filter_value" placeholder="" v-model="custom_report.Username.value">
                                 </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Username" id="Sum_of_Username" v-model="custom_report.STARK_sum_fields" :disabled="metadata.Username.data_type != 'Number' && metadata.Username.data_type != 'Float'" onchange="root.set_y_data_source('Sum_of_Username')">
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Username" id="Count_of_Username" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_Username')">
+                                </td>
+                                <td>
+                                    <input type="radio" class="checkbox-med" name="check_checkbox" value="Username" id="Username" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('Username')">
+                                </td>
                             </tr>
                             <tr>
                                 <td>
-                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Full_Name" id="Full_Name" v-model="checked_fields">
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Full Name" id="Full_Name" v-model="checked_fields">
                                 </td>
                                 <td>
                                         <label for="Full_Name">Full Name</label>
@@ -142,6 +154,15 @@
                                 </td>
                                 <td>
                                     <input type="text" class="form-control" id="Full_Name_filter_value" placeholder="" v-model="custom_report.Full_Name.value">
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Full_Name" id="Sum_of_Full_Name" v-model="custom_report.STARK_sum_fields" :disabled="metadata.Full_Name.data_type != 'Number' && metadata.Full_Name.data_type != 'Float'" onchange="root.set_y_data_source('Sum_of_Full_Name')">
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Full_Name" id="Count_of_Full_Name" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_Full_Name')">
+                                </td>
+                                <td>
+                                    <input type="radio" class="checkbox-med" name="check_checkbox" value="Full_Name" id="Full_Name" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('Full_Name')">
                                 </td>
                             </tr>
                             <tr>
@@ -161,6 +182,15 @@
                                 <td>
                                     <input type="text" class="form-control" id="Nickname_filter_value" placeholder="" v-model="custom_report.Nickname.value">
                                 </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Nickname" id="Sum_of_Nickname" v-model="custom_report.STARK_sum_fields" :disabled="metadata.Nickname.data_type != 'Number' && metadata.Nickname.data_type != 'Float'" onchange="root.set_y_data_source('Sum_of_Nickname')">
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Nickname" id="Count_of_Nickname" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_Nickname')">
+                                </td>
+                                <td>
+                                    <input type="radio" class="checkbox-med" name="check_checkbox" value="Nickname" id="Nickname" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('Nickname')">
+                                </td>
                             </tr>
                             <tr>
                                 <td>
@@ -178,6 +208,15 @@
                                 </td>
                                 <td>
                                     <input type="text" class="form-control" id="Role_filter_value" placeholder="" v-model="custom_report.Role.value">
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Role" id="Sum_of_Role" v-model="custom_report.STARK_sum_fields" :disabled="metadata.Role.data_type != 'Number' && metadata.Role.data_type != 'Float'" onchange="root.set_y_data_source('Sum_of_Role')">
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Role" id="Count_of_Role" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_Role')">
+                                </td>
+                                <td>
+                                    <input type="radio" class="checkbox-med" name="check_checkbox" value="Role" id="Role" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('Role')">
                                 </td>
                             </tr>
                         </table>
@@ -218,10 +257,20 @@
                             </tr>
                             <tr>
                                 <td></td>
-                                <td>Data Source</td>
+                                <td>X Data Source</td>
                                 <td>
-                                    <b-form-group class="form-group" label-for="Data_Source" :state="metadata.STARK_Data_Source.state" :invalid-feedback="metadata.STARK_Data_Source.feedback">
-                                        <b-form-select id="Data_Source" v-model="custom_report.STARK_Data_Source" :options="lists.STARK_Data_Source" :state="metadata.STARK_Data_Source.state">
+                                <b-form-group class="form-group" label-for="" :state="metadata.STARK_X_Data_Source.state" :invalid-feedback="metadata.STARK_X_Data_Source.feedback">
+                                    <b-form-input type="text" class="form-control" id="STARK_X_Data_Source" placeholder="" v-model="custom_report.STARK_X_Data_Source" :state="metadata.STARK_X_Data_Source.state" disabled></b-form-input>
+                                </b-form-group>
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>Y Data Source</td>
+                                <td>
+                                    <b-form-group class="form-group" label-for="Data_Source" :state="metadata.STARK_Y_Data_Source.state" :invalid-feedback="metadata.STARK_Y_Data_Source.feedback">
+                                        <b-form-select id="Data_Source" v-model="custom_report.STARK_Y_Data_Source" :options="lists.STARK_Data_Source" :state="metadata.STARK_Y_Data_Source.state">
                                         <template v-slot:first>
                                             <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                         </template>
@@ -269,7 +318,7 @@
                         <tr>
                             <th scope="col" width = "20px"> Operations </th>
                             <template v-for="column in STARK_report_fields" id="STARK_report_fields">
-                                <th scope="col">{{column.label}}</th>
+                                <th scope="col">{{column}}</th>
                             </template>         
                         </tr>
                     </thead>
@@ -277,11 +326,11 @@
                         <template v-for="STARK_User in listview_table" id="listview-table">
                             <tr>
                                 <td align="center">
-                                    <a :href="'STARK_User_edit.html?Username=' + STARK_User.Username" target="_blank"><img src="images/pencil-square.svg" class="bg-info"></a>
-                                    <a :href="'STARK_User_delete.html?Username=' + STARK_User.Username" target="_blank"><img src="images/x-square.svg" class="bg-danger"></a>
+                                    <a :href="'STARK_User_edit.html?Username=' + STARK_User['Username']" target="_blank"><img src="images/pencil-square.svg" class="bg-info"></a>
+                                    <a :href="'STARK_User_delete.html?Username=' + STARK_User['Username']" target="_blank"><img src="images/x-square.svg" class="bg-danger"></a>
                                 </td>
                                 <template v-for="column in STARK_report_fields">
-                                    <td>{{ STARK_User[column.field] }}</td>
+                                    <td>{{ STARK_User[column] }}</td>
                                 </template>             
                             </tr>
                         </template>

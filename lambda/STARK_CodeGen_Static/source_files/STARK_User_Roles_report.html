@@ -106,11 +106,14 @@
                                 </th>
                                 <th style="padding: 10px; min-width: 250px"> Field Name </th>
                                 <th style="padding: 10px"> Operator </th>
-                                <th style="padding: 10px"> Filter Value </th>
+                                <th style="padding: 10px"> Filter Value </th>  
+                                <th style="padding: 10px"> Sum </th>
+                                <th style="padding: 10px"> Count </th>
+                                <th style="padding: 10px"> Group By</th>
                             </tr>
                             <tr>
                                 <td>
-                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Role_Name" id="Role_Name" v-model="checked_fields">
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Role Name" id="Role_Name" v-model="checked_fields">
                                 </td>
                                 <td>
                                         <label for="Role_Name">Role Name</label>
@@ -124,6 +127,15 @@
                                 </td>
                                 <td>
                                     <input type="text" class="form-control" id="Role_Name_filter_value" placeholder="" v-model="custom_report.Role_Name.value">
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Role_Name" id="Sum_of_Role_Name" v-model="custom_report.STARK_sum_fields" :disabled="metadata.Role_Name.data_type != 'Number' && metadata.Role_Name.data_type != 'Float'" onchange="root.set_y_data_source('Sum_of_Role_Name')">
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Role_Name" id="Count_of_Role_Name" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_Role_Name')">
+                                </td>
+                                <td>
+                                    <input type="radio" class="checkbox-med" name="check_checkbox" value="Role_Name" id="Role_Name" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('Role_Name')">
                                 </td>
                             </tr>
                             <tr>
@@ -143,6 +155,15 @@
                                 <td>
                                     <input type="text" class="form-control" id="Description_filter_value" placeholder="" v-model="custom_report.Description.value">
                                 </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Description" id="Sum_of_Description" v-model="custom_report.STARK_sum_fields" :disabled="metadata.Description.data_type != 'Number' && metadata.Description.data_type != 'Float'" onchange="root.set_y_data_source('Sum_of_Description')">
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Description" id="Count_of_Description" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_Description')">
+                                </td>
+                                <td>
+                                    <input type="radio" class="checkbox-med" name="check_checkbox" value="Description" id="Description" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('Description')">
+                                </td>
                             </tr>
                             <tr>
                                 <td>
@@ -160,6 +181,15 @@
                                 </td>
                                 <td>
                                     <input type="text" class="form-control" id="Permissions_filter_value" placeholder="" v-model="custom_report.Permissions.value">
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Permissions" id="Sum_of_Permissions" v-model="custom_report.STARK_sum_fields" :disabled="metadata.Permissions.data_type != 'Number' && metadata.Permissions.data_type != 'Float'" onchange="root.set_y_data_source('Sum_of_Permissions')">
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="checkbox-med" name="check_checkbox" value="Permissions" id="Count_of_Permissions" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_Permissions')">
+                                </td>
+                                <td>
+                                    <input type="radio" class="checkbox-med" name="check_checkbox" value="Permissions" id="Permissions" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('Permissions')">
                                 </td>
                             </tr>
                         </table>
@@ -200,10 +230,20 @@
                             </tr>
                             <tr>
                                 <td></td>
-                                <td>Data Source</td>
+                                <td>X Data Source</td>
                                 <td>
-                                    <b-form-group class="form-group" label-for="Data_Source" :state="metadata.STARK_Data_Source.state" :invalid-feedback="metadata.STARK_Data_Source.feedback">
-                                        <b-form-select id="Data_Source" v-model="custom_report.STARK_Data_Source" :options="lists.STARK_Data_Source" :state="metadata.STARK_Data_Source.state">
+                                <b-form-group class="form-group" label-for="" :state="metadata.STARK_X_Data_Source.state" :invalid-feedback="metadata.STARK_X_Data_Source.feedback">
+                                    <b-form-input type="text" class="form-control" id="STARK_X_Data_Source" placeholder="" v-model="custom_report.STARK_X_Data_Source" :state="metadata.STARK_X_Data_Source.state" disabled></b-form-input>
+                                </b-form-group>
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>Y Data Source</td>
+                                <td>
+                                    <b-form-group class="form-group" label-for="Data_Source" :state="metadata.STARK_Y_Data_Source.state" :invalid-feedback="metadata.STARK_Y_Data_Source.feedback">
+                                        <b-form-select id="Data_Source" v-model="custom_report.STARK_Y_Data_Source" :options="lists.STARK_Data_Source" :state="metadata.STARK_Y_Data_Source.state">
                                         <template v-slot:first>
                                             <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                         </template>
@@ -251,7 +291,7 @@
                         <tr>
                             <th scope="col" width = "20px"> Operations </th>
                             <template v-for="column in STARK_report_fields" id="STARK_report_fields">
-                                <th scope="col">{{column.label}}</th>
+                                <th scope="col">{{column}}</th>
                             </template>         
                         </tr>
                     </thead>
@@ -259,11 +299,11 @@
                         <template v-for="STARK_User_Roles in listview_table" id="listview-table">
                             <tr>
                                 <td align="center">
-                                    <a :href="'STARK_User_Roles_edit.html?Role_Name=' + STARK_User_Roles.Role_Name" target="_blank" v-if="auth_list.Edit.allowed"><img src="images/pencil-square.svg" class="bg-info"></a>
-                                    <a :href="'STARK_User_Roles_delete.html?Role_Name=' + STARK_User_Roles.Role_Name" target="_blank" v-if="auth_list.Delete.allowed"><img src="images/x-square.svg" class="bg-danger"></a>
+                                    <a :href="'STARK_User_Roles_edit.html?Role_Name=' + STARK_User_Roles['Role Name']" target="_blank" v-if="auth_list.Edit.allowed"><img src="images/pencil-square.svg" class="bg-info"></a>
+                                    <a :href="'STARK_User_Roles_delete.html?Role_Name=' + STARK_User_Roles['Role Name']" target="_blank" v-if="auth_list.Delete.allowed"><img src="images/x-square.svg" class="bg-danger"></a>
                                 </td>
                                 <template v-for="column in STARK_report_fields">
-                                    <td>{{ STARK_User_Roles[column.field] }}</td>
+                                    <td>{{ STARK_User_Roles[column] }}</td>
                                 </template>             
                             </tr>
                         </template>
