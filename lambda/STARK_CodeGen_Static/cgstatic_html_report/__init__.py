@@ -254,8 +254,8 @@ def create(data):
                                     <template v-for="{entity_varname} in listview_table" id="listview-table">
                                         <tr>
                                             <td>
-                                                <a :href="'{entity_varname}_edit.html?{pk_varname}=' + {entity_varname}[{pk}]" target="_blank" v-if="auth_list.Edit.allowed"><img src="images/pencil-square.svg" class="bg-info"></a>
-                                                <a :href="'{entity_varname}_delete.html?{pk_varname}=' + {entity_varname}[{pk}]" target="_blank" v-if="auth_list.Delete.allowed"><img src="images/x-square.svg" class="bg-danger"></a>
+                                                <a :href="'{entity_varname}_edit.html?{pk_varname}=' + {entity_varname}['{pk}']" target="_blank" v-if="auth_list.Edit.allowed"><img src="images/pencil-square.svg" class="bg-info"></a>
+                                                <a :href="'{entity_varname}_delete.html?{pk_varname}=' + {entity_varname}['{pk}']" target="_blank" v-if="auth_list.Delete.allowed"><img src="images/x-square.svg" class="bg-danger"></a>
                                             </td>
                                             <template v-for="column in STARK_report_fields">
                                                 <td>{{{{ {entity_varname}[column] }}}}</td>
