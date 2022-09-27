@@ -348,7 +348,6 @@ def create(data):
         ddb_arguments['TableName'] = ddb_table
         ddb_arguments['IndexName'] = "STARK-ListView-Index"
         ddb_arguments['Select'] = "ALL_ATTRIBUTES"
-        ddb_arguments['Limit'] = 2
         ddb_arguments['ReturnConsumedCapacity'] = 'TOTAL'
         ddb_arguments['KeyConditionExpression'] = 'sk = :sk'
         ddb_arguments['ExpressionAttributeValues'] = object_expression_value
