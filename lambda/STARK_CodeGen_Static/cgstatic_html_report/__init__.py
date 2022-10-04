@@ -243,7 +243,7 @@ def create(data):
                             <table class="table  table-hover table-striped table-dark">
                                 <thead class="thead-dark">
                                     <tr>
-                                        <th scope="col" width = "20px"> Operations </th>
+                                        <th v-if="showOperations" scope="col" width = "20px"> Operations </th>
                                         <template v-for="column in STARK_report_fields" id="STARK_report_fields">
                                             <th scope="col">{{{{column}}}}</th>
                                         </template>"""
@@ -253,7 +253,7 @@ def create(data):
                                 <tbody>
                                     <template v-for="{entity_varname} in listview_table" id="listview-table">
                                         <tr>
-                                            <td>
+                                            <td v-if="showOperations">
                                                 <a :href="'{entity_varname}_edit.html?{pk_varname}=' + {entity_varname}['{pk}']" target="_blank" v-if="auth_list.Edit.allowed"><img src="images/pencil-square.svg" class="bg-info"></a>
                                                 <a :href="'{entity_varname}_delete.html?{pk_varname}=' + {entity_varname}['{pk}']" target="_blank" v-if="auth_list.Delete.allowed"><img src="images/x-square.svg" class="bg-danger"></a>
                                             </td>
