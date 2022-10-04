@@ -231,7 +231,8 @@ var root = new Vue({
         STARK_sum_fields: [],
         STARK_count_fields: [],
         STARK_group_by_1: '',
-        Y_Data: []
+        Y_Data: [],
+        showOperations: true,
     },
     methods: {
 
@@ -469,6 +470,10 @@ var root = new Vue({
                 root.metadata['STARK_Chart_Type'].required = false
                 root.metadata['STARK_X_Data_Source'].required = false
                 root.metadata['STARK_Y_Data_Source'].required = false
+                if(root.custom_report.STARK_group_by_1 != '')
+                {
+                    root.showOperations = false
+                }
             }
             else {
                 root.metadata['STARK_Chart_Type'].required = true
@@ -491,9 +496,13 @@ var root = new Vue({
                     STARK_Module_app.report(report_payload).then( function(data) {
                         root.listview_table = data[0];
                         if(root.listview_table.length > 0) {
-                            root.STARK_report_fields = Object.keys(root.listview_table[0]) 
-                            root.temp_csv_link = data[1];
-                            root.temp_pdf_link = data[2];
+                            if(root.custom_report.STARK_Report_Type == 'Tabular') {
+                                root.STARK_report_fields = root.checked_fields 
+                                root.temp_csv_link = data[1];
+                                root.temp_pdf_link = data[2];
+                            } else {
+                                root.STARK_report_fields = Object.keys(root.listview_table[0])
+                            }
                         }
                         console.log("DONE! Retrieved report.");
                         loading_modal.hide()
