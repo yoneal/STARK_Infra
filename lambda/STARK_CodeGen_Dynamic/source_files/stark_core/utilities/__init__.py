@@ -59,14 +59,19 @@ def compose_report_operators_and_parameters(key, data):
 
     return composed_filter_dict
 
-def create_csv(report_list, csv_header, diff_list):
+def filter_report_list(report_list, diff_list):
+    for rows in report_list:
+        for index in diff_list:
+            rows.pop(index)
+    
+    return report_list
+
+def create_csv(report_list, csv_header):
     
     file_buff = StringIO()
     writer = csv.DictWriter(file_buff, fieldnames=csv_header)
     writer.writeheader()
     for rows in report_list:
-        for index in diff_list:
-            rows.pop(index)
         writer.writerow(rows)
 
     filename = f"{str(uuid.uuid4())}"
