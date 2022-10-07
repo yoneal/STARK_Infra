@@ -140,14 +140,13 @@ def lambda_handler(event, context):
     #Lambda Layers###
     cloud_resources["Layers"] = layer_parser.parse(data)
 
+    #CloudFront ##################
+    cloud_resources["CloudFront"] = cloudfront_parser.parse(data)
 
     #SQS #######################
     #Disable for now, not yet implemented, just contains stub
     #cloud_resources["SQS"] = sqs_parser.parse(data)
-
-    if with_cloudfront:
-        #CloudFront ##################
-        cloud_resources["CloudFront"] = cloudfront_parser.parse(data)
+    
 
     #For debugging: pretty-print the resulting JSON
     #json_formatted_str = json.dumps(cloud_resources, indent=2)

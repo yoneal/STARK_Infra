@@ -195,7 +195,8 @@ if construct_type == "module":
 elif construct_type == 'deploy':
     cf_data = {
         "__STARK_advanced__": {
-            "cf_enable": True,
+            "CloudFront": 
+                {"enable": True},
         }
     }
     cf_filename = 'cf_yaml.yml'
