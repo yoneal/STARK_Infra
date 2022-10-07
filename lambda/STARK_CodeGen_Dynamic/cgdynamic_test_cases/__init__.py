@@ -34,7 +34,7 @@ def create(data):
     if col_type == 'SS':
         test_data_for_edit = ["Testing Edit"]
     elif col_type == 'N':
-        test_data_for_edit = 20
+        test_data_for_edit = "'20'"
 
     col_to_edit_varname = converter.convert_to_system_name(col_to_edit)
     

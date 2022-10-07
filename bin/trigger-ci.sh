@@ -4,7 +4,7 @@
 # FIXME: allow actual commit message as an optional parameter 
 
 auto_datetime=$(date '+%Y-%m-%d %H:%M:%S')
-python run_tests.py
+python bin\\run_tests.py
 test=$?
 if [ $test -eq 0 ] 
 then
