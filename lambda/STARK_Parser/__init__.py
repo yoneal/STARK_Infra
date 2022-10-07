@@ -22,9 +22,10 @@ model_parser       = importlib.import_module(f"{prepend_dir}parse_datamodel")
 lambda_parser      = importlib.import_module(f"{prepend_dir}parse_lambda")
 layer_parser       = importlib.import_module(f"{prepend_dir}parse_layers")
 s3_parser          = importlib.import_module(f"{prepend_dir}parse_s3")
+cloudfront_parser  = importlib.import_module(f"{prepend_dir}parse_cloudfront")
+
 ## unused imports
 # import parse_api_gateway as api_gateway_parser
-# import parse_cloudfront as cloudfront_parser
 # import parse_sqs as sqs_parser
 
 import get_relationship as get_rel
@@ -141,8 +142,7 @@ def lambda_handler(event, context):
     #cloud_resources["SQS"] = sqs_parser.parse(data)
 
     #CloudFront ##################
-    #Disable for now, not yet implemented, just contains stub
-    #cloud_resources["CloudFront"] = cloudfront_parser.parse(data)
+    cloud_resources["CloudFront"] = cloudfront_parser.parse(data)
 
     #For debugging: pretty-print the resulting JSON
     #json_formatted_str = json.dumps(cloud_resources, indent=2)

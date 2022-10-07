@@ -8,6 +8,9 @@ from textwrap import dedent
 
 import yaml
 
+import pprint
+pprint = pprint.PrettyPrinter(indent=4)
+
 #FIXME:
 #   This assumes cwd is always the bin folder inside the project base directory
 #   This needs to be updated after a real way to permanently specify project base dir within STARK CLI
@@ -82,6 +85,10 @@ class ValidateUpdateModule(argparse.Action):
 
         setattr(args, self.dest, json_file)
 
+class ValidateCDNActions(argparse.Action):
+    def __call__(self, parser, args, values, option_string=None):
+        ##FIXME: create validations here
+        setattr(args, self.dest, (values[0]))
 
 ##############################################################################
 #START OF MAIN STARK CLI CODE
@@ -116,11 +123,24 @@ parser.add_argument('--update-modules',
                         [1] full path and filename of your operation payload ''')
 )
 
+parser.add_argument('--cdn',
+                    required=False,
+                    nargs=1,
+                    dest='construct',
+                    action=ValidateCDNActions,
+                    help=dedent('''\
+                    Perform Cloudfront actions:
+                        [1] deploy - Deploys CDN of your project
+                        [2] status - Checks current status of deployed CDN ''')
+)
+
 args = parser.parse_args()
 
 construct = args.construct
-construct_type = construct[0]
-construct_file = construct[1]
+construct_type = construct
+if isinstance(construct, list):
+    construct_type = construct[0]
+    construct_file = construct[1]
 
 if construct_type == "module":
     print(f"Will now create new {construct_type} construct, using {construct_file}...")
@@ -147,7 +167,7 @@ if construct_type == "module":
     import libstark.STARK_Parser.parser_cli as stark_parser
     cloud_resources, current_cloud_resources = stark_parser.parse(construct_file)
     print(cloud_resources)
-
+    
     #3) CGDynamic
     #Replace STARK_Parser folder in sys.path with STARK_CodeGen_Dynamic
     import libstark.STARK_CodeGen_Dynamic.cgdynamic_cli as cgdynamic
@@ -169,5 +189,33 @@ if construct_type == "module":
 
     #Create a new template.yml file based on the newly written cloud_resources.yml
     create_iac_template(current_cloud_resources)
+
+    print("DONE")
+
+elif construct_type == 'deploy':
+    import libstark.STARK_Parser.parser_cli as stark_parser
+    import libstark.STARK_CodeGen_Dynamic.cgdynamic_cli as cgdynamic
+    cloud_resources, current_cloud_resources = stark_parser.parse('')
+    filename = project_basedir + "cloud_resources.yml"
+    current_cloud_resources["CloudFront"] = cloud_resources["CloudFront"]
+    with open(filename, "wb") as f:
+        f.write(yaml.dump(current_cloud_resources, sort_keys=False, encoding='utf-8'))
+    create_iac_template(current_cloud_resources)
+
+    print("DONE")
+
+elif construct_type == 'status':
+    print("Checking status..")
+    import boto3
+    client = boto3.client("cloudfront")
+
+    ##FIXME: manually place distribution ID for now, ID must be dynamically provided
+    response = client.get_distribution(
+        Id='E2L98D12ZMRFCQ'
+    )
+
+    print("Distribution Domain Name:", response['Distribution']['DomainName']) 
+    print("Distribution ID:", response['Distribution']['Id']) 
+    print("Status:", response['Distribution']['Status']) 
 
     print("DONE")
