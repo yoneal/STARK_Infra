@@ -30,6 +30,12 @@ def create(data):
         col_list.append(keys)
     col_to_edit = col_list[randint(0,len(col_list) - 1)]
     col_type = set_type(columns[col_to_edit])
+    test_data_for_edit = "'Testing Edit'"
+    if col_type == 'SS':
+        test_data_for_edit = ["Testing Edit"]
+    elif col_type == 'N':
+        test_data_for_edit = "'20'"
+
     col_to_edit_varname = converter.convert_to_system_name(col_to_edit)
     
     source_code = f"""\
@@ -87,7 +93,7 @@ def create(data):
         use_moto()
         ddb = boto3.client('dynamodb', region_name=core.test_region)
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
-        set_{entity_to_lower}_payload['{col_to_edit_varname}'] = "Testing Edit"
+        set_{entity_to_lower}_payload['{col_to_edit_varname}'] = {test_data_for_edit}
         {entity_to_lower}.edit(set_{entity_to_lower}_payload, ddb)
 
         assert set_{entity_to_lower}_payload['{col_to_edit_varname}'] == {entity_to_lower}.resp_obj['Attributes']['{col_to_edit_varname}']['{col_type}']
