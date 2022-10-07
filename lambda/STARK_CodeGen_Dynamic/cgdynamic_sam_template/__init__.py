@@ -83,6 +83,9 @@ def create(data, cli_mode=False):
     #Lambda-related data
     entities = cloud_resources['Data Model']
 
+    #CloudFront distribution config
+    cloudfront_distribution_config = cloud_resources.get('CloudFront', '')
+
     #FIXME: Should this transformation be here or in the Parser?
     #Let this remain here now, but probably should be the job of the parser in the future.
     if ddb_capacity_type != "PROVISIONED":
@@ -424,7 +427,44 @@ def create(data, cli_mode=False):
                 Architectures:
                     - arm64
                 MemorySize: 128
-                Timeout: 5
+                Timeout: 5"""
+    if cloudfront_distribution_config != '':
+        cf_template += f"""
+        STARKCloudFront:
+            Type: AWS::CloudFront::Distribution
+            Properties: 
+                DistributionConfig: 
+                    PriceClass: {cloudfront_distribution_config['PriceClass']}
+                    DefaultRootObject: {cloudfront_distribution_config['DefaultRootObject']}
+                    Enabled: {cloudfront_distribution_config['Enabled']}
+                    Origins:
+                        - Id: !Join [ "", [ "{s3_bucket_name}.", !FindInMap [ RegionMap, !Ref AWS::Region, s3endpoint] ] ]
+                          DomainName: !Join [ "", [ "{s3_bucket_name}.", !FindInMap [ RegionMap, !Ref AWS::Region, s3endpoint] ] ]
+                          CustomOriginConfig:
+                            HTTPPort: 80
+                            HTTPSPort: 443
+                            OriginReadTimeout: 30
+                            OriginKeepaliveTimeout: 5
+                            OriginProtocolPolicy: http-only
+                            OriginSSLProtocols:
+                                - TLSv1.2
+                          ConnectionAttempts: 3
+                          ConnectionTimeout: 10
+                    DefaultCacheBehavior:
+                        AllowedMethods:
+                            - HEAD
+                            - GET
+                        CachedMethods:
+                            - HEAD
+                            - GET
+                        CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+                        Compress: true
+                        SmoothStreaming: false
+                        TargetOriginId: !Join [ "", [ "{s3_bucket_name}.", !FindInMap [ RegionMap, !Ref AWS::Region, s3endpoint] ] ]
+                        ViewerProtocolPolicy: redirect-to-https
+                    HttpVersion: http2
+                    IPV6Enabled: true"""
+    cf_template += f"""
         STARKApiGateway:
             Type: AWS::Serverless::HttpApi
             Properties:
@@ -443,7 +483,11 @@ def create(data, cli_mode=False):
                 CorsConfiguration:
                     AllowOrigins:
                         - !Join [ "", [ "http://{s3_bucket_name}.", !FindInMap [ RegionMap, !Ref AWS::Region, s3endpoint] ] ]
-                        - http://localhost
+                        - http://localhost"""
+    if cloudfront_distribution_config != '':
+        cf_template += f"""
+                        - !Join [ "", [ "https://", !GetAtt STARKCloudFront.DomainName ] ]"""
+    cf_template += f"""
                     AllowHeaders:
                         - "Content-Type"
                         - "*"

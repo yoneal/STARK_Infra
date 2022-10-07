@@ -8,6 +8,9 @@ from textwrap import dedent
 
 import yaml
 
+import pprint
+pprint = pprint.PrettyPrinter(indent=4)
+
 #FIXME:
 #   This assumes cwd is always the bin folder inside the project base directory
 #   This needs to be updated after a real way to permanently specify project base dir within STARK CLI
@@ -82,6 +85,14 @@ class ValidateUpdateModule(argparse.Action):
 
         setattr(args, self.dest, json_file)
 
+class ValidateCDNActions(argparse.Action):
+    def __call__(self, parser, args, values, option_string=None):
+        valid_actions = ('deploy', 'status')
+        action = values[0]
+
+        if action not in valid_actions:
+            raise ValueError(f'invalid construct type "{action}". Must be one of: {valid_actions}')
+        setattr(args, self.dest, (action))
 
 ##############################################################################
 #START OF MAIN STARK CLI CODE
@@ -116,11 +127,24 @@ parser.add_argument('--update-modules',
                         [1] full path and filename of your operation payload ''')
 )
 
+parser.add_argument('--cdn',
+                    required=False,
+                    nargs=1,
+                    dest='construct',
+                    action=ValidateCDNActions,
+                    help=dedent('''\
+                    Perform Cloudfront actions:
+                        [1] deploy - Deploys CDN of your project
+                        [2] status - Checks current status of deployed CDN ''')
+)
+
 args = parser.parse_args()
 
 construct = args.construct
-construct_type = construct[0]
-construct_file = construct[1]
+construct_type = construct
+if isinstance(construct, list):
+    construct_type = construct[0]
+    construct_file = construct[1]
 
 if construct_type == "module":
     print(f"Will now create new {construct_type} construct, using {construct_file}...")
@@ -147,7 +171,7 @@ if construct_type == "module":
     import libstark.STARK_Parser.parser_cli as stark_parser
     cloud_resources, current_cloud_resources = stark_parser.parse(construct_file)
     print(cloud_resources)
-
+    
     #3) CGDynamic
     #Replace STARK_Parser folder in sys.path with STARK_CodeGen_Dynamic
     import libstark.STARK_CodeGen_Dynamic.cgdynamic_cli as cgdynamic
@@ -171,3 +195,67 @@ if construct_type == "module":
     create_iac_template(current_cloud_resources)
 
     print("DONE")
+
+elif construct_type == 'deploy':
+    print("Enabling CloudFront deployment..")
+    cf_data = {
+        "__STARK_advanced__": {
+            "CloudFront": 
+                {"enable": True},
+        }
+    }
+    cf_filename = 'cf_yaml.yml'
+    
+    with open(cf_filename, "w") as f:
+        f.write(yaml.dump(cf_data, default_flow_style=False))
+
+    import libstark.STARK_Parser.parser_cli as stark_parser
+    import libstark.STARK_CodeGen_Dynamic.cgdynamic_cli as cgdynamic
+    cloud_resources, current_cloud_resources = stark_parser.parse(cf_filename)
+
+    filename = project_basedir + "cloud_resources.yml"
+    current_cloud_resources["CloudFront"] = cloud_resources["CloudFront"]
+    with open(filename, "wb") as f:
+        f.write(yaml.dump(current_cloud_resources, sort_keys=False, encoding='utf-8'))
+    create_iac_template(current_cloud_resources)
+    
+    import os
+    os.unlink(cf_filename)
+
+    print("Done")
+
+elif construct_type == 'status':
+    print("Checking status..")
+    import boto3
+
+    ## Get project name from cloud resources
+    cloud_resources_dir = '../cloud_resources.yml'
+    with open(cloud_resources_dir, "r") as f:
+        current_cloud_resources = yaml.safe_load(f.read())
+        project_name            = current_cloud_resources["Project Name"]
+
+    with_cloudfront = current_cloud_resources.get('CloudFront', False)
+
+    if with_cloudfront:
+        ## compose stack name by trimming whitespaces in project name then append to project stack name template 
+        stack_name = f"STARK-project-{project_name.replace(' ','')}"
+
+        ##fetch the physical distribution id of CloudFront
+        cfn = boto3.resource('cloudformation')
+        stack_resource = cfn.StackResource(stack_name, 'STARKCloudFront')
+        distribution_id = stack_resource.physical_resource_id
+        try:
+            client = boto3.client("cloudfront")
+            response = client.get_distribution(
+                Id=distribution_id
+            )
+
+            print("Distribution Domain Name:", response['Distribution']['DomainName']) 
+            print("Distribution ID:", response['Distribution']['Id']) 
+            print("Status:", response['Distribution']['Status'])
+            print("Enabled:", response['Distribution']['DistributionConfig'].get('Enabled'))  
+
+        except Exception as error :
+             print(error)
+    else:
+        print('No CloudFront distribution yet for this project. Run "./stark.py --cdn deploy" to create one')

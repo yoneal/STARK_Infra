@@ -18,6 +18,7 @@ model_parser       = importlib.import_module(f"{prepend_dir}parse_datamodel")
 lambda_parser      = importlib.import_module(f"{prepend_dir}parse_lambda")
 layer_parser       = importlib.import_module(f"{prepend_dir}parse_layers")
 s3_parser          = importlib.import_module(f"{prepend_dir}parse_s3")
+cloudfront_parser  = importlib.import_module(f"{prepend_dir}parse_cloudfront")
 
 ## unused imports
 # import parse_api_gateway as api_gateway_parser
@@ -41,7 +42,7 @@ def parse(construct_file):
         data_model = yaml.safe_load(f.read())
 
     entities = []
-
+    with_cloudfront = False
     #Some essential project metadata
     #   These won't be in the construct file provided by the user (that would be redundant and tiresome)
     #   so we have to get this from the project's existing cloud_resources document
@@ -58,7 +59,9 @@ def parse(construct_file):
             project_varname = converter.convert_to_system_name(project_name)
 
         elif key == "__STARK_advanced__":
-            pass
+            for advance_config in data_model[key]:
+                if advance_config == 'CloudFront':
+                    with_cloudfront = True
 
         else:
             entities.append(key)
@@ -90,14 +93,16 @@ def parse(construct_file):
 
     #Lambdas ###
     cloud_resources["Lambda"] = lambda_parser.parse(data)
+    
+    if with_cloudfront:
+        #CloudFront ##################
+        cloud_resources["CloudFront"] = cloudfront_parser.parse(data)
+
 
     #SQS #######################
     #Disable for now, not yet implemented, just contains stub
     #cloud_resources["SQS"] = sqs_parser.parse(data)
 
-    #CloudFront ##################
-    #Disable for now, not yet implemented, just contains stub
-    #cloud_resources["CloudFront"] = cloudfront_parser.parse(data)
 
     #For debugging: pretty-print the resulting JSON
     #json_formatted_str = json.dumps(cloud_resources, indent=2)

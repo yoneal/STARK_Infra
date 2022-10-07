@@ -348,7 +348,6 @@ def create(data):
         ddb_arguments['TableName'] = ddb_table
         ddb_arguments['IndexName'] = "STARK-ListView-Index"
         ddb_arguments['Select'] = "ALL_ATTRIBUTES"
-        ddb_arguments['Limit'] = 2
         ddb_arguments['ReturnConsumedCapacity'] = 'TOTAL'
         ddb_arguments['KeyConditionExpression'] = 'sk = :sk'
         ddb_arguments['ExpressionAttributeValues'] = object_expression_value
@@ -440,7 +439,11 @@ def create(data):
                 temp_dict = {{}}
                 #remove primary identifiers and STARK attributes
                 if not aggregate_report:
-                    key.pop("sk")
+                    key.pop("sk")"""
+    if with_upload:
+        source_code += f"""
+                    key.pop("STARK uploaded s3 keys")"""
+    source_code += f"""
                 for index, value in key.items():
                     temp_dict[index.replace("_"," ")] = value
                 report_list.append(temp_dict)
@@ -487,7 +490,7 @@ def create(data):
             if next_token != '':
                 ddb_arguments['ExclusiveStartKey']=next_token
 
-            response = ddb.query(**ddb_arguments)
+            response = db_handler.query(**ddb_arguments)
             raw = response.get('Items')
             next_token = response.get('LastEvaluatedKey')
 
