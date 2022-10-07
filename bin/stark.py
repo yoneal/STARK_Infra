@@ -87,8 +87,12 @@ class ValidateUpdateModule(argparse.Action):
 
 class ValidateCDNActions(argparse.Action):
     def __call__(self, parser, args, values, option_string=None):
-        ##FIXME: create validations here
-        setattr(args, self.dest, (values[0]))
+        valid_actions = ('deploy', 'status')
+        action = values[0]
+
+        if action not in valid_actions:
+            raise ValueError(f'invalid construct type "{action}". Must be one of: {valid_actions}')
+        setattr(args, self.dest, (action))
 
 ##############################################################################
 #START OF MAIN STARK CLI CODE
@@ -193,6 +197,7 @@ if construct_type == "module":
     print("DONE")
 
 elif construct_type == 'deploy':
+    print("Enabling CloudFront deployment..")
     cf_data = {
         "__STARK_advanced__": {
             "CloudFront": 
@@ -217,14 +222,15 @@ elif construct_type == 'deploy':
     import os
     os.unlink(cf_filename)
 
-    print("DONE")
+    print("Done")
 
 elif construct_type == 'status':
     print("Checking status..")
     import boto3
 
     ## Get project name from cloud resources
-    with open("../cloud_resources.yml", "r") as f:
+    cloud_resources_dir = '../cloud_resources.yml'
+    with open(cloud_resources_dir, "r") as f:
         current_cloud_resources = yaml.safe_load(f.read())
         project_name            = current_cloud_resources["Project Name"]
 
@@ -238,16 +244,18 @@ elif construct_type == 'status':
         cfn = boto3.resource('cloudformation')
         stack_resource = cfn.StackResource(stack_name, 'STARKCloudFront')
         distribution_id = stack_resource.physical_resource_id
+        try:
+            client = boto3.client("cloudfront")
+            response = client.get_distribution(
+                Id=distribution_id
+            )
 
-        client = boto3.client("cloudfront")
-        response = client.get_distribution(
-            Id=distribution_id
-        )
+            print("Distribution Domain Name:", response['Distribution']['DomainName']) 
+            print("Distribution ID:", response['Distribution']['Id']) 
+            print("Status:", response['Distribution']['Status'])
+            print("Enabled:", response['Distribution']['DistributionConfig'].get('Enabled'))  
 
-        print("Distribution Domain Name:", response['Distribution']['DomainName']) 
-        print("Distribution ID:", response['Distribution']['Id']) 
-        print("Status:", response['Distribution']['Status']) 
-
-        print("DONE")
+        except Exception as error :
+             print(error)
     else:
-        print('No CloudFront distribution yet. Run "./stark.py --cdn deploy" to create one')
+        print('No CloudFront distribution yet for this project. Run "./stark.py --cdn deploy" to create one')
