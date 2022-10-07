@@ -487,7 +487,7 @@ def create(data):
             if next_token != '':
                 ddb_arguments['ExclusiveStartKey']=next_token
 
-            response = ddb.query(**ddb_arguments)
+            response = db_handler.query(**ddb_arguments)
             raw = response.get('Items')
             next_token = response.get('LastEvaluatedKey')
 
