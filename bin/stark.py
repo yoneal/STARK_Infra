@@ -193,29 +193,60 @@ if construct_type == "module":
     print("DONE")
 
 elif construct_type == 'deploy':
+    cf_data = {
+        "__STARK_advanced__": {
+            "cf_enable": True,
+        }
+    }
+    cf_filename = 'cf_yaml.yml'
+    
+    with open(cf_filename, "w") as f:
+        f.write(yaml.dump(cf_data, default_flow_style=False))
+
     import libstark.STARK_Parser.parser_cli as stark_parser
     import libstark.STARK_CodeGen_Dynamic.cgdynamic_cli as cgdynamic
-    cloud_resources, current_cloud_resources = stark_parser.parse('')
+    cloud_resources, current_cloud_resources = stark_parser.parse(cf_filename)
+
     filename = project_basedir + "cloud_resources.yml"
     current_cloud_resources["CloudFront"] = cloud_resources["CloudFront"]
     with open(filename, "wb") as f:
         f.write(yaml.dump(current_cloud_resources, sort_keys=False, encoding='utf-8'))
     create_iac_template(current_cloud_resources)
+    
+    import os
+    os.unlink(cf_filename)
 
     print("DONE")
 
 elif construct_type == 'status':
     print("Checking status..")
     import boto3
-    client = boto3.client("cloudfront")
 
-    ##FIXME: manually place distribution ID for now, ID must be dynamically provided
-    response = client.get_distribution(
-        Id='E2L98D12ZMRFCQ'
-    )
+    ## Get project name from cloud resources
+    with open("../cloud_resources.yml", "r") as f:
+        current_cloud_resources = yaml.safe_load(f.read())
+        project_name            = current_cloud_resources["Project Name"]
 
-    print("Distribution Domain Name:", response['Distribution']['DomainName']) 
-    print("Distribution ID:", response['Distribution']['Id']) 
-    print("Status:", response['Distribution']['Status']) 
+    with_cloudfront = current_cloud_resources.get('CloudFront', False)
 
-    print("DONE")
+    if with_cloudfront:
+        ## compose stack name by trimming whitespaces in project name then append to project stack name template 
+        stack_name = f"STARK-project-{project_name.replace(' ','')}"
+
+        ##fetch the physical distribution id of CloudFront
+        cfn = boto3.resource('cloudformation')
+        stack_resource = cfn.StackResource(stack_name, 'STARKCloudFront')
+        distribution_id = stack_resource.physical_resource_id
+
+        client = boto3.client("cloudfront")
+        response = client.get_distribution(
+            Id=distribution_id
+        )
+
+        print("Distribution Domain Name:", response['Distribution']['DomainName']) 
+        print("Distribution ID:", response['Distribution']['Id']) 
+        print("Status:", response['Distribution']['Status']) 
+
+        print("DONE")
+    else:
+        print('No CloudFront distribution yet. Run "./stark.py --cdn deploy" to create one')

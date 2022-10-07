@@ -87,6 +87,8 @@ def lambda_handler(event, context):
     project_name = ""
     project_varname = ""
 
+    with_cloudfront = False
+
     for key in data_model:
         if key == "__STARK_project_name__":
             project_name = data_model[key]
@@ -100,7 +102,9 @@ def lambda_handler(event, context):
             project_varname = converter.convert_to_system_name(project_name)
 
         elif key == "__STARK_advanced__":
-            pass
+            for advance_config in data_model[key]:
+                if advance_config == 'CloudFront':
+                    with_cloudfront = True
 
         else:
             entities.append(key)
@@ -141,8 +145,9 @@ def lambda_handler(event, context):
     #Disable for now, not yet implemented, just contains stub
     #cloud_resources["SQS"] = sqs_parser.parse(data)
 
-    #CloudFront ##################
-    cloud_resources["CloudFront"] = cloudfront_parser.parse(data)
+    if with_cloudfront:
+        #CloudFront ##################
+        cloud_resources["CloudFront"] = cloudfront_parser.parse(data)
 
     #For debugging: pretty-print the resulting JSON
     #json_formatted_str = json.dumps(cloud_resources, indent=2)
