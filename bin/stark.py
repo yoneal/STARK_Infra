@@ -142,7 +142,7 @@ args = parser.parse_args()
 
 construct = args.construct
 construct_type = construct
-if isinstance(construct, list):
+if isinstance(construct, tuple):
     construct_type = construct[0]
     construct_file = construct[1]
 
