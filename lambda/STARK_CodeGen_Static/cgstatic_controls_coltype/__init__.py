@@ -206,6 +206,9 @@ def create(data):
                 if has_many_ux == 'something':
                     #FIXME: placeholder for other design of has many
                     placeholder = "replace me with actual element design"
+                elif has_many_ux == 'repeater':
+                    #FIXME: placeholder for other design of has many for repeater
+                    placeholder = ""
                 else:
                     #default has many ux
                     #multi-select pill
