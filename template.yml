@@ -124,7 +124,7 @@ Resources:
             Content:
                 S3Bucket: !Ref UserCodeGenBucketNameParameter
                 S3Key: STARKLambdaLayers/STARK_get_relationship_py39.zip
-            Description: STARK module for extracting relationships 
+            Description: STARK module for extracting relationship for 1-1 and 1-M
             LayerName: STARK_get_relationship
             CompatibleArchitectures:
                 - x86_64
