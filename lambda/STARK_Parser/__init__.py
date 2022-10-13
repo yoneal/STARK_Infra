@@ -120,6 +120,7 @@ def lambda_handler(event, context):
         'data_model': data_model,
         'project_name': project_name,
         'project_varname': project_varname,
+        'raw_data_model': cloud_resources["Data Model"]
     }
 
     #Data Model ###
