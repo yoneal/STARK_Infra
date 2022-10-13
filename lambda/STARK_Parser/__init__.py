@@ -130,6 +130,7 @@ def lambda_handler(event, context):
     cloud_resources["S3 webserve"] = s3_parser.parse(data)
 
     #API Gateway ###
+    data.update({'raw_data_model': cloud_resources["Data Model"]})
     cloud_resources["API Gateway"] = api_gateway_parser.parse(data)
 
     #DynamoDB ###
