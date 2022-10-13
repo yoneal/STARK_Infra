@@ -612,7 +612,7 @@ def create(data):
     if len(relationships) > 0:
         source_code += f"""
         for relation in relationships['has_one']:
-            cascade_pk_change_to_child(data, relation['child'], relation['attribute'])
+            cascade_pk_change_to_child(data, relation['entity'], relation['attribute'])
         """
     source_code += f"""
 
@@ -667,7 +667,7 @@ def create(data):
             data['orig_pk'] = pk
 
         for relation in relationships['has_one']:
-            cascade_pk_change_to_child(data, relation['child'], relation['attribute'])
+            cascade_pk_change_to_child(data, relation['entity'], relation['attribute'])
         """
     source_code += f"""
         global resp_obj

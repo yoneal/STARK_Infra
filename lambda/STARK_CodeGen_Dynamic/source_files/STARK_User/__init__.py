@@ -402,7 +402,7 @@ def edit(data, db_handler = None):
     response = db_handler.update_item(**ddb_arguments)
 
     # for relation in relationships['has_one']:
-    #     cascade_pk_change_to_child(data, relation['child'], relation['attribute'])
+    #     cascade_pk_change_to_child(data, relation['entity'], relation['attribute'])
 
     assign_role_permissions({'Username': pk, 'Role': Role })
 
@@ -443,7 +443,7 @@ def add(data, method='POST', db_handler=None):
     print(assign_role_permissions({'Username': pk, 'Role': Role }))
 
     # for relation in relationships['has_one']:
-    #     cascade_pk_change_to_child(data, relation['child'], relation['attribute'])
+    #     cascade_pk_change_to_child(data, relation['entity'], relation['attribute'])
     global resp_obj
     resp_obj = response
     return "OK"
