@@ -611,8 +611,8 @@ def create(data):
         """
     if len(relationships) > 0:
         source_code += f"""
-        for relation in relationships:
-            cascade_pk_change_to_child(data, relation['parent'], relation['child'], relation['attribute'])
+        for relation in relationships['has_one']:
+            cascade_pk_change_to_child(data, relation['child'], relation['attribute'])
         """
     source_code += f"""
 
@@ -666,8 +666,8 @@ def create(data):
         if method == 'POST':
             data['orig_pk'] = pk
 
-        for relation in relationships:
-            cascade_pk_change_to_child(data, relation['parent'], relation['child'], relation['attribute'])
+        for relation in relationships['has_one']:
+            cascade_pk_change_to_child(data, relation['child'], relation['attribute'])
         """
     source_code += f"""
         global resp_obj
@@ -744,7 +744,7 @@ def create(data):
     
     if len(relationships) > 0:
         source_code += f"""    
-    def cascade_pk_change_to_child(params, parent_entity_name, child_entity_name, attribute):
+    def cascade_pk_change_to_child(params, child_entity_name, attribute):
         temp_import = importlib.import_module(child_entity_name)
 
         #fetch all records from child using old pk value

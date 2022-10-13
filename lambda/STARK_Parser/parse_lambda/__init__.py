@@ -86,9 +86,10 @@ def parse(data, relationship = []):
     }
     for entity in entities:
         dependencies = []
-        for relation in relationship:
-            if entity == relation['parent']:
-                dependencies.append(relation['child'])
+        if relationship.get('has_one', '') != '':
+            for relation in relationship.get('has_one'):
+                if entity == relation['entity']:
+                    dependencies.append(relation['entity'])
 
         parsed[entity] = {
             "Memory": 128,

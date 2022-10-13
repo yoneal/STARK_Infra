@@ -401,8 +401,8 @@ def edit(data, db_handler = None):
     ddb_arguments['ExpressionAttributeValues'] = ExpressionAttributeValuesDict
     response = db_handler.update_item(**ddb_arguments)
 
-    # for relation in relationships:
-    #     cascade_pk_change_to_child(data, relation['parent'], relation['child'], relation['attribute'])
+    # for relation in relationships['has_one']:
+    #     cascade_pk_change_to_child(data, relation['child'], relation['attribute'])
 
     assign_role_permissions({'Username': pk, 'Role': Role })
 
@@ -442,8 +442,8 @@ def add(data, method='POST', db_handler=None):
     assign_role_permissions({'Username': pk, 'Role': Role })
     print(assign_role_permissions({'Username': pk, 'Role': Role }))
 
-    # for relation in relationships:
-    #     cascade_pk_change_to_child(data, relation['parent'], relation['child'], relation['attribute'])
+    # for relation in relationships['has_one']:
+    #     cascade_pk_change_to_child(data, relation['child'], relation['attribute'])
     global resp_obj
     resp_obj = response
     return "OK"
@@ -807,7 +807,7 @@ def get_all_by_old_parent_value(old_pk_val, attribute, sk = default_sk):
 
     return items
 
-def cascade_pk_change_to_child(params, parent_entity_name, child_entity_name, attribute):
+def cascade_pk_change_to_child(params, child_entity_name, attribute):
     temp_import = importlib.import_module(child_entity_name)
 
     #fetch all records from child using old pk value
