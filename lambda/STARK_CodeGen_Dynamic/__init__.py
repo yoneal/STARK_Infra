@@ -77,11 +77,11 @@ def create_handler(event, context):
         #Step 1: generate source code.
         #Step 1.1: extract relationship
         relationships = get_rel.get_relationship(models, entity)
-        for index, items in relationships.items():
-            if len(items) > 0:
-                for key in items:
-                    for value in key:
-                        key[value] = converter.convert_to_system_name(key[value])
+        for index in relationships:
+            index['parent']    = converter.convert_to_system_name(index['parent'])
+            index['child']     = converter.convert_to_system_name(index['child'])
+            index['attribute'] = converter.convert_to_system_name(index['attribute'])
+        # print(relationships)
         data = {
             "Entity": entity, 
             "Columns": models[entity]["data"], 
