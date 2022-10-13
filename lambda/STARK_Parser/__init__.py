@@ -28,7 +28,7 @@ cloudfront_parser  = importlib.import_module(f"{prepend_dir}parse_cloudfront")
 # import parse_api_gateway as api_gateway_parser
 # import parse_sqs as sqs_parser
 
-import get_relationship as get_rel
+
 import convert_friendly_to_system as converter
 
 #Get environment variable - this will allow us to take different branches depending on whether we are LOCAL or PROD (or any other future valid value)
@@ -135,7 +135,7 @@ def lambda_handler(event, context):
     cloud_resources["DynamoDB"] = dynamodb_parser.parse(data)
 
     #Lambda ###
-    cloud_resources["Lambda"] = lambda_parser.parse(data, get_rel.get_relationship(cloud_resources["Data Model"]))
+    cloud_resources["Lambda"] = lambda_parser.parse(data)
 
     #Lambda Layers###
     cloud_resources["Layers"] = layer_parser.parse(data)
