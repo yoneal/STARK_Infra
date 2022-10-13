@@ -77,6 +77,7 @@ def create_handler(event, context):
         #Step 1: generate source code.
         #Step 1.1: extract relationship
         relationships = get_rel.get_relationship(models, entity)
+        print(relationships)
         for index, items in relationships.items():
             if len(items) > 0:
                 for key in items:
