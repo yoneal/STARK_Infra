@@ -25,6 +25,11 @@ def create(data):
     entity_varname = converter.convert_to_system_name(entity)
     entity_app     = entity_varname + '_app'
     pk_varname     = converter.convert_to_system_name(pk)
+    cloud_resources = data['cloud_resources']
+    entities = cloud_resources['Data Model']
+
+    print('entities')
+    print(entities)
 
     #file upload controls
     with_upload         = False
