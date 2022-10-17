@@ -15,7 +15,8 @@ cg_coltype = importlib.import_module(f"{prepend_dir}cgstatic_controls_coltype")
 import convert_friendly_to_system as converter
 
 def create(data):
-
+    print('data')
+    print(data)
     entity         = data["Entity"]
     cols           = data["Columns"]
     pk             = data['PK']
