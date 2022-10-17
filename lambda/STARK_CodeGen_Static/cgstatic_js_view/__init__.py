@@ -286,19 +286,25 @@ def create(data):
                 Y_Data: [],
                 showOperations: true,"""
 
+    print('cols.items()')
+    print(cols.items())
     for col, col_type in cols.items():
-            if isinstance(col_type, dict) and col_type["type"] == "relationship":
-                has_many = col_type.get('has_many', '')
-                if has_many != '':
-                    source_code += f"""
-                    {has_many}: {{
-                    '{has_many[pk]}': '',
-                    """
+        print('col')
+        print(col)
+        print('col_type')
+        print(col_type)
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_many = col_type.get('has_many', '')
+            if has_many != '':
+                source_code += f"""
+                {has_many}: {{
+                '{has_many[pk]}': '',
+                """
 
-                    for col in cols:
-                        col_varname = converter.convert_to_system_name(col)
-                        source_code += f"""
-                                    '{col_varname}': '',""" 
+                for col in cols:
+                    col_varname = converter.convert_to_system_name(col)
+                    source_code += f"""
+                                '{col_varname}': '',""" 
                 
     source_code += f"""}},
             methods: {{"""
