@@ -15,9 +15,9 @@ if 'libstark' in os.listdir():
 cg_coltype = importlib.import_module(f"{prepend_dir}cgstatic_controls_coltype")  
 import convert_friendly_to_system as converter
 
-def create(data, model):
-    print('model')
-    print(model['Order Items'])
+def create(data):
+    # print('model')
+    # print(model['Order Items'])
     # print('data')
     # print(data)
     entity         = data["Entity"]
@@ -314,6 +314,12 @@ def create(data, model):
     source_code += f"""}},
             methods: {{"""
 
+            # getEntityFields: function (entity) {{
+            #     id = model['{entity}']['pk']
+            #     print(id)
+            #     data = model['{entity}']['data]
+            #     print(data)
+            # }},
 
     for col, col_type in cols.items():
             if isinstance(col_type, dict) and col_type["type"] == "relationship":
@@ -321,12 +327,7 @@ def create(data, model):
                 if has_many != '': 
                     source_code += f"""
 
-                    getEntityFields: function (entity) {{
-                        id = model['{entity}']['pk']
-                        print(id)
-                        data = model['{entity}']['data]
-                        print(data)
-                    }},
+                    
 
                     AddField: function (entity) {{
                         many_fields = root[entity][0]
