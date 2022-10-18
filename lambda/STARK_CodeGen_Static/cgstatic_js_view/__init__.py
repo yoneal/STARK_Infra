@@ -286,17 +286,26 @@ def create(data):
                 Y_Data: [],
                 showOperations: true,
             }},
-            methods: {{
+            methods: {{"""
 
-                AddField: function (entity) {{
-                    many_fields = root[entity][0]
-                    root[entity].push({{many_fields}})
-                }},
+    for col, col_type in cols.items():
+        col_varname = converter.convert_to_system_name(col)
+        if isinstance(col_type, dict):
+            col_values = col_type.get("values", "")
+            if col_type["type"] == "relationship" or isinstance(col_values, list):
+                has_many = col_type.get('has_many', '')
+                if has_many != "":
+                    search_string += f"""
+                    AddField: function (entity) {{
+                        many_fields = root[entity][0]
+                        root[entity].push({{many_fields}})
+                    }},
 
-                RemoveField: function (index, entity) {{
-                    this[entity].splice(index, 1);       
-                }},
+                    RemoveField: function (index, entity) {{
+                        this[entity].splice(index, 1);       
+                    }},"""
 
+    source_code += f"""
                 show: function () {{
                     this.visibility = 'visible';
                 }},
