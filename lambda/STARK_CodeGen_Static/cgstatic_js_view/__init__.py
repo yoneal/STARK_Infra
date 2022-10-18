@@ -315,7 +315,21 @@ def create(data):
     source_code += f""")
                     this.metadata = response['new_metadata']
                     if(response['is_valid_form']) {{
-                        loading_modal.show()
+                        loading_modal.show()"""
+    for col, col_type in cols.items():
+        if isinstance(col_type, dict):
+            col_varname = converter.convert_to_system_name(col)
+            col_values = col_type.get("values", "")
+            has_many_ux = col_type.get('has_many_ux', '')
+            if col_type["type"] == "relationship":
+                has_many = col_type.get('has_many', '')
+                if has_many != '':
+                    if has_many_ux == 'repeater':
+                        source_code += f"""
+                        this.{entity_varname}.{col_varname} = {{ {col_varname}: JSON.stringify(root.{col_varname}) }}
+                        """
+                        
+    source_code += f"""    
                         let data = {{ {entity_varname}: this.{entity_varname} }}
 
                         {entity_app}.add(data).then( function(data) {{
@@ -368,8 +382,10 @@ def create(data):
         col_varname = converter.convert_to_system_name(col)
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_many = col_type.get('has_many', '')
+            has_many_ux = col_type.get('has_many_ux', '')
             if has_many != "":
-                source_code += f"""
+                if has_many_ux == '':
+                    source_code += f"""
                     this.{entity_varname}.{col_varname} = (root.multi_select_values.{col_varname}.sort()).join(', ')"""
     
     source_code += f"""
@@ -392,7 +408,7 @@ def create(data):
                     if has_many_ux == 'repeater':
                         print(has_many)
                         source_code += f"""
-                        this.{entity_app}.{col_varname} = {{ {col_varname}: JSON.stringify(root.{col_varname}) }}"""
+                        this.{entity_varname}.{col_varname} = {{ {col_varname}: JSON.stringify(root.{col_varname}) }}"""
 
     source_code += f"""
                         let data = {{ {entity_varname}: this.{entity_varname} }}
@@ -469,6 +485,20 @@ def create(data):
                 source_code += f"""
                             root.multi_select_values.{foreign_entity} = root.{entity_varname}.{foreign_entity}.split(', ')
                             root.list_{foreign_entity}()"""
+
+    for col, col_type in cols.items():
+        if isinstance(col_type, dict):
+            col_varname = converter.convert_to_system_name(col)
+            col_values = col_type.get("values", "")
+            has_many_ux = col_type.get('has_many_ux', '')
+            if col_type["type"] == "relationship":
+                has_many = col_type.get('has_many', '')
+                if has_many != '':
+                    if has_many_ux == 'repeater':
+                        source_code += f"""
+                            if(data["{col_varname}"].length > 0) {{
+                                root.{col_varname} = JSON.parse(data["{col_varname}"])
+                            }}"""
     source_code += f"""
                             console.log("VIEW: Retreived module data.")
                             root.show()
