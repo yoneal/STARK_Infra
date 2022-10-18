@@ -420,18 +420,15 @@ def create(data, model):
         print(col)
         print('col_type')
         print(col_type)
-        if col_type["has_many_ux"] != 'repeater':
-            col_varname = converter.convert_to_system_name(col)
-            foreign_entity  = converter.convert_to_system_name(has_many)
-            if isinstance(col_type, dict) and col_type["type"] == "relationship":
-                has_many = col_type.get('has_many', '')
-                if has_many != "":
-                    source_code += f"""
-                        this.{entity_varname}.{col_varname} = (root.multi_select_values.{col_varname}.sort()).join(', ')"""
-        else:
-            foreign_entity  = converter.convert_to_system_name(has_many)
-            source_code += f"""
-                        this.{entity_app}.{foreign_entity} = { {foreign_entity}: JSON.stringify(root.{foreign_entity}) }"""
+            
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_many = col_type.get('has_many', '')
+            if has_many != "":
+                col_varname = converter.convert_to_system_name(col)
+                foreign_entity  = converter.convert_to_system_name(has_many)
+                source_code += f"""
+                    this.{entity_app}.{foreign_entity} = { {foreign_entity}: JSON.stringify(root.{foreign_entity}) }
+                    this.{entity_varname}.{col_varname} = (root.multi_select_values.{col_varname}.sort()).join(', ')"""
     
     source_code += f"""
                     response = STARK.validate_form(root.metadata, root.{entity_varname}""" 
