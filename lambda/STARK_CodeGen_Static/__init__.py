@@ -84,7 +84,7 @@ def create_handler(event, context):
 
     #For each entity, we'll create a set of HTML and JS Files and uploaded folder
     for entity in models:
-        print(models)
+        # print(models)
         pk   = models[entity]["pk"]
         cols = models[entity]["data"]
         relationships = get_rel.get_relationship(models, entity)
@@ -98,7 +98,7 @@ def create_handler(event, context):
         add_to_commit(source_code=cg_listview.create(cgstatic_data), key=f"{entity_varname}.html", files_to_commit=files_to_commit, file_path='static')
         add_to_commit(source_code=cg_report.create(cgstatic_data), key=f"{entity_varname}_report.html", files_to_commit=files_to_commit, file_path='static')
         add_to_commit(source_code=cg_js_app.create(cgstatic_data), key=f"js/{entity_varname}_app.js", files_to_commit=files_to_commit, file_path='static')
-        add_to_commit(source_code=cg_js_view.create(cgstatic_data), key=f"js/{entity_varname}_view.js", files_to_commit=files_to_commit, file_path='static')
+        add_to_commit(source_code=cg_js_view.create(cgstatic_data, models), key=f"js/{entity_varname}_view.js", files_to_commit=files_to_commit, file_path='static')
         add_to_commit(source_code=f"{entity} Uploaded files", key=f"uploaded_files/{entity_varname}/README.txt", files_to_commit=files_to_commit, file_path='')
         
     #HTML+JS for our homepage

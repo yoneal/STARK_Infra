@@ -15,7 +15,9 @@ if 'libstark' in os.listdir():
 cg_coltype = importlib.import_module(f"{prepend_dir}cgstatic_controls_coltype")  
 import convert_friendly_to_system as converter
 
-def create(data):
+def create(data, model):
+    print('model')
+    print(model)
     print('data')
     print(data)
     entity         = data["Entity"]
