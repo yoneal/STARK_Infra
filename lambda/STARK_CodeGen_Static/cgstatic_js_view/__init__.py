@@ -17,9 +17,9 @@ import convert_friendly_to_system as converter
 
 def create(data, model):
     print('model')
-    print(model)
-    print('data')
-    print(data)
+    print(model['Order Items'])
+    # print('data')
+    # print(data)
     entity         = data["Entity"]
     cols           = data["Columns"]
     pk             = data['PK']
@@ -291,13 +291,13 @@ def create(data, model):
                 Y_Data: [],
                 showOperations: true,"""
 
-    print('cols.items()')
-    print(cols.items())
+    # print('cols.items()')
+    # print(cols.items())
     for col, col_type in cols.items():
-        print('col')
-        print(col)
-        print('col_type')
-        print(col_type)
+        # print('col')
+        # print(col)
+        # print('col_type')
+        # print(col_type)
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_many = col_type.get('has_many', '')
             if has_many != '':
