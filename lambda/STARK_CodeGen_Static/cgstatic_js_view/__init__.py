@@ -294,7 +294,9 @@ def create(data):
             col_values = col_type.get("values", "")
             if col_type["type"] == "relationship" or isinstance(col_values, list):
                 has_many = col_type.get('has_many', '')
+                print(has_many)
                 if has_many != "":
+                    print(has_many)
                     search_string += f"""
                     AddField: function (entity) {{
                         many_fields = root[entity][0]
