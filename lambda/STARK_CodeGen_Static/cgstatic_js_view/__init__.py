@@ -414,7 +414,13 @@ def create(data, model):
 
                 update: function () {{
                     console.log("VIEW: Updating!")"""
+
     for col, col_type in cols.items():
+        print('col')
+        print(col)
+        print('col_type')
+        print(col_type)
+        
         col_varname = converter.convert_to_system_name(col)
         foreign_entity  = converter.convert_to_system_name(has_one if has_one != '' else has_many)
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
