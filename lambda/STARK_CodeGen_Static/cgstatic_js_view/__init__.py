@@ -289,15 +289,14 @@ def create(data):
             methods: {{"""
 
     for col, col_type in cols.items():
-        col_varname = converter.convert_to_system_name(col)
         if isinstance(col_type, dict):
+            col_varname = converter.convert_to_system_name(col)
             col_values = col_type.get("values", "")
-            if col_type["type"] == "relationship" or isinstance(col_values, list):
+            if col_type["type"] == "relationship":
                 has_many = col_type.get('has_many', '')
-                print(has_many)
-                if has_many != "":
+                if  has_many != '':
                     print(has_many)
-                    search_string += f"""
+                    source_code += f"""
                     AddField: function (entity) {{
                         many_fields = root[entity][0]
                         root[entity].push({{many_fields}})
