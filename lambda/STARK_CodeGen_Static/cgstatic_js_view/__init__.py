@@ -5,7 +5,6 @@
 import textwrap
 import os
 import importlib
-import yaml
 
 #Private modules
 prepend_dir = ""
@@ -16,10 +15,7 @@ cg_coltype = importlib.import_module(f"{prepend_dir}cgstatic_controls_coltype")
 import convert_friendly_to_system as converter
 
 def create(data):
-    # print('model')
-    # print(model['Order Items'])
-    # print('data')
-    # print(data)
+
     entity         = data["Entity"]
     cols           = data["Columns"]
     pk             = data['PK']
@@ -28,7 +24,6 @@ def create(data):
     entity_varname = converter.convert_to_system_name(entity)
     entity_app     = entity_varname + '_app'
     pk_varname     = converter.convert_to_system_name(pk)
-
 
     #file upload controls
     with_upload         = False
@@ -289,56 +284,19 @@ def create(data):
                 STARK_count_fields: [],
                 STARK_group_by_1: '',
                 Y_Data: [],
-                showOperations: true,"""
+                showOperations: true,
+            }},
+            methods: {{
 
-    # print('cols.items()')
-    # print(cols.items())
-    # for col, col_type in cols.items():
-    #     # print('col')
-    #     # print(col)
-    #     # print('col_type')
-    #     # print(col_type)
-    #     if isinstance(col_type, dict) and col_type["type"] == "relationship":
-    #         has_many = col_type.get('has_many', '')
-    #         if has_many != '':
-    #             source_code += f"""
-    #             {has_many}: {{
-    #             '{has_many[pk]}': '',
-    #             """
+                AddField: function (entity) {{
+                    many_fields = root[entity][0]
+                    root[entity].push({{many_fields}})
+                }},
 
-    #             for col in cols:
-    #                 col_varname = converter.convert_to_system_name(col)
-    #                 source_code += f"""
-    #                             '{col_varname}': '',""" 
-                
-    source_code += f"""}},
-            methods: {{"""
+                RemoveField: function (index, entity) {{
+                    this[entity].splice(index, 1);       
+                }},
 
-            # getEntityFields: function (entity) {{
-            #     id = model['{entity}']['pk']
-            #     print(id)
-            #     data = model['{entity}']['data]
-            #     print(data)
-            # }},
-
-    for col, col_type in cols.items():
-            if isinstance(col_type, dict) and col_type["type"] == "relationship":
-                has_many = col_type.get('has_many', '')
-                if has_many != '': 
-                    source_code += f"""
-
-                    
-
-                    AddField: function (entity) {{
-                        many_fields = root[entity][0]
-                        root[entity].push({{many_fields}})
-                    }},
-
-                    RemoveField: function (index, entity) {{
-                        this[entity].splice(index, 1);       
-                    }},"""
-                        
-    source_code += f"""
                 show: function () {{
                     this.visibility = 'visible';
                 }},
@@ -349,7 +307,6 @@ def create(data):
 
                 add: function () {{
                     console.log("VIEW: Inserting!")"""
-
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
@@ -415,20 +372,12 @@ def create(data):
 
                 update: function () {{
                     console.log("VIEW: Updating!")"""
-
     for col, col_type in cols.items():
-        print('col')
-        print(col)
-        print('col_type')
-        print(col_type)
-            
+        col_varname = converter.convert_to_system_name(col)
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_many = col_type.get('has_many', '')
             if has_many != "":
-                col_varname = converter.convert_to_system_name(col)
-                foreign_entity  = converter.convert_to_system_name(has_many)
                 source_code += f"""
-                    this.{entity_app}.{foreign_entity} = { {foreign_entity}: JSON.stringify(root.{foreign_entity}) }
                     this.{entity_varname}.{col_varname} = (root.multi_select_values.{col_varname}.sort()).join(', ')"""
     
     source_code += f"""
@@ -512,9 +461,6 @@ def create(data):
                             root.list_{foreign_entity}()"""
             elif has_many != '':
                 source_code += f"""
-                            if(data["{foreign_entity}"].length > 0) {{
-                                    root.Document = JSON.parse(data["{foreign_entity}"])
-                            }}
                             root.multi_select_values.{foreign_entity} = root.{entity_varname}.{foreign_entity}.split(', ')
                             root.list_{foreign_entity}()"""
     source_code += f"""
