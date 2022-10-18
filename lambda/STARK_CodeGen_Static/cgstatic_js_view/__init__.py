@@ -15,7 +15,7 @@ if 'libstark' in os.listdir():
 cg_coltype = importlib.import_module(f"{prepend_dir}cgstatic_controls_coltype")  
 import convert_friendly_to_system as converter
 
-def create(cloud_resources, data):
+def create(data):
     print('data')
     print(data)
     entity         = data["Entity"]
@@ -26,11 +26,7 @@ def create(cloud_resources, data):
     entity_varname = converter.convert_to_system_name(entity)
     entity_app     = entity_varname + '_app'
     pk_varname     = converter.convert_to_system_name(pk)
-    # cloud_resources = yaml.safe_load(response['Body'].read().decode('utf-8'))
-    # entities = cloud_resources['Data Model']
 
-    print('cloud_resources')
-    print(cloud_resources)
 
     #file upload controls
     with_upload         = False

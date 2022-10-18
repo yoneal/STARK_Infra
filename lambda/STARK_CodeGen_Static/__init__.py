@@ -84,6 +84,7 @@ def create_handler(event, context):
 
     #For each entity, we'll create a set of HTML and JS Files and uploaded folder
     for entity in models:
+        print(models)
         pk   = models[entity]["pk"]
         cols = models[entity]["data"]
         relationships = get_rel.get_relationship(models, entity)
