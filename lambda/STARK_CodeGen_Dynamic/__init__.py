@@ -84,13 +84,20 @@ def create_handler(event, context):
                     for value in key:
                         key[value] = converter.convert_to_system_name(key[value])
         # print(relationships)
+        rel_model = {}
+        for relationship in relationships.get('has_many', []):
+            if relationship.get('type') == 'repeater':
+                rel_col = models.get(relationship.get('entity'), '')
+                rel_model.update({(relationship.get('entity')) : rel_col})
+
         data = {
-            "Entity": entity, 
-            "Columns": models[entity]["data"], 
-            "PK": models[entity]["pk"], 
-            "DynamoDB Name": ddb_table_name,
-            "Bucket Name": website_bucket,
-            "Relationships": relationships
+                "Entity": entity, 
+                "Columns": models[entity]["data"], 
+                "PK": models[entity]["pk"], 
+                "DynamoDB Name": ddb_table_name,
+                "Bucket Name": website_bucket,
+                "Relationships": relationships,
+                "Rel Model": rel_model
             }
         source_code          = cg_ddb.create(data)
         test_source_code     = cg_test.create(data)
