@@ -42,7 +42,6 @@ def parse(construct_file):
         data_model = yaml.safe_load(f.read())
 
     entities = []
-    with_cloudfront = False
     #Some essential project metadata
     #   These won't be in the construct file provided by the user (that would be redundant and tiresome)
     #   so we have to get this from the project's existing cloud_resources document
@@ -61,7 +60,7 @@ def parse(construct_file):
         elif key == "__STARK_advanced__":
             for advance_config in data_model[key]:
                 if advance_config == 'CloudFront':
-                    with_cloudfront = True
+                    pass
 
         else:
             entities.append(key)
@@ -93,10 +92,9 @@ def parse(construct_file):
 
     #Lambdas ###
     cloud_resources["Lambda"] = lambda_parser.parse(data)
-    
-    if with_cloudfront:
-        #CloudFront ##################
-        cloud_resources["CloudFront"] = cloudfront_parser.parse(data)
+
+    #CloudFront ##################
+    cloud_resources["CloudFront"] = cloudfront_parser.parse(data)
 
 
     #SQS #######################

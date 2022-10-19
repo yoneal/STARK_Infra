@@ -80,11 +80,17 @@ def create(data, cli_mode=False):
     ddb_wcu_provisioned       = cloud_resources["DynamoDB"].get("WCU", 0)
     ddb_auto_scaling          = cloud_resources["DynamoDB"].get("Auto Scaling", '')
 
+    #CloudFront distribution config
+    cdn_distribution_config = cloud_resources.get('CloudFront', '')
+    cdn_price_class         = "PriceClass_" + str(cdn_distribution_config.get('price_class',"200"))
+    cdn_enabled             = cdn_distribution_config.get('enabled','')
+    cdn_default_root_object = cdn_distribution_config.get('default_root_object','')
+    cdn_custom_domain_name  = cdn_distribution_config.get('custom_domain_name','')
+    cdn_viewer_certificate  = cdn_distribution_config.get('viewer_certificate_arn','')
+
     #Lambda-related data
     entities = cloud_resources['Data Model']
 
-    #CloudFront distribution config
-    cloudfront_distribution_config = cloud_resources.get('CloudFront', '')
 
     #FIXME: Should this transformation be here or in the Parser?
     #Let this remain here now, but probably should be the job of the parser in the future.
@@ -427,16 +433,14 @@ def create(data, cli_mode=False):
                 Architectures:
                     - arm64
                 MemorySize: 128
-                Timeout: 5"""
-    if cloudfront_distribution_config != '':
-        cf_template += f"""
+                Timeout: 5
         STARKCloudFront:
             Type: AWS::CloudFront::Distribution
             Properties: 
                 DistributionConfig: 
-                    PriceClass: {cloudfront_distribution_config['PriceClass']}
-                    DefaultRootObject: {cloudfront_distribution_config['DefaultRootObject']}
-                    Enabled: {cloudfront_distribution_config['Enabled']}
+                    PriceClass: {cdn_price_class}
+                    DefaultRootObject: {cdn_default_root_object}
+                    Enabled: {cdn_enabled}
                     Origins:
                         - Id: !Join [ "", [ "{s3_bucket_name}.", !FindInMap [ RegionMap, !Ref AWS::Region, s3endpoint] ] ]
                           DomainName: !Join [ "", [ "{s3_bucket_name}.", !FindInMap [ RegionMap, !Ref AWS::Region, s3endpoint] ] ]
@@ -464,6 +468,14 @@ def create(data, cli_mode=False):
                         ViewerProtocolPolicy: redirect-to-https
                     HttpVersion: http2
                     IPV6Enabled: true"""
+    if cdn_viewer_certificate != '':
+        cf_template += f"""
+                    Aliases:
+                        - {cdn_custom_domain_name}
+                    ViewerCertificate:
+                        AcmCertificateArn: {cdn_viewer_certificate}
+                        MinimumProtocolVersion: TLSv1.2_2021
+                        SslSupportMethod: sni-only"""
     cf_template += f"""
         STARKApiGateway:
             Type: AWS::Serverless::HttpApi
@@ -483,10 +495,11 @@ def create(data, cli_mode=False):
                 CorsConfiguration:
                     AllowOrigins:
                         - !Join [ "", [ "http://{s3_bucket_name}.", !FindInMap [ RegionMap, !Ref AWS::Region, s3endpoint] ] ]
+                        - !Join [ "", [ "https://", !GetAtt STARKCloudFront.DomainName ] ]
                         - http://localhost"""
-    if cloudfront_distribution_config != '':
+    if cdn_viewer_certificate != '':
         cf_template += f"""
-                        - !Join [ "", [ "https://", !GetAtt STARKCloudFront.DomainName ] ]"""
+                        - https://{cdn_custom_domain_name}"""
     cf_template += f"""
                     AllowHeaders:
                         - "Content-Type"
