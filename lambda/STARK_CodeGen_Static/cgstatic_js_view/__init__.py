@@ -289,18 +289,10 @@ def create(data):
 
     if relationships.get('has_many', '') != '':
         for relation in relationships.get('has_many'):
-            print('relation')
-            print(relation)
             if relation.get('type') == 'repeater':
                 entity = relation.get('entity')
-                print('entity')
-                print(entity)
-                rel_pk = rel_model[entity].get('pk', [])
-                print('rel_pk')
-                print(rel_pk)
+                rel_pk = converter.convert_to_system_name(rel_model[entity].get('pk', []))
                 rel_model = rel_model[entity].get('data', [])
-                print('rel_model')
-                print(rel_model)
                 entity = converter.convert_to_system_name(relation.get('entity'))
                 source_code += f"""
                 {entity}: [
