@@ -291,10 +291,21 @@ def create(data):
         for relation in relationships.get('has_many'):
             print('relation')
             print(relation)
-                    # if has_many_ux == 'repeater':
-                    #     source_code += f"""
-                
-                    #     """
+            if relation.get('type') == 'repeater':
+                entity = relation.get('entity')
+                print('entity')
+                print(entity)
+                rel_pk = rel_model[entity].get('pk', [])
+                print('rel_pk')
+                print(rel_pk)
+                rel_model = rel_model[entity].get('data', [])
+                print('rel_model')
+                print(rel_model)
+                source_code += f"""
+                {entity}: [
+                    
+                ]
+                """
 
 
     source_code += f"""
