@@ -268,7 +268,7 @@ elif construct_type == 'create-certificate':
     try:
         if custom_domain_name:
             print("Custom Domain Name specified, checking for certificate..")
-            
+            new_cert = False
             acm = boto3.client('acm', region_name="us-east-1")
             viewer_certificate_arn = current_cloud_resources['CloudFront'].get("viewer_certificate_arn", None)
 
@@ -276,6 +276,7 @@ elif construct_type == 'create-certificate':
                 print("Certificate found, checking status..")
                 default_status = "Pending for Validation. "
             else:
+                new_cert = True
                 print("No certificate yet, creating..")
                 default_status = ""
                 response = acm.request_certificate(
@@ -293,14 +294,25 @@ elif construct_type == 'create-certificate':
                     f.write(yaml.dump(current_cloud_resources, sort_keys=False, encoding='utf-8'))
                 print("Certificate created.")
             
-            response = acm.describe_certificate(CertificateArn=viewer_certificate_arn).get('Certificate')
-            status = response.get("Status")
+            domain_validation_options = None
+            iteration = 1
+            while domain_validation_options == None:
+                if new_cert:
+                    print("\rFetching validation requirements", "." * iteration, end ="")
+                response = acm.describe_certificate(CertificateArn=viewer_certificate_arn)
+                domain_validation_options = response.get('Certificate').get('DomainValidationOptions')[0].get("ResourceRecord", None)
+                iteration += 1
+                
+            certificate = response.get('Certificate')    
+            status = certificate.get("Status")
+            if new_cert:
+                print("")
 
             if status != "ISSUED":
-                print(f"{default_status}Create the following DNS record for", response.get('DomainName'), "to complete the validation:")
-                print("Name:", response.get('DomainValidationOptions')[0].get("ResourceRecord").get('Name'))
-                print("Type:", response.get('DomainValidationOptions')[0].get("ResourceRecord").get('Type'))
-                print("Value:", response.get('DomainValidationOptions')[0].get("ResourceRecord").get('Value'))
+                print(f"{default_status}Create the following DNS record for", certificate.get('DomainName'), "to complete the validation:")
+                print("Name:", domain_validation_options.get('Name'))
+                print("Type:", domain_validation_options.get('Type'))
+                print("Value:", domain_validation_options.get('Value'))
             else:
                 print("Certificate validated, you can deploy the CDN.")
         else:
