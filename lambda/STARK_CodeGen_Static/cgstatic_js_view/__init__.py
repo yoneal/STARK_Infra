@@ -292,7 +292,7 @@ def create(data):
             print('relation')
             print(relation)
             if relation.get('type') == 'repeater':
-                entity = converter.convert_to_system_name(relation.get('entity'))
+                entity = relation.get('entity')
                 print('entity')
                 print(entity)
                 rel_pk = rel_model[entity].get('pk', [])
@@ -301,6 +301,7 @@ def create(data):
                 rel_model = rel_model[entity].get('data', [])
                 print('rel_model')
                 print(rel_model)
+                entity = converter.convert_to_system_name(relation.get('entity'))
                 source_code += f"""
                 {entity}: [
                     {{"""
