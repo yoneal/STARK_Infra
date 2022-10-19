@@ -89,7 +89,7 @@ def create_handler(event, context):
         cols = models[entity]["data"]
         relationships = get_rel.get_relationship(models, entity)
         rel_model = {}
-        for relationship in relationships.get('has_many'):
+        for relationship in relationships.get('has_many', []):
             if relationship.get('type') == 'repeater':
                 rel_col = models.get(relationship.get('entity'), '')
                 rel_model.update({(relationship.get('entity')) : rel_col})
