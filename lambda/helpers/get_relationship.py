@@ -22,11 +22,11 @@ def get_relationship(model, parent_entity_name=""):
                                     has_one_list.append(rel)
                         if data == 'has_many':
                             if parent_entity_name == "":
-                                rel={'entity' : col}
+                                rel={'entity' : col, 'type' : types.get('has_many_ux', 'multi-select-pill')}
                                 has_many_list.append(rel)
                             else:
                                 if entity == parent_entity_name:
-                                    rel={'entity' : col}
+                                    rel={'entity' : col, 'type' : types.get('has_many_ux', 'multi-select-pill')}
                                     has_many_list.append(rel)
                     if entity == parent_entity_name:
                         if types.get('has_one', '') != '':
