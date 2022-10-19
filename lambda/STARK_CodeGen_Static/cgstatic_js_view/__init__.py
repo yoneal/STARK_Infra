@@ -304,11 +304,12 @@ def create(data):
                 entity = converter.convert_to_system_name(relation.get('entity'))
                 source_code += f"""
                 {entity}: [
-                    {{"""
+                    {{
+                        '{rel_pk}': '', """
                 for rel_entity in rel_model:   
                     rel_entity = converter.convert_to_system_name(rel_entity)
                     source_code += f"""
-                    '{rel_entity}': '',""" 
+                        '{rel_entity}': '',""" 
                 source_code += f"""
                     }}
                 ],
