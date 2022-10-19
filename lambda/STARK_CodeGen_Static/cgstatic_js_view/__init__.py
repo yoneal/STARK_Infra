@@ -1215,8 +1215,10 @@ def create(data):
                         }}
                     }}
                     return conso_subtext
-                }},
+                }},"""
 
+    if len(rel_model) > 0:
+        source_code+= f"""
                 AddField: function (entity) {{
                     many_fields = root[entity][0]
                     root[entity].push({{many_fields}})
@@ -1224,8 +1226,9 @@ def create(data):
 
                 RemoveField: function (index, entity) {{
                     this[entity].splice(index, 1);       
-                }},
-                
+                }},"""
+
+    source_code+= f"""  
             }},
             computed: {{"""
     for col, col_type in cols.items():

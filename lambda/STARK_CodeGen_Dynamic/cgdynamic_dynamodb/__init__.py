@@ -16,6 +16,7 @@ def create(data):
     ddb_table_name = data["DynamoDB Name"]
     bucket_name    = data['Bucket Name']
     relationships  = data["Relationships"]
+    rel_model      = data["Rel Model"]
     
     #Convert human-friendly names to variable-friendly names
     entity_varname = converter.convert_to_system_name(entity)
@@ -169,6 +170,13 @@ def create(data):
         col_varname = converter.convert_to_system_name(col)
         source_code +=f"""
                 data['{col_varname}'] = payload.get('{col_varname}','')"""
+    
+    if relationships.get('has_many', '') != '':
+        for relation in relationships.get('has_many'):
+            if relation.get('type') == 'repeater':
+                entity = converter.convert_to_system_name(relation.get('entity'))
+                source_code +=f"""
+                data['{entity}'] = payload.get('{entity}','')"""
 
     source_code +=f"""
                 if payload.get('STARK_isReport', False) == False:
@@ -524,13 +532,50 @@ def create(data):
         #Map to expected structure
         response = {{}}
         response['item'] = map_results(raw[0])"""
+    
+    if len(rel_model) > 0:
+        source_code+= f"""
+        many_rel = relationships['has_many']
+        for rel in many_rel:
+            entity = rel['entity']
+            sk = 'Customer|' + entity
+            many_result = get_many_by_pk(pk, sk)
+            for result in many_result:
+                response[entity] = result.get(sk, '').get('S')
+        """
+
     if with_upload : 
         source_code +=f"""
         response['object_url_prefix'] = bucket_url + entity_upload_dir"""
     source_code+= f"""
 
-        return response
+        return response"""
 
+    if len(rel_model) > 0:
+        source_code+= f"""
+    def get_many_by_pk(pk, sk, db_handler = None):
+        if db_handler == None:
+            db_handler = ddb
+
+        ddb_arguments = {{}}
+        ddb_arguments['TableName'] = ddb_table
+        ddb_arguments['Select'] = "ALL_ATTRIBUTES"
+        ddb_arguments['KeyConditionExpression'] = "#pk = :pk and #sk = :sk"
+        ddb_arguments['ExpressionAttributeNames'] = {{
+                                                    '#pk' : 'pk',
+                                                    '#sk' : 'sk'
+                                                }}
+        ddb_arguments['ExpressionAttributeValues'] = {{
+                                                    ':pk' : {{'S' : pk }},
+                                                    ':sk' : {{'S' : sk }}
+                                                }}
+        Document = db_handler.query(**ddb_arguments)
+        response = Document.get('Items')
+        return response
+        """
+
+
+    source_code+= f"""
     def delete(data, db_handler = None):
         if db_handler == None:
             db_handler = ddb
@@ -548,10 +593,38 @@ def create(data):
 
         response = db_handler.delete_item(**ddb_arguments)
         global resp_obj
-        resp_obj = response
+        resp_obj = response"""
 
+    if len(rel_model) > 0:
+            source_code+= f"""
+        many_rel = relationships['has_many']
+        for rel in many_rel:
+            entity = rel['entity']
+            sk = 'Customer|' + entity
+            delete_many(pk, sk)"""
+
+    source_code+= f"""
         return "OK"
+    """
+    if len(rel_model) > 0:
+        source_code+= f"""
+    def delete_many(pk, sk, db_handler = None):
+        if db_handler == None:
+            db_handler = ddb
 
+        ddb_arguments = {{}}
+        ddb_arguments['TableName'] = ddb_table
+        ddb_arguments['Key'] = {{
+                'pk' : {{'S' : pk}},
+                'sk' : {{'S' : sk}}
+            }}
+        print(ddb_arguments)
+        response = db_handler.delete_item(**ddb_arguments)
+        global resp_obj
+        resp_obj = response
+        """
+
+    source_code+= f"""
     def edit(data, db_handler = None):
         if db_handler == None:
             db_handler = ddb           
@@ -609,6 +682,17 @@ def create(data):
 
         response = db_handler.update_item(**ddb_arguments)
         """
+
+    if len(rel_model) > 0:
+        source_code+= f"""
+        many_rel = relationships['has_many']
+        for rel in many_rel:
+            entity = rel['entity']
+            sk = 'Customer|' + entity
+            data = data.get(entity, '')
+            data = data[entity]
+            edit_many(pk, sk, data)"""
+
     if len(relationships) > 0:
         source_code += f"""
         for relation in relationships['has_one']:
@@ -619,7 +703,37 @@ def create(data):
         global resp_obj
         resp_obj = response
         return "OK"
+        """
 
+    if len(rel_model) > 0:
+            source_code+= f"""
+    def edit_many(pk, sk, data, db_handler = None):
+        if db_handler == None:
+            db_handler = ddb  
+        
+        UpdateExpressionString = "SET #field = :data"
+        ExpressionAttributeNamesDict = {{
+            # '#' + sk : sk
+            '#field' : sk
+        }}
+        ExpressionAttributeValuesDict = {{
+            ':data' : {{'S' : data }}
+        }}
+        
+        ddb_arguments = {{}}
+        ddb_arguments['TableName'] = ddb_table
+        ddb_arguments['Key'] = {{
+                'pk' : {{'S' : pk}},
+                'sk' : {{'S' : sk}}
+            }}
+        ddb_arguments['ReturnValues'] = 'UPDATED_NEW'
+        ddb_arguments['UpdateExpression'] = UpdateExpressionString
+        ddb_arguments['ExpressionAttributeNames'] = ExpressionAttributeNamesDict
+        ddb_arguments['ExpressionAttributeValues'] = ExpressionAttributeValuesDict
+
+        response = db_handler.update_item(**ddb_arguments)"""
+            
+    source_code+= f"""
     def add(data, method='POST', db_handler=None):
         if db_handler == None:
             db_handler = ddb
@@ -669,10 +783,46 @@ def create(data):
         for relation in relationships['has_one']:
             cascade_pk_change_to_child(data, relation['entity'], relation['attribute'])
         """
+
+    if len(rel_model) > 0:
+            source_code+= f"""
+        many_rel = relationships['has_many']
+        for rel in many_rel:
+            entity = rel['entity']
+            sk = 'Customer|' + entity
+            data = data.get(entity, '')
+            data = data[entity]
+            add_many(pk, sk, data)"""
+    
     source_code += f"""
         global resp_obj
         resp_obj = response
         return "OK"
+        """
+
+    if len(rel_model) > 0:
+            source_code+= f"""
+    def add_many(pk, sk, data, db_handler=None):
+        if db_handler == None:
+            db_handler = ddb
+
+        item={{}}
+        item['pk'] = {{'S' : pk}}
+        item['sk'] = {{'S' : sk}}
+        item[sk] = {{'S' : data}}
+        print(item)
+
+        ddb_arguments = {{}}
+        ddb_arguments['TableName'] = ddb_table
+        ddb_arguments['Item'] = item
+        response = db_handler.put_item(**ddb_arguments)
+
+        global resp_obj
+        resp_obj = response
+        return "OK"
+        """
+            
+    source_code+= f"""
     
     def create_listview_index_value(data):
         ListView_index_values = []
