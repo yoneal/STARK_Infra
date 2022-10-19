@@ -15,11 +15,11 @@ cg_coltype = importlib.import_module(f"{prepend_dir}cgstatic_controls_coltype")
 import convert_friendly_to_system as converter
 
 def create(data):
-    print(data)
     entity         = data["Entity"]
     cols           = data["Columns"]
     pk             = data['PK']
     relationships  = data["Relationships"]
+    rel_model      = data["Rel Model"]
 
     entity_varname = converter.convert_to_system_name(entity)
     entity_app     = entity_varname + '_app'
@@ -285,10 +285,22 @@ def create(data):
                 STARK_group_by_1: '',
                 Y_Data: [],
                 showOperations: true,
-            }},
-            methods: {{"""
+            }},"""
+
+    if relationships.get('has_many', '') != '':
+        for relation in relationships.get('has_many'):
+            print('relation')
+            print(relation)
+                    # if has_many_ux == 'repeater':
+                    #     source_code += f"""
+                
+                    #     """
+
 
     source_code += f"""
+            methods: {{
+
+    
                 show: function () {{
                     this.visibility = 'visible';
                 }},
@@ -406,7 +418,7 @@ def create(data):
                 has_many = col_type.get('has_many', '')
                 if has_many != '':
                     if has_many_ux == 'repeater':
-                        print(has_many)
+                        # print(has_many)
                         source_code += f"""
                         this.{entity_varname}.{col_varname} = {{ {col_varname}: JSON.stringify(root.{col_varname}) }}"""
 
