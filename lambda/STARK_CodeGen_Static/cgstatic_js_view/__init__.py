@@ -285,7 +285,7 @@ def create(data):
                 STARK_group_by_1: '',
                 Y_Data: [],
                 showOperations: true,
-            }},"""
+            """
 
     if relationships.get('has_many', '') != '':
         for relation in relationships.get('has_many'):
@@ -310,11 +310,12 @@ def create(data):
                     '{rel_entity}': '',""" 
                 source_code += f"""
                     }}
-                ]
+                ],
                 """
 
 
     source_code += f"""
+            }},
             methods: {{
 
     
