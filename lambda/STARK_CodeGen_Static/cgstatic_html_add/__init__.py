@@ -67,17 +67,17 @@ def create(data):
 
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_many_ux = col_type.get('has_many_ux', None)
-            has_many = col_type.get('has_many')
+            child_entity = col_type.get('has_many')
             if has_many_ux: 
-                rel_pk = rel_model[has_many].get('pk')
+                rel_pk = rel_model[child_entity].get('pk')
                 rel_pk_varname = converter.convert_to_system_name(rel_pk)
-                child_entity_varname = converter.convert_to_system_name(has_many)
+                child_entity_varname = converter.convert_to_system_name(child_entity)
                 source_code += f"""
                             <template>
                                 <!-- <a v-b-toggle class="text-decoration-none" :href="'#group-collapse-'+index" @click.prevent> -->
                                 <a v-b-toggle class="text-decoration-none" @click.prevent>
                                     <span class="when-open"><img src="images/chevron-up.svg" class="filter-fill-svg-link" height="20rem"></span><span class="when-closed"><img src="images/chevron-down.svg" class="filter-fill-svg-link" height="20rem"></span>
-                                    <span class="align-bottom">{has_many}</span>
+                                    <span class="align-bottom">{child_entity}</span>
                                 </a>
                                 <!-- <b-collapse :id="'group-collapse-'+index" visible class="mt-0 mb-2 pl-2"> -->
                                 <b-collapse visible class="mt-0 mb-2 pl-2">
@@ -101,19 +101,19 @@ def create(data):
                                                             </div>"""
 
                 
-                for rel_col, rel_data in rel_model.items():
-                    rel_child_entity_varname = converter.convert_to_system_name(rel_col)
-                    for rel_col_key, rel_col_type in rel_data.get('data').items():
-                        rel_col_varname = converter.convert_to_system_name(rel_col_key)
-                        rel_html_control_code = cg_coltype.create({
-                            "col": rel_col_key,
-                            "col_type": rel_col_type,
-                            "col_varname": rel_col_varname,
-                            "entity" : rel_col,
-                            "entity_varname": rel_child_entity_varname
-                        })
+                
+                
+                for rel_col_key, rel_col_type in rel_model.get(child_entity).get('data').items():
+                    rel_col_varname = converter.convert_to_system_name(rel_col_key)
+                    rel_html_control_code = cg_coltype.create({
+                        "col": rel_col_key,
+                        "col_type": rel_col_type,
+                        "col_varname": rel_col_varname,
+                        "entity" : child_entity,
+                        "entity_varname": child_entity_varname
+                    })
 
-                        source_code += f"""
+                    source_code += f"""
                                                         <div class="form-group col-lg-2">
                                                             {rel_html_control_code}
                                                         </div>"""
@@ -154,3 +154,17 @@ def create(data):
     source_code += cg_footer.create()
 
     return textwrap.dedent(source_code)
+
+def remove_repeater_col(relationships, columns):
+    repeater_fields = []
+    if relationships.get('has_many', '') != '':
+        for relation in relationships.get('has_many'):
+            if relation.get('type') == 'repeater':
+                new_entity = (relation.get('entity')).replace('_', ' ')
+                repeater_fields.append(new_entity)
+
+    # model = models['Order']['data']
+    for fields in repeater_fields:
+        del columns[fields]
+    print(columns)
+    return columns

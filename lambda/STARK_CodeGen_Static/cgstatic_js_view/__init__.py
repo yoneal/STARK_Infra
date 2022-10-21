@@ -1226,12 +1226,12 @@ def create(data):
 
     if len(rel_model) > 0:
         source_code+= f"""
-                AddField: function (entity) {{
+                add_field: function (entity) {{
                     many_fields = root[entity][0]
                     root[entity].push({{many_fields}})
                 }},
 
-                RemoveField: function (index, entity) {{
+                remove_field: function (index, entity) {{
                     this[entity].splice(index, 1);       
                 }},"""
 
