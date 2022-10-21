@@ -53,16 +53,23 @@ def create(data):
         else:
             dict_to_var_code += f"""
         {col_varname} = data.get('{col_varname}', '')"""
+    
+    for col, col_type in columns.items():
+        if isinstance(col_type, dict):
+            col_varname = converter.convert_to_system_name(col)
+            col_values = col_type.get("values", "")
+            has_many_ux = col_type.get('has_many_ux', '')
+            if col_type["type"] == "relationship":
+                has_many = col_type.get('has_many', '')
+                if has_many != '':
+                    if has_many_ux == 'repeater':
+                        print('col')
+                        print(col)
 
 
     #This is for our DDB update call
     update_expression = ""
-    print('columns')
-    print(columns)
     for col, colvar_type in columns:
-        print('col')
-        print(col)
-        print('colvar_type')
         print(colvar_type)
         col_varname = converter.convert_to_system_name(col)
         update_expression += f"""#{col_varname} = :{col_varname}, """
@@ -176,6 +183,13 @@ def create(data):
         col_varname = converter.convert_to_system_name(col)
         source_code +=f"""
                 data['{col_varname}'] = payload.get('{col_varname}','')"""
+    
+    if relationships.get('has_many', '') != '':
+        for relation in relationships.get('has_many'):
+            if relation.get('type') == 'repeater':
+                entity = converter.convert_to_system_name(relation.get('entity'))
+                source_code +=f"""
+                data['{entity}'] = payload.get('{entity}','')"""
 
     source_code +=f"""
                 if payload.get('STARK_isReport', False) == False:
