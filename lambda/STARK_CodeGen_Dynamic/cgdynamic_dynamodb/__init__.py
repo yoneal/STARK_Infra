@@ -939,8 +939,8 @@ def set_type(col_type):
     return col_type_id
 
 def remove_repeater_col(relationships, columns):
+    repeater_fields = []
     if relationships.get('has_many', '') != '':
-        repeater_fields = []
         for relation in relationships.get('has_many'):
             if relation.get('type') == 'repeater':
                 new_entity = (relation.get('entity')).replace('_', ' ')
