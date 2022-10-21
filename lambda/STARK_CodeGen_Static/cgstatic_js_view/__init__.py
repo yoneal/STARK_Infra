@@ -287,29 +287,26 @@ def create(data):
                 showOperations: true,
             """
 
-    if relationships.get('has_many', '') != '':
-        for relation in relationships.get('has_many'):
-            if relation.get('type') == 'repeater':
-                entity = relation.get('entity')
-                print('entity')
-                print(entity)
-                print('rel_model')
-                print(rel_model)
-                rel_pk = converter.convert_to_system_name(rel_model[entity].get('pk', []))
-                rel_model = rel_model[entity].get('data', [])
-                entity = converter.convert_to_system_name(relation.get('entity'))
-                source_code += f"""
-                {entity}: [
-                    {{
-                        '{rel_pk}': '', """
-                for rel_entity in rel_model:   
-                    rel_entity = converter.convert_to_system_name(rel_entity)
-                    source_code += f"""
-                        '{rel_entity}': '',""" 
-                source_code += f"""
-                    }}
-                ],
-                """
+    # if relationships.get('has_many', '') != '':
+    #     for relation in relationships.get('has_many'):
+    # if relation.get('type') == 'repeater':
+
+        # entity = relation.get('entity')
+    for rel, rel_col in rel_model.items():
+        rel_pk = converter.convert_to_system_name(rel_col.get('pk'))
+        
+        source_code += f"""
+        {entity}: [
+            {{
+                '{rel_pk}': '', """
+        for rel_data_col in rel_col.get('data'):
+            rel_entity = converter.convert_to_system_name(rel_data_col)
+            source_code += f"""
+                '{rel_entity}': '',""" 
+        source_code += f"""
+            }}
+        ],
+        """
 
 
     source_code += f"""
