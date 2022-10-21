@@ -23,9 +23,10 @@ import convert_friendly_to_system as converter
 def create(data):
 
     #project = data["Project Name"]
-    entity  = data["Entity"]
-    cols    = data["Columns"]
-    pk      = data["PK"]
+    entity      = data["Entity"]
+    cols        = data["Columns"]
+    pk          = data["PK"]
+    rel_model   = data["Rel Model"]
 
     #Convert human-friendly names to variable-friendly names
     entity_varname = converter.convert_to_system_name(entity)
@@ -60,10 +61,72 @@ def create(data):
         })
 
         source_code += f"""
-                            <b-form-group class="form-group" label="{col}" label-for="{col_varname}" :state="metadata.{pk_varname}.state" :invalid-feedback="metadata.{col_varname}.feedback">
+                            <b-form-group class="form-group" label="{col}" label-for="{col_varname}" :state="metadata.{col_varname}.state" :invalid-feedback="metadata.{col_varname}.feedback">
                                 {html_control_code}
                             </b-form-group>"""
 
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_many_ux = col_type.get('has_many_ux', None)
+            child_entity = col_type.get('has_many')
+            child_entity_varname = converter.convert_to_system_name(child_entity)
+            if has_many_ux: 
+                source_code += f"""
+                            <template>
+                                <!-- <a v-b-toggle class="text-decoration-none" :href="'#group-collapse-'+index" @click.prevent> -->
+                                <a v-b-toggle class="text-decoration-none" @click.prevent>
+                                    <span class="when-open"><img src="images/chevron-up.svg" class="filter-fill-svg-link" height="20rem"></span><span class="when-closed"><img src="images/chevron-down.svg" class="filter-fill-svg-link" height="20rem"></span>
+                                    <span class="align-bottom">Document</span>
+                                </a>
+                                <!-- <b-collapse :id="'group-collapse-'+index" visible class="mt-0 mb-2 pl-2"> -->
+                                <b-collapse visible class="mt-0 mb-2 pl-2">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <form class="repeater" enctype="multipart/form-data">
+                                                        <div class="row" v-for="(field, index) in Document">
+                                                            <div class="form-group">
+                                                                <b-form-group class="form-group" label="#">
+                                                                    {{{{ index + 1 }}}}
+                                                                </b-form-group>
+                                                            </div>"""
+                
+                for rel_col, rel_col_type in rel_model.items():
+                    rel_col_varname = converter.convert_to_system_name(rel_col)
+                    rel_html_control_code = cg_coltype.create({
+                        "col": rel_col,
+                        "col_type": rel_col_type,
+                        "col_varname": rel_col_varname,
+                        "entity" : child_entity,
+                        "entity_varname": child_entity_varname
+                    })
+
+                    source_code += f"""
+                                                        <div class="form-group col-lg-2">
+                                                            {rel_html_control_code}
+                                                        </div>"""
+
+                source_code += f"""
+                                                            <div class="form-group col-lg-2 ">
+                                                                <b-form-group class="form-group" label="Remove">
+                                                                    <input type="button" class="btn bg-danger" alt="Delete" width="40" height="40" @click="root.RemoveField(index, '{child_entity_varname}')" value="X">
+                                                                </b-form-group>
+                                                            </div> 
+                                                        </div>
+                                                        <div>
+                                                            <input type="button" class="btn btn-success mt-3 mt-lg-0" @click="root.AddField('{child_entity_varname}')" value="Add"/>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </b-collapse>
+                                <hr><br>
+                            </template>
+                                                            
+
+                """
     source_code += f"""
                             <button type="button" class="btn btn-secondary" onClick="window.location.href='{entity_varname}.html'">Back</button>
                             <button type="button" class="btn btn-primary float-right" onClick="root.add()">Add</button>

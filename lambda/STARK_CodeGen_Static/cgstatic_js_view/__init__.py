@@ -293,19 +293,20 @@ def create(data):
 
         # entity = relation.get('entity')
     for rel, rel_col in rel_model.items():
+        rel_entity = converter.convert_to_system_name(rel)
         rel_pk = converter.convert_to_system_name(rel_col.get('pk'))
         
         source_code += f"""
-        {entity}: [
-            {{
-                '{rel_pk}': '', """
+                {rel_entity}: [
+                    {{
+                        '{rel_pk}': '', """
         for rel_data_col in rel_col.get('data'):
-            rel_entity = converter.convert_to_system_name(rel_data_col)
+            rel_attribute = converter.convert_to_system_name(rel_data_col)
             source_code += f"""
-                '{rel_entity}': '',""" 
+                        '{rel_attribute}': '',""" 
         source_code += f"""
-            }}
-        ],
+                    }}
+                ],
         """
 
 
@@ -328,7 +329,8 @@ def create(data):
         col_varname = converter.convert_to_system_name(col)
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_many = col_type.get('has_many', '')
-            if has_many != "":
+            has_many_ux = col_type.get('has_many_ux', '')
+            if has_many != "" and has_many_ux != 'repeater':
                 source_code += f"""
                     this.{entity_varname}.{col_varname} = (root.multi_select_values.{col_varname}.sort()).join(', ')"""
     
@@ -496,6 +498,7 @@ def create(data):
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
             has_many = col_type.get('has_many', '')
+            has_many_ux = col_type.get('has_many_ux', '')
             
             foreign_entity  = converter.convert_to_system_name(has_one if has_one != '' else has_many)
             foreign_field   = converter.convert_to_system_name(col_type.get('value', foreign_entity))
@@ -506,7 +509,8 @@ def create(data):
                 source_code += f"""
                             root.lists.{foreign_field} = [  {{ value: root.{entity_varname}.{foreign_field}, text: root.{entity_varname}.{foreign_field} }},]
                             root.list_{foreign_entity}()"""
-            elif has_many != '':
+            
+            elif has_many != "" and has_many_ux != 'repeater':
                 source_code += f"""
                             root.multi_select_values.{foreign_entity} = root.{entity_varname}.{foreign_entity}.split(', ')
                             root.list_{foreign_entity}()"""
@@ -586,7 +590,8 @@ def create(data):
         col_varname = converter.convert_to_system_name(col)
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_many = col_type.get('has_many', '')
-            if has_many != "":
+            has_many_ux = col_type.get('has_many_ux', '')
+            if has_many != "" and has_many_ux != 'repeater':
                 foreign_entity  = converter.convert_to_system_name(has_many)
                 source_code += f"""
                             for (let x = 0; x < (data['Items']).length; x++) {{
@@ -926,7 +931,8 @@ def create(data):
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
             has_many = col_type.get('has_many', '')
-            if  has_one != '' or has_many != '':
+            has_many_ux = col_type.get('has_many_ux', '')
+            if  has_one != '' or (has_many != '' and has_many_ux != 'repeater'):
                 foreign_entity  = converter.convert_to_system_name(has_one if has_one != '' else has_many)
                 foreign_field   = converter.convert_to_system_name(col_type.get('value', foreign_entity))
                 foreign_display = converter.convert_to_system_name(col_type.get('display', foreign_field))
@@ -962,28 +968,28 @@ def create(data):
                 """
                 if has_many != '':
                     source_code += f"""
-                    split_string: function(str) {{
-                        var arr = str.split(", ")
-                        var return_str = ''
-                        arr.forEach(element => {{
-                            return_str += this.tag_display_text(element).concat(", ")
-                        }});
-                        return return_str
-                    }},
+                split_string: function(str) {{
+                    var arr = str.split(", ")
+                    var return_str = ''
+                    arr.forEach(element => {{
+                        return_str += this.tag_display_text(element).concat(", ")
+                    }});
+                    return return_str
+                }},
 
-                    tag_display_text: function (tag) {{
-                        display_text = ""
-                        if(typeof tag =='string')
-                        {{
-                            display_text = tag
-                        }}
-                        else
-                        {{
-                            var index = this.lists.{foreign_entity}.findIndex(opt => tag == opt.value)
-                            display_text = this.lists.{foreign_entity}[index].text
-                        }}
-                        return display_text
-                    }},
+                tag_display_text: function (tag) {{
+                    display_text = ""
+                    if(typeof tag =='string')
+                    {{
+                        display_text = tag
+                    }}
+                    else
+                    {{
+                        var index = this.lists.{foreign_entity}.findIndex(opt => tag == opt.value)
+                        display_text = this.lists.{foreign_entity}[index].text
+                    }}
+                    return display_text
+                }},
                     """
 
     source_code += f"""
@@ -1237,7 +1243,10 @@ def create(data):
         if isinstance(col_type, dict):
             col_values = col_type.get("values","")
             if (col_type["type"] == "relationship") or isinstance(col_values, list):
-                source_code += f"""
+                has_many = col_type.get('has_many', '')
+                has_many_ux = col_type.get('has_many_ux', '')
+                if has_many != '' and has_many_ux != 'repeater':
+                    source_code += f"""
             {col_varname}_criteria() {{
                 return this.search['{col_varname}'].trim().toLowerCase()
             }},
