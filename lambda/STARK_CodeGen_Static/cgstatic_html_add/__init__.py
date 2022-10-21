@@ -68,10 +68,6 @@ def create(data):
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_many_ux = col_type.get('has_many_ux', None)
             if has_many_ux: 
-                child_entity = col_type.get('has_many', '')
-                print('child_entity')
-                print(child_entity)
-                child_entity_varname = converter.convert_to_system_name(child_entity)
                 source_code += f"""
                             <template>
                                 <!-- <a v-b-toggle class="text-decoration-none" :href="'#group-collapse-'+index" @click.prevent> -->
@@ -93,15 +89,17 @@ def create(data):
                                                                 </b-form-group>
                                                             </div>"""
                 
-                for rel_col, rel_col_type in rel_model.items():
-                    rel_col_varname = converter.convert_to_system_name(rel_col)
-                    rel_html_control_code = cg_coltype.create({
-                        "col": rel_col,
-                        "col_type": rel_col_type,
-                        "col_varname": rel_col_varname,
-                        "entity" : child_entity,
-                        "entity_varname": child_entity_varname
-                    })
+                for rel_col, rel_data in rel_model.items():
+                    child_entity_varname = converter.convert_to_system_name(rel_col)
+                    for rel_col_key, rel_col_type in rel_data.get('data').items():
+                        rel_col_varname = converter.convert_to_system_name(rel_col_key)
+                        rel_html_control_code = cg_coltype.create({
+                            "col": rel_col_key,
+                            "col_type": rel_col_type,
+                            "col_varname": rel_col_varname,
+                            "entity" : rel_col,
+                            "entity_varname": child_entity_varname
+                        })
 
                     source_code += f"""
                                                         <div class="form-group col-lg-2">
