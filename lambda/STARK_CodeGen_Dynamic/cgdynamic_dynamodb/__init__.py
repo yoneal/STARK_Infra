@@ -57,7 +57,10 @@ def create(data):
 
     #This is for our DDB update call
     update_expression = ""
-    for col in columns:
+    print(columns)
+    for col, colvar_type in columns:
+        print(col)
+        print(colvar_type)
         col_varname = converter.convert_to_system_name(col)
         update_expression += f"""#{col_varname} = :{col_varname}, """
     update_expression += " #STARKListViewsk = :STARKListViewsk"
@@ -170,13 +173,6 @@ def create(data):
         col_varname = converter.convert_to_system_name(col)
         source_code +=f"""
                 data['{col_varname}'] = payload.get('{col_varname}','')"""
-    
-    if relationships.get('has_many', '') != '':
-        for relation in relationships.get('has_many'):
-            if relation.get('type') == 'repeater':
-                entity = converter.convert_to_system_name(relation.get('entity'))
-                source_code +=f"""
-                data['{entity}'] = payload.get('{entity}','')"""
 
     source_code +=f"""
                 if payload.get('STARK_isReport', False) == False:
