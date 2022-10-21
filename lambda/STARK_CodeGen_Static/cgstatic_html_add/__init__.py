@@ -68,10 +68,10 @@ def create(data):
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_many_ux = col_type.get('has_many_ux', None)
             has_many = col_type.get('has_many')
-            rel_pk = rel_model[has_many].get('pk')
-            rel_pk_varname = converter.convert_to_system_name(rel_pk)
-            child_entity_varname = converter.convert_to_system_name(rel_col)
             if has_many_ux: 
+                rel_pk = rel_model[has_many].get('pk')
+                rel_pk_varname = converter.convert_to_system_name(rel_pk)
+                child_entity_varname = converter.convert_to_system_name(has_many)
                 source_code += f"""
                             <template>
                                 <!-- <a v-b-toggle class="text-decoration-none" :href="'#group-collapse-'+index" @click.prevent> -->
