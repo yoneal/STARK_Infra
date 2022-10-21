@@ -944,7 +944,8 @@ def remove_repeater_col(relationships, columns):
         repeater_fields = []
         for relation in relationships.get('has_many'):
             if relation.get('type') == 'repeater':
-                repeater_fields.append(relation.get('entity'))
+                new_entity = (relation.get('entity')).replace('_', ' ')
+                repeater_fields.append(new_entity)
 
     # model = models['Order']['data']
     for fields in repeater_fields:
