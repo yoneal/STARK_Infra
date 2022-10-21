@@ -57,9 +57,12 @@ def create(data):
 
     #This is for our DDB update call
     update_expression = ""
+    print('columns')
     print(columns)
     for col, colvar_type in columns:
+        print('col')
         print(col)
+        print('colvar_type')
         print(colvar_type)
         col_varname = converter.convert_to_system_name(col)
         update_expression += f"""#{col_varname} = :{col_varname}, """
