@@ -54,18 +54,13 @@ def create(data):
             dict_to_var_code += f"""
         {col_varname} = data.get('{col_varname}', '')"""
     
-    for col, col_type in columns.items():
-        if isinstance(col_type, dict):
-            col_varname = converter.convert_to_system_name(col)
-            col_values = col_type.get("values", "")
-            has_many_ux = col_type.get('has_many_ux', '')
-            if col_type["type"] == "relationship":
-                has_many = col_type.get('has_many', '')
-                if has_many != '':
-                    if has_many_ux == 'repeater':
-                        print('col')
-                        print(col)
-
+    # if relationships.get('has_many', '') != '':
+    #     for relation in relationships.get('has_many'):
+    #         if relation.get('type') != 'repeater':
+    #             entity = relation.get('entity')
+    #             print(entity)
+    print('relationships')
+    print(relationships)
 
     #This is for our DDB update call
     update_expression = ""
