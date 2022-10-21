@@ -62,12 +62,11 @@ def create(data):
     print('columns')
     print(columns)
     print('test_def')
-    remove_repeater_col(relationships, columns)
+    new_column = remove_repeater_col(relationships, columns)
 
     #This is for our DDB update call
     update_expression = ""
-    for col, colvar_type in columns:
-        print(colvar_type)
+    for col in new_column:
         col_varname = converter.convert_to_system_name(col)
         update_expression += f"""#{col_varname} = :{col_varname}, """
     update_expression += " #STARKListViewsk = :STARKListViewsk"
