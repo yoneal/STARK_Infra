@@ -67,6 +67,10 @@ def create(data):
 
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_many_ux = col_type.get('has_many_ux', None)
+            has_many = col_type.get('has_many')
+            rel_pk = rel_model[has_many].get('pk')
+            rel_pk_varname = converter.convert_to_system_name(rel_pk)
+            child_entity_varname = converter.convert_to_system_name(rel_col)
             if has_many_ux: 
                 source_code += f"""
                             <template>
@@ -82,12 +86,20 @@ def create(data):
                                             <div class="card">
                                                 <div class="card-body">
                                                     <form class="repeater" enctype="multipart/form-data">
-                                                        <div class="row" v-for="(field, index) in Document">
+                                                        <div class="row" v-for="(field, index) in {child_entity_varname}">
                                                             <div class="form-group">
                                                                 <b-form-group class="form-group" label="#">
                                                                     {{{{ index + 1 }}}}
                                                                 </b-form-group>
                                                             </div>"""
+
+                source_code += f"""
+                                                            <div class="form-group">
+                                                                <label for="{rel_pk_varname}">{rel_pk}</label>
+                                                                <b-form-input type="text" class="form-control" id="{rel_pk_varname}" placeholder="" v-model="field.{rel_pk_varname}" :state="metadata.{rel_pk_varname}.state"></b-form-input>
+                                                                <b-form-invalid-feedback>{{{{metadata.{rel_pk_varname}.feedback}}}}</b-form-invalid-feedback>
+                                                            </div>"""
+
                 
                 for rel_col, rel_data in rel_model.items():
                     child_entity_varname = converter.convert_to_system_name(rel_col)
