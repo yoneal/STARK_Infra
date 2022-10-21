@@ -291,6 +291,8 @@ def create(data):
         for relation in relationships.get('has_many'):
             if relation.get('type') == 'repeater':
                 entity = relation.get('entity')
+                print('entity')
+                print(entity)
                 rel_pk = converter.convert_to_system_name(rel_model[entity].get('pk', []))
                 rel_model = rel_model[entity].get('data', [])
                 entity = converter.convert_to_system_name(relation.get('entity'))
