@@ -77,7 +77,7 @@ def create(data):
                                 <!-- <a v-b-toggle class="text-decoration-none" :href="'#group-collapse-'+index" @click.prevent> -->
                                 <a v-b-toggle class="text-decoration-none" @click.prevent>
                                     <span class="when-open"><img src="images/chevron-up.svg" class="filter-fill-svg-link" height="20rem"></span><span class="when-closed"><img src="images/chevron-down.svg" class="filter-fill-svg-link" height="20rem"></span>
-                                    <span class="align-bottom">Document</span>
+                                    <span class="align-bottom">{has_many}</span>
                                 </a>
                                 <!-- <b-collapse :id="'group-collapse-'+index" visible class="mt-0 mb-2 pl-2"> -->
                                 <b-collapse visible class="mt-0 mb-2 pl-2">
@@ -102,7 +102,7 @@ def create(data):
 
                 
                 for rel_col, rel_data in rel_model.items():
-                    child_entity_varname = converter.convert_to_system_name(rel_col)
+                    rel_child_entity_varname = converter.convert_to_system_name(rel_col)
                     for rel_col_key, rel_col_type in rel_data.get('data').items():
                         rel_col_varname = converter.convert_to_system_name(rel_col_key)
                         rel_html_control_code = cg_coltype.create({
@@ -110,10 +110,10 @@ def create(data):
                             "col_type": rel_col_type,
                             "col_varname": rel_col_varname,
                             "entity" : rel_col,
-                            "entity_varname": child_entity_varname
+                            "entity_varname": rel_child_entity_varname
                         })
 
-                    source_code += f"""
+                        source_code += f"""
                                                         <div class="form-group col-lg-2">
                                                             {rel_html_control_code}
                                                         </div>"""
