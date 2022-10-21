@@ -950,3 +950,4 @@ def remove_repeater_col(relationships, columns):
     for fields in repeater_fields:
         del columns[fields]
     print(columns)
+    return columns
