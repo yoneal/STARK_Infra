@@ -59,8 +59,10 @@ def create(data):
     #         if relation.get('type') != 'repeater':
     #             entity = relation.get('entity')
     #             print(entity)
-    print('relationships')
-    print(relationships)
+    print('columns')
+    print(columns)
+    print('test_def')
+    remove_repeater_col(relationships, columns)
 
     #This is for our DDB update call
     update_expression = ""
@@ -936,3 +938,15 @@ def set_type(col_type):
         col_type_id = 'N'
 
     return col_type_id
+
+def remove_repeater_col(relationships, columns):
+    if relationships.get('has_many', '') != '':
+        repeater_fields = []
+        for relation in relationships.get('has_many'):
+            if relation.get('type') == 'repeater':
+                repeater_fields.append(relation.get('entity'))
+
+    # model = models['Order']['data']
+    for fields in repeater_fields:
+        del columns[fields]
+    print(columns)
