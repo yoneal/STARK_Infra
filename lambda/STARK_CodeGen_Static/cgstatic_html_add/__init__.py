@@ -93,15 +93,20 @@ def create(data):
 
                 source_code += f"""
                                                             <b-form-group class="form-group" label="{rel_pk}" label-for="{rel_pk_varname}">
-                                                                <b-form-input type="text" class="form-control" id="{rel_pk_varname}" placeholder="" v-model="field.{rel_pk_varname}" :state="metadata.{rel_pk_varname}.state"></b-form-input>
-                                                                <b-form-invalid-feedback>{{{{metadata.{rel_pk_varname}.feedback}}}}</b-form-invalid-feedback>
+                                                                <b-form-input type="text" class="form-control" id="{rel_pk_varname}" placeholder="" v-model="field.{rel_pk_varname}"></b-form-input>
                                                             </b-form-group>"""
 
                 for rel_col_key, rel_col_type in rel_model.get(child_entity).get('data').items():
                     rel_col_varname = converter.convert_to_system_name(rel_col_key)
-                    html_controls['is_many_control'] = True
-                    rel_html_control_code = cg_coltype.create(html_controls)
-
+                    rel_html_control_code = cg_coltype.create({
+                        "col": rel_col_key,
+                        "col_type": rel_col_type,
+                        "col_varname": rel_col_varname,
+                        "entity" : child_entity,
+                        "entity_varname": child_entity_varname,
+                        "is_many_control": True
+                    })
+                    
                     source_code += f"""
                                                             <b-form-group class="form-group col-lg-2" label="{rel_col_key}" label-for="{rel_col_varname}" >
                                                                 {rel_html_control_code}

@@ -89,6 +89,7 @@ def create_handler(event, context):
         cols = models[entity]["data"]
         relationships = get_rel.get_relationship(models, entity)
         rel_model = {}
+        
         for relationship in relationships.get('has_many', []):
             if relationship.get('type') == 'repeater':
                 rel_col = models.get(relationship.get('entity'), '')
@@ -96,6 +97,9 @@ def create_handler(event, context):
             
         cgstatic_data = { "Entity": entity, "PK": pk, "Columns": cols, "Project Name": project_name, "Relationships": relationships, "Rel Model": rel_model }
         entity_varname = converter.convert_to_system_name(entity)
+
+        for rel in rel_model:
+            add_to_commit(source_code='', key=f"js/many_{rel}.js", files_to_commit=files_to_commit, file_path='static')
 
         add_to_commit(source_code=cg_add.create(cgstatic_data), key=f"{entity_varname}_add.html", files_to_commit=files_to_commit, file_path='static')
         add_to_commit(source_code=cg_edit.create(cgstatic_data), key=f"{entity_varname}_edit.html", files_to_commit=files_to_commit, file_path='static')
