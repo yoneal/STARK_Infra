@@ -131,6 +131,11 @@ def create(data):
                                 <hr><br>
                             </template>      
                 """
+            else:
+                source_code += f"""
+                        <b-form-group class="form-group" label="{col}" label-for="{col_varname}" :state="metadata.{col_varname}.state" :invalid-feedback="metadata.{col_varname}.feedback">
+                            {html_control_code}
+                        </b-form-group>"""
         else:
             source_code += f"""
                         <b-form-group class="form-group" label="{col}" label-for="{col_varname}" :state="metadata.{col_varname}.state" :invalid-feedback="metadata.{col_varname}.feedback">
