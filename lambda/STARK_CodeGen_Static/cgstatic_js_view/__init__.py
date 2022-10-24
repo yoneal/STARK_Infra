@@ -163,6 +163,17 @@ def create(data):
 
                     ],"""
 
+    for rel in rel_model:
+        pk   = rel_model[rel]["pk"]
+        cols = rel_model[rel]["data"]
+        for col, col_type in cols.items():
+            if isinstance(col_type, dict) and col_type["type"] == "relationship":
+                has_one = col_type.get('has_one', '')
+                if has_one != '':
+                    source_code += f"""
+                    '{col}': [
+                    ],"""
+        
                     
 
     for col, col_type in cols.items():

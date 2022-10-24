@@ -38,7 +38,22 @@ def create(data):
     
     source_code += f"""
             }}
-        ],"""
+        ],
+        
+        list_status: {{"""
+
+    for col, col_type in cols.items():
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_one = col_type.get('has_one', '')
+            if  has_one != '':
+                foreign_entity  = converter.convert_to_system_name(has_one)
+                source_code += f"""
+            '{foreign_entity}': 'empty',
+                """
+
+    source_code += f"""
+        }}
+    """
 
     for col, col_type in cols.items():
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
@@ -50,11 +65,10 @@ def create(data):
 
                 source_code += f"""
     list_{foreign_entity}: function () {{
-        if (this.list_status.{foreign_entity} == 'empty') {{
+        if (many_Order_Items.list_status.{foreign_entity} == 'empty') {{
             loading_modal.show();
             root.lists.{foreign_entity} = []
 
-            //FIXME: for now, generic list() is used. Can be optimized to use a list function that only retrieves specific columns
             fields = ['{foreign_field}', '{foreign_display}']
             {foreign_entity}_app.get_fields(fields).then( function(data) {{
                 data.forEach(function(arrayItem) {{
@@ -66,7 +80,7 @@ def create(data):
                 
                 source_code += f""" 
         }})
-                root.list_status.{foreign_entity} = 'populated'
+                many_Order_Items.list_status.{foreign_entity} = 'populated'
                 loading_modal.hide();
             }}).catch(function(error) {{
                 console.log("Encountered an error! [" + error + "]")
