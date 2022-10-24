@@ -48,11 +48,10 @@ def create(data):
             if  has_one != '':
                 foreign_entity  = converter.convert_to_system_name(has_one)
                 source_code += f"""
-            '{foreign_entity}': 'empty',
-                """
+            '{foreign_entity}': 'empty',"""
 
     source_code += f"""
-        }}
+        }},
     """
 
     for col, col_type in cols.items():
@@ -64,33 +63,33 @@ def create(data):
                 foreign_display = converter.convert_to_system_name(col_type.get('display', foreign_field))
 
                 source_code += f"""
-    list_{foreign_entity}: function () {{
-        if (many_Order_Items.list_status.{foreign_entity} == 'empty') {{
-            loading_modal.show();
-            root.lists.{foreign_entity} = []
+        list_{foreign_entity}: function () {{
+            if (many_Order_Items.list_status.{foreign_entity} == 'empty') {{
+                loading_modal.show();
+                root.lists.{foreign_entity} = []
 
-            fields = ['{foreign_field}', '{foreign_display}']
-            {foreign_entity}_app.get_fields(fields).then( function(data) {{
-                data.forEach(function(arrayItem) {{
-                    value = arrayItem['{foreign_field}']
-                    text  = arrayItem['{foreign_display}']"""
-                
+                fields = ['{foreign_field}', '{foreign_display}']
+                {foreign_entity}_app.get_fields(fields).then( function(data) {{
+                    data.forEach(function(arrayItem) {{
+                        value = arrayItem['{foreign_field}']
+                        text  = arrayItem['{foreign_display}']"""
+                    
                 source_code += f"""            
-                root.lists.{foreign_entity}.push({{ value: value, text: text }})"""
+                    root.lists.{foreign_entity}.push({{ value: value, text: text }})"""
                 
                 source_code += f""" 
-        }})
-                many_Order_Items.list_status.{foreign_entity} = 'populated'
-                loading_modal.hide();
-            }}).catch(function(error) {{
-                console.log("Encountered an error! [" + error + "]")
-                loading_modal.hide();
-            }});
-        }}
-    }},
+                    }})
+                    many_Order_Items.list_status.{foreign_entity} = 'populated'
+                    loading_modal.hide();
+                }}).catch(function(error) {{
+                    console.log("Encountered an error! [" + error + "]")
+                    loading_modal.hide();
+                }});
+            }}
+        }},
                 """
     source_code += f"""
-        }}
+    }}
     """
 
     return textwrap.dedent(source_code)
