@@ -285,17 +285,20 @@ def create(data):
                 STARK_group_by_1: '',
                 Y_Data: [],
                 showOperations: true,
+                many_entity: {{
             """
+            
+    if relationships.get('has_many', '') != '':
+        for relation in relationships.get('has_many'):
+            if relation.get('type') == 'repeater':
+                many_entity = relation.get('entity')
+                many_entity_varname = converter.convert_to_system_name(many_entity)
 
-    # if relationships.get('has_many', '') != '':
-    #     for relation in relationships.get('has_many'):
-    # if relation.get('type') == 'repeater':
-
-        # entity = relation.get('entity')
+                source_code += f"""    
+                    '{many_entity_varname}': many_{many_entity_varname}.{many_entity_varname},"""
     
-
-
     source_code += f"""
+                }},
             }},
             methods: {{
 
@@ -338,7 +341,7 @@ def create(data):
                 if has_many != '':
                     if has_many_ux == 'repeater':
                         source_code += f"""
-                        this.{entity_varname}.{col_varname} = {{ {col_varname}: JSON.stringify(root.{col_varname}) }}
+                        this.{entity_varname}.{col_varname} = {{ {col_varname}: JSON.stringify(root.many_entity.{col_varname}) }}
                         """
                         
     source_code += f"""    
@@ -420,7 +423,7 @@ def create(data):
                     if has_many_ux == 'repeater':
                         # print(has_many)
                         source_code += f"""
-                        this.{entity_varname}.{col_varname} = {{ {col_varname}: JSON.stringify(root.{col_varname}) }}"""
+                        this.{entity_varname}.{col_varname} = {{ {col_varname}: JSON.stringify(root.many_entity.{col_varname}) }}"""
 
     source_code += f"""
                         let data = {{ {entity_varname}: this.{entity_varname} }}
@@ -511,7 +514,7 @@ def create(data):
                     if has_many_ux == 'repeater':
                         source_code += f"""
                             if(data["{col_varname}"].length > 0) {{
-                                root.{col_varname} = JSON.parse(data["{col_varname}"])
+                                root.many_entity.{col_varname} = JSON.parse(data["{col_varname}"])
                             }}"""
     source_code += f"""
                             console.log("VIEW: Retreived module data.")
@@ -934,12 +937,10 @@ def create(data):
                             data.forEach(function(arrayItem) {{
                                 value = arrayItem['{foreign_field}']
                                 text  = arrayItem['{foreign_display}']"""
-                if has_one != '': 
-                    source_code += f"""            
+                 
+                source_code += f"""            
                                 root.lists.{foreign_entity}.push({{ value: value, text: text }})"""
-                if has_many != '': 
-                    source_code += f"""            
-                                root.lists.{foreign_entity}.push({{ value: value, text: text }})"""
+
                 source_code += f""" 
                 }})
                             root.list_status.{foreign_entity} = 'populated'
@@ -1212,14 +1213,12 @@ def create(data):
     if len(rel_model) > 0:
         source_code+= f"""
                 add_field: function (entity) {{
-                    many_fields = root[entity][0]
-                    root[entity].push({{many_fields}})
+                    many_fields = root.many_entity[entity][0]
+                    root.many_entity[entity].push({{many_fields}})
                 }},
-
                 remove_field: function (index, entity) {{
-                    this[entity].splice(index, 1);       
+                    root.many_entity[entity].splice(index, 1);       
                 }},"""
-
     source_code+= f"""  
             }},
             computed: {{"""
