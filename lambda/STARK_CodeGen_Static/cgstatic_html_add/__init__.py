@@ -61,13 +61,7 @@ def create(data):
             "entity_varname": entity_varname,
             "is_many_control": False
         }
-        if html_controls['is_many_control'] == False:
-            html_control_code = cg_coltype.create(html_controls)
-
-            source_code += f"""
-                            <b-form-group class="form-group" label="{col}" label-for="{col_varname}" :state="metadata.{col_varname}.state" :invalid-feedback="metadata.{col_varname}.feedback">
-                                {html_control_code}
-                            </b-form-group>"""
+        html_control_code = cg_coltype.create(html_controls)
 
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_many_ux = col_type.get('has_many_ux', None)
@@ -103,19 +97,9 @@ def create(data):
                                                                 <b-form-invalid-feedback>{{{{metadata.{rel_pk_varname}.feedback}}}}</b-form-invalid-feedback>
                                                             </b-form-group>"""
 
-                
-                
-                
                 for rel_col_key, rel_col_type in rel_model.get(child_entity).get('data').items():
                     rel_col_varname = converter.convert_to_system_name(rel_col_key)
-                    html_controls = {
-                        "col": col,
-                        "col_type": col_type,
-                        "col_varname": col_varname,
-                        "entity" : entity,
-                        "entity_varname": entity_varname,
-                        "is_many_control": True
-                    }
+                    html_controls['is_many_control'] = True
                     rel_html_control_code = cg_coltype.create(html_controls)
 
                     source_code += f"""
@@ -140,10 +124,14 @@ def create(data):
                                     </div>
                                 </b-collapse>
                                 <hr><br>
-                            </template>
-                                                            
-
+                            </template>      
                 """
+        else:
+            source_code += f"""
+                        <b-form-group class="form-group" label="{col}" label-for="{col_varname}" :state="metadata.{col_varname}.state" :invalid-feedback="metadata.{col_varname}.feedback">
+                            {html_control_code}
+                        </b-form-group>"""
+            
     source_code += f"""
                             <button type="button" class="btn btn-secondary" onClick="window.location.href='{entity_varname}.html'">Back</button>
                             <button type="button" class="btn btn-primary float-right" onClick="root.add()">Add</button>
