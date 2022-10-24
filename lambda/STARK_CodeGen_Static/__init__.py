@@ -22,6 +22,7 @@ if 'libstark' in os.listdir():
 
 cg_js_app    = importlib.import_module(f"{prepend_dir}cgstatic_js_app")  
 cg_js_view   = importlib.import_module(f"{prepend_dir}cgstatic_js_view")  
+cg_js_many   = importlib.import_module(f"{prepend_dir}cgstatic_js_many")  
 cg_js_login  = importlib.import_module(f"{prepend_dir}cgstatic_js_login")  
 cg_js_home   = importlib.import_module(f"{prepend_dir}cgstatic_js_homepage")  
 cg_js_stark  = importlib.import_module(f"{prepend_dir}cgstatic_js_stark")  
@@ -99,7 +100,10 @@ def create_handler(event, context):
         entity_varname = converter.convert_to_system_name(entity)
 
         for rel in rel_model:
-            add_to_commit(source_code='', key=f"js/many_{rel}.js", files_to_commit=files_to_commit, file_path='static')
+            pk   = rel_model[rel]["pk"]
+            cols = rel_model[rel]["data"]
+            cgstatic_many_data = { "Entity": rel, "PK": pk, "Columns": cols, "Project Name": project_name, "Relationships": relationships }
+            add_to_commit(source_code=cg_js_many.create(cgstatic_many_data), key=f"js/many_{rel}.js", files_to_commit=files_to_commit, file_path='static')
 
         add_to_commit(source_code=cg_add.create(cgstatic_data), key=f"{entity_varname}_add.html", files_to_commit=files_to_commit, file_path='static')
         add_to_commit(source_code=cg_edit.create(cgstatic_data), key=f"{entity_varname}_edit.html", files_to_commit=files_to_commit, file_path='static')
