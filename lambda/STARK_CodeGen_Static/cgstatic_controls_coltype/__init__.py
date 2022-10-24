@@ -17,6 +17,7 @@ def create(data):
     entity_varname  = data['entity_varname']
     html_code       = ""
     is_many_control = data['is_many_control']
+    state_control   = ""
 
     if isinstance(col_type, str):
         col_type = col_type.lower()
