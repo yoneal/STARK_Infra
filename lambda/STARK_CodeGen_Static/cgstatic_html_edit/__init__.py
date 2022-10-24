@@ -51,15 +51,18 @@ def create(data):
 
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
-        html_control_code = cg_coltype.create({
+        html_controls = {
             "col": col,
             "col_type": col_type,
             "col_varname": col_varname,
             "entity" : entity,
-            "entity_varname": entity_varname
-        })
+            "entity_varname": entity_varname,
+            "is_many_control": False
+        }
+        if not html_controls['is_many_control']:
+            html_control_code = cg_coltype.create(html_controls)
 
-        source_code += f"""
+            source_code += f"""
                             <div class="form-group">
                                 <label for="{col_varname}">{col}</label>
                                 {html_control_code}
