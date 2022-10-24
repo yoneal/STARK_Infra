@@ -18,7 +18,7 @@ import convert_friendly_to_system as converter
 def create(data, special="none"):
 
     project     = data["Project Name"]
-    rel_model   = data["Rel Model"]
+    rel_model   = data.get('Rel Model', {})
     
     with_upload = False
 
