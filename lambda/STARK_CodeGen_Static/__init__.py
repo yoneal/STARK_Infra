@@ -102,8 +102,9 @@ def create_handler(event, context):
         for rel in rel_model:
             pk   = rel_model[rel]["pk"]
             cols = rel_model[rel]["data"]
+            many_entity_varname = converter.convert_to_system_name(rel)
             cgstatic_many_data = { "Entity": rel, "PK": pk, "Columns": cols, "Project Name": project_name, "Relationships": relationships }
-            add_to_commit(source_code=cg_js_many.create(cgstatic_many_data), key=f"js/many_{rel}.js", files_to_commit=files_to_commit, file_path='static')
+            add_to_commit(source_code=cg_js_many.create(cgstatic_many_data), key=f"js/many_{many_entity_varname}.js", files_to_commit=files_to_commit, file_path='static')
 
         add_to_commit(source_code=cg_add.create(cgstatic_data), key=f"{entity_varname}_add.html", files_to_commit=files_to_commit, file_path='static')
         add_to_commit(source_code=cg_edit.create(cgstatic_data), key=f"{entity_varname}_edit.html", files_to_commit=files_to_commit, file_path='static')

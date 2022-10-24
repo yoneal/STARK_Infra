@@ -92,7 +92,7 @@ def create(data):
                                                             </div>"""
 
                 source_code += f"""
-                                                            <b-form-group class="form-group" label="{rel_pk}" label-for="{rel_pk_varname}">
+                                                            <b-form-group class="form-group col-lg-2" label="{rel_pk}" label-for="{rel_pk_varname}">
                                                                 <b-form-input type="text" class="form-control" id="{rel_pk_varname}" placeholder="" v-model="field.{rel_pk_varname}"></b-form-input>
                                                             </b-form-group>"""
 
@@ -115,12 +115,12 @@ def create(data):
                 source_code += f"""
                                                             <div class="form-group col-lg-2 ">
                                                                 <b-form-group class="form-group" label="Remove">
-                                                                    <input type="button" class="btn bg-danger" alt="Delete" width="40" height="40" @click="root.RemoveField(index, '{child_entity_varname}')" value="X">
+                                                                    <input type="button" class="btn bg-danger" alt="Delete" width="40" height="40" @click="root.remove_field(index, '{child_entity_varname}')" value="X">
                                                                 </b-form-group>
                                                             </div> 
                                                         </div>
                                                         <div>
-                                                            <input type="button" class="btn btn-success mt-3 mt-lg-0" @click="root.AddField('{child_entity_varname}')" value="Add"/>
+                                                            <input type="button" class="btn btn-success mt-3 mt-lg-0" @click="root.add_field('{child_entity_varname}')" value="Add"/>
                                                         </div>
                                                     </form>
                                                 </div>

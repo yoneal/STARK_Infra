@@ -26,8 +26,10 @@ def create(data):
 
     source_code = f"""\
     many_{entity_varname} = {{
+        
 
-        {entity_varname}: {{
+        {entity_varname}: [
+            {{
                     '{pk_varname}': '',"""
     for col in cols:
         col_varname = converter.convert_to_system_name(col)
@@ -35,7 +37,8 @@ def create(data):
                     '{col_varname}': '',"""
     
     source_code += f"""
-        }},"""
+            }}
+        ],"""
 
     for col, col_type in cols.items():
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
@@ -46,31 +49,31 @@ def create(data):
                 foreign_display = converter.convert_to_system_name(col_type.get('display', foreign_field))
 
                 source_code += f"""
-                list_{foreign_entity}: function () {{
-                    if (this.list_status.{foreign_entity} == 'empty') {{
-                        loading_modal.show();
-                        root.lists.{foreign_entity} = []
+    list_{foreign_entity}: function () {{
+        if (this.list_status.{foreign_entity} == 'empty') {{
+            loading_modal.show();
+            root.lists.{foreign_entity} = []
 
-                        //FIXME: for now, generic list() is used. Can be optimized to use a list function that only retrieves specific columns
-                        fields = ['{foreign_field}', '{foreign_display}']
-                        {foreign_entity}_app.get_fields(fields).then( function(data) {{
-                            data.forEach(function(arrayItem) {{
-                                value = arrayItem['{foreign_field}']
-                                text  = arrayItem['{foreign_display}']"""
+            //FIXME: for now, generic list() is used. Can be optimized to use a list function that only retrieves specific columns
+            fields = ['{foreign_field}', '{foreign_display}']
+            {foreign_entity}_app.get_fields(fields).then( function(data) {{
+                data.forEach(function(arrayItem) {{
+                    value = arrayItem['{foreign_field}']
+                    text  = arrayItem['{foreign_display}']"""
                 
                 source_code += f"""            
-                            root.lists.{foreign_entity}.push({{ value: value, text: text }})"""
+                root.lists.{foreign_entity}.push({{ value: value, text: text }})"""
                 
                 source_code += f""" 
-                    }})
-                            root.list_status.{foreign_entity} = 'populated'
-                            loading_modal.hide();
-                        }}).catch(function(error) {{
-                            console.log("Encountered an error! [" + error + "]")
-                            loading_modal.hide();
-                        }});
-                    }}
-                }},
+        }})
+                root.list_status.{foreign_entity} = 'populated'
+                loading_modal.hide();
+            }}).catch(function(error) {{
+                console.log("Encountered an error! [" + error + "]")
+                loading_modal.hide();
+            }});
+        }}
+    }},
                 """
     source_code += f"""
         }}
