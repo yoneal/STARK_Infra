@@ -24,7 +24,7 @@ def create(data):
     if is_many_control:
         entity_varname = 'field'
     else:
-        state_control = f':state="metadata.{col_varname}.state'   
+        state_control = f':state="metadata.{col_varname}.state"'   
 
 
     if col_type == "date":

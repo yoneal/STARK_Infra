@@ -52,6 +52,7 @@ def create(data):
 
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
+
         html_controls = {
             "col": col,
             "col_type": col_type,
@@ -60,7 +61,7 @@ def create(data):
             "entity_varname": entity_varname,
             "is_many_control": False
         }
-        if not html_controls['is_many_control']:
+        if html_controls['is_many_control'] == False:
             html_control_code = cg_coltype.create(html_controls)
 
             source_code += f"""
@@ -107,7 +108,14 @@ def create(data):
                 
                 for rel_col_key, rel_col_type in rel_model.get(child_entity).get('data').items():
                     rel_col_varname = converter.convert_to_system_name(rel_col_key)
-                    html_controls['is_many_control'] = True
+                    html_controls = {
+                        "col": col,
+                        "col_type": col_type,
+                        "col_varname": col_varname,
+                        "entity" : entity,
+                        "entity_varname": entity_varname,
+                        "is_many_control": True
+                    }
                     rel_html_control_code = cg_coltype.create(html_controls)
 
                     source_code += f"""

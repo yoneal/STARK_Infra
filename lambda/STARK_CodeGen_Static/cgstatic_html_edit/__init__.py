@@ -59,7 +59,7 @@ def create(data):
             "entity_varname": entity_varname,
             "is_many_control": False
         }
-        if not html_controls['is_many_control']:
+        if html_controls['is_many_control'] == False:
             html_control_code = cg_coltype.create(html_controls)
 
             source_code += f"""
