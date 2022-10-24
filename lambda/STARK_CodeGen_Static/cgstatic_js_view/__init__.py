@@ -352,8 +352,7 @@ def create(data):
                 if has_many != '':
                     if has_many_ux == 'repeater':
                         source_code += f"""
-                        this.{entity_varname}.{col_varname} = {{ {col_varname}: JSON.stringify(root.many_entity.{col_varname}) }}
-                        """
+                        this.{entity_varname}.{col_varname} = JSON.stringify(root.many_entity.{col_varname})"""
                         
     source_code += f"""    
                         let data = {{ {entity_varname}: this.{entity_varname} }}
@@ -434,7 +433,7 @@ def create(data):
                     if has_many_ux == 'repeater':
                         # print(has_many)
                         source_code += f"""
-                        this.{entity_varname}.{col_varname} = {{ {col_varname}: JSON.stringify(root.many_entity.{col_varname}) }}"""
+                        this.{entity_varname}.{col_varname} = JSON.stringify(root.many_entity.{col_varname})"""
 
     source_code += f"""
                         let data = {{ {entity_varname}: this.{entity_varname} }}

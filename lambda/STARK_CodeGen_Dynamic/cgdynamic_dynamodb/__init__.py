@@ -698,13 +698,12 @@ def create(data):
         for rel in many_rel:
             entity = rel['entity']
             sk = 'Customer|' + entity
-            data = data.get(entity, '')
-            data = data[entity]
-            edit_many(pk, sk, data)"""
+            many_data = data.get(entity, '')
+            edit_many(pk, sk, many_data)"""
 
     if len(relationships) > 0:
         source_code += f"""
-        for relation in relationships['has_one']:
+        for relation in relationships.get('has_one', []):
             cascade_pk_change_to_child(data, relation['entity'], relation['attribute'])
         """
     source_code += f"""
@@ -789,7 +788,7 @@ def create(data):
         if method == 'POST':
             data['orig_pk'] = pk
 
-        for relation in relationships['has_one']:
+        for relation in relationships.get('has_one', []):
             cascade_pk_change_to_child(data, relation['entity'], relation['attribute'])
         """
 
@@ -799,9 +798,8 @@ def create(data):
         for rel in many_rel:
             entity = rel['entity']
             sk = 'Customer|' + entity
-            data = data.get(entity, '')
-            data = data[entity]
-            add_many(pk, sk, data)"""
+            many_data = data.get(entity, '')
+            add_many(pk, sk, many_data)"""
     
     source_code += f"""
         global resp_obj
