@@ -165,13 +165,13 @@ def create(data):
 
     for rel in rel_model:
         pk   = rel_model[rel]["pk"]
-        cols = rel_model[rel]["data"]
-        for col, col_type in cols.items():
+        rel_cols = rel_model[rel]["data"]
+        for col, col_type in rel_cols.items():
             if isinstance(col_type, dict) and col_type["type"] == "relationship":
                 has_one = col_type.get('has_one', '')
                 if has_one != '':
                     source_code += f"""
-                    '{col}': [
+                    '{has_one}': [
                     ],"""
         
                     
@@ -197,11 +197,13 @@ def create(data):
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
             has_many = col_type.get('has_many', '')
+            has_many_ux = col_type.get('has_many_ux', '')
             if  has_one != '' or has_many != '':
+                if has_many_ux == '':
                 #simple 1-1 relationship
-                col_varname = converter.convert_to_system_name(col)
+                    col_varname = converter.convert_to_system_name(col)
 
-                source_code += f"""
+                    source_code += f"""
                     '{col_varname}': 'empty',"""
 
 
@@ -217,8 +219,10 @@ def create(data):
             col_values = col_type.get("values", "")
             if col_type["type"] == "relationship":
                 has_many = col_type.get('has_many', '')
+                has_many_ux = col_type.get('has_many_ux', '')
                 if  has_many != '':
-                    source_code += f"""
+                    if has_many_ux == '':
+                        source_code += f"""
                         '{col_varname}': [],"""
             elif isinstance(col_values, list):
                     source_code += f"""

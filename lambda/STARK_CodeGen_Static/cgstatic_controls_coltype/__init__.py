@@ -24,8 +24,10 @@ def create(data):
 
     if is_many_control:
         entity_varname = 'field'
+        rel_list = f'many_{entity_varname}'
     else:
-        state_control = f':state="metadata.{col_varname}.state"'   
+        state_control = f':state="metadata.{col_varname}.state"'  
+        rel_list = f'root' 
 
 
     if col_type == "date":
@@ -199,7 +201,7 @@ def create(data):
                 #simple 1-1 relationship
                 foreign_entity  = converter.convert_to_system_name(has_one)
 
-                html_code=f"""<b-form-select id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}" onmouseover="root.list_{foreign_entity}()" onfocus="root.list_{foreign_entity}()" {state_control}>
+                html_code=f"""<b-form-select id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}" onmouseover="{rel_list}.list_{foreign_entity}()" onfocus="{rel_list}.list_{foreign_entity}()" {state_control}>
                                 <template v-slot:first>
                                     <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                 </template>

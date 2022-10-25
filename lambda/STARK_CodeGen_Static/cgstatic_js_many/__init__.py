@@ -26,16 +26,13 @@ def create(data):
 
     source_code = f"""\
     many_{entity_varname} = {{
-        
-
         {entity_varname}: [
             {{
-                    '{pk_varname}': '',"""
+                '{pk_varname}': '',"""
     for col in cols:
         col_varname = converter.convert_to_system_name(col)
         source_code += f"""
-                    '{col_varname}': '',"""
-    
+                '{col_varname}': '',"""
     source_code += f"""
             }}
         ],
