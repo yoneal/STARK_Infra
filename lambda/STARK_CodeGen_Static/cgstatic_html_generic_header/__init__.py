@@ -65,6 +65,13 @@ def create(data, special="none"):
             many_entity_varname = converter.convert_to_system_name(rel)
             source_code += f"""
             <script src="js/many_{many_entity_varname}.js"></script>"""
+            for rel_col, rel_col_type in rel.items():
+                if isinstance(rel_col_type, dict) and rel_col_type["type"] == "relationship":
+                    has_one = rel_col_type.get('has_one', '')
+                    if  has_one != '':
+                        foreign_entity  = converter.convert_to_system_name(has_one)
+                        source_code += f"""
+            <script src="js/{foreign_entity}_app.js"></script>"""
 
         #Figure out which other _app.js files we need to add based on relationships
         for col, col_type in cols.items():
