@@ -529,19 +529,19 @@ def create(data):
                             root.multi_select_values.{foreign_entity} = root.{entity_varname}.{foreign_entity}.split(', ')
                             root.list_{foreign_entity}()"""
 
-    for col, col_type in cols.items():
-        if isinstance(col_type, dict):
-            col_varname = converter.convert_to_system_name(col)
-            col_values = col_type.get("values", "")
-            has_many_ux = col_type.get('has_many_ux', '')
-            if col_type["type"] == "relationship":
-                has_many = col_type.get('has_many', '')
-                if has_many != '':
-                    if has_many_ux == 'repeater':
-                        source_code += f"""
+    for rel, rel_data in rel_model.items():
+        col_varname = converter.convert_to_system_name(rel)
+        source_code += f"""
                             if(data["{col_varname}"].length > 0) {{
                                 root.many_entity.{col_varname} = JSON.parse(data["{col_varname}"])
                             }}"""
+        for col, col_type in rel_data.get('data').items():
+            if isinstance(col_type, dict) and col_type["type"] == "relationship":
+                print(rel)
+                rel_foreign_entity = converter.convert_to_system_name(col)
+                source_code += f"""
+                            root.list_{foreign_entity}()"""
+                
     source_code += f"""
                             console.log("VIEW: Retreived module data.")
                             root.show()
