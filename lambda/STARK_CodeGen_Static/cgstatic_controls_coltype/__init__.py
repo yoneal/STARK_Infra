@@ -23,24 +23,25 @@ def create(data):
         col_type = col_type.lower()
 
     if is_many_control:
-        entity_varname = 'field'
+        field_entity_varname = 'field'
         rel_list = f'many_{entity_varname}'
     else:
         state_control = f':state="metadata.{col_varname}.state"'  
         rel_list = f'root' 
+        field_entity_varname = entity_varname
 
 
     if col_type == "date":
-        html_code=f"""<b-form-datepicker id="{col_varname}" show-decade-nav v-model="{entity_varname}.{col_varname}" class="mb-2" {state_control}></b-form-datepicker>"""
+        html_code=f"""<b-form-datepicker id="{col_varname}" show-decade-nav v-model="{field_entity_varname}.{col_varname}" class="mb-2" {state_control}></b-form-datepicker>"""
 
     elif col_type == "time":
-        html_code=f"""<b-form-timepicker id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2" {state_control}></b-form-timepicker>"""
+        html_code=f"""<b-form-timepicker id="{col_varname}" v-model="{field_entity_varname}.{col_varname}" class="mb-2" {state_control}></b-form-timepicker>"""
 
     elif col_type == "number":
-        html_code=f"""<b-form-input type="number" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}" {state_control}></b-form-input>"""
+        html_code=f"""<b-form-input type="number" class="form-control" id="{col_varname}" placeholder="" v-model="{field_entity_varname}.{col_varname}" {state_control}></b-form-input>"""
 
     elif col_type == "int":
-        html_code=f"""<b-form-input type="number"  min="0" step="1" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}" {state_control}></b-form-input>"""
+        html_code=f"""<b-form-input type="number"  min="0" step="1" class="form-control" id="{col_varname}" placeholder="" v-model="{field_entity_varname}.{col_varname}" {state_control}></b-form-input>"""
 
     elif col_type in [ "yes-no", "boolean" ]:
         if col_type == "yes-no":
@@ -50,13 +51,13 @@ def create(data):
             checked   ="True"
             unchecked ="False"
 
-        html_code=f"""<b-form-checkbox id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2" value="{checked}" unchecked-value="{unchecked}" {state_control}>{{{{ {entity_varname}.{col_varname} }}}}</b-form-checkbox>"""
+        html_code=f"""<b-form-checkbox id="{col_varname}" v-model="{field_entity_varname}.{col_varname}" class="mb-2" value="{checked}" unchecked-value="{unchecked}" {state_control}>{{{{ {field_entity_varname}.{col_varname} }}}}</b-form-checkbox>"""
 
     elif col_type == "multi-line-string":
-        html_code=f"""<b-form-textarea id="{col_varname}" v-model="{entity_varname}.{col_varname}" class="mb-2" rows="4" max-rows="8" {state_control}></b-form-textarea>"""
+        html_code=f"""<b-form-textarea id="{col_varname}" v-model="{field_entity_varname}.{col_varname}" class="mb-2" rows="4" max-rows="8" {state_control}></b-form-textarea>"""
 
     elif isinstance(col_type, list):
-        html_code=f"""<b-form-select id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}" {state_control}>
+        html_code=f"""<b-form-select id="{col_varname}" v-model="{field_entity_varname}.{col_varname}" :options="lists.{col_varname}" {state_control}>
                                     <template v-slot:first>
                                         <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                     </template>
@@ -95,7 +96,7 @@ def create(data):
             if col_type.get('wrap','') == "no-wrap":
                 spin_wrap = ""
 
-            html_code=f"""<b-form-spinbutton class="mb-2" id="{col_varname}" v-model="{entity_varname}.{col_varname}" {spin_wrap} min="{spin_min}" max="{spin_max}" step="{spin_step}" {state_control}>"""
+            html_code=f"""<b-form-spinbutton class="mb-2" id="{col_varname}" v-model="{field_entity_varname}.{col_varname}" {spin_wrap} min="{spin_min}" max="{spin_max}" step="{spin_step}" {state_control}>"""
 
 
         #Tags input - really user-friendly UX for multiple values in a field (think of the "To:" fields in email)
@@ -109,11 +110,11 @@ def create(data):
                 tag_limit = int(col_type.get('limit', 0))
             if col_type.get('values','') != '':
                 #Do not include validator for now, that's for later sprint
-                #attribs_for_tags_list = f""":input-attrs="{{ list: '{col_varname}-tags-list', autocomplete: 'off' }}" :tag-validator="validate_{entity_varname}" add-on-change"""
+                #attribs_for_tags_list = f""":input-attrs="{{ list: '{col_varname}-tags-list', autocomplete: 'off' }}" :tag-validator="validate_{field_entity_varname}" add-on-change"""
                 attribs_for_tags_list = f""":input-attrs="{{ list: '{col_varname}-tags-list', autocomplete: 'off' }}" add-on-change"""
                 datalist_helper = f"""<b-form-datalist id="{col_varname}-tags-list" :options="lists.{col_varname}"></b-form-datalist>"""
 
-            html_code=f"""<b-form-tags input-id="{col_varname}" v-model="{entity_varname}.{col_varname}" :limit="{tag_limit}" remove-on-delete {attribs_for_tags_list} {state_control}></b-form-tags>"""
+            html_code=f"""<b-form-tags input-id="{col_varname}" v-model="{field_entity_varname}.{col_varname}" :limit="{tag_limit}" remove-on-delete {attribs_for_tags_list} {state_control}></b-form-tags>"""
 
             if datalist_helper != '':
                 html_code+=f"""
@@ -127,14 +128,14 @@ def create(data):
             if int(col_type.get('max', 0)) != 0:
                 rating_max = int(col_type.get('max', 0))
 
-            html_code=f"""<b-form-rating id="{col_varname}" v-model="{entity_varname}.{col_varname}" stars="{rating_max}" show-value {state_control}></b-form-rating>"""
+            html_code=f"""<b-form-rating id="{col_varname}" v-model="{field_entity_varname}.{col_varname}" stars="{rating_max}" show-value {state_control}></b-form-rating>"""
 
         #A group of check boxes for multiple choice inputs
         elif col_type["type"] == "multiple choice":
 
             values = col_type.get('values', [])
 
-            html_code=f"""<b-form-checkbox-group id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}" {state_control}></b-form-checkbox-group>"""
+            html_code=f"""<b-form-checkbox-group id="{col_varname}" v-model="{field_entity_varname}.{col_varname}" :options="lists.{col_varname}" {state_control}></b-form-checkbox-group>"""
 
         elif col_type["type"] in [ "radio button", "radio bar" ]:
 
@@ -147,7 +148,7 @@ def create(data):
                 buttons = 'buttons button-variant="outline-secondary"'
                 ugly_hack = "<br>"
 
-            html_code=f"""{ugly_hack}<b-form-radio-group id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}" {buttons} {state_control}></b-form-radio-group>"""
+            html_code=f"""{ugly_hack}<b-form-radio-group id="{col_varname}" v-model="{field_entity_varname}.{col_varname}" :options="lists.{col_varname}" {buttons} {state_control}></b-form-radio-group>"""
         elif col_type["type"] == "multi select combo":
             dropup_flag = col_type.get('dropup',"false") #dropup by default is false as for now, only reporting is using this property
             html_code =f"""<b-form-group label-for="tags-with-dropdown">
@@ -201,7 +202,7 @@ def create(data):
                 #simple 1-1 relationship
                 foreign_entity  = converter.convert_to_system_name(has_one)
 
-                html_code=f"""<b-form-select id="{col_varname}" v-model="{entity_varname}.{col_varname}" :options="lists.{col_varname}" onmouseover="{rel_list}.list_{foreign_entity}()" onfocus="{rel_list}.list_{foreign_entity}()" {state_control}>
+                html_code=f"""<b-form-select id="{col_varname}" v-model="{field_entity_varname}.{col_varname}" :options="lists.{col_varname}" onmouseover="{rel_list}.list_{foreign_entity}()" onfocus="{rel_list}.list_{foreign_entity}()" {state_control}>
                                 <template v-slot:first>
                                     <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                 </template>
@@ -256,7 +257,7 @@ def create(data):
             
 
     else:
-        html_code=f"""<b-form-input type="text" class="form-control" id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}" {state_control}></b-form-input>"""
+        html_code=f"""<b-form-input type="text" class="form-control" id="{col_varname}" placeholder="" v-model="{field_entity_varname}.{col_varname}" {state_control}></b-form-input>"""
 
 
                       
