@@ -47,9 +47,12 @@ def create(data):
     
     for col, col_type in cols.items():
         print('col print' + col)
-        print('coltype print' + col_type)
+        print('coltype print')
+        print(col_type)
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_many_ux = col_type.get('has_many_ux', None)
+            print('has_many_ux')
+            print(has_many_ux)
             if has_many_ux == None:
                 col_varname = converter.convert_to_system_name(col)
                 data_type = set_data_type(col_type)
