@@ -540,7 +540,7 @@ def create(data):
                 print(rel)
                 rel_foreign_entity = converter.convert_to_system_name(col)
                 source_code += f"""
-                            root.list_{foreign_entity}()"""
+                            many_{col_varname}.list_{rel_foreign_entity}()"""
                 
     source_code += f"""
                             console.log("VIEW: Retreived module data.")
