@@ -70,7 +70,7 @@ def create(data, special="none"):
                     # print(rel_col)
                     rel_entity_varname = converter.convert_to_system_name(rel_col)
                     source_code += f"""
-            <script src="js/{rel_entity_varname}_app.js"></script>"""
+            <script src="js/{rel_entity_varname}_app.js" defer></script>"""
 
         #Figure out which other _app.js files we need to add based on relationships
         for col, col_type in cols.items():
