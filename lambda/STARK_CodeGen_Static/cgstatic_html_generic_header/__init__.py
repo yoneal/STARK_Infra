@@ -62,6 +62,10 @@ def create(data, special="none"):
             <script src="js/{entity_varname}_view.js" defer></script>"""
 
         for rel, rel_col_data in rel_model:
+            print('rel')
+            print(rel)
+            print('rel_col_data')
+            print(rel_col_data)
             many_entity_varname = converter.convert_to_system_name(rel)
             source_code += f"""
             <script src="js/many_{many_entity_varname}.js"></script>"""
