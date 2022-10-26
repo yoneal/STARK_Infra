@@ -26,6 +26,7 @@ def create(data):
     entity  = data["Entity"]
     cols    = data["Columns"]
     pk      = data["PK"]
+    rel_model   = data["Rel Model"]
 
     #Convert human-friendly names to variable-friendly names
     entity_varname = converter.convert_to_system_name(entity)
@@ -54,8 +55,15 @@ def create(data):
                             <tr>
                                 <th scope="col">Edit</th>
                                 <th scope="col">{pk}</th>"""
-    for col in cols:
-        source_code += f"""
+
+    for col, col_type in cols.items():
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_many_ux = col_type.get('has_many_ux', None)
+            if has_many_ux == None:
+                source_code += f"""
+                                <th scope="col">{col}</th>"""
+        else:
+            source_code += f"""
                                 <th scope="col">{col}</th>"""
 
     source_code += f"""
@@ -77,9 +85,15 @@ def create(data):
                                         </template>
                                     </th>"""
 
-    for col in cols:
-        col_varname = converter.convert_to_system_name(col)
-        source_code += f"""
+    for col, col_type in cols.items():
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_many_ux = col_type.get('has_many_ux', None)
+            col_varname = converter.convert_to_system_name(col)
+            if has_many_ux == None:
+                source_code += f"""
+                                    <td>{{{{ {entity_varname}.{col_varname} }}}}</td>"""
+        else:
+            source_code += f"""
                                     <td>{{{{ {entity_varname}.{col_varname} }}}}</td>"""
 
     source_code += f"""
