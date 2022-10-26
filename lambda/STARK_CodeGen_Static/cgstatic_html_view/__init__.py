@@ -55,22 +55,24 @@ def create(data):
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
         
-        if isinstance(col_type, dict) and col_type["type"] != "relationship":
-            source_code += f"""
-                            <div class="form-group row">
-                                <label for="{col_varname}" class="col-sm-2 col-form-label">{col}</label>
-                                <div class="col-sm-10">"""
-        elif isinstance(col_type, dict) and col_type["type"] == "relationship":
+        
+            
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
             has_many = col_type.get('has_many', '')
             has_many_ux = col_type.get('has_many_ux', None)
 
             if  has_one != '':
+                source_code += f"""
+                            <div class="form-group row">
+                                <label for="{col_varname}" class="col-sm-2 col-form-label">{col}</label>
+                                <div class="col-sm-10">"""
             #simple 1-1 relationship
                 foreign_entity  = converter.convert_to_system_name(has_one)
                 source_code += f"""
-                            <input type="text" class="form-control-plaintext" readonly id="{foreign_entity}" placeholder="" v-model="{entity_varname}.{foreign_entity}">"""
-                
+                                <input type="text" class="form-control-plaintext" readonly id="{foreign_entity}" placeholder="" v-model="{entity_varname}.{foreign_entity}">"""
+                source_code += f"""
+                            <div"""
             if  has_many != '':
             # 1-M relationship
                 foreign_entity  = converter.convert_to_system_name(has_many)
@@ -128,9 +130,9 @@ def create(data):
                     for rel_col_key, rel_col_type in rel_model.get(has_many).get('data').items():
                         rel_col_varname = converter.convert_to_system_name(rel_col_key)
                         source_code += f"""
-                                            <b-form-group class="form-group col-lg-2" label="{rel_col_key}" label-for="{rel_col_varname}">
-                                                <b-form-input type="text" class="form-control" readonly id="{rel_col_varname}" placeholder="" v-model="field.{rel_col_varname}">
-                                            </b-form-group>"""
+                                                        <b-form-group class="form-group col-lg-2" label="{rel_col_key}" label-for="{rel_col_varname}">
+                                                            <b-form-input type="text" class="form-control" readonly id="{rel_col_varname}" placeholder="" v-model="field.{rel_col_varname}">
+                                                        </b-form-group>"""
 
                     source_code += f"""
                                                         </div>
@@ -142,20 +144,20 @@ def create(data):
                                 </b-collapse>
                                 <hr><br>
                             </template>"""
-            elif col_type["type"] == 'file-upload':
-                source_code += f""" 
-                                <a :href="'https://'+ root.object_url_prefix + {entity_varname}.STARK_uploaded_s3_keys.{col_varname}">
-                                    <span class="form-control-link" readonly id="{col_varname}" placeholder="" >{{{{{entity_varname}.{col_varname}}}}}</span>   
-                                </a>
-                                """  
-        if isinstance(col_type, dict) and col_type["type"] != "relationship":
+        elif col_type["type"] == 'file-upload':
+            source_code += f""" 
+                            <a :href="'https://'+ root.object_url_prefix + {entity_varname}.STARK_uploaded_s3_keys.{col_varname}">
+                                <span class="form-control-link" readonly id="{col_varname}" placeholder="" >{{{{{entity_varname}.{col_varname}}}}}</span>   
+                            </a>
+                            """  
+        else:
             source_code += f"""
-                            <input type="text" class="form-control-plaintext" readonly id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}">
-                            """
-            source_code+= f"""
+                            <div class="form-group row">
+                                <label for="{col_varname}" class="col-sm-2 col-form-label">{col}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control-plaintext" readonly id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}">
                                 </div>
                             </div>"""
-
     source_code += f"""
                             <button type="button" class="btn btn-secondary" onClick="window.location.href='{entity_varname}.html'">Back</button>
                             </form>
@@ -163,7 +165,8 @@ def create(data):
                     </div>
                 </div>
             </div>
-        </div>"""
+        </div>
+        """
         
     source_code += cg_loadmod.create()
     source_code += cg_footer.create()
