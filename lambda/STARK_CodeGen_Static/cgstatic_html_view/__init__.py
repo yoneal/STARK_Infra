@@ -54,106 +54,105 @@ def create(data):
 
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
-        source_code += f"""
+        
+        if isinstance(col_type, dict) and col_type["type"] != "relationship":
+            source_code += f"""
                             <div class="form-group row">
                                 <label for="{col_varname}" class="col-sm-2 col-form-label">{col}</label>
                                 <div class="col-sm-10">"""
-        if isinstance(col_type, dict):
-            if col_type["type"] == "relationship":
-                has_one = col_type.get('has_one', '')
-                has_many = col_type.get('has_many', '')
-                has_many_ux = col_type.get('has_many_ux', None)
+        else:
+            has_one = col_type.get('has_one', '')
+            has_many = col_type.get('has_many', '')
+            has_many_ux = col_type.get('has_many_ux', None)
 
-                if  has_one != '':
-                #simple 1-1 relationship
-                    foreign_entity  = converter.convert_to_system_name(has_one)
+            if  has_one != '':
+            #simple 1-1 relationship
+                foreign_entity  = converter.convert_to_system_name(has_one)
+                source_code += f"""
+                            <input type="text" class="form-control-plaintext" readonly id="{foreign_entity}" placeholder="" v-model="{entity_varname}.{foreign_entity}">"""
+                
+            if  has_many != '':
+            # 1-M relationship
+                foreign_entity  = converter.convert_to_system_name(has_many)
+                if has_many_ux == None:
                     source_code += f"""
-                    <input type="text" class="form-control-plaintext" readonly id="{foreign_entity}" placeholder="" v-model="{entity_varname}.{foreign_entity}">
-                    """
-                    
-                if  has_many != '':
-                # 1-M relationship
-                    foreign_entity  = converter.convert_to_system_name(has_many)
-                    if has_many_ux == None:
+                            <b-form-group label-for="tags-with-dropdown">
+                                <b-form-tags id="tags-with-dropdown" v-model="multi_select_values.{foreign_entity}" no-outer-focus class="mb-2">
+                                    <template v-slot="{{ tags, disabled, addTag, removeTag }}">
+                                        <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
+                                            <li v-for="tag in tags" :key="tag" class="list-inline-item">
+                                                <b-form-tag 
+                                                    @remove="removeTag(tag)" 
+                                                    :title="tag" 
+                                                    :disabled="true" 
+                                                    variant="info" >
+                                                    {{{{ tag_display_text(tag) }}}}
+                                                </b-form-tag>
+                                            </li>
+                                        </ul>
+                                    </template>
+                                </b-form-tags>
+                            </b-form-group>"""  
+                else:
+                    print('rel_model')
+                    print(rel_model)
+                    print('foreign_entity')
+                    print(foreign_entity)
+                    print('rel_model[foreign_entity]')
+                    print(rel_model[has_many])
+                    rel_pk = rel_model[has_many].get('pk')
+                    rel_pk_varname = converter.convert_to_system_name(rel_pk)
+                    child_entity_varname = converter.convert_to_system_name(foreign_entity)
+                    source_code += f"""
+                            <template>
+                            <a v-b-toggle class="text-decoration-none" @click.prevent>
+                                <span class="when-open"><img src="images/chevron-up.svg" class="filter-fill-svg-link" height="20rem"></span><span class="when-closed"><img src="images/chevron-down.svg" class="filter-fill-svg-link" height="20rem"></span>
+                                <span class="align-bottom">{has_many}</span>
+                            </a>
+                            <b-collapse visible class="mt-0 mb-2 pl-2">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <form class="repeater" enctype="multipart/form-data">
+                                                    <div class="row" v-for="(field, index) in many_entity.{child_entity_varname}">
+                                                        <div class="form-group">
+                                                            <b-form-group class="form-group" label="#">
+                                                                {{{{ index + 1 }}}}
+                                                            </b-form-group>
+                                                        </div>
+                                                        <b-form-group class="form-group col-lg-2"  label="{rel_pk}" label-for="{rel_pk_varname}">
+                                                            <b-form-input type="text" class="form-control" readonly id="{rel_pk_varname}" placeholder="" v-model="field.{rel_pk_varname}"></b-form-input>
+                                                        </b-form-group>"""
+
+                    for rel_col_key, rel_col_type in rel_model.get(has_many).get('data').items():
+                        rel_col_varname = converter.convert_to_system_name(rel_col_key)
                         source_code += f"""
-                    <b-form-group label-for="tags-with-dropdown">
-                        <b-form-tags id="tags-with-dropdown" v-model="multi_select_values.{foreign_entity}" no-outer-focus class="mb-2">
-                            <template v-slot="{{ tags, disabled, addTag, removeTag }}">
-                                <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
-                                    <li v-for="tag in tags" :key="tag" class="list-inline-item">
-                                        <b-form-tag 
-                                            @remove="removeTag(tag)" 
-                                            :title="tag" 
-                                            :disabled="true" 
-                                            variant="info" >
-                                            {{{{ tag_display_text(tag) }}}}
-                                        </b-form-tag>
-                                    </li>
-                                </ul>
-                            </template>
-                        </b-form-tags>
-                    </b-form-group>
-                    """  
-                    else:
-                        print('rel_model')
-                        print(rel_model)
-                        print('foreign_entity')
-                        print(foreign_entity)
-                        print('rel_model[foreign_entity]')
-                        print(rel_model[has_many])
-                        rel_pk = rel_model[has_many].get('pk')
-                        rel_pk_varname = converter.convert_to_system_name(rel_pk)
-                        child_entity_varname = converter.convert_to_system_name(foreign_entity)
-                        source_code += f"""
-                    <template>
-                    <a v-b-toggle class="text-decoration-none" @click.prevent>
-                        <span class="when-open"><img src="images/chevron-up.svg" class="filter-fill-svg-link" height="20rem"></span><span class="when-closed"><img src="images/chevron-down.svg" class="filter-fill-svg-link" height="20rem"></span>
-                        <span class="align-bottom">{has_many}</span>
-                    </a>
-                    <b-collapse visible class="mt-0 mb-2 pl-2">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <form class="repeater" enctype="multipart/form-data">
-                                            <div class="row" v-for="(field, index) in many_entity.{child_entity_varname}">
-                                                <div class="form-group">
-                                                    <b-form-group class="form-group" label="#">
-                                                        {{{{ index + 1 }}}}
-                                                    </b-form-group>
+                                            <b-form-group class="form-group col-lg-2" label="{rel_col_key}" label-for="{rel_col_varname}">
+                                                <b-form-input type="text" class="form-control" readonly id="{rel_col_varname}" placeholder="" v-model="field.{rel_col_varname}">
+                                            </b-form-group>"""
+
+                    source_code += f"""
+                                                        </div>
+                                                    </form>
                                                 </div>
-                                                <b-form-group class="form-group col-lg-2"  label="{rel_pk}" label-for="{rel_pk_varname}">
-                                                    <b-form-input type="text" class="form-control" readonly id="{rel_pk_varname}" placeholder="" v-model="field.{rel_pk_varname}"></b-form-input>
-                                                </b-form-group>"""
-
-                        for rel_col_key, rel_col_type in rel_model.get(has_many).get('data').items():
-                            rel_col_varname = converter.convert_to_system_name(rel_col_key)
-                            source_code += f"""
-                                                <b-form-group class="form-group col-lg-2" label="{rel_col_key}" label-for="{rel_col_varname}">
-                                                    <b-form-input type="text" class="form-control" readonly id="{rel_col_varname}" placeholder="" v-model="field.{rel_col_varname}">
-                                                </b-form-group>"""
-
-                        source_code += f"""
                                             </div>
-                                        </form>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </b-collapse>
-                    <hr><br>
-                </template>"""
+                                </b-collapse>
+                                <hr><br>
+                            </template>"""
             elif col_type["type"] == 'file-upload':
                 source_code += f""" 
                                 <a :href="'https://'+ root.object_url_prefix + {entity_varname}.STARK_uploaded_s3_keys.{col_varname}">
                                     <span class="form-control-link" readonly id="{col_varname}" placeholder="" >{{{{{entity_varname}.{col_varname}}}}}</span>   
                                 </a>
                                 """  
-        else:
+        if isinstance(col_type, dict) and col_type["type"] != "relationship":
             source_code += f"""
                             <input type="text" class="form-control-plaintext" readonly id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}">
                             """
-        source_code+= f"""
+            source_code+= f"""
                                 </div>
                             </div>"""
 
@@ -164,8 +163,8 @@ def create(data):
                     </div>
                 </div>
             </div>
-        </div>
-"""
+        </div>"""
+        
     source_code += cg_loadmod.create()
     source_code += cg_footer.create()
 
