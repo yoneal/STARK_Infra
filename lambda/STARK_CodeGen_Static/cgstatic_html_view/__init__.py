@@ -77,23 +77,28 @@ def create(data):
                     foreign_entity  = converter.convert_to_system_name(has_many)
                     if has_many_ux == None:
                         source_code += f"""
-                            <b-form-group label-for="tags-with-dropdown">
-                                <b-form-tags id="tags-with-dropdown" v-model="multi_select_values.{foreign_entity}" no-outer-focus class="mb-2">
-                                    <template v-slot="{{ tags, disabled, addTag, removeTag }}">
-                                        <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
-                                            <li v-for="tag in tags" :key="tag" class="list-inline-item">
-                                                <b-form-tag 
-                                                    @remove="removeTag(tag)" 
-                                                    :title="tag" 
-                                                    :disabled="true" 
-                                                    variant="info" >
-                                                    {{{{ tag_display_text(tag) }}}}
-                                                </b-form-tag>
-                                            </li>
-                                        </ul>
-                                    </template>
-                                </b-form-tags>
-                            </b-form-group>"""  
+                            <div class="form-group row">
+                                <label for="{col_varname}" class="col-sm-2 col-form-label">{col}</label>
+                                <div class="col-sm-10">
+                                    <b-form-group label-for="tags-with-dropdown">
+                                        <b-form-tags id="tags-with-dropdown" v-model="multi_select_values.{foreign_entity}" no-outer-focus class="mb-2">
+                                            <template v-slot="{{ tags, disabled, addTag, removeTag }}">
+                                                <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
+                                                    <li v-for="tag in tags" :key="tag" class="list-inline-item">
+                                                        <b-form-tag 
+                                                            @remove="removeTag(tag)" 
+                                                            :title="tag" 
+                                                            :disabled="true" 
+                                                            variant="info" >
+                                                            {{{{ tag_display_text(tag) }}}}
+                                                        </b-form-tag>
+                                                    </li>
+                                                </ul>
+                                            </template>
+                                        </b-form-tags>
+                                    </b-form-group>
+                                </div>
+                            </div>"""  
                     else:
                         print('rel_model')
                         print(rel_model)
