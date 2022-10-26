@@ -86,9 +86,10 @@ def create(data):
                                     </th>"""
 
     for col, col_type in cols.items():
+        col_varname = converter.convert_to_system_name(col)
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_many_ux = col_type.get('has_many_ux', None)
-            col_varname = converter.convert_to_system_name(col)
+            
             if has_many_ux == None:
                 source_code += f"""
                                     <td>{{{{ {entity_varname}.{col_varname} }}}}</td>"""
