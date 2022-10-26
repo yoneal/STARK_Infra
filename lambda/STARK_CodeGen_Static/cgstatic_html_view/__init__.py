@@ -73,7 +73,8 @@ def create(data):
                     source_code += f"""
                                     <input type="text" class="form-control-plaintext" readonly id="{foreign_entity}" placeholder="" v-model="{entity_varname}.{foreign_entity}">"""
                     source_code += f"""
-                                <div"""
+                                <div>
+                            </div>"""
                 if  has_many != '':
                 # 1-M relationship
                     foreign_entity  = converter.convert_to_system_name(has_many)
@@ -136,23 +137,22 @@ def create(data):
                                                         </b-form-group>"""
 
                         source_code += f"""
-                                                        </div>
-                                                    </form>
-                                                </div>
+                                                    </div>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
-                                </b-collapse>
-                                <hr><br>
+                                </div>
+                            </b-collapse>
+                            <hr><br>
                             </template>"""
             elif col_type["type"] == 'file-upload':
                 source_code += f""" 
                             <a :href="'https://'+ root.object_url_prefix + {entity_varname}.STARK_uploaded_s3_keys.{col_varname}">
                                 <span class="form-control-link" readonly id="{col_varname}" placeholder="" >{{{{{entity_varname}.{col_varname}}}}}</span>   
-                            </a>
-                                """  
-            else:
-                source_code += f"""
+                            </a>"""  
+        else:
+            source_code += f"""
                             <div class="form-group row">
                                 <label for="{col_varname}" class="col-sm-2 col-form-label">{col}</label>
                                 <div class="col-sm-10">
