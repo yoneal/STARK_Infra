@@ -74,7 +74,6 @@ def create(data):
                 if  has_many != '':
                 # 1-M relationship
                     foreign_entity  = converter.convert_to_system_name(has_many)
-                    print(foreign_entity)
                     if has_many_ux == None:
                         source_code += f"""
                     <b-form-group label-for="tags-with-dropdown">
@@ -96,6 +95,12 @@ def create(data):
                     </b-form-group>
                     """  
                     else:
+                        print('rel_model')
+                        print(rel_model)
+                        print('foreign_entity')
+                        print(foreign_entity)
+                        print('rel_model[foreign_entity]')
+                        print(rel_model[foreign_entity])
                         rel_pk = rel_model[foreign_entity].get('pk')
                         rel_pk_varname = converter.convert_to_system_name(rel_pk)
                         child_entity_varname = converter.convert_to_system_name(foreign_entity)
