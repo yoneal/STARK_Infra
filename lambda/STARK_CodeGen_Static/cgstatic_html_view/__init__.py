@@ -101,14 +101,14 @@ def create(data):
                         print(foreign_entity)
                         print('rel_model[foreign_entity]')
                         print(rel_model[foreign_entity])
-                        rel_pk = rel_model[foreign_entity].get('pk')
+                        rel_pk = rel_model[has_many].get('pk')
                         rel_pk_varname = converter.convert_to_system_name(rel_pk)
                         child_entity_varname = converter.convert_to_system_name(foreign_entity)
                         source_code += f"""
                     <template>
                     <a v-b-toggle class="text-decoration-none" @click.prevent>
                         <span class="when-open"><img src="images/chevron-up.svg" class="filter-fill-svg-link" height="20rem"></span><span class="when-closed"><img src="images/chevron-down.svg" class="filter-fill-svg-link" height="20rem"></span>
-                        <span class="align-bottom">{foreign_entity}</span>
+                        <span class="align-bottom">{has_many}</span>
                     </a>
                     <b-collapse visible class="mt-0 mb-2 pl-2">
                         <div class="row">
@@ -126,7 +126,7 @@ def create(data):
                                                     <b-form-input type="text" class="form-control" readonly id="{rel_pk_varname}" placeholder="" v-model="field.{rel_pk_varname}"></b-form-input>
                                                 </b-form-group>"""
 
-                        for rel_col_key, rel_col_type in rel_model.get(foreign_entity).get('data').items():
+                        for rel_col_key, rel_col_type in rel_model.get(has_many).get('data').items():
                             rel_col_varname = converter.convert_to_system_name(rel_col_key)
                             source_code += f"""
                                                 <b-form-group class="form-group col-lg-2" label="{rel_col_key}" label-for="{rel_col_varname}">
