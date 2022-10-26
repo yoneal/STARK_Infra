@@ -54,9 +54,6 @@ def create(data):
 
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
-        
-        
-            
         if isinstance(col_type, dict):
             if col_type["type"] == "relationship":
                 has_one = col_type.get('has_one', '')
@@ -73,7 +70,7 @@ def create(data):
                     source_code += f"""
                                     <input type="text" class="form-control-plaintext" readonly id="{foreign_entity}" placeholder="" v-model="{entity_varname}.{foreign_entity}">"""
                     source_code += f"""
-                                <div>
+                                </div>
                             </div>"""
                 if  has_many != '':
                 # 1-M relationship
