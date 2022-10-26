@@ -177,11 +177,10 @@ def create(data):
                     ],"""
 
     for rel in rel_model:
-        rel_cols = rel_model[rel]["data"]
-        for col, col_type in rel_cols.items():
+        for col, col_type in cols.items():
             if isinstance(col_type, dict) and col_type["type"] == "relationship":
-                has_one = col_type.get('has_one', '')
-                if has_one != '':
+                has_many_ux = col_type.get('has_many_ux', None)
+                if has_many_ux == None:
                     source_code += f"""
                     '{has_one}': [
                     ],"""
@@ -261,8 +260,11 @@ def create(data):
                 authTry: false,
                 all_selected: true,"""
     field_strings = f"['{pk}',"
-    for col in cols:
-        field_strings += f"""'{col}',"""
+    for col, col_type in cols.items():
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_many_ux = col_type.get('has_many_ux', None)
+            if has_many_ux == None:
+                field_strings += f"""'{col}',"""
     field_strings += f"""]"""
     source_code += f"""
                 temp_checked_fields: {field_strings},
@@ -275,8 +277,10 @@ def create(data):
             col_values = col_type.get("values", "")
             if col_type["type"] == "relationship" or isinstance(col_values, list):
                 has_many = col_type.get('has_many', '')
-                search_string += f"""
-                    {col_varname}: '',"""
+                has_many_ux = col_type.get('has_many_ux', None)
+                if has_many_ux == None:
+                    search_string += f"""
+                        {col_varname}: '',"""
             if col_type["type"] == 'file-upload': 
                 with_upload = True 
                 ext_string += f"""
