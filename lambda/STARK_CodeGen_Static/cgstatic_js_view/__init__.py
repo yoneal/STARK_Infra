@@ -261,8 +261,11 @@ def create(data):
                 authTry: false,
                 all_selected: true,"""
     field_strings = f"['{pk}',"
-    for col in cols:
-        field_strings += f"""'{col}',"""
+    for col, col_type in cols.items():
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_many_ux = col_type.get('has_many_ux', None)
+            if has_many_ux == None:
+                field_strings += f"""'{col}',"""
     field_strings += f"""]"""
     source_code += f"""
                 temp_checked_fields: {field_strings},
