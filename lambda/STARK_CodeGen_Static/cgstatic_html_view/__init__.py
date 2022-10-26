@@ -60,7 +60,7 @@ def create(data):
                             <div class="form-group row">
                                 <label for="{col_varname}" class="col-sm-2 col-form-label">{col}</label>
                                 <div class="col-sm-10">"""
-        else:
+        elif isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
             has_many = col_type.get('has_many', '')
             has_many_ux = col_type.get('has_many_ux', None)
