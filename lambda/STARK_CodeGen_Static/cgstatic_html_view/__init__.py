@@ -148,6 +148,14 @@ def create(data):
                             <a :href="'https://'+ root.object_url_prefix + {entity_varname}.STARK_uploaded_s3_keys.{col_varname}">
                                 <span class="form-control-link" readonly id="{col_varname}" placeholder="" >{{{{{entity_varname}.{col_varname}}}}}</span>   
                             </a>"""  
+            else:
+                source_code += f"""
+                            <div class="form-group row">
+                                <label for="{col_varname}" class="col-sm-2 col-form-label">{col}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control-plaintext" readonly id="{col_varname}" placeholder="" v-model="{entity_varname}.{col_varname}">
+                                </div>
+                            </div>"""
         else:
             source_code += f"""
                             <div class="form-group row">
