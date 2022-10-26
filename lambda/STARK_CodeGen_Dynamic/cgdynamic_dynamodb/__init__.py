@@ -547,7 +547,7 @@ def create(data):
         many_rel = relationships['has_many']
         for rel in many_rel:
             entity = rel['entity']
-            sk = 'Customer|' + entity
+            sk = '{entity_varname}|' + entity
             many_result = get_many_by_pk(pk, sk)
             for result in many_result:
                 response[entity] = result.get(sk, '').get('S')
@@ -609,7 +609,7 @@ def create(data):
         many_rel = relationships['has_many']
         for rel in many_rel:
             entity = rel['entity']
-            sk = 'Customer|' + entity
+            sk = '{entity_varname}|' + entity
             delete_many(pk, sk)"""
 
     source_code+= f"""
@@ -697,7 +697,7 @@ def create(data):
         many_rel = relationships['has_many']
         for rel in many_rel:
             entity = rel['entity']
-            sk = 'Customer|' + entity
+            sk = '{entity_varname}|' + entity
             many_data = data.get(entity, '')
             edit_many(pk, sk, many_data)"""
 
@@ -797,7 +797,7 @@ def create(data):
         many_rel = relationships['has_many']
         for rel in many_rel:
             entity = rel['entity']
-            sk = 'Customer|' + entity
+            sk = '{entity_varname}|' + entity
             many_data = data.get(entity, '')
             add_many(pk, sk, many_data)"""
     
