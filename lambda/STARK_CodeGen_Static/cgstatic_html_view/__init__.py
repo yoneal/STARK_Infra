@@ -100,7 +100,7 @@ def create(data):
                         print('foreign_entity')
                         print(foreign_entity)
                         print('rel_model[foreign_entity]')
-                        print(rel_model[foreign_entity])
+                        print(rel_model[has_many])
                         rel_pk = rel_model[has_many].get('pk')
                         rel_pk_varname = converter.convert_to_system_name(rel_pk)
                         child_entity_varname = converter.convert_to_system_name(foreign_entity)
