@@ -180,6 +180,7 @@ def create(data):
         for col, col_type in cols.items():
             if isinstance(col_type, dict) and col_type["type"] == "relationship":
                 has_many_ux = col_type.get('has_many_ux', None)
+                has_one = col_type.get('has_one', '')
                 if has_many_ux == None:
                     source_code += f"""
                     '{has_one}': [
