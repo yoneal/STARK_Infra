@@ -46,7 +46,7 @@ def create(data):
             '{col_varname}': '',"""
 
     source_code += f"""
-        }}
+        }},
         
         list_status: {{"""
 
