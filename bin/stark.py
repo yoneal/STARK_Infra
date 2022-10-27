@@ -7,6 +7,7 @@ import sys
 from textwrap import dedent
 
 import yaml
+import boto3
 
 import pprint
 pprint = pprint.PrettyPrinter(indent=4)
@@ -87,7 +88,7 @@ class ValidateUpdateModule(argparse.Action):
 
 class ValidateCDNActions(argparse.Action):
     def __call__(self, parser, args, values, option_string=None):
-        valid_actions = ('deploy', 'status')
+        valid_actions = ('deploy', 'status', 'create-certificate')
         action = values[0]
 
         if action not in valid_actions:
@@ -135,7 +136,8 @@ parser.add_argument('--cdn',
                     help=dedent('''\
                     Perform Cloudfront actions:
                         [1] deploy - Deploys CDN of your project
-                        [2] status - Checks current status of deployed CDN ''')
+                        [2] status - Checks current status of deployed CDN
+                        [3] create-certificate - Create certificate for custom domain name specified ''')
 )
 
 args = parser.parse_args()
@@ -198,35 +200,37 @@ if construct_type == "module":
 
 elif construct_type == 'deploy':
     print("Enabling CloudFront deployment..")
-    cf_data = {
-        "__STARK_advanced__": {
-            "CloudFront": 
-                {"enable": True},
-        }
-    }
-    cf_filename = 'cf_yaml.yml'
-    
-    with open(cf_filename, "w") as f:
-        f.write(yaml.dump(cf_data, default_flow_style=False))
-
-    import libstark.STARK_Parser.parser_cli as stark_parser
+    with open("../cloud_resources.yml", "r") as f:
+        current_cloud_resources = yaml.safe_load(f.read())
     import libstark.STARK_CodeGen_Dynamic.cgdynamic_cli as cgdynamic
-    cloud_resources, current_cloud_resources = stark_parser.parse(cf_filename)
 
     filename = project_basedir + "cloud_resources.yml"
-    current_cloud_resources["CloudFront"] = cloud_resources["CloudFront"]
+    current_cloud_resources["CloudFront"]['enabled'] = True
     with open(filename, "wb") as f:
         f.write(yaml.dump(current_cloud_resources, sort_keys=False, encoding='utf-8'))
-    create_iac_template(current_cloud_resources)
-    
-    import os
-    os.unlink(cf_filename)
 
-    print("Done")
+    is_continue_create_iac = True
+    custom_domain_name = current_cloud_resources["CloudFront"].get("custom_domain_name", "")
+    viewer_certificate_arn = current_cloud_resources["CloudFront"].get("viewer_certificate_arn", None)
+
+    if custom_domain_name != "":        
+        is_continue_create_iac = False
+        acm = boto3.client('acm', region_name="us-east-1")
+        response = acm.describe_certificate(CertificateArn=viewer_certificate_arn).get('Certificate')
+        status = response.get("Status")
+
+        if status != "ISSUED":
+            print("Certificate for Custom Domain Name:", custom_domain_name, 'is still pending for DNS validation. Validate to proceed')
+        else:
+            is_continue_create_iac = True      
+    
+    if is_continue_create_iac:
+        print("Updating template.yml..")
+        create_iac_template(current_cloud_resources)
+        print("Done")
 
 elif construct_type == 'status':
     print("Checking status..")
-    import boto3
 
     ## Get project name from cloud resources
     cloud_resources_dir = '../cloud_resources.yml'
@@ -234,28 +238,84 @@ elif construct_type == 'status':
         current_cloud_resources = yaml.safe_load(f.read())
         project_name            = current_cloud_resources["Project Name"]
 
-    with_cloudfront = current_cloud_resources.get('CloudFront', False)
+    ## compose stack name by trimming whitespaces in project name then append to project stack name template 
+    stack_name = f"STARK-project-{project_name.replace(' ','')}"
 
-    if with_cloudfront:
-        ## compose stack name by trimming whitespaces in project name then append to project stack name template 
-        stack_name = f"STARK-project-{project_name.replace(' ','')}"
+    ##fetch the physical distribution id of CloudFront
+    cfn = boto3.resource('cloudformation')
+    stack_resource = cfn.StackResource(stack_name, 'STARKCloudFront')
+    distribution_id = stack_resource.physical_resource_id
+    try:
+        client = boto3.client("cloudfront")
+        response = client.get_distribution(
+            Id=distribution_id
+        )
 
-        ##fetch the physical distribution id of CloudFront
-        cfn = boto3.resource('cloudformation')
-        stack_resource = cfn.StackResource(stack_name, 'STARKCloudFront')
-        distribution_id = stack_resource.physical_resource_id
-        try:
-            client = boto3.client("cloudfront")
-            response = client.get_distribution(
-                Id=distribution_id
-            )
+        print("Distribution Domain Name:", response['Distribution']['DomainName']) 
+        print("Distribution ID:", response['Distribution']['Id']) 
+        print("Status:", response['Distribution']['Status'])
+        print("Enabled:", response['Distribution']['DistributionConfig'].get('Enabled'))  
 
-            print("Distribution Domain Name:", response['Distribution']['DomainName']) 
-            print("Distribution ID:", response['Distribution']['Id']) 
-            print("Status:", response['Distribution']['Status'])
-            print("Enabled:", response['Distribution']['DistributionConfig'].get('Enabled'))  
+    except Exception as error :
+            print(error)
 
-        except Exception as error :
-             print(error)
-    else:
-        print('No CloudFront distribution yet for this project. Run "./stark.py --cdn deploy" to create one')
+elif construct_type == 'create-certificate':
+    with open("../cloud_resources.yml", "r") as f:
+        current_cloud_resources = yaml.safe_load(f.read())
+
+    custom_domain_name = current_cloud_resources.get("CloudFront").get("custom_domain_name")
+
+    try:
+        if custom_domain_name:
+            print("Custom Domain Name specified, checking for certificate..")
+            new_cert = False
+            acm = boto3.client('acm', region_name="us-east-1")
+            viewer_certificate_arn = current_cloud_resources['CloudFront'].get("viewer_certificate_arn", None)
+
+            if viewer_certificate_arn:
+                print("Certificate found, checking status..")
+                default_status = "Pending for Validation. "
+            else:
+                new_cert = True
+                print("No certificate yet, creating..")
+                default_status = ""
+                response = acm.request_certificate(
+                            DomainName= custom_domain_name,
+                            ValidationMethod= 'DNS'
+                )
+                # print(response)
+                viewer_certificate_arn = response['CertificateArn']
+                current_cloud_resources.get("CloudFront").update({
+                        'viewer_certificate_arn': viewer_certificate_arn
+                    })    
+
+                filename = project_basedir + "cloud_resources.yml"
+                with open(filename, "wb") as f:
+                    f.write(yaml.dump(current_cloud_resources, sort_keys=False, encoding='utf-8'))
+                print("Certificate created.")
+            
+            domain_validation_options = None
+            iteration = 1
+            while domain_validation_options == None:
+                if new_cert:
+                    print("\rFetching validation requirements", "." * iteration, end ="")
+                response = acm.describe_certificate(CertificateArn=viewer_certificate_arn)
+                domain_validation_options = response.get('Certificate').get('DomainValidationOptions')[0].get("ResourceRecord", None)
+                iteration += 1
+                
+            certificate = response.get('Certificate')    
+            status = certificate.get("Status")
+            if new_cert:
+                print("")
+
+            if status != "ISSUED":
+                print(f"{default_status}Create the following DNS record for", certificate.get('DomainName'), "to complete the validation:")
+                print("Name:", domain_validation_options.get('Name'))
+                print("Type:", domain_validation_options.get('Type'))
+                print("Value:", domain_validation_options.get('Value'))
+            else:
+                print("Certificate validated, you can deploy the CDN.")
+        else:
+            print("No Custom Domain Name specified in cloud_resources.yml")
+    except Exception as error:
+        print(error)

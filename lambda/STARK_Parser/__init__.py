@@ -104,7 +104,7 @@ def lambda_handler(event, context):
         elif key == "__STARK_advanced__":
             for advance_config in data_model[key]:
                 if advance_config == 'CloudFront':
-                    with_cloudfront = True
+                    pass
 
         else:
             entities.append(key)
