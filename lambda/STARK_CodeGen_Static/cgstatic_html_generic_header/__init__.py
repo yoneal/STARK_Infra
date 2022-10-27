@@ -17,7 +17,8 @@ import convert_friendly_to_system as converter
 
 def create(data, special="none"):
 
-    project = data["Project Name"]
+    project     = data["Project Name"]
+    rel_model   = data.get('Rel Model', {})
     
     with_upload = False
 
@@ -58,8 +59,18 @@ def create(data, special="none"):
     else:
         source_code += f"""
             <script src="js/{entity_varname}_app.js" defer></script>
-            <script src="js/{entity_varname}_view.js" defer></script>
-            """
+            <script src="js/{entity_varname}_view.js" defer></script>"""
+
+        for rel, rel_data in rel_model.items():
+            many_entity_varname = converter.convert_to_system_name(rel)
+            source_code += f"""
+            <script src="js/many_{many_entity_varname}.js"></script>"""
+            for rel_col, rel_col_data in rel_data.get('data').items():
+                if isinstance(rel_col_data, dict) and rel_col_data['type'] == 'relationship':
+                    # print(rel_col)
+                    rel_entity_varname = converter.convert_to_system_name(rel_col)
+                    source_code += f"""
+            <script src="js/{rel_entity_varname}_app.js" defer></script>"""
 
         #Figure out which other _app.js files we need to add based on relationships
         for col, col_type in cols.items():

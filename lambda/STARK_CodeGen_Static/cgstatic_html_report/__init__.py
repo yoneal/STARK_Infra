@@ -95,17 +95,21 @@ def create(data):
                                         </tr>"""
     
 
-
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
-        html_control_code = cg_colreport.create({
+        html_control_code = {
             "col": col,
             "col_type": col_type,
             "col_varname": col_varname,
             "entity" : entity,
-            "entity_varname": entity_varname
-        })
-        source_code += f"""
+            "entity_varname": entity_varname,
+            "is_many_control": False
+        }
+        html_control_code = cg_colreport.create(html_control_code)
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_many_ux = col_type.get('has_many_ux', None)
+            if has_many_ux == None:
+                source_code += f"""
                                         <tr>
                                             <td>
                                                 <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col}" id="{col_varname}" v-model="checked_fields">

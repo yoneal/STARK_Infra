@@ -15,11 +15,11 @@ cg_coltype = importlib.import_module(f"{prepend_dir}cgstatic_controls_coltype")
 import convert_friendly_to_system as converter
 
 def create(data):
-
     entity         = data["Entity"]
     cols           = data["Columns"]
     pk             = data['PK']
     relationships  = data["Relationships"]
+    rel_model      = data["Rel Model"]
 
     entity_varname = converter.convert_to_system_name(entity)
     entity_app     = entity_varname + '_app'
@@ -48,7 +48,20 @@ def create(data):
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
         data_type = set_data_type(col_type)
-        source_code += f"""
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_many_ux = col_type.get('has_many_ux', None)
+            if has_many_ux == None:
+                source_code += f"""
+                    '{col_varname}': {{
+                        'value': '',
+                        'required': true,
+                        'max_length': '',
+                        'data_type': '{data_type}',
+                        'state': null,
+                        'feedback': ''
+                    }},""" 
+        else:
+            source_code += f"""
                     '{col_varname}': {{
                         'value': '',
                         'required': true,
@@ -163,6 +176,16 @@ def create(data):
 
                     ],"""
 
+    for rel in rel_model:
+        rel_cols = rel_model[rel]["data"]
+        for col, col_type in rel_cols.items():
+            if isinstance(col_type, dict) and col_type["type"] == "relationship":
+                has_one = col_type.get('has_one', '')
+                if has_one != '':
+                    source_code += f"""
+                    '{has_one}': [
+                    ],"""
+        
                     
 
     for col, col_type in cols.items():
@@ -186,11 +209,13 @@ def create(data):
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
             has_many = col_type.get('has_many', '')
+            has_many_ux = col_type.get('has_many_ux', '')
             if  has_one != '' or has_many != '':
+                if has_many_ux == '':
                 #simple 1-1 relationship
-                col_varname = converter.convert_to_system_name(col)
+                    col_varname = converter.convert_to_system_name(col)
 
-                source_code += f"""
+                    source_code += f"""
                     '{col_varname}': 'empty',"""
 
 
@@ -206,8 +231,10 @@ def create(data):
             col_values = col_type.get("values", "")
             if col_type["type"] == "relationship":
                 has_many = col_type.get('has_many', '')
+                has_many_ux = col_type.get('has_many_ux', '')
                 if  has_many != '':
-                    source_code += f"""
+                    if has_many_ux == '':
+                        source_code += f"""
                         '{col_varname}': [],"""
             elif isinstance(col_values, list):
                     source_code += f"""
@@ -234,8 +261,11 @@ def create(data):
                 authTry: false,
                 all_selected: true,"""
     field_strings = f"['{pk}',"
-    for col in cols:
-        field_strings += f"""'{col}',"""
+    for col, col_type in cols.items():
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_many_ux = col_type.get('has_many_ux', None)
+            if has_many_ux == None:
+                field_strings += f"""'{col}',"""
     field_strings += f"""]"""
     source_code += f"""
                 temp_checked_fields: {field_strings},
@@ -285,9 +315,24 @@ def create(data):
                 STARK_group_by_1: '',
                 Y_Data: [],
                 showOperations: true,
+                many_entity: {{
+            """
+            
+    if relationships.get('has_many', '') != '':
+        for relation in relationships.get('has_many'):
+            if relation.get('type') == 'repeater':
+                many_entity = relation.get('entity')
+                many_entity_varname = converter.convert_to_system_name(many_entity)
+
+                source_code += f"""    
+                    '{many_entity_varname}': many_{many_entity_varname}.{many_entity_varname},"""
+    
+    source_code += f"""
+                }},
             }},
             methods: {{
 
+    
                 show: function () {{
                     this.visibility = 'visible';
                 }},
@@ -302,7 +347,8 @@ def create(data):
         col_varname = converter.convert_to_system_name(col)
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_many = col_type.get('has_many', '')
-            if has_many != "":
+            has_many_ux = col_type.get('has_many_ux', '')
+            if has_many != "" and has_many_ux != 'repeater':
                 source_code += f"""
                     this.{entity_varname}.{col_varname} = (root.multi_select_values.{col_varname}.sort()).join(', ')"""
     
@@ -314,7 +360,20 @@ def create(data):
     source_code += f""")
                     this.metadata = response['new_metadata']
                     if(response['is_valid_form']) {{
-                        loading_modal.show()
+                        loading_modal.show()"""
+    for col, col_type in cols.items():
+        if isinstance(col_type, dict):
+            col_varname = converter.convert_to_system_name(col)
+            col_values = col_type.get("values", "")
+            has_many_ux = col_type.get('has_many_ux', '')
+            if col_type["type"] == "relationship":
+                has_many = col_type.get('has_many', '')
+                if has_many != '':
+                    if has_many_ux == 'repeater':
+                        source_code += f"""
+                        this.{entity_varname}.{col_varname} = JSON.stringify(root.many_entity.{col_varname})"""
+                        
+    source_code += f"""    
                         let data = {{ {entity_varname}: this.{entity_varname} }}
 
                         {entity_app}.add(data).then( function(data) {{
@@ -367,8 +426,10 @@ def create(data):
         col_varname = converter.convert_to_system_name(col)
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_many = col_type.get('has_many', '')
+            has_many_ux = col_type.get('has_many_ux', '')
             if has_many != "":
-                source_code += f"""
+                if has_many_ux == '':
+                    source_code += f"""
                     this.{entity_varname}.{col_varname} = (root.multi_select_values.{col_varname}.sort()).join(', ')"""
     
     source_code += f"""
@@ -379,7 +440,21 @@ def create(data):
     source_code += f""")
                     this.metadata = response['new_metadata']
                     if(response['is_valid_form']) {{
-                        loading_modal.show()
+                        loading_modal.show()"""
+    for col, col_type in cols.items():
+        if isinstance(col_type, dict):
+            col_varname = converter.convert_to_system_name(col)
+            col_values = col_type.get("values", "")
+            has_many_ux = col_type.get('has_many_ux', '')
+            if col_type["type"] == "relationship":
+                has_many = col_type.get('has_many', '')
+                if has_many != '':
+                    if has_many_ux == 'repeater':
+                        # print(has_many)
+                        source_code += f"""
+                        this.{entity_varname}.{col_varname} = JSON.stringify(root.many_entity.{col_varname})"""
+
+    source_code += f"""
                         let data = {{ {entity_varname}: this.{entity_varname} }}
 
                         {entity_app}.update(data).then( function(data) {{
@@ -440,6 +515,7 @@ def create(data):
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
             has_many = col_type.get('has_many', '')
+            has_many_ux = col_type.get('has_many_ux', '')
             
             foreign_entity  = converter.convert_to_system_name(has_one if has_one != '' else has_many)
             foreign_field   = converter.convert_to_system_name(col_type.get('value', foreign_entity))
@@ -450,10 +526,25 @@ def create(data):
                 source_code += f"""
                             root.lists.{foreign_field} = [  {{ value: root.{entity_varname}.{foreign_field}, text: root.{entity_varname}.{foreign_field} }},]
                             root.list_{foreign_entity}()"""
-            elif has_many != '':
+            
+            elif has_many != "" and has_many_ux != 'repeater':
                 source_code += f"""
                             root.multi_select_values.{foreign_entity} = root.{entity_varname}.{foreign_entity}.split(', ')
                             root.list_{foreign_entity}()"""
+
+    for rel, rel_data in rel_model.items():
+        col_varname = converter.convert_to_system_name(rel)
+        source_code += f"""
+                            if(data["{col_varname}"].length > 0) {{
+                                root.many_entity.{col_varname} = JSON.parse(data["{col_varname}"])
+                            }}"""
+        for col, col_type in rel_data.get('data').items():
+            if isinstance(col_type, dict) and col_type["type"] == "relationship":
+                print(rel)
+                rel_foreign_entity = converter.convert_to_system_name(col)
+                source_code += f"""
+                            many_{col_varname}.list_{rel_foreign_entity}()"""
+                
     source_code += f"""
                             console.log("VIEW: Retreived module data.")
                             root.show()
@@ -516,7 +607,8 @@ def create(data):
         col_varname = converter.convert_to_system_name(col)
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_many = col_type.get('has_many', '')
-            if has_many != "":
+            has_many_ux = col_type.get('has_many_ux', '')
+            if has_many != "" and has_many_ux != 'repeater':
                 foreign_entity  = converter.convert_to_system_name(has_many)
                 source_code += f"""
                             for (let x = 0; x < (data['Items']).length; x++) {{
@@ -844,9 +936,10 @@ def create(data):
                 refresh_child () {{
                     //NOTE: this is empty if this entity does not have a child, might need refactoring
                 """
-    for relation in relationships:
-        source_code += f""" 
-                    STARK.local_storage_delete_key('Listviews', '{relation.get('child')}');"""
+    if relationships.get('has_one', '') != '':
+        for relation in relationships.get('has_one'):
+                source_code += f""" 
+                            STARK.local_storage_delete_key('Listviews', '{relation.get('entity')}');"""
     source_code += f"""
                 }},
                 """
@@ -855,7 +948,8 @@ def create(data):
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
             has_many = col_type.get('has_many', '')
-            if  has_one != '' or has_many != '':
+            has_many_ux = col_type.get('has_many_ux', '')
+            if  has_one != '' or (has_many != '' and has_many_ux != 'repeater'):
                 foreign_entity  = converter.convert_to_system_name(has_one if has_one != '' else has_many)
                 foreign_field   = converter.convert_to_system_name(col_type.get('value', foreign_entity))
                 foreign_display = converter.convert_to_system_name(col_type.get('display', foreign_field))
@@ -872,12 +966,10 @@ def create(data):
                             data.forEach(function(arrayItem) {{
                                 value = arrayItem['{foreign_field}']
                                 text  = arrayItem['{foreign_display}']"""
-                if has_one != '': 
-                    source_code += f"""            
+                 
+                source_code += f"""            
                                 root.lists.{foreign_entity}.push({{ value: value, text: text }})"""
-                if has_many != '': 
-                    source_code += f"""            
-                                root.lists.{foreign_entity}.push({{ value: value, text: text }})"""
+
                 source_code += f""" 
                 }})
                             root.list_status.{foreign_entity} = 'populated'
@@ -891,28 +983,28 @@ def create(data):
                 """
                 if has_many != '':
                     source_code += f"""
-                    split_string: function(str) {{
-                        var arr = str.split(", ")
-                        var return_str = ''
-                        arr.forEach(element => {{
-                            return_str += this.tag_display_text(element).concat(", ")
-                        }});
-                        return return_str
-                    }},
+                split_string: function(str) {{
+                    var arr = str.split(", ")
+                    var return_str = ''
+                    arr.forEach(element => {{
+                        return_str += this.tag_display_text(element).concat(", ")
+                    }});
+                    return return_str
+                }},
 
-                    tag_display_text: function (tag) {{
-                        display_text = ""
-                        if(typeof tag =='string')
-                        {{
-                            display_text = tag
-                        }}
-                        else
-                        {{
-                            var index = this.lists.{foreign_entity}.findIndex(opt => tag == opt.value)
-                            display_text = this.lists.{foreign_entity}[index].text
-                        }}
-                        return display_text
-                    }},
+                tag_display_text: function (tag) {{
+                    display_text = ""
+                    if(typeof tag =='string')
+                    {{
+                        display_text = tag
+                    }}
+                    else
+                    {{
+                        var index = this.lists.{foreign_entity}.findIndex(opt => tag == opt.value)
+                        display_text = this.lists.{foreign_entity}[index].text
+                    }}
+                    return display_text
+                }},
                     """
 
     source_code += f"""
@@ -1145,7 +1237,9 @@ def create(data):
                         }}
                     }}
                     return conso_subtext
-                }}
+                }},"""
+                
+    source_code+= f"""  
             }},
             computed: {{"""
     for col, col_type in cols.items():
@@ -1153,7 +1247,10 @@ def create(data):
         if isinstance(col_type, dict):
             col_values = col_type.get("values","")
             if (col_type["type"] == "relationship") or isinstance(col_values, list):
-                source_code += f"""
+                has_many = col_type.get('has_many', '')
+                has_many_ux = col_type.get('has_many_ux', '')
+                if has_many != '' and has_many_ux != 'repeater':
+                    source_code += f"""
             {col_varname}_criteria() {{
                 return this.search['{col_varname}'].trim().toLowerCase()
             }},

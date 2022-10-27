@@ -35,7 +35,8 @@ def create(data):
                 "col_type": col_type,
                 "col_varname": col_varname,
                 "entity" : entity,
-                "entity_varname": entity_varname
+                "entity_varname": entity_varname,
+                "is_many_control": False
             })
         else:
             default_control = True

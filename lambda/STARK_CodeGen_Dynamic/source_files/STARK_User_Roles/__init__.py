@@ -712,7 +712,7 @@ def create_listview_index_value(data):
     STARK_ListView_sk = "|".join(ListView_index_values)
     return STARK_ListView_sk
 
-def cascade_pk_change_to_child(params, parent_entity_name, child_entity_name, attribute):
+def cascade_pk_change_to_child(params, child_entity_name, attribute):
     temp_import = importlib.import_module(child_entity_name)
 
     #fetch all records from child using old pk value
