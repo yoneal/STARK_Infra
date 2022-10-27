@@ -36,6 +36,17 @@ def create(data):
     source_code += f"""
             }}
         ],
+
+        add_object: {{"""
+    source_code += f"""
+            '{pk_varname}': '',"""
+    for col in cols:
+        col_varname = converter.convert_to_system_name(col)
+        source_code += f"""
+            '{col_varname}': '',"""
+
+    source_code += f"""
+        }}
         
         list_status: {{"""
 
@@ -84,7 +95,15 @@ def create(data):
                 }});
             }}
         }},
-                """
+        add_field: function (entity) {{
+            this.{entity_varname}.push(this.add_object)
+        }},
+        remove_field: function (index, entity) {{
+            this.{entity_varname}.splice(index, 1);       
+        }},
+        """
+
+    
     source_code += f"""
     }}
     """
