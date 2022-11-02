@@ -345,18 +345,15 @@ def create(data):
                 STARK_group_by_1: '',
                 Y_Data: [],
                 showOperations: true,
-                many_entity: {{
-            """
+                many_entity: {{"""
             
     if relationships.get('has_many', '') != '':
         for relation in relationships.get('has_many'):
             if relation.get('type') == 'repeater':
                 many_entity = relation.get('entity')
                 many_entity_varname = converter.convert_to_system_name(many_entity)
-
                 source_code += f"""    
                     '{many_entity_varname}': many_{many_entity_varname},"""
-    
     source_code += f"""
                 }},
             }},
@@ -400,8 +397,8 @@ def create(data):
                 if has_many != '':
                     if has_many_ux == 'repeater':
                         source_code += f"""
-                        many_{col_varname}_validation = many_{col_varname}.many_validation()"""
-                        validation += '&& many_{col_varname}_validation' 
+                    many_{col_varname}_validation = many_{col_varname}.many_validation()"""
+                        validation += '&& many_' + {col_varname} +'_validation' 
                         
     source_code += f"""
                     if(response['is_valid_form'] {validation}) {{
@@ -495,8 +492,8 @@ def create(data):
                 if has_many != '':
                     if has_many_ux == 'repeater':
                         source_code += f"""
-                        many_{col_varname}_validation = many_{col_varname}.many_validation()"""
-                        validation += '&& many_{col_varname}_validation' 
+                    many_{col_varname}_validation = many_{col_varname}.many_validation()"""
+                        validation += '&& many_' + {col_varname} +'_validation'  
                         
     source_code += f"""
                     if(response['is_valid_form'] {validation}) {{
@@ -596,7 +593,6 @@ def create(data):
         col_varname = converter.convert_to_system_name(rel)
         source_code += f"""
                             if(data["{col_varname}"].length > 0) {{
-                                root.many_entity.{col_varname} = 
                                 var module_data = JSON.parse(data["{col_varname}"])
                                 root.many_entity.{col_varname}.module_fields = []
                                 module_data.forEach(element => {{

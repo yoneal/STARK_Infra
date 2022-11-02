@@ -27,12 +27,12 @@ def create(data):
     source_code = f"""\
     many_{entity_varname} = {{
         metadata: {{
-                    '{pk_varname}': {{
-                        'value': '',
-                        'required': true,
-                        'max_length': '',
-                        'data_type': 'S'
-                    }},"""
+            '{pk_varname}': {{
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': 'S'
+            }},"""
     
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
@@ -41,30 +41,30 @@ def create(data):
             has_many_ux = col_type.get('has_many_ux', None)
             if has_many_ux == None:
                 source_code += f"""
-                    '{col_varname}': {{
-                        'value': '',
-                        'required': true,
-                        'max_length': '',
-                        'data_type': '{data_type}'
-                    }},""" 
+            '{col_varname}': {{
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': '{data_type}'
+            }},""" 
         else:
             source_code += f"""
-                    '{col_varname}': {{
-                        'value': '',
-                        'required': true,
-                        'max_length': '',
-                        'data_type': '{data_type}'
-                    }},""" 
+            '{col_varname}': {{
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': '{data_type}'
+            }},""" 
                     
     source_code += f"""
-                }},
+        }},
 
-                validation_properties: [
-                    {{
-                        '{pk_varname}': {{
-                            'state': null,
-                            'feedback': ''
-                        }},"""
+        validation_properties: [
+            {{
+                '{pk_varname}': {{
+                    'state': null,
+                    'feedback': ''
+                }},"""
     
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
@@ -73,19 +73,18 @@ def create(data):
             has_many_ux = col_type.get('has_many_ux', None)
             if has_many_ux == None:
                 source_code += f"""
-                        '{col_varname}': {{
-                            'state': null,
-                            'feedback': ''
-                        }},""" 
+                '{col_varname}': {{
+                    'state': null,
+                    'feedback': ''
+                }},""" 
         else:
             source_code += f"""
-                        '{col_varname}': {{
-                            'state': null,
-                            'feedback': ''
-                        }}
-                    }}
-                ],
-
+                '{col_varname}': {{
+                    'state': null,
+                    'feedback': ''
+                }}
+            }}
+        ],
     
         module_fields: [
             {{
@@ -172,11 +171,11 @@ def create(data):
     source_code += f"""
             }}
 
-            var validation_properties: {{
-                    '{pk_varname}': {{
-                        'state': null,
-                        'feedback': ''
-                    }},"""
+            var validation_properties = {{
+                '{pk_varname}': {{
+                    'state': null,
+                    'feedback': ''
+                }},"""
     
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
@@ -185,17 +184,17 @@ def create(data):
             has_many_ux = col_type.get('has_many_ux', None)
             if has_many_ux == None:
                 source_code += f"""
-                    '{col_varname}': {{
-                        'state': null,
-                        'feedback': ''
-                    }},""" 
+                '{col_varname}': {{
+                    'state': null,
+                    'feedback': ''
+                }},""" 
         else:
             source_code += f"""
-                    '{col_varname}': {{
-                        'state': null,
-                        'feedback': ''
-                    }}
-                }},
+                '{col_varname}': {{
+                    'state': null,
+                    'feedback': ''
+                }}
+            }},
 
             if(param != '') {{
                 new_row = param

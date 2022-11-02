@@ -46,8 +46,8 @@ def create(data):
                             <input type="hidden" id="orig_{pk_varname}" v-model="{entity_varname}.{pk_varname}">
                             <div class="form-group">
                                 <label for="{pk_varname}">{pk}</label>
-                                <b-form-input type="text" class="form-control" id="{pk_varname}" placeholder="" v-model="{entity_varname}.{pk_varname}" :state="metadata.{pk_varname}.state"></b-form-input>
-                                <b-form-invalid-feedback>{{{{metadata.{pk_varname}.feedback}}}}</b-form-invalid-feedback>
+                                <b-form-input type="text" class="form-control" id="{pk_varname}" placeholder="" v-model="{entity_varname}.{pk_varname}" :state="validation_properties.{pk_varname}.state"></b-form-input>
+                                <b-form-invalid-feedback>{{{{validation_properties.{pk_varname}.feedback}}}}</b-form-invalid-feedback>
                             </div>"""
 
     for col, col_type in cols.items():
@@ -71,30 +71,30 @@ def create(data):
                 rel_pk_varname = converter.convert_to_system_name(rel_pk)
                 child_entity_varname = converter.convert_to_system_name(child_entity)
                 source_code += f"""
-                            <template>
-                                <!-- <a v-b-toggle class="text-decoration-none" :href="'#group-collapse-'+index" @click.prevent> -->
-                                <a v-b-toggle class="text-decoration-none" @click.prevent>
-                                    <span class="when-open"><img src="images/chevron-up.svg" class="filter-fill-svg-link" height="20rem"></span><span class="when-closed"><img src="images/chevron-down.svg" class="filter-fill-svg-link" height="20rem"></span>
-                                    <span class="align-bottom">{child_entity}</span>
-                                </a>
-                                <!-- <b-collapse :id="'group-collapse-'+index" visible class="mt-0 mb-2 pl-2"> -->
-                                <b-collapse visible class="mt-0 mb-2 pl-2">
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <form class="repeater" enctype="multipart/form-data">
-                                                        <div class="row" v-for="(field, index) in many_entity.{child_entity_varname}">
-                                                            <div class="form-group">
-                                                                <b-form-group class="form-group" label="#">
-                                                                    {{{{ index + 1 }}}}
-                                                                </b-form-group>
-                                                            </div>"""
+                        <template>
+                            <!-- <a v-b-toggle class="text-decoration-none" :href="'#group-collapse-'+index" @click.prevent> -->
+                            <a v-b-toggle class="text-decoration-none" @click.prevent>
+                                <span class="when-open"><img src="images/chevron-up.svg" class="filter-fill-svg-link" height="20rem"></span><span class="when-closed"><img src="images/chevron-down.svg" class="filter-fill-svg-link" height="20rem"></span>
+                                <span class="align-bottom">{child_entity}</span>
+                            </a>
+                            <!-- <b-collapse :id="'group-collapse-'+index" visible class="mt-0 mb-2 pl-2"> -->
+                            <b-collapse visible class="mt-0 mb-2 pl-2">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <form class="repeater" enctype="multipart/form-data">
+                                                    <div class="row" v-for="(field, index) in many_entity.{child_entity_varname}.module_fields">
+                                                        <div class="form-group">
+                                                            <b-form-group class="form-group" label="#">
+                                                                {{{{ index + 1 }}}}
+                                                            </b-form-group>
+                                                        </div>"""
 
                 source_code += f"""
-                                                            <b-form-group class="form-group col-lg-2" label="{rel_pk}" label-for="{rel_pk_varname}">
-                                                                <b-form-input type="text" class="form-control" id="{rel_pk_varname}" placeholder="" v-model="field.{rel_pk_varname}"></b-form-input>
-                                                            </b-form-group>"""
+                                                        <b-form-group class="form-group col-sm" label="{rel_pk}" label-for="{rel_pk_varname}" :invalid-feedback="many_entity.{child_entity_varname}.validation_properties[index].{rel_pk_varname}.feedback">
+                                                            <b-form-input type="text" class="form-control" id="{rel_pk_varname}" placeholder="" v-model="field.{rel_pk_varname}"></b-form-input>
+                                                        </b-form-group>"""
 
                 for rel_col_key, rel_col_type in rel_model.get(child_entity).get('data').items():
                     rel_col_varname = converter.convert_to_system_name(rel_col_key)
@@ -108,37 +108,37 @@ def create(data):
                     })
                     
                     source_code += f"""
-                                                            <b-form-group class="form-group col-lg-2" label="{rel_col_key}" label-for="{rel_col_varname}" >
-                                                                {rel_html_control_code}
-                                                            </b-form-group>"""
+                                                        <b-form-group class="form-group col-lg-2" label="{rel_col_key}" label-for="{rel_col_varname}" :invalid-feedback="many_entity.{child_entity_varname}.validation_properties[index].{rel_col_varname}.feedback">
+                                                            {rel_html_control_code}
+                                                        </b-form-group>"""
 
                 source_code += f"""
-                                                            <div class="form-group col-lg-2 ">
-                                                                <b-form-group class="form-group" label="Remove">
-                                                                    <input type="button" class="btn bg-danger" alt="Delete" width="40" height="40" @click="many_{child_entity_varname}.remove_field(index)" value="X">
-                                                                </b-form-group>
-                                                            </div> 
-                                                        </div>
-                                                        <div>
-                                                            <input type="button" class="btn btn-success mt-3 mt-lg-0" @click="many_{child_entity_varname}.add_field()" value="Add"/>
-                                                        </div>
-                                                    </form>
-                                                </div>
+                                                        <div class="form-group col-lg-2 ">
+                                                            <b-form-group class="form-group" label="Remove">
+                                                                <input type="button" class="btn bg-danger" alt="Delete" width="40" height="40" @click="many_{child_entity_varname}.remove_field(index)" value="X">
+                                                            </b-form-group>
+                                                        </div> 
+                                                    </div>
+                                                    <div>
+                                                        <input type="button" class="btn btn-success mt-3 mt-lg-0" @click="many_{child_entity_varname}.add_field()" value="Add"/>
+                                                    </div>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
-                                </b-collapse>
-                                <hr><br>
-                            </template>      
+                                </div>
+                            </b-collapse>
+                            <hr><br>
+                        </template>      
                 """
             else:
                 source_code += f"""
-                        <b-form-group class="form-group" label="{col}" label-for="{col_varname}" :state="metadata.{col_varname}.state" :invalid-feedback="metadata.{col_varname}.feedback">
+                        <b-form-group class="form-group" label="{col}" label-for="{col_varname}" :state="validation_properties.{col_varname}.state" :invalid-feedback="validation_properties.{col_varname}.feedback">
                             {html_control_code}
                         </b-form-group>"""
         else:
             source_code += f"""
-                        <b-form-group class="form-group" label="{col}" label-for="{col_varname}" :state="metadata.{col_varname}.state" :invalid-feedback="metadata.{col_varname}.feedback">
+                        <b-form-group class="form-group" label="{col}" label-for="{col_varname}" :state="validation_properties.{col_varname}.state" :invalid-feedback="validation_properties.{col_varname}.feedback">
                             {html_control_code}
                         </b-form-group>"""
 
