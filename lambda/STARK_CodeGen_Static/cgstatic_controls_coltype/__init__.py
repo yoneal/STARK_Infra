@@ -18,15 +18,13 @@ def create(data):
     html_code       = ""
     is_many_control = data['is_many_control']
     state_control   = ""
-    rel_model   = data["Rel Model"]
+    # rel_model       = data["Rel Model"]
 
     if isinstance(col_type, str):
         col_type = col_type.lower()
 
     if is_many_control:
-        for rel_col_key, rel_col_type in rel_model.get(col).get('data').items():
-            rel_col_varname = converter.convert_to_system_name(rel_col_key)
-        state_control = f':many_entity.{col_varname}.validation_properties[index].{rel_col_varname}.feedback"'
+        state_control = f':many_entity.{entity_varname}.validation_properties[index].{col_varname}.feedback"'
         field_entity_varname = 'field'
         rel_list = f'many_{entity_varname}'
     else:
