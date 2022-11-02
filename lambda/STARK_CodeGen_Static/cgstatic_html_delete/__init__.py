@@ -110,7 +110,7 @@ def create(data):
                                         <div class="card">
                                             <div class="card-body">
                                                 <form class="repeater" enctype="multipart/form-data">
-                                                    <div class="row" v-for="(field, index) in many_entity.{child_entity_varname}">
+                                                    <div class="row" v-for="(field, index) in many_entity.{child_entity_varname}.module_fields">
                                                         <div class="form-group">
                                                             <b-form-group class="form-group" label="#">
                                                                 {{{{ index + 1 }}}}
