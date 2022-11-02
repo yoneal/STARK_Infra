@@ -71,25 +71,25 @@ def create(data):
                         'value': '',
                         'required': true,
                         'max_length': '',
-                        'data_type': ''
+                        'data_type': 'String'
                     }},
                     'STARK_Chart_Type': {{
                         'value': '',
                         'required': true,
                         'max_length': '',
-                        'data_type': ''
+                        'data_type': 'String'
                     }},
                     'STARK_X_Data_Source': {{
                         'value': '',
                         'required': true,
                         'max_length': '',
-                        'data_type': ''
+                        'data_type': 'String'
                     }},
                     'STARK_Y_Data_Source': {{
                         'value': '',
                         'required': true,
                         'max_length': '',
-                        'data_type': ''
+                        'data_type': 'String'
                     }},
                 }},
 
@@ -743,7 +743,7 @@ def create(data):
                         root.metadata['STARK_Y_Data_Source'].required = true
                     }}
                     response = STARK.validate_form(root.metadata, root.custom_report)
-                    this.metadata = response['new_metadata']
+                    this.validation_properties = response['validation_properties']
                     // console.log(response['is_valid_form'])
                     if(response['is_valid_form']) {{
                         if(root.custom_report.STARK_Report_Type == 'Graph') {{
