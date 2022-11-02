@@ -493,7 +493,7 @@ def create(data):
                     if has_many_ux == 'repeater':
                         source_code += f"""
                     many_{col_varname}_validation = many_{col_varname}.many_validation()"""
-                        validation += '&& many_' + {col_varname} +'_validation'  
+                        validation += f"&& many_{col_varname}_validation"  
                         
     source_code += f"""
                     if(response['is_valid_form'] {validation}) {{
