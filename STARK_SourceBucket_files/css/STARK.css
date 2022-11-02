@@ -32,6 +32,11 @@ input.checkbox-med {
   color: #cccccc;
 }
 
+.form-control-link {
+  color: #17a3b9;
+  cursor: pointer
+}
+
 a:hover,
 a:active,
 a:link,
