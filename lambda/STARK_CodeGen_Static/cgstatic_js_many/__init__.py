@@ -84,8 +84,9 @@ def create(data):
                     'feedback': ''
                 }}
             }}
-        ],
-    
+        ],"""
+
+    source_code += f"""
         module_fields: [
             {{
                 '{pk_varname}': '',"""
@@ -143,8 +144,9 @@ def create(data):
                     loading_modal.hide();
                 }});
             }}
-        }},
+        }},"""
 
+    source_code += f"""
         many_validation() {{
             is_valid_form = true
             for (let index = 0; index < this.module_fields.length; index++) {{
@@ -193,8 +195,9 @@ def create(data):
                 '{col_varname}': {{
                     'state': null,
                     'feedback': ''
-                }}
-            }},
+                }}"""
+    source_code += f"""
+            }}
 
             if(param != '') {{
                 new_row = param

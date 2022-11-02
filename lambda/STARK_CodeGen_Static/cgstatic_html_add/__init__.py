@@ -93,7 +93,7 @@ def create(data):
 
                 source_code += f"""
                                                         <b-form-group class="form-group col-sm" label="{rel_pk}" label-for="{rel_pk_varname}" :invalid-feedback="many_entity.{child_entity_varname}.validation_properties[index].{rel_pk_varname}.feedback">
-                                                            <b-form-input type="text" class="form-control" id="{rel_pk_varname}" placeholder="" v-model="field.{rel_pk_varname}"></b-form-input>
+                                                            <b-form-input type="text" class="form-control" id="{rel_pk_varname}" placeholder="" v-model="field.{rel_pk_varname}" :state="many_entity.{child_entity_varname}.validation_properties[index].{rel_pk_varname}.state"></b-form-input>
                                                         </b-form-group>"""
 
                 for rel_col_key, rel_col_type in rel_model.get(child_entity).get('data').items():
