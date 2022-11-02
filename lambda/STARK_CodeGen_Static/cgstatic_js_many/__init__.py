@@ -82,7 +82,9 @@ def create(data):
                 '{col_varname}': {{
                     'state': null,
                     'feedback': ''
-                }}
+                }},"""
+
+    source_code += f"""
             }}
         ],"""
 
