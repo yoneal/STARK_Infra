@@ -24,7 +24,7 @@ def create(data):
         col_type = col_type.lower()
 
     if is_many_control:
-        state_control = f':state="many_entity.{entity_varname}.validation_properties[index].{col_varname}.feedback"'
+        state_control = f':state="many_entity.{entity_varname}.validation_properties[index].{col_varname}.state"'
         field_entity_varname = 'field'
         rel_list = f'many_{entity_varname}'
     else:
