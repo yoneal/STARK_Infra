@@ -100,12 +100,6 @@ def create(data):
                                 </div>
                             </div>"""  
                     else:
-                        print('rel_model')
-                        print(rel_model)
-                        print('foreign_entity')
-                        print(foreign_entity)
-                        print('rel_model[foreign_entity]')
-                        print(rel_model[has_many])
                         rel_pk = rel_model[has_many].get('pk')
                         rel_pk_varname = converter.convert_to_system_name(rel_pk)
                         child_entity_varname = converter.convert_to_system_name(foreign_entity)
@@ -121,20 +115,20 @@ def create(data):
                                         <div class="card">
                                             <div class="card-body">
                                                 <form class="repeater" enctype="multipart/form-data">
-                                                    <div class="row" v-for="(field, index) in many_entity.{child_entity_varname}">
+                                                    <div class="row" v-for="(field, index) in many_entity.{child_entity_varname}.module_fields">
                                                         <div class="form-group">
                                                             <b-form-group class="form-group" label="#">
                                                                 {{{{ index + 1 }}}}
                                                             </b-form-group>
                                                         </div>
-                                                        <b-form-group class="form-group col-lg-2"  label="{rel_pk}" label-for="{rel_pk_varname}">
+                                                        <b-form-group class="form-group col-sm"  label="{rel_pk}" label-for="{rel_pk_varname}">
                                                             <b-form-input type="text" class="form-control" readonly id="{rel_pk_varname}" placeholder="" v-model="field.{rel_pk_varname}"></b-form-input>
                                                         </b-form-group>"""
 
                         for rel_col_key, rel_col_type in rel_model.get(has_many).get('data').items():
                             rel_col_varname = converter.convert_to_system_name(rel_col_key)
                             source_code += f"""
-                                                        <b-form-group class="form-group col-lg-2" label="{rel_col_key}" label-for="{rel_col_varname}">
+                                                        <b-form-group class="form-group col-sm" label="{rel_col_key}" label-for="{rel_col_varname}">
                                                             <b-form-input type="text" class="form-control" readonly id="{rel_col_varname}" placeholder="" v-model="field.{rel_col_varname}">
                                                         </b-form-group>"""
 

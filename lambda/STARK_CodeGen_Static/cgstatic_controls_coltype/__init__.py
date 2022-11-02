@@ -18,15 +18,17 @@ def create(data):
     html_code       = ""
     is_many_control = data['is_many_control']
     state_control   = ""
+    # rel_model       = data["Rel Model"]
 
     if isinstance(col_type, str):
         col_type = col_type.lower()
 
     if is_many_control:
+        state_control = f':state="many_entity.{entity_varname}.validation_properties[index].{col_varname}.state"'
         field_entity_varname = 'field'
         rel_list = f'many_{entity_varname}'
     else:
-        state_control = f':state="metadata.{col_varname}.state"'  
+        state_control = f':state="validation_properties.{col_varname}.state"'  
         rel_list = f'root' 
         field_entity_varname = entity_varname
 
@@ -57,11 +59,12 @@ def create(data):
         html_code=f"""<b-form-textarea id="{col_varname}" v-model="{field_entity_varname}.{col_varname}" class="mb-2" rows="4" max-rows="8" {state_control}></b-form-textarea>"""
 
     elif isinstance(col_type, list):
-        html_code=f"""<b-form-select id="{col_varname}" v-model="{field_entity_varname}.{col_varname}" :options="lists.{col_varname}" {state_control}>
-                                    <template v-slot:first>
-                                        <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
-                                    </template>
-                                </b-form-select>"""
+        html_code=f"""
+                        <b-form-select id="{col_varname}" v-model="{field_entity_varname}.{col_varname}" :options="lists.{col_varname}" {state_control}>
+                            <template v-slot:first>
+                                <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
+                            </template>
+                        </b-form-select>"""
 
     elif isinstance(col_type, dict):
         #These are the complex data types that need additional settings as part of their spec
