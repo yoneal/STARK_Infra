@@ -100,12 +100,6 @@ def create(data):
                                 </div>
                             </div>"""  
                     else:
-                        print('rel_model')
-                        print(rel_model)
-                        print('foreign_entity')
-                        print(foreign_entity)
-                        print('rel_model[foreign_entity]')
-                        print(rel_model[has_many])
                         rel_pk = rel_model[has_many].get('pk')
                         rel_pk_varname = converter.convert_to_system_name(rel_pk)
                         child_entity_varname = converter.convert_to_system_name(foreign_entity)
@@ -121,7 +115,7 @@ def create(data):
                                         <div class="card">
                                             <div class="card-body">
                                                 <form class="repeater" enctype="multipart/form-data">
-                                                    <div class="row" v-for="(field, index) in many_entity.{child_entity_varname}">
+                                                    <div class="row" v-for="(field, index) in many_entity.{child_entity_varname}.module_fields">
                                                         <div class="form-group">
                                                             <b-form-group class="form-group" label="#">
                                                                 {{{{ index + 1 }}}}
