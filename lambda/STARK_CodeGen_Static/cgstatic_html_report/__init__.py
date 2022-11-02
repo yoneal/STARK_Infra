@@ -149,8 +149,8 @@ def create(data):
                                             <td></td>
                                             <td>Report Type</td>
                                             <td>
-                                                <b-form-group class="form-group" label="" label-for="Report_Type" :state="metadata.STARK_Report_Type.state" :invalid-feedback="metadata.STARK_Report_Type.feedback" >
-                                                    <b-form-select id="Report_Type" v-model="custom_report.STARK_Report_Type" :options="lists.STARK_Report_Type" :state="metadata.STARK_Report_Type.state" @change="root.showChartWizard()">
+                                                <b-form-group class="form-group" label="" label-for="Report_Type" :state="validation_properties.STARK_Report_Type.state" :invalid-feedback="validation_properties.STARK_Report_Type.feedback" >
+                                                    <b-form-select id="Report_Type" v-model="custom_report.STARK_Report_Type" :options="lists.STARK_Report_Type" :state="validation_properties.STARK_Report_Type.state" @change="root.showChartWizard()">
                                                     <template v-slot:first>
                                                         <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                                     </template>
@@ -168,8 +168,8 @@ def create(data):
                                             <td></td>
                                             <td>Chart Type</td>
                                             <td>
-                                            <b-form-group class="form-group" label="" label-for="Chart_Type" :state="metadata.STARK_Chart_Type.state" :invalid-feedback="metadata.STARK_Chart_Type.feedback" >
-                                                <b-form-select id="Chart_Type" v-model="custom_report.STARK_Chart_Type" :options="lists.STARK_Chart_Type" :state="metadata.STARK_Chart_Type.state" @change="root.showFields()">
+                                            <b-form-group class="form-group" label="" label-for="Chart_Type" :state="validation_properties.STARK_Chart_Type.state" :invalid-feedback="validation_properties.STARK_Chart_Type.feedback" >
+                                                <b-form-select id="Chart_Type" v-model="custom_report.STARK_Chart_Type" :options="lists.STARK_Chart_Type" :state="validation_properties.STARK_Chart_Type.state" @change="root.showFields()">
                                                 <template v-slot:first>
                                                     <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                                 </template>
@@ -182,8 +182,8 @@ def create(data):
                                             <td></td>
                                             <td>X Data Source</td>
                                             <td>
-                                            <b-form-group class="form-group" label-for="" :state="metadata.STARK_X_Data_Source.state" :invalid-feedback="metadata.STARK_X_Data_Source.feedback">
-                                                <b-form-input type="text" class="form-control" id="STARK_X_Data_Source" placeholder="" v-model="custom_report.STARK_X_Data_Source" :state="metadata.STARK_X_Data_Source.state" disabled></b-form-input>
+                                            <b-form-group class="form-group" label-for="" :state="validation_properties.STARK_X_Data_Source.state" :invalid-feedback="validation_properties.STARK_X_Data_Source.feedback">
+                                                <b-form-input type="text" class="form-control" id="STARK_X_Data_Source" placeholder="" v-model="custom_report.STARK_X_Data_Source" :state="validation_properties.STARK_X_Data_Source.state" disabled></b-form-input>
                                             </b-form-group>
                                             </td>
                                             <td></td>
@@ -192,8 +192,8 @@ def create(data):
                                             <td></td>
                                             <td>Y Data Source</td>
                                             <td>
-                                                <b-form-group class="form-group" label-for="Data_Source" :state="metadata.STARK_Y_Data_Source.state" :invalid-feedback="metadata.STARK_Y_Data_Source.feedback">
-                                                    <b-form-select id="Data_Source" v-model="custom_report.STARK_Y_Data_Source" :options="lists.STARK_Data_Source" :state="metadata.STARK_Y_Data_Source.state">
+                                                <b-form-group class="form-group" label-for="Data_Source" :state="validation_properties.STARK_Y_Data_Source.state" :invalid-feedback="validation_properties.STARK_Y_Data_Source.feedback">
+                                                    <b-form-select id="Data_Source" v-model="custom_report.STARK_Y_Data_Source" :options="lists.STARK_Data_Source" :state="validation_properties.STARK_Y_Data_Source.state">
                                                     <template v-slot:first>
                                                         <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                                     </template>
