@@ -563,7 +563,7 @@ def create(data):
                             if(data["{col_varname}"].length > 0) {{"""
         if with_upload_on_many:
             source_code += f"""
-                                root.many_entity.{col_varname}.STARK_uploaded_s3_keys = root.Transaction.STARK_uploaded_s3_keys['many_{col_varname}']"""
+                                root.many_entity.{col_varname}.STARK_uploaded_s3_keys = root.{entity_varname}.STARK_uploaded_s3_keys['many_{col_varname}']"""
         source_code += f"""
                                 var many_object = JSON.parse(data["{col_varname}"])
                                 many_object.forEach(element => {{
