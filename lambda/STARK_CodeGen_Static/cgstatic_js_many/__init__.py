@@ -64,7 +64,7 @@ def create(data):
                 'data_type': '{data_type}'
             }},""" 
         
-        source_code += f"""
+    source_code += f"""
         module_fields: [],
         validation_properties: []
         list_status: {{"""
@@ -105,16 +105,16 @@ def create(data):
 
     if with_upload:
         source_code += f"""
-                ext_whitelist: {{{ext_string}
-                }},
-                allowed_size: {{{allowed_size_string}
-                }},
-                ext_whitelist_table: "",
-                allowed_size_table: 0,
-                STARK_upload_elements: {{{upload_elems_string}
-                }},
-                STARK_uploaded_s3_keys: {{{uploaded_s3_keys_string}
-                }},"""
+        ext_whitelist: {{{ext_string}
+        }},
+        allowed_size: {{{allowed_size_string}
+        }},
+        ext_whitelist_table: "",
+        allowed_size_table: 0,
+        STARK_upload_elements: {{{upload_elems_string}
+        }},
+        STARK_uploaded_s3_keys: {{{uploaded_s3_keys_string}
+        }},"""
 
     for col, col_type in cols.items():
         if isinstance(col_type, dict) and col_type["type"] == "relationship":
@@ -141,7 +141,7 @@ def create(data):
                 
                 source_code += f""" 
                     }})
-                    this.list_status.{foreign_entity} = 'populated'
+                    many_{entity_varname}.list_status.{foreign_entity} = 'populated'
                     loading_modal.hide();
                 }}).catch(function(error) {{
                     console.log("Encountered an error! [" + error + "]")
@@ -156,7 +156,7 @@ def create(data):
 
     if with_upload:
         source_code += f"""
-            var upload_fields = []
+            var upload_fields = this.get_upload_fields()
             var new_s3_key = "" """
 
     source_code += f"""

@@ -27,12 +27,14 @@ def create(data):
         js_object = f'many_entity.{entity_varname}'
         file_upload_col_varname = f"{col_varname}[index]"
         dot_compound = "."
+        s3_upload_index_param = ", index"
     else:
         state_control = f':state="metadata.{col_varname}.state"'  
         dot_compound = ""
         js_object = f'' 
         field_entity_varname = entity_varname
         file_upload_col_varname = col_varname
+        s3_upload_index_param = ""
 
 
     if col_type == "date":
@@ -196,7 +198,7 @@ def create(data):
                             </b-form-group>
             """
         elif col_type["type"] == "file-upload":
-            html_code=f"""<b-form-file v-model="{js_object}{dot_compound}STARK_upload_elements.{file_upload_col_varname}.file" :placeholder="{js_object}{dot_compound}STARK_upload_elements.{file_upload_col_varname}.file" drop-placeholder="Drop file here..." @input="{js_object}{dot_compound}s3upload('{col_varname}')" v-b-hover="init_s3_access" onfocus="root.init_s3_access()" {state_control}></b-form-file>      
+            html_code=f"""<b-form-file v-model="{js_object}{dot_compound}STARK_upload_elements.{file_upload_col_varname}.file" :placeholder="{js_object}{dot_compound}STARK_upload_elements.{file_upload_col_varname}.file" drop-placeholder="Drop file here..." @input="{js_object}{dot_compound}s3upload('{col_varname}'{s3_upload_index_param})" v-b-hover="init_s3_access" onfocus="root.init_s3_access()" {state_control}></b-form-file>      
                                 <b-progress :value="{js_object}{dot_compound}STARK_upload_elements.{file_upload_col_varname}.progress_bar_val" :max="100" class="mt-2"></b-progress>"""
         elif col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
@@ -206,7 +208,7 @@ def create(data):
                 #simple 1-1 relationship
                 foreign_entity  = converter.convert_to_system_name(has_one)
 
-                html_code=f"""<b-form-select id="{col_varname}" v-model="{field_entity_varname}.{col_varname}" :options="lists.{col_varname}" onmouseover="root{js_object}.list_{foreign_entity}()" onfocus="root{js_object}.list_{foreign_entity}()" {state_control}>
+                html_code=f"""<b-form-select id="{col_varname}" v-model="{field_entity_varname}.{col_varname}" :options="lists.{col_varname}" onmouseover="root{dot_compound}{js_object}.list_{foreign_entity}()" onfocus="root{dot_compound}{js_object}.list_{foreign_entity}()" {state_control}>
                                 <template v-slot:first>
                                     <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                 </template>

@@ -126,7 +126,7 @@ def create(data):
                                 if rel_col_type["type"] == "file-upload":
                                     source_code += f"""
                                                         <b-form-group class="form-group col-sm" label="{rel_col_key}" label-for="{rel_col_varname}">
-                                                            <a :href="'https://'+ root.object_url_prefix + many_entity.{entity_varname}.STARK_uploaded_s3_keys.{col_varname}[index]">
+                                                            <a :href="'https://'+ root.object_url_prefix + many_entity.{col_varname}.STARK_uploaded_s3_keys.{rel_col_varname}[index]">
                                                                 <b-form-input type="text" class="form-control-link" readonly id="{rel_col_varname}" placeholder="" v-model="field.{rel_col_varname}">
                                                             </a>
                                                         </b-form-group>"""

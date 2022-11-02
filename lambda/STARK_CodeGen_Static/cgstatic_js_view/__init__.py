@@ -560,7 +560,11 @@ def create(data):
     for rel, rel_data in rel_model.items():
         col_varname = converter.convert_to_system_name(rel)
         source_code += f"""
-                            if(data["{col_varname}"].length > 0) {{
+                            if(data["{col_varname}"].length > 0) {{"""
+        if with_upload_on_many:
+            source_code += f"""
+                                root.many_entity.{col_varname}.STARK_uploaded_s3_keys = root.Transaction.STARK_uploaded_s3_keys['many_{col_varname}']"""
+        source_code += f"""
                                 var many_object = JSON.parse(data["{col_varname}"])
                                 many_object.forEach(element => {{
                                     root.many_entity.{col_varname}.add_row(element)

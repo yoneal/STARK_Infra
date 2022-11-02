@@ -467,7 +467,7 @@ def create(data):
                 #remove primary identifiers and STARK attributes
                 if not aggregate_report:
                     key.pop("sk")"""
-    if with_upload:
+    if with_upload or with_upload_on_many:
         source_code += f"""
                     key.pop("STARK uploaded s3 keys")"""
     source_code += f"""
@@ -767,7 +767,7 @@ def create(data):
             db_handler = ddb
         {dict_to_var_code}"""
 
-    if with_upload:
+    if with_upload or with_upload_on_many:
         source_code += f"""
         temp_s3_keys = data.get('STARK_uploaded_s3_keys', {{}}) 
         STARK_uploaded_s3_keys = {{}}
