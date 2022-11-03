@@ -892,7 +892,10 @@ def create(data):
                     STARK_uploaded_s3_keys[key] = sub_map_item
                 elif sub_key == 'M':
                     for third_key, third_item in sub_map_item.items():
-                        STARK_uploaded_s3_keys[key] = {{third_key: third_item['SS']}}
+                        if key in STARK_uploaded_s3_keys:
+                            STARK_uploaded_s3_keys[key].update({{third_key: third_item['SS']}}) 
+                        else:
+                            STARK_uploaded_s3_keys[key] = {{third_key: third_item['SS']}}
 
         item['STARK_uploaded_s3_keys'] = STARK_uploaded_s3_keys"""
     source_code += f"""

@@ -528,7 +528,7 @@ def create(data):
         col_varname = converter.convert_to_system_name(col)
         if isinstance(col_type, dict) and col_type['type'] == 'file-upload':
             source_code += f"""
-                            root.{entity_varname}.STARK_uploaded_s3_keys['{col_varname}'] = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.STARK_uploaded_s3_keys.{col_varname}.S : ""
+                            root.{entity_varname}.STARK_uploaded_s3_keys['{col_varname}'] = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.STARK_uploaded_s3_keys.{col_varname} : ""
                             root.STARK_upload_elements['{col_varname}'].file = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.{col_varname} : ""
                             root.STARK_upload_elements['{col_varname}'].progress_bar_val = root.{entity_varname}.{col_varname} != "" ? 100 : 0
                             

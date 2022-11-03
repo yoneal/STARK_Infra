@@ -208,7 +208,8 @@ def create(data):
                 this.STARK_upload_elements[element['field']].splice(index, 1);    
                 this.STARK_uploaded_s3_keys[element['field']].splice(index, 1);    
 
-            }});   
+            }});"""  
+    source_code += f""" 
         }},"""
 
     if with_upload:
