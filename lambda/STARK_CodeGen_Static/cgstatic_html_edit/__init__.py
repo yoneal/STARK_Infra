@@ -92,7 +92,7 @@ def create(data):
                                                             </div>"""
 
                 source_code += f"""
-                                                            <b-form-group class="form-group col-lg-2" label="{rel_pk}" label-for="{rel_pk_varname}">
+                                                            <b-form-group class="form-group col-sm" label="{rel_pk}" label-for="{rel_pk_varname}">
                                                                 <b-form-input type="text" class="form-control" id="{rel_pk_varname}" placeholder="" v-model="field.{rel_pk_varname}"></b-form-input>
                                                             </b-form-group>"""
 
@@ -108,12 +108,12 @@ def create(data):
                     })
                     
                     source_code += f"""
-                                                            <b-form-group class="form-group col-lg-2" label="{rel_col_key}" label-for="{rel_col_varname}" >
+                                                            <b-form-group class="form-group col-sm" label="{rel_col_key}" label-for="{rel_col_varname}" >
                                                                 {rel_html_control_code}
                                                             </b-form-group>"""
 
                 source_code += f"""
-                                                            <div class="form-group col-lg-2 ">
+                                                            <div class="form-group col-sm-0.5 ">
                                                                 <b-form-group class="form-group" label="Remove">
                                                                     <input type="button" class="btn bg-danger" alt="Delete" width="40" height="40" @click="many_{child_entity_varname}.remove_row(index)" value="X">
                                                                 </b-form-group>

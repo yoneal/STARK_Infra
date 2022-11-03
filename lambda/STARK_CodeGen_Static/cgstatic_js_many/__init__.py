@@ -65,8 +65,9 @@ def create(data):
             }},""" 
         
     source_code += f"""
+        }},
         module_fields: [],
-        validation_properties: []
+        validation_properties: [],
         list_status: {{"""
 
     for col, col_type in cols.items():
