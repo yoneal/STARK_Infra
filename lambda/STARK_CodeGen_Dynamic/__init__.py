@@ -83,7 +83,7 @@ def create_handler(event, context):
                 for key in items:
                     for value in key:
                         key[value] = converter.convert_to_system_name(key[value])
-        # print(relationships)
+        print(relationships)
         rel_model = {}
         for relationship in relationships.get('has_many', []):
             if relationship.get('type') == 'repeater':
