@@ -27,14 +27,16 @@ def create(data):
         state_control = f':state="many_entity.{entity_varname}.validation_properties[index].{col_varname}.state"'
         field_entity_varname = 'field'
         rel_list = f'many_{entity_varname}'
+        date_picker = f':id="{col_varname}[index]"'
     else:
         state_control = f':state="validation_properties.{col_varname}.state"'  
         rel_list = f'root' 
         field_entity_varname = entity_varname
+        date_picker = f'id="{col_varname}"'
 
 
     if col_type == "date":
-        html_code=f"""<b-form-datepicker id="{col_varname}" show-decade-nav v-model="{field_entity_varname}.{col_varname}" class="mb-2" {state_control}></b-form-datepicker>"""
+        html_code=f"""<b-form-datepicker {date_picker} show-decade-nav v-model="{field_entity_varname}.{col_varname}" class="mb-2" {state_control}></b-form-datepicker>"""
 
     elif col_type == "time":
         html_code=f"""<b-form-timepicker id="{col_varname}" v-model="{field_entity_varname}.{col_varname}" class="mb-2" {state_control}></b-form-timepicker>"""
