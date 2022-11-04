@@ -149,6 +149,19 @@ def create(data):
                     loading_modal.hide();
                 }});
             }}
+        }},
+        many_validation() {{
+            is_valid_form = true
+            for (let index = 0; index < this.module_fields.length; index++) {{
+                console.log(this.module_fields[index])
+                response = STARK.validate_form(this.metadata, this.module_fields[index])
+                this.validation_properties[index] = response['validation_properties']
+                if (response['is_valid_form'] == false)
+                {{
+                    is_valid_form = false
+                }}
+            }}
+            return is_valid_form
         }},"""
 
     source_code += f"""
@@ -306,6 +319,11 @@ def create(data):
 
             return upload_processed
         }},
+        
+        remove_field: function (index) {{
+            this.module_fields.splice(index, 1);       
+            this.validation_properties.splice(index, 1);       
+        }},  
         """
 
     

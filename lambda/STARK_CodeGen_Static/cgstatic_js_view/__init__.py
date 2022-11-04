@@ -5,6 +5,7 @@
 import textwrap
 import os
 import importlib
+from wsgiref import validate
 
 #Private modules
 prepend_dir = ""
@@ -48,9 +49,7 @@ def create(data):
                         'value': '',
                         'required': true,
                         'max_length': '',
-                        'data_type': 'S',
-                        'state': null,
-                        'feedback': ''
+                        'data_type': 'String'
                     }},"""
     
     for col, col_type in cols.items():
@@ -64,9 +63,7 @@ def create(data):
                         'value': '',
                         'required': true,
                         'max_length': '',
-                        'data_type': '{data_type}',
-                        'state': null,
-                        'feedback': ''
+                        'data_type': '{data_type}'
                     }},""" 
         else:
             source_code += f"""
@@ -74,9 +71,7 @@ def create(data):
                         'value': '',
                         'required': true,
                         'max_length': '',
-                        'data_type': '{data_type}',
-                        'state': null,
-                        'feedback': ''
+                        'data_type': '{data_type}'
                     }},""" 
                     
     source_code += f"""
@@ -84,36 +79,71 @@ def create(data):
                         'value': '',
                         'required': true,
                         'max_length': '',
-                        'data_type': '',
-                        'state': null,
-                        'feedback': ''
+                        'data_type': 'String'
                     }},
                     'STARK_Chart_Type': {{
                         'value': '',
                         'required': true,
                         'max_length': '',
-                        'data_type': '',
-                        'state': null,
-                        'feedback': ''
+                        'data_type': 'String'
                     }},
                     'STARK_X_Data_Source': {{
                         'value': '',
                         'required': true,
                         'max_length': '',
-                        'data_type': '',
-                        'state': null,
-                        'feedback': ''
+                        'data_type': 'String'
                     }},
                     'STARK_Y_Data_Source': {{
                         'value': '',
                         'required': true,
                         'max_length': '',
-                        'data_type': '',
+                        'data_type': 'String'
+                    }},
+                }},
+
+                validation_properties: {{
+                    '{pk_varname}': {{
+                        'state': null,
+                        'feedback': ''
+                    }},"""
+    
+    for col, col_type in cols.items():
+        col_varname = converter.convert_to_system_name(col)
+        data_type = set_data_type(col_type)
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_many_ux = col_type.get('has_many_ux', None)
+            if has_many_ux == None:
+                source_code += f"""
+                    '{col_varname}': {{
+                        'state': null,
+                        'feedback': ''
+                    }},""" 
+        else:
+            source_code += f"""
+                    '{col_varname}': {{
+                        'state': null,
+                        'feedback': ''
+                    }},""" 
+                    
+    source_code += f"""
+                    'STARK_Report_Type': {{
+                        'state': null,
+                        'feedback': ''
+                    }},
+                    'STARK_Chart_Type': {{
+                        'state': null,
+                        'feedback': ''
+                    }},
+                    'STARK_X_Data_Source': {{
+                        'state': null,
+                        'feedback': ''
+                    }},
+                    'STARK_Y_Data_Source': {{
                         'state': null,
                         'feedback': ''
                     }},
                 }},
-                
+
                 auth_config: {{ }},
 
                 auth_list: {{
@@ -325,15 +355,13 @@ def create(data):
                 STARK_group_by_1: '',
                 Y_Data: [],
                 showOperations: true,
-                many_entity: {{
-            """
+                many_entity: {{"""
             
     if relationships.get('has_many', '') != '':
         for relation in relationships.get('has_many'):
             if relation.get('type') == 'repeater':
                 many_entity = relation.get('entity')
                 many_entity_varname = converter.convert_to_system_name(many_entity)
-
                 source_code += f"""    
                     '{many_entity_varname}': many_{many_entity_varname},"""
     
@@ -368,8 +396,23 @@ def create(data):
         source_code += f", root.STARK_upload_elements"
 
     source_code += f""")
-                    this.metadata = response['new_metadata']
-                    if(response['is_valid_form']) {{
+                    this.validation_properties = response['validation_properties']"""
+    validation = ''
+    for col, col_type in cols.items():
+        if isinstance(col_type, dict):
+            col_varname = converter.convert_to_system_name(col)
+            col_values = col_type.get("values", "")
+            has_many_ux = col_type.get('has_many_ux', '')
+            if col_type["type"] == "relationship":
+                has_many = col_type.get('has_many', '')
+                if has_many != '':
+                    if has_many_ux == 'repeater':
+                        source_code += f"""
+                    many_{col_varname}_validation = many_{col_varname}.many_validation()"""
+                        validation += f" && many_{col_varname}_validation"
+                        
+    source_code += f"""
+                    if(response['is_valid_form']{validation}) {{
                         loading_modal.show()"""
     for col, col_type in cols.items():
         if isinstance(col_type, dict):
@@ -457,8 +500,23 @@ def create(data):
         source_code += f", root.STARK_upload_elements"
 
     source_code += f""")
-                    this.metadata = response['new_metadata']
-                    if(response['is_valid_form']) {{
+                    this.validation_properties = response['validation_properties']"""
+    validation = ''
+    for col, col_type in cols.items():
+        if isinstance(col_type, dict):
+            col_varname = converter.convert_to_system_name(col)
+            col_values = col_type.get("values", "")
+            has_many_ux = col_type.get('has_many_ux', '')
+            if col_type["type"] == "relationship":
+                has_many = col_type.get('has_many', '')
+                if has_many != '':
+                    if has_many_ux == 'repeater':
+                        source_code += f"""
+                    many_{col_varname}_validation = many_{col_varname}.many_validation()"""
+                        validation += f" && many_{col_varname}_validation"  
+                        
+    source_code += f"""
+                    if(response['is_valid_form']{validation}) {{
                         loading_modal.show()"""
     for col, col_type in cols.items():
         if isinstance(col_type, dict):
@@ -715,7 +773,7 @@ def create(data):
                         root.metadata['STARK_Y_Data_Source'].required = true
                     }}
                     response = STARK.validate_form(root.metadata, root.custom_report)
-                    this.metadata = response['new_metadata']
+                    this.validation_properties = response['validation_properties']
                     // console.log(response['is_valid_form'])
                     if(response['is_valid_form']) {{
                         if(root.custom_report.STARK_Report_Type == 'Graph') {{
