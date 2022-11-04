@@ -98,8 +98,11 @@ def create_handler(event, context):
             
         cgstatic_data = { "Entity": entity, "PK": pk, "Columns": cols, "Project Name": project_name, "Relationships": relationships, "Rel Model": rel_model }
         entity_varname = converter.convert_to_system_name(entity)
-
+        print('static rel_model')
+        print(rel_model)
         for rel in rel_model:
+            print('static rel_model')
+            print(rel_model)
             pk   = rel_model[rel]["pk"]
             cols = rel_model[rel]["data"]
             many_entity_varname = converter.convert_to_system_name(rel)

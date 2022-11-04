@@ -77,7 +77,6 @@ def create_handler(event, context):
         #Step 1: generate source code.
         #Step 1.1: extract relationship
         relationships = get_rel.get_relationship(models, entity)
-
         rel_model = {}
         for relationship in relationships.get('has_many', []):
             if relationship.get('type') == 'repeater':
