@@ -149,7 +149,9 @@ def create(data):
                     loading_modal.hide();
                 }});
             }}
-        }},
+        }},"""
+
+    source_code += f"""
         many_validation() {{
             is_valid_form = true
             for (let index = 0; index < this.module_fields.length; index++) {{
