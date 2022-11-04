@@ -26,12 +26,20 @@ def create(data):
     if is_many_control:
         state_control = f':state="many_entity.{entity_varname}.validation_properties[index].{col_varname}.state"'
         field_entity_varname = 'field'
+        file_upload_col_varname = f"{col_varname}[index]"
+        js_object = f'many_entity.{entity_varname}'
+        dot_compound = "."
+        s3_upload_index_param = ", index"
         rel_list = f'many_{entity_varname}'
         date_picker = f':id="{col_varname}[index]"'
     else:
         state_control = f':state="validation_properties.{col_varname}.state"'  
-        rel_list = f'root' 
         field_entity_varname = entity_varname
+        file_upload_col_varname = col_varname
+        dot_compound = ""
+        js_object = f'' 
+        s3_upload_index_param = ""
+        rel_list = f'root' 
         date_picker = f'id="{col_varname}"'
 
 
@@ -197,8 +205,8 @@ def create(data):
                             </b-form-group>
             """
         elif col_type["type"] == "file-upload":
-            html_code=f"""<b-form-file v-model="STARK_upload_elements.{col_varname}.file" :placeholder="STARK_upload_elements.{col_varname}.file" drop-placeholder="Drop file here..." @input="s3upload('{col_varname}')" v-b-hover="init_s3_access" onfocus="root.init_s3_access()" {state_control}></b-form-file>      
-                                <b-progress :value="STARK_upload_elements.{col_varname}.progress_bar_val" :max="100" class="mt-2"></b-progress>"""
+            html_code=f"""<b-form-file v-model="{js_object}{dot_compound}STARK_upload_elements.{file_upload_col_varname}.file" :placeholder="{js_object}{dot_compound}STARK_upload_elements.{file_upload_col_varname}.file" drop-placeholder="Drop file here..." @input="{js_object}{dot_compound}s3upload('{col_varname}'{s3_upload_index_param})" v-b-hover="init_s3_access" onfocus="root.init_s3_access()" {state_control}></b-form-file>      
+                                <b-progress :value="{js_object}{dot_compound}STARK_upload_elements.{file_upload_col_varname}.progress_bar_val" :max="100" class="mt-2"></b-progress>"""
         elif col_type["type"] == "relationship":
             has_one = col_type.get('has_one', '')
             has_many = col_type.get('has_many', '')
@@ -207,7 +215,7 @@ def create(data):
                 #simple 1-1 relationship
                 foreign_entity  = converter.convert_to_system_name(has_one)
 
-                html_code=f"""<b-form-select id="{col_varname}" v-model="{field_entity_varname}.{col_varname}" :options="lists.{col_varname}" onmouseover="{rel_list}.list_{foreign_entity}()" onfocus="{rel_list}.list_{foreign_entity}()" {state_control}>
+                html_code=f"""<b-form-select id="{col_varname}" v-model="{field_entity_varname}.{col_varname}" :options="lists.{col_varname}" onmouseover="root{dot_compound}{js_object}.list_{foreign_entity}()" onfocus="root{dot_compound}{js_object}.list_{foreign_entity}()" {state_control}>
                                 <template v-slot:first>
                                     <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
                                 </template>

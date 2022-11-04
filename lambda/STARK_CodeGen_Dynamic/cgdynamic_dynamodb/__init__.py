@@ -23,7 +23,9 @@ def create(data):
     pk_varname     = converter.convert_to_system_name(pk)
 
     default_sk     = entity_varname + "|info"
-    with_upload    = False
+    
+    with_upload         = False
+    with_upload_on_many = False
  
     #Create the column dict we'll use in the code as a declaration
     col_dict = '{ "pk": pk, "sk": sk, '
@@ -37,6 +39,15 @@ def create(data):
     dict_to_var_code = f"""pk = data.get('pk', '')
         sk = data.get('sk', '')    
         if sk == '': sk = default_sk"""
+
+    #Check for file upload in child if 1-M is available
+    for rel in rel_model:
+        rel_cols = rel_model[rel]["data"]
+        for rel_col, rel_col_type in rel_cols.items():
+            if isinstance(rel_col_type, dict):
+                if rel_col_type["type"] == 'file-upload': 
+                    with_upload_on_many = True
+
     for col, col_type in columns.items():
         col_varname = converter.convert_to_system_name(col)
         
@@ -70,7 +81,7 @@ def create(data):
         col_varname = converter.convert_to_system_name(col)
         update_expression += f"""#{col_varname} = :{col_varname}, """
     update_expression += " #STARKListViewsk = :STARKListViewsk"
-    if with_upload:
+    if with_upload or with_upload_on_many:
         update_expression += ", #STARK_uploaded_s3_keys = :STARK_uploaded_s3_keys"
 
     source_code = f"""\
@@ -456,7 +467,7 @@ def create(data):
                 #remove primary identifiers and STARK attributes
                 if not aggregate_report:
                     key.pop("sk")"""
-    if with_upload:
+    if with_upload or with_upload_on_many:
         source_code += f"""
                     key.pop("STARK uploaded s3 keys")"""
     source_code += f"""
@@ -552,7 +563,7 @@ def create(data):
                 response[entity] = result.get(sk, '').get('S')
         """
 
-    if with_upload : 
+    if with_upload or with_upload_on_many: 
         source_code +=f"""
         response['object_url_prefix'] = bucket_url + entity_upload_dir"""
     source_code+= f"""
@@ -638,13 +649,23 @@ def create(data):
             db_handler = ddb           
         {dict_to_var_code}"""
 
-    if with_upload:
+    if with_upload or with_upload_on_many:
         source_code += f"""
         temp_s3_keys = data.get('STARK_uploaded_s3_keys', {{}}) 
         STARK_uploaded_s3_keys = {{}}
         for key, items in temp_s3_keys.items():
-            STARK_uploaded_s3_keys[key] = {{ 'S' : items }}
-            utilities.copy_object_to_bucket(items, entity_upload_dir)
+            upload_data = {{}}
+            if isinstance(items, dict):
+                upload_dict_data = {{}}
+                for sub_key, sub_items in items.items():
+                    upload_dict_data[sub_key] = {{'SS':sub_items}}
+                    for s3_key in sub_items:
+                        utilities.copy_object_to_bucket(s3_key, entity_upload_dir)
+                upload_data = {{'M': upload_dict_data}}
+            else:  
+                utilities.copy_object_to_bucket(items, entity_upload_dir)
+                upload_data = {{'S': items}}
+            STARK_uploaded_s3_keys[key] = upload_data
         """
     source_code += f"""
         UpdateExpressionString = "SET {update_expression}" 
@@ -655,7 +676,7 @@ def create(data):
         source_code +=f"""
             '#{col_varname}' : '{col_varname}',"""  
     
-    if with_upload:
+    if with_upload or with_upload_on_many:
         source_code += f"""
             '#STARK_uploaded_s3_keys': 'STARK_uploaded_s3_keys',"""
     source_code += f"""
@@ -670,7 +691,7 @@ def create(data):
         source_code +=f"""
             ':{col_varname}' : {{'{col_type_id}' : {col_varname} }},"""  
 
-    if with_upload:
+    if with_upload or with_upload_on_many:
         source_code += f"""
             ':STARK_uploaded_s3_keys': {{'M': STARK_uploaded_s3_keys }},"""
     source_code += f"""
@@ -746,13 +767,23 @@ def create(data):
             db_handler = ddb
         {dict_to_var_code}"""
 
-    if with_upload:
+    if with_upload or with_upload_on_many:
         source_code += f"""
         temp_s3_keys = data.get('STARK_uploaded_s3_keys', {{}}) 
         STARK_uploaded_s3_keys = {{}}
         for key, items in temp_s3_keys.items():
-            STARK_uploaded_s3_keys[key] = {{ 'S' : items }}
-            utilities.copy_object_to_bucket(items, entity_upload_dir)
+            upload_data = {{}}
+            if isinstance(items, dict):
+                upload_dict_data = {{}}
+                for sub_key, sub_items in items.items():
+                    upload_dict_data[sub_key] = {{'SS':sub_items}}
+                    for s3_key in sub_items:
+                        utilities.copy_object_to_bucket(s3_key, entity_upload_dir)
+                upload_data = {{'M': upload_dict_data}}
+            else:  
+                utilities.copy_object_to_bucket(items, entity_upload_dir)
+                upload_data = {{'S': items}}
+            STARK_uploaded_s3_keys[key] = upload_data
         """
     source_code += f"""
         item={{}}
@@ -766,7 +797,7 @@ def create(data):
         source_code +=f"""
         item['{col_varname}'] = {{'{col_type_id}' : {col_varname}}}"""
 
-    if with_upload:
+    if with_upload or with_upload_on_many:
         source_code += f"""
         item['STARK_uploaded_s3_keys'] = {{'M' : STARK_uploaded_s3_keys}}"""
 
@@ -851,9 +882,22 @@ def create(data):
         source_code +=f"""
         item['{col_varname}'] = record.get('{col_varname}',{{}}).get('{col_type_id}','')"""
 
-    if with_upload:
+    if with_upload or with_upload_on_many:
         source_code += f"""
-        item['STARK_uploaded_s3_keys'] = record.get('STARK_uploaded_s3_keys',{{}}).get('M',{{}})"""
+        STARK_uploaded_s3_keys = {{}}
+
+        for key, map_item in (record.get('STARK_uploaded_s3_keys',{{}}).get('M',{{}})).items():
+            for sub_key, sub_map_item in map_item.items():
+                if sub_key == 'S':
+                    STARK_uploaded_s3_keys[key] = sub_map_item
+                elif sub_key == 'M':
+                    for third_key, third_item in sub_map_item.items():
+                        if key in STARK_uploaded_s3_keys:
+                            STARK_uploaded_s3_keys[key].update({{third_key: third_item['SS']}}) 
+                        else:
+                            STARK_uploaded_s3_keys[key] = {{third_key: third_item['SS']}}
+
+        item['STARK_uploaded_s3_keys'] = STARK_uploaded_s3_keys"""
     source_code += f"""
         return item
 

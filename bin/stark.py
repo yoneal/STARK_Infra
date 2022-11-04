@@ -298,7 +298,7 @@ elif construct_type == 'create-certificate':
             iteration = 1
             while domain_validation_options == None:
                 if new_cert:
-                    print("\rFetching validation requirements", "." * iteration, end ="")
+                    print("\rFetching validation requirements", "." * iteration, end ="", sep='')
                 response = acm.describe_certificate(CertificateArn=viewer_certificate_arn)
                 domain_validation_options = response.get('Certificate').get('DomainValidationOptions')[0].get("ResourceRecord", None)
                 iteration += 1

@@ -77,19 +77,17 @@ def create_handler(event, context):
         #Step 1: generate source code.
         #Step 1.1: extract relationship
         relationships = get_rel.get_relationship(models, entity)
-        print(relationships)
-        for index, items in relationships.items():
-            if len(items) > 0:
-                for key in items:
-                    for value in key:
-                        key[value] = converter.convert_to_system_name(key[value])
-        print(relationships)
         rel_model = {}
         for relationship in relationships.get('has_many', []):
             if relationship.get('type') == 'repeater':
                 rel_col = models.get(relationship.get('entity'), '')
                 rel_model.update({(relationship.get('entity')) : rel_col})
-
+        #FIXME: For double checking 
+        for index, items in relationships.items():
+            if len(items) > 0:
+                for key in items:
+                    for value in key:
+                        key[value] = converter.convert_to_system_name(key[value])
         data = {
                 "Entity": entity, 
                 "Columns": models[entity]["data"], 

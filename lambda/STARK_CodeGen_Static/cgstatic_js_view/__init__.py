@@ -28,9 +28,17 @@ def create(data):
 
     #file upload controls
     with_upload         = False
+    with_upload_on_many = False
     ext_string          = ""
     allowed_size_string = ""
     upload_elems_string = ""
+    
+    for rel in rel_model:
+        rel_cols = rel_model[rel]["data"]
+        for rel_col, rel_col_type in rel_cols.items():
+            if isinstance(rel_col_type, dict):
+                if rel_col_type["type"] == 'file-upload': 
+                    with_upload_on_many = True
 
     source_code = f"""\
         var root = new Vue({{
@@ -320,9 +328,11 @@ def create(data):
                          "{col_varname}": {int(temp_split[0])},"""
                 upload_elems_string += f"""
                         "{col_varname}": {{"file": '', "progress_bar_val": 0}},"""
+    if with_upload or with_upload_on_many:
+        source_code += f"""
+                s3_access: "","""
     if with_upload:
         source_code += f"""
-                s3_access: "",
                 STARK_upload_elements: {{{upload_elems_string}
                 }},
                 ext_whitelist: {{{ext_string}
@@ -354,6 +364,7 @@ def create(data):
                 many_entity_varname = converter.convert_to_system_name(many_entity)
                 source_code += f"""    
                     '{many_entity_varname}': many_{many_entity_varname},"""
+    
     source_code += f"""
                 }},
             }},
@@ -414,6 +425,15 @@ def create(data):
                     if has_many_ux == 'repeater':
                         source_code += f"""
                         this.{entity_varname}.{col_varname} = JSON.stringify(root.many_entity.{col_varname}.module_fields)"""
+
+                    if with_upload_on_many:
+                        source_code += f"""
+                        for (const key in root.many_entity) {{
+                            if (Object.hasOwnProperty.call(root.many_entity, key)) {{
+                                var element = root.many_entity[key];
+                                this.Transaction.STARK_uploaded_s3_keys[`many_${{key}}`] = element.STARK_uploaded_s3_keys
+                            }}
+                        }}"""
                         
     source_code += f"""    
                         let data = {{ {entity_varname}: this.{entity_varname} }}
@@ -548,6 +568,12 @@ def create(data):
 
                     if(data['{pk_varname}'] == null) {{
                         root.show();
+                        for (const key in root.many_entity) {{
+                            if (Object.hasOwnProperty.call(root.many_entity, key)) {{
+                                var element = root.many_entity[key];
+                                element.add_row()
+                            }}
+                        }}
                     }}
                     else {{
                         loading_modal.show();
@@ -560,10 +586,10 @@ def create(data):
         col_varname = converter.convert_to_system_name(col)
         if isinstance(col_type, dict) and col_type['type'] == 'file-upload':
             source_code += f"""
-                            root.{entity_varname}.STARK_uploaded_s3_keys['{col_varname}'] = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.STARK_uploaded_s3_keys.{col_varname}.S : ""
-                            root.STARK_upload_elements['{col_varname}'].file              = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.{col_varname} : ""
-                            root.STARK_upload_elements['{col_varname}'].progress_bar_val  = root.{entity_varname}.{col_varname} != "" ? 100 : 0
-                            root.object_url_prefix                                           = data['object_url_prefix']
+                            root.{entity_varname}.STARK_uploaded_s3_keys['{col_varname}'] = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.STARK_uploaded_s3_keys.{col_varname} : ""
+                            root.STARK_upload_elements['{col_varname}'].file = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.{col_varname} : ""
+                            root.STARK_upload_elements['{col_varname}'].progress_bar_val = root.{entity_varname}.{col_varname} != "" ? 100 : 0
+                            
                             """
 
     #If there are 1:1 rel fields, we need to assign their initial value to the still-unpopulated drop-down list so that it displays 
@@ -592,20 +618,24 @@ def create(data):
     for rel, rel_data in rel_model.items():
         col_varname = converter.convert_to_system_name(rel)
         source_code += f"""
-                            if(data["{col_varname}"].length > 0) {{
-                                var module_data = JSON.parse(data["{col_varname}"])
-                                root.many_entity.{col_varname}.module_fields = []
-                                module_data.forEach(element => {{
-                                    root.many_entity.{col_varname}.add_field(element) 
+                            if(data["{col_varname}"].length > 0) {{"""
+        if with_upload_on_many:
+            source_code += f"""
+                                root.many_entity.{col_varname}.STARK_uploaded_s3_keys = root.{entity_varname}.STARK_uploaded_s3_keys['many_{col_varname}']"""
+        source_code += f"""
+                                var many_object = JSON.parse(data["{col_varname}"])
+                                many_object.forEach(element => {{
+                                    root.many_entity.{col_varname}.add_row(element)
                                 }});
                             }}"""
         for col, col_type in rel_data.get('data').items():
             if isinstance(col_type, dict) and col_type["type"] == "relationship":
-                print(rel)
                 rel_foreign_entity = converter.convert_to_system_name(col)
                 source_code += f"""
-                            many_{col_varname}.list_{rel_foreign_entity}()"""
-                
+                            root.many_entity.{col_varname}.list_{rel_foreign_entity}()"""
+    if with_upload or with_upload_on_many:
+        source_code += f"""
+                            root.object_url_prefix = data['object_url_prefix']"""
     source_code += f"""
                             console.log("VIEW: Retreived module data.")
                             root.show()
@@ -867,68 +897,11 @@ def create(data):
                     root.checked_fields = checked ? root.temp_checked_fields.slice() : []
                     root.all_selected = checked
                 }},"""
-    if with_upload:
+    if with_upload or with_upload_on_many:
         source_code += f"""
-                process_upload_file(file_upload_element) {{
-                    var upload_processed = {{
-                            'message': 'initial'
-                        }}
-                    var uuid = ""
-                    var ext = ""
-                    var file = root.STARK_upload_elements[file_upload_element].file;
-                    is_valid = true;
-                    error_message = ""
-
-                    if(file)
-                    {{
-                        if(typeof root.{entity_varname}.STARK_uploaded_s3_keys[file_upload_element] == 'undefined')
-                        {{
-                            uuid = STARK.create_UUID()
-                            ext = file.name.split('.').pop()
-                        }}
-                        else
-                        {{
-                            var s3_key = root.{entity_varname}.STARK_uploaded_s3_keys[file_upload_element]
-                            uuid = s3_key.split('.').shift()
-                            ext = file.name.split('.').pop()
-                        }}
-
-                        valid_file = STARK.get_file_ext_whitelist(root.ext_whitelist[file_upload_element], root.ext_whitelist_table).split(", ").includes(ext)
-                        allowed_file_size = STARK.get_allowed_upload_size(root.allowed_size[file_upload_element], root.allowed_size_table)
-                        if(!valid_file)
-                        {{
-                            //check if file type is valid
-                            error_message = `Invalid file type: ${{ext.toUpperCase()}}`
-                        }}
-                        else if(file.size > allowed_file_size)
-                        {{
-                            // check if file size is allowed
-                            error_message = `Uploaded file exceeded allowed file size of ${{allowed_file_size / 1024 / 1024}}MB`
-                        }}
-
-                        if(error_message == "")
-                        {{
-                            upload_processed = {{
-                                'message'   : error_message,
-                                'file_body' : file,
-                                'filename'  : file.name,
-                                's3_key'    : uuid + '.' + ext
-                            }}
-                        }}
-                        else
-                        {{
-                            upload_processed = {{
-                                'message'   : error_message
-                            }}
-                        }}
-                    }}
-
-                    return upload_processed
-                }},
                 init_s3_access: function(){{
 
-                    if(root.s3_access == "")
-                    {{
+                    if(root.s3_access == "") {{
                         STARK.get_s3_credentials().then( function(data){{
                             access_key_id = data[0]['access_key_id']
                             secret_access_key = data[0]['secret_access_key']
@@ -947,13 +920,63 @@ def create(data):
                         }});
                     }}
                     
+                }},"""
+    if with_upload:
+        source_code += f"""
+                process_upload_file(file_upload_element) {{
+                    var upload_processed = {{
+                            'message': 'initial'
+                        }}
+                    var uuid = ""
+                    var ext = ""
+                    var file = root.STARK_upload_elements[file_upload_element].file;
+                    is_valid = true;
+                    error_message = ""
+
+                    if(file) {{
+                        if(typeof root.{entity_varname}.STARK_uploaded_s3_keys[file_upload_element] == 'undefined') {{
+                            uuid = STARK.create_UUID()
+                            ext = file.name.split('.').pop()
+                        }}
+                        else {{
+                            var s3_key = root.{entity_varname}.STARK_uploaded_s3_keys[file_upload_element]
+                            uuid = s3_key.split('.').shift()
+                            ext = file.name.split('.').pop()
+                        }}
+
+                        valid_file = STARK.get_file_ext_whitelist(root.ext_whitelist[file_upload_element], root.ext_whitelist_table).split(", ").includes(ext)
+                        allowed_file_size = STARK.get_allowed_upload_size(root.allowed_size[file_upload_element], root.allowed_size_table)
+                        if(!valid_file) {{
+                            //check if file type is valid
+                            error_message = `Invalid file type: ${{ext.toUpperCase()}}`
+                        }}
+                        else if(file.size > allowed_file_size) {{
+                            // check if file size is allowed
+                            error_message = `Uploaded file exceeded allowed file size of ${{allowed_file_size / 1024 / 1024}}MB`
+                        }}
+
+                        if(error_message == "") {{
+                            upload_processed = {{
+                                'message'   : error_message,
+                                'file_body' : file,
+                                'filename'  : file.name,
+                                's3_key'    : uuid + '.' + ext
+                            }}
+                        }}
+                        else {{
+                            upload_processed = {{
+                                'message'   : error_message
+                            }}
+                        }}
+                    }}
+
+                    return upload_processed
                 }},
                 s3upload: function(file_upload_element) {{
 
                     root.STARK_upload_elements[file_upload_element].progress_bar_val = 0
                     var upload_processed = root.process_upload_file(file_upload_element)
-                    if(upload_processed['message'] == "")
-                    {{
+                    if(upload_processed['message'] == "") {{
                         root.{entity_varname}[file_upload_element] = upload_processed['filename']
                         var filePath = 'tmp/' + upload_processed['s3_key'];
                         root.{entity_varname}.STARK_uploaded_s3_keys[file_upload_element] = upload_processed['s3_key']
@@ -972,11 +995,9 @@ def create(data):
                             root.metadata[file_upload_element].feedback = "" 
                         }});
                     }}
-                    else
-                    {{
+                    else {{
                         //do not show alert when file upload is opened then closed
-                        if(upload_processed['message'] != 'initial')
-                        {{
+                        if(upload_processed['message'] != 'initial') {{
                             root.metadata[file_upload_element].state = false
                             root.metadata[file_upload_element].feedback = upload_processed['message'] 
                         }}
@@ -1374,6 +1395,9 @@ def set_data_type(col_type):
         
         if col_type["type"] in [ "tags", "multiple choice" ]:
             data_type = 'List'
+
+        if col_type["type"] == 'file-upload':
+            data_type = 'File'
     
     elif col_type in [ "int", "number" ]:
         data_type = 'Number'
