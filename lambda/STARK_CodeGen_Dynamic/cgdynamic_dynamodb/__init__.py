@@ -658,7 +658,7 @@ def create(data):
             if isinstance(items, dict):
                 upload_dict_data = {{}}
                 for sub_key, sub_items in items.items():
-                upload_dict_data[sub_key] = {{'S':'||'.join(sub_items)}}
+                    upload_dict_data[sub_key] = {{'S':'||'.join(sub_items)}}
                     for s3_key in sub_items:
                         utilities.copy_object_to_bucket(s3_key, entity_upload_dir)
                 upload_data = {{'M': upload_dict_data}}
@@ -776,7 +776,7 @@ def create(data):
             if isinstance(items, dict):
                 upload_dict_data = {{}}
                 for sub_key, sub_items in items.items():
-                upload_dict_data[sub_key] = {{'S':'||'.join(sub_items)}}
+                    upload_dict_data[sub_key] = {{'S':'||'.join(sub_items)}}
                     for s3_key in sub_items:
                         utilities.copy_object_to_bucket(s3_key, entity_upload_dir)
                 upload_data = {{'M': upload_dict_data}}
