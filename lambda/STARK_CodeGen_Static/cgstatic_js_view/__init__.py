@@ -304,6 +304,8 @@ def create(data):
             has_many_ux = col_type.get('has_many_ux', None)
             if has_many_ux == None:
                 field_strings += f"""'{col}',"""
+        else:
+            field_strings += f"""'{col}',"""
     field_strings += f"""]"""
     source_code += f"""
                 temp_checked_fields: {field_strings},
