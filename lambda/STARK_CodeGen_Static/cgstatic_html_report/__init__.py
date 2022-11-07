@@ -140,6 +140,38 @@ def create(data):
                                             </td>
                                         </tr>
                                     """
+        else:
+            source_code += f"""
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col}" id="{col_varname}" v-model="checked_fields">
+                                            </td>
+                                            <td>
+                                                    <label for="{col_varname}">{col}</label>
+                                            </td>
+                                            <td>
+                                                <b-form-select id="{col_varname}_operator" :options="lists.Report_Operator" v-model="custom_report.{col_varname}.operator">
+                                                    <template v-slot:first>
+                                                        <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
+                                                    </template>
+                                                </b-form-select>
+                                            </td>
+                                            <td>
+                                                <div class="report">
+                                                    {html_control_code}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="Sum_of_{col_varname}" v-model="custom_report.STARK_sum_fields" :disabled="metadata.{col_varname}.data_type != 'Number' && metadata.{col_varname}.data_type != 'Float'" onchange="root.set_y_data_source('Sum_of_{col_varname}')">
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="Count_of_{col_varname}" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_{col_varname}')">
+                                            </td>
+                                            <td>
+                                                <input type="radio" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="{col_varname}" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('{col_varname}')">
+                                            </td>
+                                        </tr>
+                                    """
 
     source_code += f"""
                                     </table>    

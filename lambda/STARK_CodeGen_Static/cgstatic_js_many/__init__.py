@@ -322,10 +322,7 @@ def create(data):
             return upload_processed
         }},
         
-        remove_field: function (index) {{
-            this.module_fields.splice(index, 1);       
-            this.validation_properties.splice(index, 1);       
-        }},  
+         
         """
 
     
