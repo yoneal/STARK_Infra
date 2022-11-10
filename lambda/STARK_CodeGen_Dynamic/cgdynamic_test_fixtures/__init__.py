@@ -46,7 +46,7 @@ def create(data):
         payload['{col_varname}'] = {test_data}"""
 
         raw_rpt_payload_string += f"""
-        payload['{col_varname}'] = {{'operator': "",'type': "{col_type_id}",'value': ""}},"""
+            '{col_varname}': {{'operator': "",'type': "{col_type_id}",'value': ""}},"""
 
         report_field_string += f""""{col_varname}", """
         
@@ -88,11 +88,11 @@ def create(data):
                 'STARK_count_fields' : [],
                 'STARK_group_by_1' : "",
                 'STARK_isReport' : True,
-                'STARK_report_fields': [{report_field_string}{pk_varname}],
+                'STARK_report_fields': [{report_field_string}'{pk_varname}'],
                 'STARK_sum_fields': []
             }}
         }}
-    return raw_payload
+        return raw_payload
 
 
         """
