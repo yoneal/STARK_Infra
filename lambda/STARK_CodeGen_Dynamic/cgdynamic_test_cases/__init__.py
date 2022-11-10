@@ -96,7 +96,7 @@ def create(data):
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         set_{entity_to_lower}_payload['pk'] = 'Test1'
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
-        response  = {entity_to_lower}.get_all('{entity_varname}|Listview', None, ddb)
+        response  = {entity_to_lower}.get_all('{entity_varname}|info', None, ddb)
         # print(response)
         assert len(response[0]) == 4
 
@@ -122,7 +122,7 @@ def create(data):
         monkeypatch.setattr({entity_to_lower}, "cascade_pk_change_to_child", mock_cascade_pk_change_to_child)
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         {entity_to_lower}.delete(set_{entity_to_lower}_payload, ddb)
-        response  = {entity_to_lower}.get_all('{entity_varname}|Listview', None, ddb)
+        response  = {entity_to_lower}.get_all('{entity_varname}|info', None, ddb)
         assert len(response[0]) == 0
     
     def test_lambda_handler_rt_fail():
@@ -166,7 +166,7 @@ def create(data):
         assert '"Could not handle API request"' == response['body']
         
     def test_lambda_handler_method_report_fail(get_customer_raw_report_payload):
-        get_customer_raw_report_payload['{entity}']['{pk_varname}']['operator'] = ''
+        get_customer_raw_report_payload['{entity_varname}']['{pk_varname}']['operator'] = ''
         event = {{
             'requestContext':{{
                 'http': {{'method':"POST"}}
@@ -285,7 +285,7 @@ def create(data):
         {entity_to_lower}.lambda_handler(event, '')
 
     def test_lambda_handler_edit_add(get_customer_raw_payload, set_customer_payload, monkeypatch):
-        get_customer_raw_payload['{entity}']['{pk_varname}'] = 'Test1'
+        get_customer_raw_payload['{entity_varname}']['{pk_varname}'] = 'Test1'
         event = {{
             'requestContext':{{
                 'http':{{'method':"PUT"}}
