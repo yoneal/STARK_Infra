@@ -154,35 +154,35 @@ def create(data):
     
         assert '"Client payload missing"' == response['body']
         
-    def test_lambda_handler_method_fail(get_customer_raw_payload):
+    def test_lambda_handler_method_fail(get_{entity_to_lower}_raw_payload):
         event = {{
             'requestContext':{{
                 'http': {{'method':"POSTS"}}
                 }},
-            'body':json.dumps(get_customer_raw_payload)
+            'body':json.dumps(get_{entity_to_lower}_raw_payload)
             }}
         response = {entity_to_lower}.lambda_handler(event, '')
 
         assert '"Could not handle API request"' == response['body']
         
-    def test_lambda_handler_method_report_fail(get_customer_raw_report_payload):
-        get_customer_raw_report_payload['{entity_varname}']['{pk_varname}']['operator'] = ''
+    def test_lambda_handler_method_report_fail(get_{entity_to_lower}_raw_report_payload):
+        get_{entity_to_lower}_raw_report_payload['{entity_varname}']['{pk_varname}']['operator'] = ''
         event = {{
             'requestContext':{{
                 'http': {{'method':"POST"}}
                 }},
-            'body':json.dumps(get_customer_raw_report_payload)
+            'body':json.dumps(get_{entity_to_lower}_raw_report_payload)
             }}
         response = {entity_to_lower}.lambda_handler(event, '')
 
         assert '"Missing operators"' == response['body']
         
-    def test_lambda_handler_delete_unauthorized(get_customer_raw_payload,monkeypatch):
+    def test_lambda_handler_delete_unauthorized(get_{entity_to_lower}_raw_payload,monkeypatch):
         event = {{
             'requestContext':{{
                 'http': {{'method':"DELETE"}}
                 }},
-            'body':json.dumps(get_customer_raw_payload)
+            'body':json.dumps(get_{entity_to_lower}_raw_payload)
             }}
         def mock_is_authorized(permission, event, ddb):
             return False
@@ -193,12 +193,12 @@ def create(data):
     
         assert '"Could not find {entity}|delete for test_user"' == response['body']
         
-    def test_lambda_handler_edit_unauthorized(get_customer_raw_payload, monkeypatch):
+    def test_lambda_handler_edit_unauthorized(get_{entity_to_lower}_raw_payload, monkeypatch):
         event = {{
             'requestContext':{{
                 'http': {{'method':"PUT"}}
                 }},
-            'body':json.dumps(get_customer_raw_payload)
+            'body':json.dumps(get_{entity_to_lower}_raw_payload)
             }}
         def mock_is_authorized(permission, event, ddb):
             return False
@@ -209,12 +209,12 @@ def create(data):
         
         assert '"Could not find {entity}|edit for test_user"' == response['body']
 
-    def test_lambda_handler_add_unauthorized(get_customer_raw_payload, monkeypatch):
+    def test_lambda_handler_add_unauthorized(get_{entity_to_lower}_raw_payload, monkeypatch):
         event = {{
             'requestContext':{{
                 'http': {{'method':"POST"}}
                 }},
-            'body':json.dumps(get_customer_raw_payload)
+            'body':json.dumps(get_{entity_to_lower}_raw_payload)
             }}
         def mock_is_authorized(permission, event, ddb):
             return False
@@ -225,12 +225,12 @@ def create(data):
         
         assert '"Could not find {entity}|add for test_user"' == response['body']
 
-    def test_lambda_handler_report_unauthorized(get_customer_raw_report_payload, monkeypatch):
+    def test_lambda_handler_report_unauthorized(get_{entity_to_lower}_raw_report_payload, monkeypatch):
         event = {{
             'requestContext':{{
                 'http':{{'method':"POST"}}
                 }},
-            'body':json.dumps(get_customer_raw_report_payload)
+            'body':json.dumps(get_{entity_to_lower}_raw_report_payload)
             }}
         def mock_is_authorized(permission, event, ddb):
             return False
@@ -241,31 +241,31 @@ def create(data):
         
         assert '"Could not find {entity}|report for test_user"' == response['body']
 
-    def test_lambda_handler_delete(get_customer_raw_payload, set_customer_payload, monkeypatch):
+    def test_lambda_handler_delete(get_{entity_to_lower}_raw_payload, set_{entity_to_lower}_payload, monkeypatch):
         event = {{
             'requestContext':{{
                 'http':{{'method':"DELETE"}}
                 }},
-            'body':json.dumps(get_customer_raw_payload)
+            'body':json.dumps(get_{entity_to_lower}_raw_payload)
             }}
 
         def mock_is_authorized(permission, event, ddb):
             return True
 
         def mock_delete(data):
-            assert set_customer_payload == data
+            assert set_{entity_to_lower}_payload == data
             return "OK"
 
         monkeypatch.setattr(security, "is_authorized", mock_is_authorized)
         monkeypatch.setattr({entity_to_lower}, "delete", mock_delete)
         {entity_to_lower}.lambda_handler(event, '')
         
-    def test_lambda_handler_edit(get_customer_raw_payload, set_customer_payload, monkeypatch):
+    def test_lambda_handler_edit(get_{entity_to_lower}_raw_payload, set_{entity_to_lower}_payload, monkeypatch):
         event = {{
             'requestContext':{{
                 'http':{{'method':"PUT"}}
                 }},
-            'body':json.dumps(get_customer_raw_payload)
+            'body':json.dumps(get_{entity_to_lower}_raw_payload)
             }}
 
         def mock_is_authorized(permission, event, ddb):
@@ -276,7 +276,7 @@ def create(data):
 
         def mock_edit(data):
             data.pop('{pk_varname}')
-            assert set_customer_payload == data
+            assert set_{entity_to_lower}_payload == data
             return "OK"
 
         monkeypatch.setattr(security, "is_authorized", mock_is_authorized)
@@ -284,13 +284,13 @@ def create(data):
         monkeypatch.setattr({entity_to_lower}, "edit", mock_edit)
         {entity_to_lower}.lambda_handler(event, '')
 
-    def test_lambda_handler_edit_add(get_customer_raw_payload, set_customer_payload, monkeypatch):
-        get_customer_raw_payload['{entity_varname}']['{pk_varname}'] = 'Test1'
+    def test_lambda_handler_edit_add(get_{entity_to_lower}_raw_payload, set_{entity_to_lower}_payload, monkeypatch):
+        get_{entity_to_lower}_raw_payload['{entity_varname}']['{pk_varname}'] = 'Test1'
         event = {{
             'requestContext':{{
                 'http':{{'method':"PUT"}}
                 }},
-            'body':json.dumps(get_customer_raw_payload)
+            'body':json.dumps(get_{entity_to_lower}_raw_payload)
             }}
 
         def mock_is_authorized(permission, event, ddb):
@@ -301,14 +301,14 @@ def create(data):
 
         def mock_add(data, method):
             data.pop('{pk_varname}')
-            set_customer_payload['pk'] = 'Test1'
-            set_customer_payload['STARK-ListView-sk'] = 'Test1'
-            assert set_customer_payload == data
+            set_{entity_to_lower}_payload['pk'] = 'Test1'
+            set_{entity_to_lower}_payload['STARK-ListView-sk'] = 'Test1'
+            assert set_{entity_to_lower}_payload == data
             return "OK"
 
         def mock_delete(data):
-            set_customer_payload['pk'] = 'Test2'
-            assert set_customer_payload == data
+            set_{entity_to_lower}_payload['pk'] = 'Test2'
+            assert set_{entity_to_lower}_payload == data
             return "OK"
 
         monkeypatch.setattr(security, "is_authorized", mock_is_authorized)
@@ -317,12 +317,12 @@ def create(data):
         monkeypatch.setattr({entity_to_lower}, "delete", mock_delete)
         {entity_to_lower}.lambda_handler(event, '')
 
-    def test_lambda_handler_add(get_customer_raw_payload, set_customer_payload, monkeypatch):
+    def test_lambda_handler_add(get_{entity_to_lower}_raw_payload, set_{entity_to_lower}_payload, monkeypatch):
         event = {{
             'requestContext':{{
                 'http':{{'method':"POST"}}
                 }},
-            'body':json.dumps(get_customer_raw_payload)
+            'body':json.dumps(get_{entity_to_lower}_raw_payload)
             }}
 
         def mock_is_authorized(permission, event, ddb):
@@ -333,7 +333,7 @@ def create(data):
 
         def mock_add(data):
             data.pop('{pk_varname}')
-            assert set_customer_payload == data
+            assert set_{entity_to_lower}_payload == data
             return "OK"
 
 
