@@ -17,6 +17,7 @@ def create(data):
     ddb_table_name = data["DynamoDB Name"]
     bucket_name    = data['Bucket Name']
     relationships  = data["Relationships"]
+    rel_model      = data["Rel Model"]
     
     #Convert human-friendly names to variable-friendly names
     entity_varname  = converter.convert_to_system_name(entity)
@@ -25,6 +26,14 @@ def create(data):
 
     default_sk     = entity_varname + "|info"
     with_upload    = False
+
+    cascade_function_string = ""
+
+    if len(relationships) > 0:
+        cascade_function_string = f"""
+        {cascade_function_string}
+        """
+
     col_list = []
     for keys in columns:
         col_list.append(keys)
@@ -64,9 +73,7 @@ def create(data):
     def test_add(use_moto,set_{entity_to_lower}_payload, monkeypatch):
         use_moto()
         ddb = boto3.client('dynamodb', region_name=core.test_region)
-        def mock_cascade_pk_change_to_child(data, entity, attribute):
-            return 'OK'
-        monkeypatch.setattr({entity_to_lower}, "cascade_pk_change_to_child", mock_cascade_pk_change_to_child)
+        {cascade_function_string}
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         assert  {entity_to_lower}.resp_obj['ResponseMetadata']['HTTPStatusCode'] == 200
         
@@ -74,9 +81,7 @@ def create(data):
     def test_get_by_pk(use_moto,set_{entity_to_lower}_payload, monkeypatch):
         use_moto()
         ddb = boto3.client('dynamodb', region_name=core.test_region)
-        def mock_cascade_pk_change_to_child(data, entity, attribute):
-            return 'OK'
-        monkeypatch.setattr({entity_to_lower}, "cascade_pk_change_to_child", mock_cascade_pk_change_to_child)
+        {cascade_function_string}
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         response  = {entity_to_lower}.get_by_pk(set_{entity_to_lower}_payload['pk'], set_{entity_to_lower}_payload['sk'], ddb)
 
@@ -86,9 +91,7 @@ def create(data):
     def test_get_all(use_moto,set_{entity_to_lower}_payload, monkeypatch):
         use_moto()
         ddb = boto3.client('dynamodb', region_name=core.test_region)
-        def mock_cascade_pk_change_to_child(data, entity, attribute):
-            return 'OK'
-        monkeypatch.setattr({entity_to_lower}, "cascade_pk_change_to_child", mock_cascade_pk_change_to_child)
+        {cascade_function_string}
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         set_{entity_to_lower}_payload['pk'] = 'Test3'
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
@@ -96,7 +99,7 @@ def create(data):
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         set_{entity_to_lower}_payload['pk'] = 'Test1'
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
-        response  = {entity_to_lower}.get_all('{entity_varname}|info', None, ddb)
+        response  = {entity_to_lower}.get_all('{default_sk}', None, ddb)
         # print(response)
         assert len(response[0]) == 4
 
@@ -104,9 +107,7 @@ def create(data):
     def test_edit(use_moto,set_{entity_to_lower}_payload, monkeypatch):
         use_moto()
         ddb = boto3.client('dynamodb', region_name=core.test_region)
-        def mock_cascade_pk_change_to_child(data, entity, attribute):
-            return 'OK'
-        monkeypatch.setattr({entity_to_lower}, "cascade_pk_change_to_child", mock_cascade_pk_change_to_child)
+        {cascade_function_string}
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         set_{entity_to_lower}_payload['{col_to_edit_varname}'] = {test_data_for_edit}
         {entity_to_lower}.edit(set_{entity_to_lower}_payload, ddb)
@@ -117,12 +118,10 @@ def create(data):
     def test_delete(use_moto,set_{entity_to_lower}_payload, monkeypatch):
         use_moto()
         ddb = boto3.client('dynamodb', region_name=core.test_region)
-        def mock_cascade_pk_change_to_child(data, entity, attribute):
-            return 'OK'
-        monkeypatch.setattr({entity_to_lower}, "cascade_pk_change_to_child", mock_cascade_pk_change_to_child)
+        {cascade_function_string}
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         {entity_to_lower}.delete(set_{entity_to_lower}_payload, ddb)
-        response  = {entity_to_lower}.get_all('{entity_varname}|info', None, ddb)
+        response  = {entity_to_lower}.get_all('{default_sk}', None, ddb)
         assert len(response[0]) == 0
     
     def test_lambda_handler_rt_fail():
@@ -140,7 +139,7 @@ def create(data):
         def mock_get_by_pk(pk, sk):
             return "always success"
         monkeypatch.setattr({entity_to_lower}, "get_by_pk", mock_get_by_pk)
-        response = {entity_to_lower}.lambda_handler({{'queryStringParameters':{{'rt':'detail','{pk_varname}':'0001', 'sk': '{entity}|info'}}}}, '')
+        response = {entity_to_lower}.lambda_handler({{'queryStringParameters':{{'rt':'detail','{pk_varname}':'0001', 'sk': '{default_sk}'}}}}, '')
         assert 200 == response['statusCode']
         
     def test_lambda_handler_method_no_payload():

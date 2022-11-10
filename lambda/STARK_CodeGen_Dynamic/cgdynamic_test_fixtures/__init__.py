@@ -17,6 +17,7 @@ def create(data):
     ddb_table_name = data["DynamoDB Name"]
     bucket_name    = data['Bucket Name']
     relationships  = data["Relationships"]
+    rel_model      = data["Rel Model"]
     
     #Convert human-friendly names to variable-friendly names
     entity_varname  = converter.convert_to_system_name(entity)
@@ -46,10 +47,25 @@ def create(data):
         payload['{col_varname}'] = {test_data}"""
 
         raw_rpt_payload_string += f"""
-            '{col_varname}': {{'operator': "",'type': "{col_type_id}",'value': ""}},"""
+                '{col_varname}': {{'operator': "",'type': "{col_type_id}",'value': ""}},"""
 
         report_field_string += f""""{col_varname}", """
         
+    for rel, rel_data in rel_model.items():
+        many_entity_varname = converter.convert_to_system_name(rel)
+
+        data_string += f"""
+        data['{many_entity_varname}'] = {{'{col_type_id}': {test_data}}}"""
+
+        raw_payload_string += f"""
+                '{many_entity_varname}': {test_data},"""
+
+        payload_string += f"""
+        payload['{many_entity_varname}'] = {test_data}"""
+
+        raw_rpt_payload_string += f"""
+                '{many_entity_varname}': {{'operator': "",'type': "{col_type_id}",'value': ""}},"""
+
     source_code = f"""\
     def get_data():
         data = {{}}
