@@ -17,6 +17,7 @@ def create(data):
     ddb_table_name = data["DynamoDB Name"]
     bucket_name    = data['Bucket Name']
     relationships  = data["Relationships"]
+    rel_model      = data["Rel Model"]
     
     #Convert human-friendly names to variable-friendly names
     entity_varname  = converter.convert_to_system_name(entity)
@@ -25,6 +26,14 @@ def create(data):
 
     default_sk     = entity_varname + "|info"
     with_upload    = False
+
+    cascade_function_string = ""
+
+    if len(relationships) > 0:
+        cascade_function_string = f"""
+        {cascade_function_string}
+        """
+
     col_list = []
     for keys in columns:
         col_list.append(keys)
@@ -47,6 +56,9 @@ def create(data):
 
     import {entity_varname} as {entity_to_lower}
     import stark_core as core
+    from stark_core import security
+    from stark_core import validation
+    from stark_core import utilities
 
     def test_map_results(get_{entity_to_lower}_data):
 
@@ -58,25 +70,28 @@ def create(data):
         assert set_{entity_to_lower}_payload['pk'] == {entity_to_lower}.create_listview_index_value(set_{entity_to_lower}_payload)
 
     @mock_dynamodb
-    def test_add(use_moto,set_{entity_to_lower}_payload):
+    def test_add(use_moto,set_{entity_to_lower}_payload, monkeypatch):
         use_moto()
         ddb = boto3.client('dynamodb', region_name=core.test_region)
+        {cascade_function_string}
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         assert  {entity_to_lower}.resp_obj['ResponseMetadata']['HTTPStatusCode'] == 200
         
     @mock_dynamodb
-    def test_get_by_pk(use_moto,set_{entity_to_lower}_payload):
+    def test_get_by_pk(use_moto,set_{entity_to_lower}_payload, monkeypatch):
         use_moto()
         ddb = boto3.client('dynamodb', region_name=core.test_region)
+        {cascade_function_string}
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         response  = {entity_to_lower}.get_by_pk(set_{entity_to_lower}_payload['pk'], set_{entity_to_lower}_payload['sk'], ddb)
 
         assert set_{entity_to_lower}_payload['pk'] == response['item']['{pk_varname}']
 
     @mock_dynamodb
-    def test_get_all(use_moto,set_{entity_to_lower}_payload):
+    def test_get_all(use_moto,set_{entity_to_lower}_payload, monkeypatch):
         use_moto()
         ddb = boto3.client('dynamodb', region_name=core.test_region)
+        {cascade_function_string}
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         set_{entity_to_lower}_payload['pk'] = 'Test3'
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
@@ -84,14 +99,15 @@ def create(data):
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         set_{entity_to_lower}_payload['pk'] = 'Test1'
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
-        response  = {entity_to_lower}.get_all('{entity_varname}|Listview', None, ddb)
+        response  = {entity_to_lower}.get_all('{default_sk}', None, ddb)
         # print(response)
         assert len(response[0]) == 4
 
     @mock_dynamodb
-    def test_edit(use_moto,set_{entity_to_lower}_payload):
+    def test_edit(use_moto,set_{entity_to_lower}_payload, monkeypatch):
         use_moto()
         ddb = boto3.client('dynamodb', region_name=core.test_region)
+        {cascade_function_string}
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         set_{entity_to_lower}_payload['{col_to_edit_varname}'] = {test_data_for_edit}
         {entity_to_lower}.edit(set_{entity_to_lower}_payload, ddb)
@@ -99,13 +115,232 @@ def create(data):
         assert set_{entity_to_lower}_payload['{col_to_edit_varname}'] == {entity_to_lower}.resp_obj['Attributes']['{col_to_edit_varname}']['{col_type}']
 
     @mock_dynamodb
-    def test_delete(use_moto,set_{entity_to_lower}_payload):
+    def test_delete(use_moto,set_{entity_to_lower}_payload, monkeypatch):
         use_moto()
         ddb = boto3.client('dynamodb', region_name=core.test_region)
+        {cascade_function_string}
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         {entity_to_lower}.delete(set_{entity_to_lower}_payload, ddb)
-        response  = {entity_to_lower}.get_all('{entity_varname}|Listview', None, ddb)
+        response  = {entity_to_lower}.get_all('{default_sk}', None, ddb)
         assert len(response[0]) == 0
+    
+    def test_lambda_handler_rt_fail():
+        response = {entity_to_lower}.lambda_handler({{'queryStringParameters':{{'rt':'incorrect_request_type'}}}}, '')
+        assert '"Could not handle GET request - unknown request type"' == response['body']
+        
+    def test_lambda_handler_rt_all(monkeypatch):
+        def mock_get_all(sk, lv_token):
+            return "always success", ''
+        monkeypatch.setattr({entity_to_lower}, "get_all", mock_get_all)
+        response = {entity_to_lower}.lambda_handler({{'queryStringParameters':{{'rt':'all'}}}}, '')
+        assert 200 == response['statusCode']
+
+    def test_lambda_handler_rt_detail(monkeypatch): 
+        def mock_get_by_pk(pk, sk):
+            return "always success"
+        monkeypatch.setattr({entity_to_lower}, "get_by_pk", mock_get_by_pk)
+        response = {entity_to_lower}.lambda_handler({{'queryStringParameters':{{'rt':'detail','{pk_varname}':'0001', 'sk': '{default_sk}'}}}}, '')
+        assert 200 == response['statusCode']
+        
+    def test_lambda_handler_method_no_payload():
+        event = {{
+            'requestContext':{{
+                'http': {{'method':"POST"}}
+                }},
+            'body':json.dumps({{'No':'Payload'}})
+            }}
+        response = {entity_to_lower}.lambda_handler(event, '')
+    
+        assert '"Client payload missing"' == response['body']
+        
+    def test_lambda_handler_method_fail(get_{entity_to_lower}_raw_payload):
+        event = {{
+            'requestContext':{{
+                'http': {{'method':"POSTS"}}
+                }},
+            'body':json.dumps(get_{entity_to_lower}_raw_payload)
+            }}
+        response = {entity_to_lower}.lambda_handler(event, '')
+
+        assert '"Could not handle API request"' == response['body']
+        
+    def test_lambda_handler_method_report_fail(get_{entity_to_lower}_raw_report_payload):
+        get_{entity_to_lower}_raw_report_payload['{entity_varname}']['{pk_varname}']['operator'] = ''
+        event = {{
+            'requestContext':{{
+                'http': {{'method':"POST"}}
+                }},
+            'body':json.dumps(get_{entity_to_lower}_raw_report_payload)
+            }}
+        response = {entity_to_lower}.lambda_handler(event, '')
+
+        assert '"Missing operators"' == response['body']
+        
+    def test_lambda_handler_delete_unauthorized(get_{entity_to_lower}_raw_payload,monkeypatch):
+        event = {{
+            'requestContext':{{
+                'http': {{'method':"DELETE"}}
+                }},
+            'body':json.dumps(get_{entity_to_lower}_raw_payload)
+            }}
+        def mock_is_authorized(permission, event, ddb):
+            return False
+
+        monkeypatch.setattr(security, "is_authorized", mock_is_authorized)
+        monkeypatch.setattr(security, "authFailResponse", [security.authFailCode, f"Could not find {entity}|delete for test_user"])
+        response = {entity_to_lower}.lambda_handler(event, '')
+    
+        assert '"Could not find {entity}|delete for test_user"' == response['body']
+        
+    def test_lambda_handler_edit_unauthorized(get_{entity_to_lower}_raw_payload, monkeypatch):
+        event = {{
+            'requestContext':{{
+                'http': {{'method':"PUT"}}
+                }},
+            'body':json.dumps(get_{entity_to_lower}_raw_payload)
+            }}
+        def mock_is_authorized(permission, event, ddb):
+            return False
+
+        monkeypatch.setattr(security, "is_authorized", mock_is_authorized)
+        monkeypatch.setattr(security, "authFailResponse", [security.authFailCode, f"Could not find {entity}|edit for test_user"])
+        response = {entity_to_lower}.lambda_handler(event, '')
+        
+        assert '"Could not find {entity}|edit for test_user"' == response['body']
+
+    def test_lambda_handler_add_unauthorized(get_{entity_to_lower}_raw_payload, monkeypatch):
+        event = {{
+            'requestContext':{{
+                'http': {{'method':"POST"}}
+                }},
+            'body':json.dumps(get_{entity_to_lower}_raw_payload)
+            }}
+        def mock_is_authorized(permission, event, ddb):
+            return False
+
+        monkeypatch.setattr(security, "is_authorized", mock_is_authorized)
+        monkeypatch.setattr(security, "authFailResponse", [security.authFailCode, f"Could not find {entity}|add for test_user"])
+        response = {entity_to_lower}.lambda_handler(event, '')
+        
+        assert '"Could not find {entity}|add for test_user"' == response['body']
+
+    def test_lambda_handler_report_unauthorized(get_{entity_to_lower}_raw_report_payload, monkeypatch):
+        event = {{
+            'requestContext':{{
+                'http':{{'method':"POST"}}
+                }},
+            'body':json.dumps(get_{entity_to_lower}_raw_report_payload)
+            }}
+        def mock_is_authorized(permission, event, ddb):
+            return False
+
+        monkeypatch.setattr(security, "is_authorized", mock_is_authorized)
+        monkeypatch.setattr(security, "authFailResponse", [security.authFailCode, f"Could not find {entity}|report for test_user"])
+        response = {entity_to_lower}.lambda_handler(event, '')
+        
+        assert '"Could not find {entity}|report for test_user"' == response['body']
+
+    def test_lambda_handler_delete(get_{entity_to_lower}_raw_payload, set_{entity_to_lower}_payload, monkeypatch):
+        event = {{
+            'requestContext':{{
+                'http':{{'method':"DELETE"}}
+                }},
+            'body':json.dumps(get_{entity_to_lower}_raw_payload)
+            }}
+
+        def mock_is_authorized(permission, event, ddb):
+            return True
+
+        def mock_delete(data):
+            assert set_{entity_to_lower}_payload == data
+            return "OK"
+
+        monkeypatch.setattr(security, "is_authorized", mock_is_authorized)
+        monkeypatch.setattr({entity_to_lower}, "delete", mock_delete)
+        {entity_to_lower}.lambda_handler(event, '')
+        
+    def test_lambda_handler_edit(get_{entity_to_lower}_raw_payload, set_{entity_to_lower}_payload, monkeypatch):
+        event = {{
+            'requestContext':{{
+                'http':{{'method':"PUT"}}
+                }},
+            'body':json.dumps(get_{entity_to_lower}_raw_payload)
+            }}
+
+        def mock_is_authorized(permission, event, ddb):
+            return True
+
+        def mock_validate_form(payload, metadata):
+            return []
+
+        def mock_edit(data):
+            data.pop('{pk_varname}')
+            assert set_{entity_to_lower}_payload == data
+            return "OK"
+
+        monkeypatch.setattr(security, "is_authorized", mock_is_authorized)
+        monkeypatch.setattr(validation, "validate_form", mock_validate_form)
+        monkeypatch.setattr({entity_to_lower}, "edit", mock_edit)
+        {entity_to_lower}.lambda_handler(event, '')
+
+    def test_lambda_handler_edit_add(get_{entity_to_lower}_raw_payload, set_{entity_to_lower}_payload, monkeypatch):
+        get_{entity_to_lower}_raw_payload['{entity_varname}']['{pk_varname}'] = 'Test1'
+        event = {{
+            'requestContext':{{
+                'http':{{'method':"PUT"}}
+                }},
+            'body':json.dumps(get_{entity_to_lower}_raw_payload)
+            }}
+
+        def mock_is_authorized(permission, event, ddb):
+            return True
+
+        def mock_validate_form(payload, metadata):
+            return []
+
+        def mock_add(data, method):
+            data.pop('{pk_varname}')
+            set_{entity_to_lower}_payload['pk'] = 'Test1'
+            set_{entity_to_lower}_payload['STARK-ListView-sk'] = 'Test1'
+            assert set_{entity_to_lower}_payload == data
+            return "OK"
+
+        def mock_delete(data):
+            set_{entity_to_lower}_payload['pk'] = 'Test2'
+            assert set_{entity_to_lower}_payload == data
+            return "OK"
+
+        monkeypatch.setattr(security, "is_authorized", mock_is_authorized)
+        monkeypatch.setattr(validation, "validate_form", mock_validate_form)
+        monkeypatch.setattr({entity_to_lower}, "add", mock_add)
+        monkeypatch.setattr({entity_to_lower}, "delete", mock_delete)
+        {entity_to_lower}.lambda_handler(event, '')
+
+    def test_lambda_handler_add(get_{entity_to_lower}_raw_payload, set_{entity_to_lower}_payload, monkeypatch):
+        event = {{
+            'requestContext':{{
+                'http':{{'method':"POST"}}
+                }},
+            'body':json.dumps(get_{entity_to_lower}_raw_payload)
+            }}
+
+        def mock_is_authorized(permission, event, ddb):
+            return True
+
+        def mock_validate_form(payload, metadata):
+            return []
+
+        def mock_add(data):
+            data.pop('{pk_varname}')
+            assert set_{entity_to_lower}_payload == data
+            return "OK"
+
+
+        monkeypatch.setattr(security, "is_authorized", mock_is_authorized)
+        monkeypatch.setattr(validation, "validate_form", mock_validate_form)
+        monkeypatch.setattr({entity_to_lower}, "add", mock_add)
+        {entity_to_lower}.lambda_handler(event, '')
+
     """
 
     return textwrap.dedent(source_code)
