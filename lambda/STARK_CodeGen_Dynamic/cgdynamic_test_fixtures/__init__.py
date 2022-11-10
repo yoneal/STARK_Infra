@@ -80,7 +80,7 @@ def create(data):
     def get_raw_report_payload():
         raw_payload = {{
             "Customer": {{
-                '{pk_varname}': {'operator': "=",'type': "S",'value': "Hello"},{raw_rpt_payload_string}
+                '{pk_varname}': {{'operator': "=",'type': "S",'value': "Hello"}},{raw_rpt_payload_string}
                 'STARK_Chart_Type' : "",
                 'STARK_Report_Type' : "Tabular",
                 'STARK_X_Data_Source' : "",
