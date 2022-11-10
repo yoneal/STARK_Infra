@@ -110,5 +110,9 @@ def create(data):
         @pytest.fixture
         def get_{entity_varname.lower()}_raw_payload():
             return {entity_varname.lower()}.get_raw_payload()
+
+        @pytest.fixture
+        def get_{entity_varname.lower()}_raw_report_payload():
+            return {entity_varname.lower()}.get_raw_report_payload()
         """
     return textwrap.dedent(source_code)

@@ -47,6 +47,9 @@ def create(data):
 
     import {entity_varname} as {entity_to_lower}
     import stark_core as core
+    from stark_core import security
+    from stark_core import validation
+    from stark_core import utilities
 
     def test_map_results(get_{entity_to_lower}_data):
 
@@ -58,25 +61,34 @@ def create(data):
         assert set_{entity_to_lower}_payload['pk'] == {entity_to_lower}.create_listview_index_value(set_{entity_to_lower}_payload)
 
     @mock_dynamodb
-    def test_add(use_moto,set_{entity_to_lower}_payload):
+    def test_add(use_moto,set_{entity_to_lower}_payload, monkeypatch):
         use_moto()
         ddb = boto3.client('dynamodb', region_name=core.test_region)
+        def mock_cascade_pk_change_to_child(data, entity, attribute):
+            return 'OK'
+        monkeypatch.setattr({entity_to_lower}, "cascade_pk_change_to_child", mock_cascade_pk_change_to_child)
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         assert  {entity_to_lower}.resp_obj['ResponseMetadata']['HTTPStatusCode'] == 200
         
     @mock_dynamodb
-    def test_get_by_pk(use_moto,set_{entity_to_lower}_payload):
+    def test_get_by_pk(use_moto,set_{entity_to_lower}_payload, monkeypatch):
         use_moto()
         ddb = boto3.client('dynamodb', region_name=core.test_region)
+        def mock_cascade_pk_change_to_child(data, entity, attribute):
+            return 'OK'
+        monkeypatch.setattr({entity_to_lower}, "cascade_pk_change_to_child", mock_cascade_pk_change_to_child)
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         response  = {entity_to_lower}.get_by_pk(set_{entity_to_lower}_payload['pk'], set_{entity_to_lower}_payload['sk'], ddb)
 
         assert set_{entity_to_lower}_payload['pk'] == response['item']['{pk_varname}']
 
     @mock_dynamodb
-    def test_get_all(use_moto,set_{entity_to_lower}_payload):
+    def test_get_all(use_moto,set_{entity_to_lower}_payload, monkeypatch):
         use_moto()
         ddb = boto3.client('dynamodb', region_name=core.test_region)
+        def mock_cascade_pk_change_to_child(data, entity, attribute):
+            return 'OK'
+        monkeypatch.setattr({entity_to_lower}, "cascade_pk_change_to_child", mock_cascade_pk_change_to_child)
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         set_{entity_to_lower}_payload['pk'] = 'Test3'
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
@@ -89,9 +101,12 @@ def create(data):
         assert len(response[0]) == 4
 
     @mock_dynamodb
-    def test_edit(use_moto,set_{entity_to_lower}_payload):
+    def test_edit(use_moto,set_{entity_to_lower}_payload, monkeypatch):
         use_moto()
         ddb = boto3.client('dynamodb', region_name=core.test_region)
+        def mock_cascade_pk_change_to_child(data, entity, attribute):
+            return 'OK'
+        monkeypatch.setattr({entity_to_lower}, "cascade_pk_change_to_child", mock_cascade_pk_change_to_child)
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         set_{entity_to_lower}_payload['{col_to_edit_varname}'] = {test_data_for_edit}
         {entity_to_lower}.edit(set_{entity_to_lower}_payload, ddb)
@@ -99,9 +114,12 @@ def create(data):
         assert set_{entity_to_lower}_payload['{col_to_edit_varname}'] == {entity_to_lower}.resp_obj['Attributes']['{col_to_edit_varname}']['{col_type}']
 
     @mock_dynamodb
-    def test_delete(use_moto,set_{entity_to_lower}_payload):
+    def test_delete(use_moto,set_{entity_to_lower}_payload, monkeypatch):
         use_moto()
         ddb = boto3.client('dynamodb', region_name=core.test_region)
+        def mock_cascade_pk_change_to_child(data, entity, attribute):
+            return 'OK'
+        monkeypatch.setattr({entity_to_lower}, "cascade_pk_change_to_child", mock_cascade_pk_change_to_child)
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         {entity_to_lower}.delete(set_{entity_to_lower}_payload, ddb)
         response  = {entity_to_lower}.get_all('{entity_varname}|Listview', None, ddb)

@@ -25,9 +25,11 @@ def create(data):
     default_sk      = entity_varname + "|info"
     with_upload     = False
 
-    data_string        = ""
-    raw_payload_string = ""
-    payload_string     = ""
+    data_string            = ""
+    raw_payload_string     = ""
+    payload_string         = ""
+    raw_rpt_payload_string = ""
+    report_field_string    = ""
 
     for col, col_type in columns.items():
         col_varname = converter.convert_to_system_name(col)
@@ -38,17 +40,21 @@ def create(data):
         data['{col_varname}'] = {{'{col_type_id}': {test_data}}}"""
 
         raw_payload_string += f"""
-                {col_varname}: {test_data},"""
+                '{col_varname}': {test_data},"""
 
         payload_string += f"""
         payload['{col_varname}'] = {test_data}"""
+
+        raw_rpt_payload_string += f"""
+        payload['{col_varname}'] = {{'operator': "",'type': "{col_type_id}",'value': ""}},"""
+
+        report_field_string += f""""{col_varname}", """
         
     source_code = f"""\
     def get_data():
         data = {{}}
         data['pk'] = {{'S':'Test1'}}
-        data['sk'] = {{'S':'{entity_varname}|info'}}
-        {data_string}
+        data['sk'] = {{'S':'{entity_varname}|info'}}{data_string}
         
         return data
 
@@ -56,22 +62,38 @@ def create(data):
         payload = {{}}
         payload['pk'] = 'Test2'
         payload['orig_pk'] = 'Test2'
-        payload['sk'] = '{entity_varname}|info'
-        {payload_string}
+        payload['sk'] = '{entity_varname}|info'{payload_string}
         payload['STARK-ListView-sk'] = 'Test2'
+        payload['STARK_uploaded_s3_keys'] = {{}}
         return payload
 
-    get_raw_payload():
+    def get_raw_payload():
         raw_payload = {{
             "{entity}": {{
                 '{pk_varname}': "Test2",
-                'orig_{pk_varname}': 'Test2',
-                {raw_payload_string}
+                'orig_{pk_varname}': 'Test2',{raw_payload_string}
                 'sk': ''
-
             }}
         }}
         return raw_payload
+
+    def get_raw_report_payload():
+        raw_payload = {{
+            "Customer": {{
+                '{pk_varname}': {'operator': "=",'type': "S",'value': "Hello"},{raw_rpt_payload_string}
+                'STARK_Chart_Type' : "",
+                'STARK_Report_Type' : "Tabular",
+                'STARK_X_Data_Source' : "",
+                'STARK_Y_Data_Source' : "",
+                'STARK_count_fields' : [],
+                'STARK_group_by_1' : "",
+                'STARK_isReport' : True,
+                'STARK_report_fields': [{report_field_string}{pk_varname}],
+                'STARK_sum_fields': []
+            }}
+        }}
+    return raw_payload
+
 
         """
         
