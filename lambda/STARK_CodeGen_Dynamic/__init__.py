@@ -109,7 +109,7 @@ def create_handler(event, context):
 
         # test cases
         files_to_commit.append({
-            'filePath': f"lambda/test_cases/test_{entity_varname.lower()}.py",
+            'filePath': f"lambda/test_cases/business_modules/test_{entity_varname.lower()}.py",
             'fileContent': test_source_code.encode()
         })
 
@@ -138,6 +138,22 @@ def create_handler(event, context):
         'filePath': f"lambda/test_cases/__init__.py",
         'fileContent': "#blank init for test_cases folder"
     })
+
+    files_to_commit.append({
+        'filePath': f"lambda/test_cases/business_modules/__init__.py",
+        'fileContent': "#blank init for business modules"
+    })
+
+    files_to_commit.append({
+        'filePath': f"lambda/test_cases/admin_modules/__init__.py",
+        'fileContent': "#blank init for STARK admin modules"
+    })
+
+    files_to_commit.append({
+        'filePath': f"lambda/test_cases/core_modules/__init__.py",
+        'fileContent': "#blank init for stark core functions"
+    })
+    
     files_to_commit.append({
         'filePath': f"lambda/test_cases/fixtures/__init__.py",
         'fileContent': "#blank init for fixtures folder"
