@@ -469,7 +469,7 @@ def create(data):
                     key.pop("sk")"""
     if with_upload or with_upload_on_many:
         source_code += f"""
-                    key.pop("STARK uploaded s3 keys")"""
+                    key.pop("STARK_uploaded_s3_keys")"""
     source_code += f"""
                 for index, value in key.items():
                     temp_dict[index.replace("_"," ")] = value
