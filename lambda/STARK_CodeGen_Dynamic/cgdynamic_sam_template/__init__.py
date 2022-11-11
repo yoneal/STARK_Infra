@@ -128,60 +128,84 @@ def create(data, cli_mode=False):
         RegionMap:
             us-east-2:
                 s3endpoint: "s3-website.us-east-2.amazonaws.com"
+                s3bucket: "s3.us-east-2.amazonaws.com"
             us-east-1:
                 s3endpoint: "s3-website-us-east-1.amazonaws.com"
+                s3bucket: "s3-us-east-1.amazonaws.com"
             us-west-1:
                 s3endpoint: "s3-website-us-west-1.amazonaws.com"
+                s3bucket: "s3-us-west-1.amazonaws.com"
             us-west-2:
                 s3endpoint: "s3-website-us-west-2.amazonaws.com"
+                s3bucket: "s3-us-west-2.amazonaws.com"
             af-south-1:
                 s3endpoint: "s3-website.af-south-1.amazonaws.com"
+                s3bucket: "s3.af-south-1.amazonaws.com"
             ap-east-1:
                 s3endpoint: "s3-website.ap-east-1.amazonaws.com"
+                s3bucket: "s3.ap-east-1.amazonaws.com"
             ap-south-1:
                 s3endpoint: "s3-website.ap-south-1.amazonaws.com"
+                s3bucket: "s3.ap-south-1.amazonaws.com"
             ap-northeast-3:
                 s3endpoint: "s3-website.ap-northeast-3.amazonaws.com"
+                s3bucket: "s3.ap-northeast-3.amazonaws.com"
             ap-northeast-2:
                 s3endpoint: "s3-website.ap-northeast-2.amazonaws.com"
+                s3bucket: "s3.ap-northeast-2.amazonaws.com"
             ap-southeast-1:
                 s3endpoint: "s3-website-ap-southeast-1.amazonaws.com"
+                s3bucket: "s3-ap-southeast-1.amazonaws.com"
             ap-southeast-2:
                 s3endpoint: "s3-website-ap-southeast-2.amazonaws.com"
+                s3bucket: "s3-ap-southeast-2.amazonaws.com"
             ap-northeast-1:
                 s3endpoint: "s3-website-ap-northeast-1.amazonaws.com"
+                s3bucket: "s3-ap-northeast-1.amazonaws.com"
             ca-central-1:
                 s3endpoint: "s3-website.ca-central-1.amazonaws.com"
+                s3bucket: "s3.ca-central-1.amazonaws.com"
             cn-northwest-1:
                 s3endpoint: "s3-website.cn-northwest-1.amazonaws.com.cn"
+                s3bucket: "s3.cn-northwest-1.amazonaws.com.cn"
             eu-central-1:
                 s3endpoint: "s3-website.eu-central-1.amazonaws.com"
+                s3bucket: "s3.eu-central-1.amazonaws.com"
             eu-west-1:
                 s3endpoint: "s3-website-eu-west-1.amazonaws.com"
+                s3bucket: "s3-eu-west-1.amazonaws.com"
             eu-west-2:
                 s3endpoint: "s3-website.eu-west-2.amazonaws.com"
+                s3bucket: "s3.eu-west-2.amazonaws.com"
             eu-south-1:
                 s3endpoint: "s3-website.eu-south-1.amazonaws.com"
+                s3bucket: "s3.eu-south-1.amazonaws.com"
             eu-west-3:
                 s3endpoint: "s3-website.eu-west-3.amazonaws.com"
+                s3bucket: "s3.eu-west-3.amazonaws.com"
             eu-north-1:
                 s3endpoint: "s3-website.eu-north-1.amazonaws.com"
+                s3bucket: "s3.eu-north-1.amazonaws.com"
             ap-southeast-3:
                 s3endpoint: "s3-website.ap-southeast-3.amazonaws.com"
+                s3bucket: "s3.ap-southeast-3.amazonaws.com"
             me-south-1:
                 s3endpoint: "s3-website.me-south-1.amazonaws.com"
+                s3bucket: "s3.me-south-1.amazonaws.com"
             sa-east-1:
                 s3endpoint: "s3-website-sa-east-1.amazonaws.com"
+                s3bucket: "s3-sa-east-1.amazonaws.com"
             us-gov-east-1:
                 s3endpoint: "s3-website.us-gov-east-1.amazonaws.com"
+                s3bucket: "s3.us-gov-east-1.amazonaws.com"
             us-gov-west-1:
                 s3endpoint: "s3-website-us-gov-west-1.amazonaws.com"
+                s3bucket: "s3-us-gov-west-1.amazonaws.com"
 
     Resources:
         STARKSystemBucket:
             Type: AWS::S3::Bucket
             Properties:
-                AccessControl: {s3_access_control}
                 LifecycleConfiguration:
                     Rules:
                         - Id: clean_up_tmp
@@ -203,10 +227,14 @@ def create(data, cli_mode=False):
                             - ETag
                 BucketName: !Ref UserWebsiteBucketNameParameter
                 VersioningConfiguration:
-                    Status: {s3_versioning}
+                    Status: {s3_versioning}"""
+    if not cdn_enabled:
+        cf_template +=f"""
+                AccessControl: {s3_access_control}
                 WebsiteConfiguration:
                     ErrorDocument: {s3_error_document}
-                    IndexDocument: {s3_index_document}
+                    IndexDocument: {s3_index_document}"""
+    cf_template +=f"""
         STARKSystemBucketUser:
             Type: AWS::IAM::User
             Properties: 
@@ -442,8 +470,8 @@ def create(data, cli_mode=False):
                     DefaultRootObject: {cdn_default_root_object}
                     Enabled: {cdn_enabled}
                     Origins:
-                        - Id: !Join [ "", [ "{s3_bucket_name}.", !FindInMap [ RegionMap, !Ref AWS::Region, s3endpoint] ] ]
-                          DomainName: !Join [ "", [ "{s3_bucket_name}.", !FindInMap [ RegionMap, !Ref AWS::Region, s3endpoint] ] ]
+                        - Id: !Join [ "", [ "{s3_bucket_name}.", !FindInMap [ RegionMap, !Ref AWS::Region, s3bucket] ] ]
+                          DomainName: !Join [ "", [ "{s3_bucket_name}.", !FindInMap [ RegionMap, !Ref AWS::Region, s3bucket] ] ]
                           CustomOriginConfig:
                             HTTPPort: 80
                             HTTPSPort: 443
@@ -464,7 +492,7 @@ def create(data, cli_mode=False):
                         CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
                         Compress: true
                         SmoothStreaming: false
-                        TargetOriginId: !Join [ "", [ "{s3_bucket_name}.", !FindInMap [ RegionMap, !Ref AWS::Region, s3endpoint] ] ]
+                        TargetOriginId: !Join [ "", [ "{s3_bucket_name}.", !FindInMap [ RegionMap, !Ref AWS::Region, s3bucket] ] ]
                         ViewerProtocolPolicy: redirect-to-https
                     HttpVersion: http2
                     IPV6Enabled: true"""

@@ -202,8 +202,9 @@ elif construct_type == 'deploy':
     print("Enabling CloudFront deployment..")
     with open("../cloud_resources.yml", "r") as f:
         current_cloud_resources = yaml.safe_load(f.read())
+        project_name            = current_cloud_resources["Project Name"]
     import libstark.STARK_CodeGen_Dynamic.cgdynamic_cli as cgdynamic
-
+    cdn_domain_name = None
     filename = project_basedir + "cloud_resources.yml"
     current_cloud_resources["CloudFront"]['enabled'] = True
     with open(filename, "wb") as f:
@@ -224,10 +225,30 @@ elif construct_type == 'deploy':
         else:
             is_continue_create_iac = True      
     
+    else:
+        stack_name = f"STARK-project-{project_name.replace(' ','')}"
+
+        ##fetch the physical distribution id of CloudFront
+        cfn = boto3.resource('cloudformation')
+        stack_resource = cfn.StackResource(stack_name, 'STARKCloudFront')
+        distribution_id = stack_resource.physical_resource_id
+        try:
+            client = boto3.client("cloudfront")
+            response = client.get_distribution(
+                Id=distribution_id
+            )
+            cdn_domain_name = response['Distribution']['DomainName'] 
+          
+        except Exception as error :
+                print(error)
+    
     if is_continue_create_iac:
         print("Updating template.yml..")
         create_iac_template(current_cloud_resources)
         print("Done")
+        print("Commit then push the changes to take effect.")
+        if cdn_domain_name:
+            print("Cloudfront Distribution Name:", cdn_domain_name)
 
 elif construct_type == 'status':
     print("Checking status..")
