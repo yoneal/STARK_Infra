@@ -469,7 +469,7 @@ def create(data):
                     key.pop("sk")"""
     if with_upload or with_upload_on_many:
         source_code += f"""
-                    key.pop("STARK uploaded s3 keys")"""
+                    key.pop("STARK_uploaded_s3_keys")"""
     source_code += f"""
                 for index, value in key.items():
                     temp_dict[index.replace("_"," ")] = value
@@ -658,7 +658,7 @@ def create(data):
             if isinstance(items, dict):
                 upload_dict_data = {{}}
                 for sub_key, sub_items in items.items():
-                    upload_dict_data[sub_key] = {{'SS':sub_items}}
+                    upload_dict_data[sub_key] = {{'S':'||'.join(sub_items)}}
                     for s3_key in sub_items:
                         utilities.copy_object_to_bucket(s3_key, entity_upload_dir)
                 upload_data = {{'M': upload_dict_data}}
@@ -776,7 +776,7 @@ def create(data):
             if isinstance(items, dict):
                 upload_dict_data = {{}}
                 for sub_key, sub_items in items.items():
-                    upload_dict_data[sub_key] = {{'SS':sub_items}}
+                    upload_dict_data[sub_key] = {{'S':'||'.join(sub_items)}}
                     for s3_key in sub_items:
                         utilities.copy_object_to_bucket(s3_key, entity_upload_dir)
                 upload_data = {{'M': upload_dict_data}}
@@ -892,10 +892,11 @@ def create(data):
                     STARK_uploaded_s3_keys[key] = sub_map_item
                 elif sub_key == 'M':
                     for third_key, third_item in sub_map_item.items():
+                        list_s3_keys = list(third_item['S'].split('||'))
                         if key in STARK_uploaded_s3_keys:
-                            STARK_uploaded_s3_keys[key].update({{third_key: third_item['SS']}}) 
+                            STARK_uploaded_s3_keys[key].update({{third_key: list_s3_keys}}) 
                         else:
-                            STARK_uploaded_s3_keys[key] = {{third_key: third_item['SS']}}
+                            STARK_uploaded_s3_keys[key] = {{third_key: list_s3_keys}}
 
         item['STARK_uploaded_s3_keys'] = STARK_uploaded_s3_keys"""
     source_code += f"""

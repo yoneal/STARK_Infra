@@ -17,44 +17,100 @@ def create(data):
     ddb_table_name = data["DynamoDB Name"]
     bucket_name    = data['Bucket Name']
     relationships  = data["Relationships"]
+    rel_model      = data["Rel Model"]
     
     #Convert human-friendly names to variable-friendly names
     entity_varname  = converter.convert_to_system_name(entity)
     entity_to_lower = entity_varname.lower()
-    pk_varname     = converter.convert_to_system_name(pk)
+    pk_varname      = converter.convert_to_system_name(pk)
+    default_sk      = entity_varname + "|info"
+    with_upload     = False
 
-    default_sk     = entity_varname + "|info"
-    with_upload    = False
+    data_string            = ""
+    raw_payload_string     = ""
+    payload_string         = ""
+    raw_rpt_payload_string = ""
+    report_field_string    = ""
+
+    for col, col_type in columns.items():
+        col_varname = converter.convert_to_system_name(col)
+        col_type_id = set_type(col_type)
+        test_data   = generate_test_data(col_type)
+
+        data_string += f"""
+        data['{col_varname}'] = {{'{col_type_id}': {test_data}}}"""
+
+        raw_payload_string += f"""
+                '{col_varname}': {test_data},"""
+
+        payload_string += f"""
+        payload['{col_varname}'] = {test_data}"""
+
+        raw_rpt_payload_string += f"""
+                '{col_varname}': {{'operator': "",'type': "{col_type_id}",'value': ""}},"""
+
+        report_field_string += f""""{col_varname}", """
+        
+    for rel, rel_data in rel_model.items():
+        many_entity_varname = converter.convert_to_system_name(rel)
+
+        data_string += f"""
+        data['{many_entity_varname}'] = {{'{col_type_id}': {test_data}}}"""
+
+        raw_payload_string += f"""
+                '{many_entity_varname}': {test_data},"""
+
+        payload_string += f"""
+        payload['{many_entity_varname}'] = {test_data}"""
+
+        raw_rpt_payload_string += f"""
+                '{many_entity_varname}': {{'operator': "",'type': "{col_type_id}",'value': ""}},"""
 
     source_code = f"""\
     def get_data():
         data = {{}}
         data['pk'] = {{'S':'Test1'}}
-        data['sk'] = {{'S':'{entity_varname}|Listview'}}"""
-    for col, col_type in columns.items():
-        col_varname = converter.convert_to_system_name(col)
-        col_type_id = set_type(col_type)
-        test_data   = generate_test_data(col_type)
-        source_code += f"""
-        data['{col_varname}'] = {{'{col_type_id}': {test_data}}}"""
-    source_code += f"""
-
+        data['sk'] = {{'S':'{entity_varname}|info'}}{data_string}
+        
         return data
 
     def set_payload():
         payload = {{}}
         payload['pk'] = 'Test2'
-        payload['orig_{pk_varname}'] = 'Test2'
-        payload['sk'] = '{entity_varname}|Listview'"""
-    for col, col_type in columns.items():
-        col_varname = converter.convert_to_system_name(col)
-        col_type_id = set_type(col_type)
-        test_data   = generate_test_data(col_type)
-        source_code += f"""
-        payload['{col_varname}'] = {test_data}"""
-    source_code += f"""
-        payload['STARK-ListView-sk'] = '{pk_varname}'
+        payload['orig_pk'] = 'Test2'
+        payload['sk'] = '{entity_varname}|info'{payload_string}
+        payload['STARK-ListView-sk'] = 'Test2'
+        payload['STARK_uploaded_s3_keys'] = {{}}
         return payload
+
+    def get_raw_payload():
+        raw_payload = {{
+            "{entity_varname}": {{
+                '{pk_varname}': "Test2",
+                'orig_{pk_varname}': 'Test2',{raw_payload_string}
+                'sk': ''
+            }}
+        }}
+        return raw_payload
+
+    def get_raw_report_payload():
+        raw_payload = {{
+            "{entity_varname}": {{
+                '{pk_varname}': {{'operator': "=",'type': "S",'value': "Hello"}},{raw_rpt_payload_string}
+                'STARK_Chart_Type' : "",
+                'STARK_Report_Type' : "Tabular",
+                'STARK_X_Data_Source' : "",
+                'STARK_Y_Data_Source' : "",
+                'STARK_count_fields' : [],
+                'STARK_group_by_1' : "",
+                'STARK_isReport' : True,
+                'STARK_report_fields': [{report_field_string}'{pk_varname}'],
+                'STARK_sum_fields': []
+            }}
+        }}
+        return raw_payload
+
+
         """
         
     return textwrap.dedent(source_code)
