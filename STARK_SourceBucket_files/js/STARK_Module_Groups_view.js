@@ -421,12 +421,10 @@ var root = new Vue({
                         root.listview_table = data[0];
                         console.log(root.listview_table)
                         if(root.listview_table.length > 0) {
+                            root.STARK_report_fields = Object.keys(root.listview_table[0])
                             if(root.custom_report.STARK_Report_Type == 'Tabular') {
-                                root.STARK_report_fields = root.checked_fields 
                                 root.temp_csv_link = data[1];
                                 root.temp_pdf_link = data[2];
-                            } else {
-                                root.STARK_report_fields = Object.keys(root.listview_table[0])
                             }
                         }
                         console.log("DONE! Retrieved report.");
