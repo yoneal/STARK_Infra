@@ -179,7 +179,7 @@ var root = new Vue({
             this.STARK_User_Roles.Permissions = (root.multi_select_values.Permissions.sort()).join(', ')
             response = STARK.validate_form(root.metadata, root.STARK_User_Roles)
             console.log(response)
-            this.metadata = response['validation_propertiesta']
+            this.metadata = response['validation_properties']
             if(response['is_valid_form']) {
                 loading_modal.show()
                 let data = { STARK_User_Roles: this.STARK_User_Roles }
@@ -231,7 +231,7 @@ var root = new Vue({
             console.log("VIEW: Updating!")
             this.STARK_User_Roles.Permissions = (root.multi_select_values.Permissions.sort()).join(', ')
             response = STARK.validate_form(root.metadata, root.STARK_User_Roles)
-            this.metadata = response['validation_propertiesta']
+            this.metadata = response['validation_properties']
             if(response['is_valid_form']) {
                 loading_modal.show()
 
@@ -440,7 +440,7 @@ var root = new Vue({
                 root.metadata['STARK_Y_Data_Source'].required = true
             }
             response = STARK.validate_form(root.metadata, root.custom_report)
-            this.metadata = response['validation_propertiesta']
+            this.metadata = response['validation_properties']
             // console.log(response['is_valid_form'])
             if(response['is_valid_form']) {
                 if(root.custom_report.STARK_Report_Type == 'Graph') {
