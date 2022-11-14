@@ -180,7 +180,7 @@ var root = new Vue({
             
             console.log("VIEW: Inserting!")
             response = STARK.validate_form(root.metadata, root.STARK_Module_Groups)
-            this.metadata = response['new_metadata']
+            this.metadata = response['validation_properties']
             if(response['is_valid_form']) {
                 loading_modal.show()
 
@@ -232,7 +232,7 @@ var root = new Vue({
         update: function () {
             console.log("VIEW: Updating!")
             response = STARK.validate_form(root.metadata, root.STARK_Module_Groups)
-            this.metadata = response['new_metadata']
+            this.metadata = response['validation_properties']
             if(response['is_valid_form']) {
                 loading_modal.show()
 
@@ -403,7 +403,7 @@ var root = new Vue({
                 root.metadata['STARK_Y_Data_Source'].required = true
             }
             response = STARK.validate_form(root.metadata, root.custom_report)
-            this.metadata = response['new_metadata']
+            this.metadata = response['validation_properties']
             // console.log(response['is_valid_form'])
             if(response['is_valid_form']) {
                 if(root.custom_report.STARK_Report_Type == 'Graph') {
