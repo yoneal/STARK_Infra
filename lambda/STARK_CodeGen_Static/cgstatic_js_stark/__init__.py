@@ -254,8 +254,10 @@ def create(data):
                     if(message == "") {{
                         //maxlength
                         if(md_element['max_length'] != "") {{
-                            if(value.length > md_element['max_length']) {{
-                                message = ` must not exceed ${{md_element['max_length']}} characters`
+                            if(value) {{
+                                if(value.length > md_element['max_length']) {{
+                                    message = ` must not exceed ${{md_element['max_length']}} characters`
+                                }}
                             }}
                         }}
 
