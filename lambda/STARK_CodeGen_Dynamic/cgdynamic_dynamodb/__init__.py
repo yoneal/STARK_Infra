@@ -120,6 +120,7 @@ def create(data):
     metadata          = {{
                 "{pk_varname}": {{
                     'value': '',
+                    'key': 'pk'
                     'required': True,
                     'max_length': '',
                     'data_type': '',
@@ -133,6 +134,7 @@ def create(data):
         source_code += f"""
                 '{col_varname}': {{
                     'value': '',
+                    'key': ''
                     'required': True,
                     'max_length': '',
                     'data_type': '',
