@@ -639,6 +639,48 @@ def create(data, cli_mode=False):
                     - !Ref Fpdf2Layer"""
     
     cf_template += f"""
+        STARKBackendApiForSTARKAnalytics:
+            Type: AWS::Serverless::Function
+            Properties:
+                Events:
+                    STARKAnalyticsGetEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_Analytics
+                            Method: GET
+                            ApiId:
+                                Ref: STARKApiGateway
+                    STARKAnalyticsPostEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_Analytics
+                            Method: POST
+                            ApiId:
+                                Ref: STARKApiGateway
+                    STARKAnalyticsPutEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_Analytics
+                            Method: PUT
+                            ApiId:
+                                Ref: STARKApiGateway
+                    STARKAnalyticsDeleteEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_Analytics
+                            Method: DELETE
+                            ApiId:
+                                Ref: STARKApiGateway
+                Runtime: python3.9
+                Handler: __init__.lambda_handler
+                CodeUri: lambda/STARK_Analytics
+                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
+                Architectures:
+                    - arm64
+                MemorySize: 128
+                Timeout: 10
+                Layers:
+                    - !Ref Fpdf2Layer
         STARKBackendApiForSTARKUser:
             Type: AWS::Serverless::Function
             Properties:
