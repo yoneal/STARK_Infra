@@ -39,6 +39,8 @@ def create(data):
                     temp_dict = {{}}
                     #remove primary identifiers and STARK attributes    
                     key.pop("sk")
+                    if "STARK_uploaded_s3_keys" in key:
+                        key.pop("STARK_uploaded_s3_keys")
                     for index, value in key.items():
                         temp_dict[index.replace("_"," ")] = value
                     report_list.append(temp_dict)
