@@ -238,7 +238,7 @@ def create(data, cli_mode=False):
         STARKAnalyticsRawBucket:
                 Type: AWS::S3::Bucket
                 Properties:
-                    BucketName: !Join ["", [!Ref UserWebsiteBucketNameParameter, "_raw"] ]
+                    BucketName: !Join ["", [!Ref UserWebsiteBucketNameParameter, "-raw"] ]
         STARKSystemBucketUser:
             Type: AWS::IAM::User
             Properties: 
