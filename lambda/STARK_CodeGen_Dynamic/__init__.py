@@ -186,10 +186,10 @@ def create_handler(event, context):
     #########################################
     #Create Lambdas of built-in STARK modules 
     #    (Analytics)
-    source_code = cg_analytics.create({"Entities": entities})
+    analytics_source_code = cg_analytics.create({"Entities": entities})
     files_to_commit.append({
         'filePath': f"lambda/STARK_analytics/__init__.py",
-        'fileContent': source_code.encode()
+        'fileContent': analytics_source_code.encode()
     })
 
     #    (user management, permissions, etc)
