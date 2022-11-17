@@ -4,8 +4,13 @@
 import base64
 import textwrap
 
+import convert_friendly_to_system as converter
+
 def create(data):
     entities = data["Entities"]
+    entities_varname = []
+    for entity in entities:
+        entities_varname.append(converter.convert_to_system_name(entity))
 
     source_code = f"""\
     import importlib
@@ -14,7 +19,7 @@ def create(data):
     from stark_core import utilities
 
     def lambda_handler(event, context):
-        entities = {entities}
+        entities = {entities_varname}
 
         for entity in entities:
 
