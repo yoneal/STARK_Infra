@@ -235,6 +235,10 @@ def create(data, cli_mode=False):
                     ErrorDocument: {s3_error_document}
                     IndexDocument: {s3_index_document}"""
     cf_template +=f"""
+        STARKAnalyticsRawBucket:
+                Type: AWS::S3::Bucket
+                Properties:
+                    BucketName: !Join ["", [!Ref UserWebsiteBucketNameParameter, "_raw"] ]
         STARKSystemBucketUser:
             Type: AWS::IAM::User
             Properties: 

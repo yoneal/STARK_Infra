@@ -19,14 +19,15 @@ prepend_dir = ""
 if 'libstark' in os.listdir():
     prepend_dir = "libstark.STARK_CodeGen_Dynamic."
 
-cg_login   = importlib.import_module(f"{prepend_dir}cgdynamic_login")
-cg_logout  = importlib.import_module(f"{prepend_dir}cgdynamic_logout")
-cg_builder = importlib.import_module(f"{prepend_dir}cgdynamic_builder")
-cg_ddb     = importlib.import_module(f"{prepend_dir}cgdynamic_dynamodb")
-cg_build   = importlib.import_module(f"{prepend_dir}cgdynamic_buildspec")
-cg_auth    = importlib.import_module(f"{prepend_dir}cgdynamic_authorizer")
-cg_sam     = importlib.import_module(f"{prepend_dir}cgdynamic_sam_template")
-cg_conf    = importlib.import_module(f"{prepend_dir}cgdynamic_template_conf")
+cg_login     = importlib.import_module(f"{prepend_dir}cgdynamic_login")
+cg_logout    = importlib.import_module(f"{prepend_dir}cgdynamic_logout")
+cg_builder   = importlib.import_module(f"{prepend_dir}cgdynamic_builder")
+cg_ddb       = importlib.import_module(f"{prepend_dir}cgdynamic_dynamodb")
+cg_build     = importlib.import_module(f"{prepend_dir}cgdynamic_buildspec")
+cg_auth      = importlib.import_module(f"{prepend_dir}cgdynamic_authorizer")
+cg_sam       = importlib.import_module(f"{prepend_dir}cgdynamic_sam_template")
+cg_conf      = importlib.import_module(f"{prepend_dir}cgdynamic_template_conf")
+cg_analytics = importlib.import_module(f"{prepend_dir}cgdynamic_analytics")
 
 cg_conftest = importlib.import_module(f"{prepend_dir}cgdynamic_conftest")
 cg_test     = importlib.import_module(f"{prepend_dir}cgdynamic_test_cases")
@@ -184,6 +185,13 @@ def create_handler(event, context):
 
     #########################################
     #Create Lambdas of built-in STARK modules 
+    #    (Analytics)
+    source_code = cg_analytics.create({"Entities": entities})
+    files_to_commit.append({
+        'filePath': f"lambda/STARK_analytics/__init__.py",
+        'fileContent': source_code.encode()
+    })
+
     #    (user management, permissions, etc)
     for root, subdirs, files in os.walk('source_files'):
         for source_file in files:
