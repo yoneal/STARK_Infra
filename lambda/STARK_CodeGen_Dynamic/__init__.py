@@ -188,7 +188,7 @@ def create_handler(event, context):
     #    (Analytics)
     analytics_source_code = cg_analytics.create({"Entities": entities})
     files_to_commit.append({
-        'filePath': f"lambda/STARK_analytics/__init__.py",
+        'filePath': f"lambda/STARK_Analytics/__init__.py",
         'fileContent': analytics_source_code.encode()
     })
 

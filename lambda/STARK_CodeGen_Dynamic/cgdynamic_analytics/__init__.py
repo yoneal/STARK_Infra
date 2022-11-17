@@ -1,5 +1,4 @@
 #STARK Code Generator component.
-#Produces the customized dynamic content for a STARK system
 
 #Python Standard Library
 import base64
