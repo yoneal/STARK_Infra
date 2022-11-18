@@ -34,6 +34,10 @@ def empty_bucket(event, _):
         #   "I really want to empty the damn bucket no matter what!" command.
         target_bucket.object_versions.all().delete()
 
+    #FIXME: update when naming for raw and processed buckets are final
+    raw_bucket_name = target_bucket_name + "-raw"
+    target_bucket   = s3.Bucket(raw_bucket_name)
+    target_bucket.object_versions.all().delete()
 
 def lambda_handler(event, context):
     helper(event, context)
