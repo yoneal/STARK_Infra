@@ -267,7 +267,7 @@ Resources:
                 - AmazonS3FullAccess
                 - AWSLambdaBasicExecutionRole
                 - AWSCodeCommitFullAccess
-                - AWSCodePipelineFullAccess
+                - AWSCodePipeline_FullAccess
                 - ReadOnlyAccess
                 - IAMFullAccess
             Layers:
@@ -292,7 +292,7 @@ Resources:
                 - AmazonS3FullAccess
                 - AWSLambda_FullAccess 
                 - AWSCodeCommitFullAccess
-                - AWSCodePipelineFullAccess
+                - AWSCodePipeline_FullAccess
                 - IAMFullAccess
             Layers:
                 - !Ref CFCustomResourceHelperLayer
