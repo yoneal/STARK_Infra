@@ -115,12 +115,12 @@ def create(data):
                 source_code += f"""
                                                         <div class="form-group col-sm-0.5">
                                                             <b-form-group class="form-group" label="Remove">
-                                                                <input type="button" class="btn bg-danger" alt="Delete" width="40" height="40" @click="many_{child_entity_varname}.remove_field(index)" value="X">
+                                                                <input type="button" class="btn bg-danger" alt="Delete" width="40" height="40" @click="many_{child_entity_varname}.remove_row(index)" value="X">
                                                             </b-form-group>
                                                         </div> 
                                                     </div>
                                                     <div>
-                                                        <input type="button" class="btn btn-success mt-3 mt-lg-0" @click="many_{child_entity_varname}.add_field()" value="Add"/>
+                                                        <input type="button" class="btn btn-success mt-3 mt-lg-0" @click="many_{child_entity_varname}.add_row()" value="Add"/>
                                                     </div>
                                                 </form>
                                             </div>

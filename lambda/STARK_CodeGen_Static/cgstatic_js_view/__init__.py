@@ -304,6 +304,8 @@ def create(data):
             has_many_ux = col_type.get('has_many_ux', None)
             if has_many_ux == None:
                 field_strings += f"""'{col}',"""
+        else:
+            field_strings += f"""'{col}',"""
     field_strings += f"""]"""
     source_code += f"""
                 temp_checked_fields: {field_strings},
@@ -796,12 +798,10 @@ def create(data):
                             {entity_app}.report(report_payload).then( function(data) {{
                                 root.listview_table = data[0];
                                 if(root.listview_table.length > 0) {{
+                                    root.STARK_report_fields = Object.keys(root.listview_table[0])
                                     if(root.custom_report.STARK_Report_Type == 'Tabular') {{
-                                        root.STARK_report_fields = root.checked_fields 
                                         root.temp_csv_link = data[1];
                                         root.temp_pdf_link = data[2];
-                                    }} else {{
-                                        root.STARK_report_fields = Object.keys(root.listview_table[0])
                                     }}
                                 }}
                                 console.log("DONE! Retrieved report.");
