@@ -338,6 +338,44 @@ def create(data, cli_mode=False):
                                     Action:
                                         - 'lambda:InvokeFunction'
                                     Resource: !GetAtt STARKDefaultAuthorizerFunc.Arn
+        STARKProjectSchedulerInvokeRole:
+            Type: AWS::IAM::Role
+            Properties:
+                AssumeRolePolicyDocument:
+                    Version: '2012-10-17'
+                    Statement: 
+                        - 
+                            Effect: Allow
+                            Principal:
+                                Service: 
+                                    - 'scheduler.amazonaws.com'
+                            Action: 'sts:AssumeRole'
+                Policies:
+                    - 
+                        PolicyName: PolicyForSTARKProjectSchedulerInvokeRole
+                        PolicyDocument:
+                            Version: '2012-10-17'
+                            Statement:
+                                - 
+                                    Sid: VisualEditor0
+                                    Effect: Allow
+                                    Action:
+                                        - 'lambda:InvokeFunction'
+                                    Resource:
+                                        - !Join [ ":", [!GetAtt STARKBackendApiForSTARKAnalytics.Arn ] ]
+                                        - !Join [ ":", [!GetAtt STARKBackendApiForSTARKAnalytics.Arn, "*" ] ]
+        STARKProjectAnalyticsScheduler:
+            Type: AWS::Scheduler::Schedule
+            Properties: 
+                Description: Triggers dumping of data of each business entity in CSV formatted files 
+                FlexibleTimeWindow: 
+                    MaximumWindowInMinutes: 2
+                    Mode: FLEXIBLE
+                ScheduleExpression: cron(0 0 * * ? *)
+                State: ENABLED
+                Target:
+                    Arn: !GetAtt STARKBackendApiForSTARKAnalytics.Arn
+                    RoleArn: !GetAtt STARKProjectSchedulerInvokeRole.Arn
         CFCustomResourceHelperLayer:
             Type: AWS::Lambda::LayerVersion
             Properties:
