@@ -27,6 +27,7 @@ def create(data):
     entity  = data["Entity"]
     cols    = data["Columns"]
     pk      = data["PK"]
+    rel_model      = data["Rel Model"]
 
     #Convert human-friendly names to variable-friendly names
     entity_varname = converter.convert_to_system_name(entity)
@@ -140,6 +141,77 @@ def create(data):
                                             </td>
                                         </tr>
                                     """
+            else:
+                for rel_ent in rel_model:
+                    rel_cols = rel_model[rel_ent]["data"]
+                    rel_pk = rel_model[rel_ent]["pk"]
+                    var_pk = rel_ent.replace(' ', '_') + '_' + rel_pk.replace(' ', '_')
+                    pk_label = '[' + rel_ent + '] ' + rel_pk
+                    source_code += f"""
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{var_pk.replace('_', ' ')}" id="{var_pk}" v-model="checked_fields">
+                                            </td>
+                                            <td>
+                                                    <label for="{var_pk}">{pk_label}</label>
+                                            </td>
+                                            <td>
+                                                <b-form-select id="{var_pk}_operator" :options="lists.Report_Operator" v-model="custom_report.{var_pk}.operator">
+                                                    <template v-slot:first>
+                                                        <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
+                                                    </template>
+                                                </b-form-select>
+                                            </td>
+                                            <td>
+                                                <div class="report">
+                                                    {html_control_code}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{var_pk}" id="Sum_of_{var_pk}" v-model="custom_report.STARK_sum_fields" :disabled="metadata.{var_pk}.data_type != 'Number' && metadata.{var_pk}.data_type != 'Float'" onchange="root.set_y_data_source('Sum_of_{var_pk}')">
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{var_pk}" id="Count_of_{var_pk}" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_{var_pk}')">
+                                            </td>
+                                            <td>
+                                                <input type="radio" class="checkbox-med" name="check_checkbox" value="{var_pk}" id="{var_pk}" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('{var_pk}')">
+                                            </td>
+                                        </tr>
+                                    """
+                    for rel_col, rel_col_type in rel_cols.items():
+                        var_data = rel_ent.replace(' ', '_') + '_' + rel_col.replace(' ', '_')
+                        data_label = '[' + rel_ent + '] ' + rel_col
+                        source_code += f"""
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{var_data.replace('_', ' ')}" id="{var_data}" v-model="checked_fields">
+                                            </td>
+                                            <td>
+                                                    <label for="{var_data}">{data_label}</label>
+                                            </td>
+                                            <td>
+                                                <b-form-select id="{var_data}_operator" :options="lists.Report_Operator" v-model="custom_report.{var_data}.operator">
+                                                    <template v-slot:first>
+                                                        <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
+                                                    </template>
+                                                </b-form-select>
+                                            </td>
+                                            <td>
+                                                <div class="report">
+                                                    {html_control_code}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{var_data}" id="Sum_of_{var_data}" v-model="custom_report.STARK_sum_fields" :disabled="metadata.{var_data}.data_type != 'Number' && metadata.{var_data}.data_type != 'Float'" onchange="root.set_y_data_source('Sum_of_{var_data}')">
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{var_data}" id="Count_of_{var_data}" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_{var_data}')">
+                                            </td>
+                                            <td>
+                                                <input type="radio" class="checkbox-med" name="check_checkbox" value="{var_data}" id="{var_data}" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('{var_data}')">
+                                            </td>
+                                        </tr>
+                                    """                      
         else:
             source_code += f"""
                                         <tr>
@@ -172,6 +244,8 @@ def create(data):
                                             </td>
                                         </tr>
                                     """
+
+                                    
 
     source_code += f"""
                                     </table>    

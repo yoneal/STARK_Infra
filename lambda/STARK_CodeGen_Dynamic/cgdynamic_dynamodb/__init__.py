@@ -139,6 +139,45 @@ def create(data):
                     'state': None,
                     'feedback': ''
                 }},""" 
+    for rel_ent in rel_model:
+        rel_cols = rel_model[rel_ent]["data"]
+        rel_pk = rel_model[rel_ent]["pk"]
+        var_pk = rel_ent.replace(' ', '_') + '_' + rel_pk.replace(' ', '_')
+        source_code += f"""
+                '{var_pk}': {{
+                    'value': '',
+                    'required': False,
+                    'max_length': '',
+                    'data_type': '',
+                    'state': None,
+                    'feedback': ''
+                }},""" 
+        for rel_col, rel_col_type in rel_cols.items():
+            var_data = rel_ent.replace(' ', '_') + '_' + rel_col.replace(' ', '_')
+            source_code += f"""
+                '{var_data}': {{
+                    'value': '',
+                    'required': False,
+                    'max_length': '',
+                    'data_type': '',
+                    'state': None,
+                    'feedback': ''
+                }},""" 
+            
+
+    for col, col_type in columns.items():
+        col_varname = converter.convert_to_system_name(col)
+        # data_type = set_data_type(col_type)
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_many_ux = col_type.get('has_many_ux', None)
+            if has_many_ux == 'repeater':
+                source_code += f"""
+            '{col_varname}': {{
+                'value': '',
+                'required': true,
+                'max_length': '',
+                'data_type': ''
+            }},""" 
                     
     source_code += f"""
     }}
@@ -197,6 +236,17 @@ def create(data):
                 entity = converter.convert_to_system_name(relation.get('entity'))
                 source_code +=f"""
                 data['{entity}'] = payload.get('{entity}','')"""
+    
+    for rel_ent in rel_model:
+        rel_cols = rel_model[rel_ent]["data"]
+        rel_pk = rel_model[rel_ent]["pk"]
+        var_pk = rel_ent.replace(' ', '_') + '_' + rel_pk.replace(' ', '_')
+        source_code +=f"""
+                data['{var_pk}'] = payload.get('{var_pk}','')"""
+        for rel_col, rel_col_type in rel_cols.items():
+            var_data = rel_ent.replace(' ', '_') + '_' + rel_col.replace(' ', '_')
+            source_code +=f"""
+                data['{var_data}'] = payload.get('{var_data}','')"""
 
     source_code +=f"""
                 if payload.get('STARK_isReport', False) == False:
@@ -392,49 +442,119 @@ def create(data):
             raw = response.get('Items')
             next_token = response.get('LastEvaluatedKey')
             aggregate_report = False if data['STARK_group_by_1'] == '' else True
-            for record in raw:
-                item = map_results(record)
-                if aggregate_report:
-                    aggregate_key = data['STARK_group_by_1']
-                    aggregate_key_value = item.get(aggregate_key)
-                    if aggregate_key_value in aggregated_results:
-                        for field in data['STARK_count_fields']:
-                            count_index_name = f"Count of {{field}}"
-                            aggregated_results[aggregate_key_value][count_index_name] += 1
-
-                        for field in data['STARK_sum_fields']:
-                            sum_index_name = f"Sum of {{field}}"
-                            sum_value = float(item.get(field))
-                            aggregated_results[aggregate_key_value][sum_index_name] = round(aggregated_results[aggregate_key_value][sum_index_name], 1) + sum_value
-
-                        for column in data['STARK_report_fields']:
-                            if column != aggregate_key:  
-                                aggregated_results[aggregate_key_value][column] = item.get(column.replace(" ","_"))
-
-                    else:
-                        temp_dict = {{ aggregate_key : aggregate_key_value}}
-                        for field in data['STARK_count_fields']:
-                            count_index_name = f"Count of {{field}}"
-                            temp_dict.update({{
-                                count_index_name:  1
-                            }})
-                            
-                        for field in data['STARK_sum_fields']:
-                            sum_index_name = f"Sum of {{field}}"
-                            sum_value = float(item.get(field))
-                            temp_dict.update({{
-                                sum_index_name: sum_value
-                            }})
+            # Checker if report has many in report fields
+            has_many = False
+            many_sk = []
+            many_entity = []
+            for rel in relationships.get('has_many', ''):
+                for report_fields in data['STARK_report_fields']:
+                    if rel.get('entity').replace('_', ' ') in report_fields:
+                        has_many = True 
+                        # Get 1-M entity
+                        # Make List of 1-M entity
+                        rel_entity = rel.get('entity')
+                        many_entity.append(rel_entity.replace('_', ' ')) 
                         
-                        for column in data['STARK_report_fields']:
-                            if column != aggregate_key:  
+            many_entity_dict = {{}}
+            for ent in many_entity:
+                ent_filter = ent
+                many_val = []
+                for report_fields in data['STARK_report_fields']:
+                    if ent in report_fields:
+                        many_val.append(report_fields.replace(ent_filter, '').replace(' ', '_').replace("_", "", 1))
+                many_entity_dict.update({{ent.replace(' ', '_') : many_val}})
+
+            for record in raw:
+                item = []
+                item.append(map_results(record))
+
+                new_item = []
+                for each_item in item:
+                    if(has_many):
+                        # Get transaction number per report result
+                        many_pk = each_item.get(pk_field)
+                        for many_rel_entity, many_rel_field in many_entity_dict.items():
+                            many_sk = 'Transaction|' + many_rel_entity
+                            
+                            many_result = get_many_by_pk(many_pk, many_sk)
+                            response = None
+                            response = json.loads(many_result[0].get(many_sk, '').get('S'))
+                            temp_list = []
+                            for res in response:  
+                                temp_item = {{}}
+                                for item_key, item_val in each_item.items():
+                                    temp_item.update({{item_key: item_val}})
+                                consolidated_items = {{}}
+                                for rel_field in many_rel_field:
+                                    
+                                    rel_entity = many_rel_entity.replace(' ', '_')
+                                    many_field = rel_field.replace(' ', '_')
+                                    new_rel_field = rel_entity + '_' + many_field
+                                    temp_item.update({{new_rel_field : res[rel_field]}})
+                                    
+                                no_val_items = {{}}
+                                for dict in data['STARK_report_fields']:
+                                    if dict.replace(' ', '_') not in temp_item:
+                                        no_val_items.update({{dict.replace(' ', '_') : ''}})       
+                                consolidated_items = temp_item | no_val_items
+
+                                new_item.append(consolidated_items)
+                    else:
+                        new_item = item
+
+                for each_item in new_item:
+
+                    if aggregate_report:
+                        aggregate_key = data['STARK_group_by_1']
+                        aggregate_key_value = each_item.get(aggregate_key)
+                        if aggregate_key_value in aggregated_results:
+                            for field in data['STARK_count_fields']:
+                                count_index_name = f"Count of {{field}}"
+                                aggregated_results[aggregate_key_value][count_index_name] += 1
+
+                            for field in data['STARK_sum_fields']:
+                                sum_index_name = f"Sum of {{field}}"
+                                if each_item.get(field) != '':
+                                    sum_value = float(each_item.get(field))
+                                else:
+                                    sum_value = 0.00
+                                aggregated_results[aggregate_key_value][sum_index_name] = round(aggregated_results[aggregate_key_value][sum_index_name], 1) + sum_value
+
+                            for column in data['STARK_report_fields']:
+                                if column != aggregate_key:  
+                                    aggregated_results[aggregate_key_value][column] = each_item.get(column.replace(" ","_"))
+
+                        else:
+                            temp_dict = {{ aggregate_key : aggregate_key_value}}
+                            for field in data['STARK_count_fields']:
+                                count_index_name = f"Count of {{field}}"
                                 temp_dict.update({{
-                                    column: item.get(column.replace(" ","_"))
+                                    count_index_name:  1
                                 }})
 
-                        aggregated_results[aggregate_key_value] = temp_dict
-                else:
-                    items.append(item)
+                            for field in data['STARK_sum_fields']:
+                                sum_index_name = f"Sum of {{field}}"
+                                print('here')
+                                print(type(each_item.get(field)))
+                                print(each_item.get(field))
+                                if each_item.get(field) != None:
+                                    sum_value = float(each_item.get(field))
+                                else:
+                                    sum_value = 0.00
+                                temp_dict.update({{
+                                    sum_index_name: sum_value
+                                }})
+
+                            for column in data['STARK_report_fields']:
+                                if column != aggregate_key:  
+                                    temp_dict.update({{
+                                        column: each_item.get(column.replace(" ","_"))
+                                    }})
+
+                            aggregated_results[aggregate_key_value] = temp_dict
+                    else:
+                        items.append(each_item)
+
 
         report_list = []
         csv_file = ''
@@ -474,6 +594,11 @@ def create(data):
                 for index, value in key.items():
                     temp_dict[index.replace("_"," ")] = value
                 report_list.append(temp_dict)
+
+            for dict in diff_list:      
+                for report in report_list:
+                    if dict not in report:
+                        report.update({{dict : ''}})
 
             report_list = utilities.filter_report_list(report_list, diff_list)
             csv_file = utilities.create_csv(report_list, report_header)

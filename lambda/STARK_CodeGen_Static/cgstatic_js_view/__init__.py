@@ -73,6 +73,27 @@ def create(data):
                         'max_length': '',
                         'data_type': '{data_type}'
                     }},""" 
+    
+    for rel_ent in rel_model:
+        rel_cols = rel_model[rel_ent]["data"]
+        rel_pk = rel_model[rel_ent]["pk"]
+        var_pk = rel_ent.replace(' ', '_') + '_' + rel_pk.replace(' ', '_')
+        source_code += f"""
+                '{var_pk}': {{
+                    'value': '',
+                    'required': False,
+                    'max_length': '',
+                    'data_type': '',
+                }},""" 
+        for rel_col, rel_col_type in rel_cols.items():
+            var_data = rel_ent.replace(' ', '_') + '_' + rel_col.replace(' ', '_')
+            source_code += f"""
+                '{var_data}': {{
+                    'value': '',
+                    'required': False,
+                    'max_length': '',
+                    'data_type': '',
+                }},"""
                     
     source_code += f"""
                     'STARK_Report_Type': {{
@@ -175,6 +196,17 @@ def create(data):
         col_type_id = set_type(col_type)
         source_code += f"""
                     '{col_varname}':  {{"operator": "", "value": "", "type":"{col_type_id}"}},""" 
+
+    for rel_ent in rel_model:
+        rel_cols = rel_model[rel_ent]["data"]
+        rel_pk = rel_model[rel_ent]["pk"]
+        var_pk = rel_ent.replace(' ', '_') + '_' + rel_pk.replace(' ', '_')
+        source_code += f"""
+                    '{var_pk}':  {{"operator": "", "value": "", "type":"S"}},"""
+        for rel_col, rel_col_type in rel_cols.items():
+            var_data = rel_ent.replace(' ', '_') + '_' + rel_col.replace(' ', '_')
+            source_code += f"""
+                    '{var_data}':  {{"operator": "", "value": "", "type":"S"}},"""
 
     source_code += f"""
                     'STARK_isReport':true,
@@ -306,6 +338,16 @@ def create(data):
                 field_strings += f"""'{col}',"""
         else:
             field_strings += f"""'{col}',"""
+
+    for rel_ent in rel_model:
+        rel_cols = rel_model[rel_ent]["data"]
+        rel_pk = rel_model[rel_ent]["pk"]
+        var_pk = rel_ent.replace(' ', '_') + '_' + rel_pk.replace(' ', '_')
+        field_strings += f"""'{var_pk.replace('_', ' ')}',"""
+        for rel_col, rel_col_type in rel_cols.items():
+            var_data = rel_ent.replace(' ', '_') + '_' + rel_col.replace(' ', '_')
+            field_strings += f"""'{var_data.replace('_', ' ')}',"""
+
     field_strings += f"""]"""
     source_code += f"""
                 temp_checked_fields: {field_strings},
@@ -446,8 +488,8 @@ def create(data):
                             {{
                                 for (var key in data) {{
                                     if (data.hasOwnProperty(key)) {{
-                                        root.metadata[key]['state'] = false
-                                        root.metadata[key]['feedback'] = data[key]
+                                        root.validation_properties[key]['state'] = false
+                                        root.validation_properties[key]['feedback'] = data[key]
                                     }}
                                 }}
                                 return false
@@ -542,8 +584,8 @@ def create(data):
                             {{
                                 for (var key in data) {{
                                     if (data.hasOwnProperty(key)) {{
-                                        root.metadata[key]['state'] = false
-                                        root.metadata[key]['feedback'] = data[key]
+                                        root.validation_properties[key]['state'] = false
+                                        root.validation_properties[key]['feedback'] = data[key]
                                     }}
                                 }}
                                 return false
@@ -798,10 +840,18 @@ def create(data):
                             {entity_app}.report(report_payload).then( function(data) {{
                                 root.listview_table = data[0];
                                 if(root.listview_table.length > 0) {{
-                                    root.STARK_report_fields = Object.keys(root.listview_table[0])
                                     if(root.custom_report.STARK_Report_Type == 'Tabular') {{
+                                        if(root.custom_report.STARK_group_by_1 != '')
+                                        {{
+                                            root.STARK_report_fields = Object.keys(root.listview_table[0])
+                                        }}
+                                        else {{
+                                            root.STARK_report_fields = root.checked_fields 
+                                        }}
                                         root.temp_csv_link = data[1];
                                         root.temp_pdf_link = data[2];
+                                    }} else {{
+                                        root.STARK_report_fields = Object.keys(root.listview_table[0])
                                     }}
                                 }}
                                 console.log("DONE! Retrieved report.");
