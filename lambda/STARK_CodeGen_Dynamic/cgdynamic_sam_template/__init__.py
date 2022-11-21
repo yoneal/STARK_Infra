@@ -239,6 +239,11 @@ def create(data, cli_mode=False):
                 Type: AWS::S3::Bucket
                 Properties:
                     BucketName: !Join ["", [!Ref UserWebsiteBucketNameParameter, "-raw"] ]
+                PublicAccessBlockConfiguration:
+                    BlockPublicAcls: True
+                    BlockPublicPolicy: True
+                    IgnorePublicAcls: True
+                    RestrictPublicBuckets: True
         STARKSystemBucketUser:
             Type: AWS::IAM::User
             Properties: 
