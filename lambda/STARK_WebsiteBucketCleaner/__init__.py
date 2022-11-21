@@ -34,10 +34,12 @@ def empty_bucket(event, _):
         #   "I really want to empty the damn bucket no matter what!" command.
         target_bucket.object_versions.all().delete()
 
-    #FIXME: update when naming for raw and processed buckets are final
-    raw_bucket_name = target_bucket_name + "-raw"
-    target_bucket   = s3.Bucket(raw_bucket_name)
-    target_bucket.object_versions.all().delete()
+        #FIXME: update when naming for raw and processed buckets are final
+        trimmed_project_name = target_bucket_name.strip("-stark-dynamic-site")
+        analytics_bucket_suffix = ['-stark-analytics-raw', '-stark-analytics-processed', '-stark-analytics-athena']
+        for suffix in analytics_bucket_suffix:
+            target_bucket = s3.Bucket(trimmed_project_name + suffix)
+            target_bucket.object_versions.all().delete()
 
 def lambda_handler(event, context):
     helper(event, context)

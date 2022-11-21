@@ -30,7 +30,7 @@ def create(data):
             
             master_fields = []
             for key in entity_namespace.metadata.keys():
-                master_fields.append(key.replace("_"," "))
+                master_fields.append(key)
                 report_header = master_fields
 
             report_list = []
@@ -42,11 +42,15 @@ def create(data):
                     if "STARK_uploaded_s3_keys" in key:
                         key.pop("STARK_uploaded_s3_keys")
                     for index, value in key.items():
-                        temp_dict[index.replace("_"," ")] = value
+                        temp_dict[index] = value
                     report_list.append(temp_dict)
 
                 csv_file, file_buff_value = utilities.create_csv(report_list, report_header)
-                utilities.save_object_to_bucket(file_buff_value, csv_file, stark_core.raw_analytics_bucket_name, entity)
+                ## Do not use csv filename provided by the create_csv function, instead use the entity varname
+                #  so that each entity will only have one csv file making the dumper overwrite the existing file 
+                #  everytime it runs.
+                key_filename = entity 
+                utilities.save_object_to_bucket(file_buff_value, key_filename, stark_core.raw_analytics_bucket_name, entity)
     """
     return textwrap.dedent(source_code)
 

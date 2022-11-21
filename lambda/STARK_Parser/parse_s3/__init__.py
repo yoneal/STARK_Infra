@@ -20,10 +20,22 @@ def parse(data):
     if s3_static_bucket_name == "":
         s3_static_bucket_name = project_varname + "-stark-dynamic-site"
 
-    s3_static_bucket_name = converter.convert_to_system_name(s3_static_bucket_name, 's3')
+    analytics_raw_bucket_name       = project_varname + "-stark-analytics-raw"
+    analytics_processed_bucket_name = project_varname + "-stark-analytics-processed"
+    analytics_athena_bucket_name    = project_varname + "-stark-analytics-athena"
+
+    s3_static_bucket_name           = converter.convert_to_system_name(s3_static_bucket_name, 's3')
+    analytics_raw_bucket_name       = converter.convert_to_system_name(analytics_raw_bucket_name, 's3')
+    analytics_processed_bucket_name = converter.convert_to_system_name(analytics_processed_bucket_name, 's3')
+    analytics_athena_bucket_name    = converter.convert_to_system_name(analytics_athena_bucket_name, 's3')
 
     parsed =  {
         "Bucket Name": s3_static_bucket_name,
+        "Analytics Buckets": {
+            "raw"       : analytics_raw_bucket_name,
+            "processed" : analytics_processed_bucket_name,
+            "athena"    : analytics_athena_bucket_name,    
+        },
         "Error Document": "error.html",
         "Index Document": "index.html"
     }

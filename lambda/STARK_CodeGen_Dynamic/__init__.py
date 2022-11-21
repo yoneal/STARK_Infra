@@ -198,6 +198,9 @@ def create_handler(event, context):
             with open(os.path.join(root, source_file)) as f:
                 source_code = f.read().replace("[[STARK_DDB_TABLE_NAME]]", ddb_table_name)
                 source_code = source_code.replace("[[STARK_WEB_BUCKET]]", website_bucket)
+                source_code = source_code.replace("[[STARK_RAW_BUCKET]]", converter.convert_to_system_name(project_varname + '-stark-analytics-raw', 's3'))
+                source_code = source_code.replace("[[STARK_PROCESSED_BUCKET]]", converter.convert_to_system_name(project_varname + '-stark-analytics-processed', 's3'))
+                source_code = source_code.replace("[[STARK_ATHENA_BUCKET]]", converter.convert_to_system_name(project_varname + '-stark-analytics-athena', 's3'))
                 #We use root[13:] because we want to strip out the "source_files/" part of the root path
                 files_to_commit.append({
                     'filePath': f"lambda/" + os.path.join(root[13:], source_file),

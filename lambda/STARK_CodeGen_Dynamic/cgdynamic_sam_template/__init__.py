@@ -67,9 +67,12 @@ def create(data, cli_mode=False):
     #Load and sanitize data here, for whatever IaC rules that govern them (e.g., S3 Bucket names must be lowercase)
 
     #S3-related data
-    s3_bucket_name    = cloud_resources["S3 webserve"]["Bucket Name"].lower()
-    s3_error_document = cloud_resources["S3 webserve"]["Error Document"]
-    s3_index_document = cloud_resources["S3 webserve"]["Index Document"]
+    s3_bucket_name           = cloud_resources["S3 webserve"]["Bucket Name"].lower()
+    s3_raw_bucket_name       = cloud_resources["S3 webserve"]["Analytics Buckets"]["raw"].lower()
+    s3_processed_bucket_name = cloud_resources["S3 webserve"]["Analytics Buckets"]["processed"].lower()
+    s3_athena_bucket_name    = cloud_resources["S3 webserve"]["Analytics Buckets"]["athena"].lower()
+    s3_error_document        = cloud_resources["S3 webserve"]["Error Document"]
+    s3_index_document        = cloud_resources["S3 webserve"]["Index Document"]
 
     #DynamoDB-related data
     ddb_table_name            = cloud_resources["DynamoDB"]['Table Name']
@@ -238,7 +241,25 @@ def create(data, cli_mode=False):
         STARKAnalyticsRawBucket:
                 Type: AWS::S3::Bucket
                 Properties:
-                    BucketName: !Join ["", [!Ref UserWebsiteBucketNameParameter, "-raw"] ]
+                    BucketName: {s3_raw_bucket_name}
+                PublicAccessBlockConfiguration:
+                    BlockPublicAcls: True
+                    BlockPublicPolicy: True
+                    IgnorePublicAcls: True
+                    RestrictPublicBuckets: True
+        STARKAnalyticsProcessedBucket:
+                Type: AWS::S3::Bucket
+                Properties:
+                    BucketName: {s3_processed_bucket_name}
+                PublicAccessBlockConfiguration:
+                    BlockPublicAcls: True
+                    BlockPublicPolicy: True
+                    IgnorePublicAcls: True
+                    RestrictPublicBuckets: True
+        STARKAnalyticsAthenaBucket:
+                Type: AWS::S3::Bucket
+                Properties:
+                    BucketName: {s3_athena_bucket_name}
                 PublicAccessBlockConfiguration:
                     BlockPublicAcls: True
                     BlockPublicPolicy: True
@@ -318,7 +339,7 @@ def create(data, cli_mode=False):
                                         - !Join [ ":", [ "arn:aws:dynamodb", !Ref AWS::Region, !Ref AWS::AccountId, "table/{ddb_table_name}/index/STARK-ListView-Index", ] ]
                                         - !Join [ "",  [ "arn:aws:s3:::", "{s3_bucket_name}", "/tmp/*"] ]
                                         - !Join [ "",  [ "arn:aws:s3:::", "{s3_bucket_name}", "/uploaded_files/*"] ]
-                                        - !Join [ "",  [ "arn:aws:s3:::", "{s3_bucket_name}", "-raw/*"] ]
+                                        - !Join [ "",  [ "arn:aws:s3:::", "{s3_raw_bucket_name}", "/*"] ]
         STARKProjectDefaultAuthorizerInvokeRole:
             Type: AWS::IAM::Role
             Properties:
