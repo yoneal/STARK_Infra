@@ -142,12 +142,12 @@ def create(data):
                                         </tr>
                                     """
             
-        for rel_ent in rel_model:
-            rel_cols = rel_model[rel_ent]["data"]
-            rel_pk = rel_model[rel_ent]["pk"]
-            var_pk = rel_ent.replace(' ', '_') + '_' + rel_pk.replace(' ', '_')
-            pk_label = '[' + rel_ent + '] ' + rel_pk
-            source_code += f"""
+    for rel_ent in rel_model:
+        rel_cols = rel_model[rel_ent]["data"]
+        rel_pk = rel_model[rel_ent]["pk"]
+        var_pk = rel_ent.replace(' ', '_') + '_' + rel_pk.replace(' ', '_')
+        pk_label = '[' + rel_ent + '] ' + rel_pk
+        source_code += f"""
                                         <tr>
                                             <td>
                                                 <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{var_pk.replace('_', ' ')}" id="{var_pk}" v-model="checked_fields">
@@ -178,10 +178,10 @@ def create(data):
                                             </td>
                                         </tr>
                             """
-            for rel_col, rel_col_type in rel_cols.items():
-                var_data = rel_ent.replace(' ', '_') + '_' + rel_col.replace(' ', '_')
-                data_label = '[' + rel_ent + '] ' + rel_col
-                source_code += f"""
+        for rel_col, rel_col_type in rel_cols.items():
+            var_data = rel_ent.replace(' ', '_') + '_' + rel_col.replace(' ', '_')
+            data_label = '[' + rel_ent + '] ' + rel_col
+            source_code += f"""
                                         <tr>
                                             <td>
                                                 <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{var_data.replace('_', ' ')}" id="{var_data}" v-model="checked_fields">
