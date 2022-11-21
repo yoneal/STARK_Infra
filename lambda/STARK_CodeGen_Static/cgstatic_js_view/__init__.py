@@ -79,21 +79,21 @@ def create(data):
         rel_pk = rel_model[rel_ent]["pk"]
         var_pk = rel_ent.replace(' ', '_') + '_' + rel_pk.replace(' ', '_')
         source_code += f"""
-                '{var_pk}': {{
-                    'value': '',
-                    'required': False,
-                    'max_length': '',
-                    'data_type': '',
-                }},""" 
+                    '{var_pk}': {{
+                        'value': '',
+                        'required': false,
+                        'max_length': '',
+                        'data_type': '',
+                    }},""" 
         for rel_col, rel_col_type in rel_cols.items():
             var_data = rel_ent.replace(' ', '_') + '_' + rel_col.replace(' ', '_')
             source_code += f"""
-                '{var_data}': {{
-                    'value': '',
-                    'required': False,
-                    'max_length': '',
-                    'data_type': '',
-                }},"""
+                    '{var_data}': {{
+                        'value': '',
+                        'required': false,
+                        'max_length': '',
+                        'data_type': '',
+                    }},"""
                     
     source_code += f"""
                     'STARK_Report_Type': {{
