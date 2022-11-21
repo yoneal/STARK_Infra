@@ -242,29 +242,29 @@ def create(data, cli_mode=False):
                 Type: AWS::S3::Bucket
                 Properties:
                     BucketName: {s3_raw_bucket_name}
-                PublicAccessBlockConfiguration:
-                    BlockPublicAcls: True
-                    BlockPublicPolicy: True
-                    IgnorePublicAcls: True
-                    RestrictPublicBuckets: True
+                    PublicAccessBlockConfiguration:
+                        BlockPublicAcls: True
+                        BlockPublicPolicy: True
+                        IgnorePublicAcls: True
+                        RestrictPublicBuckets: True
         STARKAnalyticsProcessedBucket:
                 Type: AWS::S3::Bucket
                 Properties:
                     BucketName: {s3_processed_bucket_name}
-                PublicAccessBlockConfiguration:
-                    BlockPublicAcls: True
-                    BlockPublicPolicy: True
-                    IgnorePublicAcls: True
-                    RestrictPublicBuckets: True
+                    PublicAccessBlockConfiguration:
+                        BlockPublicAcls: True
+                        BlockPublicPolicy: True
+                        IgnorePublicAcls: True
+                        RestrictPublicBuckets: True
         STARKAnalyticsAthenaBucket:
                 Type: AWS::S3::Bucket
                 Properties:
                     BucketName: {s3_athena_bucket_name}
-                PublicAccessBlockConfiguration:
-                    BlockPublicAcls: True
-                    BlockPublicPolicy: True
-                    IgnorePublicAcls: True
-                    RestrictPublicBuckets: True
+                    PublicAccessBlockConfiguration:
+                        BlockPublicAcls: True
+                        BlockPublicPolicy: True
+                        IgnorePublicAcls: True
+                        RestrictPublicBuckets: True
         STARKSystemBucketUser:
             Type: AWS::IAM::User
             Properties: 
