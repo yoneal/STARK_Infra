@@ -35,7 +35,7 @@ def empty_bucket(event, _):
         target_bucket.object_versions.all().delete()
 
         #FIXME: update when naming for raw and processed buckets are final
-        trimmed_project_name = target_bucket_name.strip("-stark-dynamic-site")
+        trimmed_project_name = target_bucket_name[0:-19]
         analytics_bucket_suffix = ['-stark-analytics-raw', '-stark-analytics-processed', '-stark-analytics-athena']
         for suffix in analytics_bucket_suffix:
             target_bucket = s3.Bucket(trimmed_project_name + suffix)
