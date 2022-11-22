@@ -49,7 +49,7 @@ def create(data):
                 ## Do not use csv filename provided by the create_csv function, instead use the entity varname
                 #  so that each entity will only have one csv file making the dumper overwrite the existing file 
                 #  everytime it runs.
-                key_filename = entity 
+                key_filename = entity + ".csv"
                 utilities.save_object_to_bucket(file_buff_value, key_filename, stark_core.analytics_raw_bucket_name, entity)
     """
     return textwrap.dedent(source_code)
