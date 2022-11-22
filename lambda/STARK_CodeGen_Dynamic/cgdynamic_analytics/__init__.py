@@ -50,7 +50,7 @@ def create(data):
                 #  so that each entity will only have one csv file making the dumper overwrite the existing file 
                 #  everytime it runs.
                 key_filename = entity 
-                utilities.save_object_to_bucket(file_buff_value, key_filename, stark_core.raw_analytics_bucket_name, entity)
+                utilities.save_object_to_bucket(file_buff_value, key_filename, stark_core.analytics_raw_bucket_name, entity)
     """
     return textwrap.dedent(source_code)
 
