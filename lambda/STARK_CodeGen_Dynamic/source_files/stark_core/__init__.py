@@ -18,4 +18,4 @@ upload_dir  = f"uploaded_files/"
 
 analytics_raw_bucket_name       = "[[STARK_RAW_BUCKET]]"
 analytics_processed_bucket_name = "[[STARK_PROCESSED_BUCKET]]"
-analytics_processed_bucket_name = "[[STARK_ATHENA_BUCKET]]"
+analytics_athena_bucket_name    = "[[STARK_ATHENA_BUCKET]]"
