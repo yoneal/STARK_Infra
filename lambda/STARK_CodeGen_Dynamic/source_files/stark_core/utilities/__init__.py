@@ -235,10 +235,10 @@ def estimate_lines_needed(self, iter, col_width: float) -> int:
     return math.ceil(max_cell_text_len_header * font_width_in_mm / col_width)
 
 def save_object_to_bucket(body, filename, bucket_name = None, directory = "tmp"):
-    canned_ACL = 'public-read'
+    canned_ACL = 'private'
     if bucket_name == None:
         bucket_name = stark_core.bucket_name
-        canned_ACL = 'private'
+        canned_ACL = 'public-read'
 
     s3_action = s3.put_object(
         ACL= canned_ACL,
