@@ -398,6 +398,7 @@ def create(data, cli_mode=False):
                     MaximumWindowInMinutes: 2
                     Mode: FLEXIBLE
                 ScheduleExpression: cron(0 0 * * ? *)
+                ScheduleExpressionTimezone: Hongkong
                 State: ENABLED
                 Target:
                     Arn: !GetAtt STARKBackendApiForSTARKAnalytics.Arn
