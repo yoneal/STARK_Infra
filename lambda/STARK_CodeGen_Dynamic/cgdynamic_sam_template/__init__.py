@@ -742,24 +742,24 @@ def create(data, cli_mode=False):
                 Timeout: 5
                 Layers:
                     - !Ref Fpdf2Layer
-    STARKAnalyticsGlueJobFor{entity_logical_name}:
-            Type: AWS::Glue::Job
-            Properties: 
-                Command: 
-                    Name: glueetl
-                    PythonVersion: 3
-                    ScriptLocation: lambda/STARK_Analytics/ETL_Scripts/{entity_endpoint_name}.py
-                Description: Test template generated ETL Job
-                ExecutionClass: STANDARD
-                ExecutionProperty: 
-                    MaxConcurrentRuns: 1
-                GlueVersion: 3.0
-                MaxRetries: 0
-                Name: STARK_unique_job_name_only
-                NumberOfWorkers: 2
-                Role: !GetAtt STARKAnalyticsGlueJobRole.Arn
-                Timeout: 2880
-                WorkerType: G.1X"""
+        STARKAnalyticsGlueJobFor{entity_logical_name}:
+                Type: AWS::Glue::Job
+                Properties: 
+                    Command: 
+                        Name: glueetl
+                        PythonVersion: 3
+                        ScriptLocation: lambda/STARK_Analytics/ETL_Scripts/{entity_endpoint_name}.py
+                    Description: Test template generated ETL Job
+                    ExecutionClass: STANDARD
+                    ExecutionProperty: 
+                        MaxConcurrentRuns: 1
+                    GlueVersion: 3.0
+                    MaxRetries: 0
+                    Name: STARK_{project_varname}_ETL_script_for_{entity_endpoint_name}
+                    NumberOfWorkers: 2
+                    Role: !GetAtt STARKAnalyticsGlueJobRole.Arn
+                    Timeout: 2880
+                    WorkerType: G.1X"""
     
     cf_template += f"""
         STARKBackendApiForSTARKAnalytics:
