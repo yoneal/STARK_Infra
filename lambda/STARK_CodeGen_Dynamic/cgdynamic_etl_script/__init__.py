@@ -8,8 +8,8 @@ import convert_friendly_to_system as converter
 def create(data):
   
     entity                = data["Entity"]
-    raw_bucket_name       = data["Analytics Raw Bucket Name"]
-    processed_bucket_name = data["Analytics Processed Bucket Name"]
+    raw_bucket_name       = data["Raw Bucket Name"]
+    processed_bucket_name = data["Processed Bucket Name"]
     project_varname       = data["Project Name"]
 
     entity_varname = converter.convert_to_system_name(entity)
