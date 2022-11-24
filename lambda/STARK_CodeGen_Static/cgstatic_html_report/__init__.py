@@ -227,9 +227,7 @@ def create(data):
                                                 </b-form-select>
                                             </td>
                                             <td>
-                                                <div class="report">
-                                                    {html_control_code}
-                                                </div>
+                                                <input type="text" class="form-control" id="{var_data}_filter_value" placeholder="" v-model="custom_report.{var_data}.value">
                                             </td>
                                             <td>
                                                 <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{var_data}" id="Sum_of_{var_data}" v-model="custom_report.STARK_sum_fields" :disabled="metadata.{var_data}.data_type != 'Number' && metadata.{var_data}.data_type != 'Float'" onchange="root.set_y_data_source('Sum_of_{var_data}')">
