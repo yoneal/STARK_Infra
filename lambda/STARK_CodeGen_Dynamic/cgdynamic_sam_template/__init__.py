@@ -270,7 +270,7 @@ def create(data, cli_mode=False):
                 Properties:
                     CatalogId: !Ref AWS::AccountId
                     DatabaseInput:
-                        Name: {project_varname.lower()}_db
+                        Name: stark_{project_varname.lower()}_db
         STARKAnalyticsGlueJobRole:
             Type: AWS::IAM::Role
             Properties:
@@ -297,10 +297,12 @@ def create(data, cli_mode=False):
                                     Action:
                                         - 's3:PutObject'
                                         - 's3:GetObject'
+                                        - 's3:PutObjectACL'
+                                        - 's3:GetObjectACL'
                                     Resource: 
                                         - !Join [ "",  [ "arn:aws:s3:::", "{s3_processed_bucket_name}", "/*"] ]
                                         - !Join [ "",  [ "arn:aws:s3:::", "{s3_processed_bucket_name}"] ]
-                                        - !Join [ "",  [ "arn:aws:s3:::", !Ref UserCICDPipelineBucketNameParameter, "{project_varname}/*"] ]
+                                        - !Join [ "",  [ "arn:aws:s3:::", !Ref UserCICDPipelineBucketNameParameter, "/{project_varname}/*"] ]
         STARKSystemBucketUser:
             Type: AWS::IAM::User
             Properties: 

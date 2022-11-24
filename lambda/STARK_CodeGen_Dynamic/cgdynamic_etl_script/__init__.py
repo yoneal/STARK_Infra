@@ -81,7 +81,7 @@ def create(data):
 
     metadata_mappings = []
     for field, item in metadata.items():
-        metadata_mappings.append((field, item.data_type, field, item.data_type))
+        metadata_mappings.append((field, item['data_type'], field, item['data_type']))
 
     # Script generated for node ApplyMapping
     ApplyMapping_node2 = ApplyMapping.apply(
@@ -101,7 +101,7 @@ def create(data):
         transformation_ctx="S3bucket_node3",
     )
     S3bucket_node3.setCatalogInfo(
-        catalogDatabase="{project_varname}_db", catalogTableName="{entity_varname}"
+        catalogDatabase="stark_{project_varname.lower()}_db", catalogTableName="{entity_varname}"
     )
     S3bucket_node3.setFormat("glueparquet")
     S3bucket_node3.writeFrame(ApplyMapping_node2)

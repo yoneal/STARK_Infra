@@ -41,8 +41,8 @@ def empty_bucket(event, _):
         trimmed_project_name = target_bucket_name[0:-19]
         analytics_bucket_suffix = ['-stark-analytics-raw', '-stark-analytics-processed', '-stark-analytics-athena']
         for suffix in analytics_bucket_suffix:
-            target_bucket = s3.Bucket(trimmed_project_name + suffix)
             try:
+                target_bucket = s3.Bucket(trimmed_project_name + suffix)
                 target_bucket.object_versions.all().delete()
             except Exception as error:
                 print(target_bucket + "does not exist or already deleted")
