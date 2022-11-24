@@ -624,13 +624,18 @@ def create(data):
                         console.log("VIEW: Getting!")
 
                         {entity_app}.get(data).then( function(data) {{
-                            root.{entity_varname} = data["item"]; 
+                            root.{entity_varname} = data["item"];"""
+    if with_upload or with_upload_on_many:
+        source_code += f"""
+                            root.object_url_prefix = data['object_url_prefix']"""
+    source_code += f"""
                             root.{entity_varname}.orig_{pk_varname} = root.{entity_varname}.{pk_varname};"""
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
         if isinstance(col_type, dict) and col_type['type'] == 'file-upload':
             source_code += f"""
                             root.{entity_varname}.STARK_uploaded_s3_keys['{col_varname}'] = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.STARK_uploaded_s3_keys.{col_varname} : ""
+                            root.Transaction.orig_STARK_uploaded_s3_keys = structuredClone(Object.fromEntries(Object.entries(data["item"]['STARK_uploaded_s3_keys'])))
                             root.STARK_upload_elements['{col_varname}'].file = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.{col_varname} : ""
                             root.STARK_upload_elements['{col_varname}'].progress_bar_val = root.{entity_varname}.{col_varname} != "" ? 100 : 0
                             
@@ -677,9 +682,7 @@ def create(data):
                 rel_foreign_entity = converter.convert_to_system_name(col)
                 source_code += f"""
                             root.many_entity.{col_varname}.list_{rel_foreign_entity}()"""
-    if with_upload or with_upload_on_many:
-        source_code += f"""
-                            root.object_url_prefix = data['object_url_prefix']"""
+    
     source_code += f"""
                             console.log("VIEW: Retreived module data.")
                             root.show()
@@ -984,15 +987,8 @@ def create(data):
                     error_message = ""
 
                     if(file) {{
-                        if(typeof root.{entity_varname}.STARK_uploaded_s3_keys[file_upload_element] == 'undefined') {{
-                            uuid = STARK.create_UUID()
-                            ext = file.name.split('.').pop()
-                        }}
-                        else {{
-                            var s3_key = root.{entity_varname}.STARK_uploaded_s3_keys[file_upload_element]
-                            uuid = s3_key.split('.').shift()
-                            ext = file.name.split('.').pop()
-                        }}
+                        uuid = STARK.create_UUID()
+                        ext = file.name.split('.').pop()
 
                         valid_file = STARK.get_file_ext_whitelist(root.ext_whitelist[file_upload_element], root.ext_whitelist_table).split(", ").includes(ext)
                         allowed_file_size = STARK.get_allowed_upload_size(root.allowed_size[file_upload_element], root.allowed_size_table)

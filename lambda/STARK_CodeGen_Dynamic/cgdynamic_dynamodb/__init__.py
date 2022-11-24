@@ -94,6 +94,7 @@ def create(data):
     #Extra modules
     import boto3
     import uuid
+    import copy
 
     #STARK
     import stark_core 
@@ -274,6 +275,7 @@ def create(data):
                     data['STARK_group_by_1'] = payload.get('STARK_group_by_1', '')
 
                 data['STARK_uploaded_s3_keys'] = payload.get('STARK_uploaded_s3_keys',{{}})
+                data['orig_STARK_uploaded_s3_keys'] = payload.get('orig_STARK_uploaded_s3_keys',{{}})
 
                 if isInvalidPayload:
                     return {{
@@ -776,7 +778,19 @@ def create(data):
 
     if with_upload or with_upload_on_many:
         source_code += f"""
+        #FIXME: Simplify comparison using metadata after metadata separation in child entities
         temp_s3_keys = data.get('STARK_uploaded_s3_keys', {{}}) 
+        orig_s3_keys = data.get('orig_STARK_uploaded_s3_keys', {{}}) 
+        updated_s3_keys = compareDict(orig_s3_keys, temp_s3_keys)
+
+        for updated_key, updated_items in updated_s3_keys.items():
+            if isinstance(updated_items, dict):
+                for updated_sub_key, updated_sub_items in updated_items.items():
+                    for updated_s3_key in updated_sub_items:
+                        utilities.copy_object_to_bucket(updated_s3_key, entity_upload_dir)
+            else:
+                utilities.copy_object_to_bucket(updated_items, entity_upload_dir)
+
         STARK_uploaded_s3_keys = {{}}
         for key, items in temp_s3_keys.items():
             upload_data = {{}}
@@ -784,11 +798,8 @@ def create(data):
                 upload_dict_data = {{}}
                 for sub_key, sub_items in items.items():
                     upload_dict_data[sub_key] = {{'S':'||'.join(sub_items)}}
-                    for s3_key in sub_items:
-                        utilities.copy_object_to_bucket(s3_key, entity_upload_dir)
                 upload_data = {{'M': upload_dict_data}}
             else:  
-                utilities.copy_object_to_bucket(items, entity_upload_dir)
                 upload_data = {{'S': items}}
             STARK_uploaded_s3_keys[key] = upload_data
         """
@@ -895,6 +906,7 @@ def create(data):
     if with_upload or with_upload_on_many:
         source_code += f"""
         temp_s3_keys = data.get('STARK_uploaded_s3_keys', {{}}) 
+        orig_s3_keys = data.get('orig_STARK_uploaded_s3_keys', {{}})
         STARK_uploaded_s3_keys = {{}}
         for key, items in temp_s3_keys.items():
             upload_data = {{}}
@@ -1083,6 +1095,41 @@ def create(data):
 
         return "OK"
     """
+    if with_upload or with_upload_on_many:
+        source_code += f"""        
+    def compareDict(old_dict, new_dict):
+        diff_orig = set(old_dict) - set(new_dict)
+        diff_temp = set(new_dict) - set(old_dict)
+        intersect_keys = set(old_dict.keys()).intersection(set(new_dict.keys()))
+        modified = {{}}
+        for i in intersect_keys:
+            if old_dict[i] != new_dict[i]: 
+                if isinstance(old_dict[i], dict) and isinstance(old_dict[i], dict):
+                    modified[i]=compareDict(old_dict[i], new_dict[i])
+                elif isinstance(old_dict[i], list) and isinstance(old_dict[i], list):
+                    lst = []
+                    
+                    # diff_temp = set(new_dict) - set(old_dict)
+                    # for a in old_dict[i]:
+                    #     # diff_orig_set = set(old_dict[i]) - set(new_dict[i])
+                    #     if a not in new_dict[i]:
+                    #         lst.append(a)
+                    #         modified.update({{i : lst}})
+
+                    for b in new_dict[i]:
+                        if b not in old_dict[i]:
+                            lst.append(b)
+                            modified.update({{i : lst}})
+                else:
+                    modified.update({{i : new_dict[i]}})
+
+        for a in diff_orig:
+            modified.update({{a : old_dict[a]}})
+
+        for b in diff_temp:
+            modified.update({{b : new_dict[b]}})
+                
+        return copy.deepcopy(modified)"""
 
     return textwrap.dedent(source_code)
 
