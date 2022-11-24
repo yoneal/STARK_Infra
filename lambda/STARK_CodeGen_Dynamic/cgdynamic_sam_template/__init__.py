@@ -300,6 +300,7 @@ def create(data, cli_mode=False):
                                     Resource: 
                                         - !Join [ "",  [ "arn:aws:s3:::", "{s3_processed_bucket_name}", "/*"] ]
                                         - !Join [ "",  [ "arn:aws:s3:::", "{s3_processed_bucket_name}"] ]
+                                        - !Join [ "",  [ "arn:aws:s3:::", !Ref UserCICDPipelineBucketNameParameter, "{project_varname}/*"] ]
         STARKSystemBucketUser:
             Type: AWS::IAM::User
             Properties: 
