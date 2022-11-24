@@ -69,7 +69,7 @@ def filter_report_list(report_list, diff_list):
 def create_csv(report_list, csv_header):
     
     file_buff = StringIO()
-    writer = csv.DictWriter(file_buff, fieldnames=csv_header)
+    writer = csv.DictWriter(file_buff, fieldnames=csv_header,quoting=csv.QUOTE_ALL)
     writer.writeheader()
     for rows in report_list:
         writer.writerow(rows)

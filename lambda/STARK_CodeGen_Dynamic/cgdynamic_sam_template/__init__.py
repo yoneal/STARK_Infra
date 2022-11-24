@@ -265,6 +265,41 @@ def create(data, cli_mode=False):
                         BlockPublicPolicy: True
                         IgnorePublicAcls: True
                         RestrictPublicBuckets: True
+        STARKAnalyticsGlueDatabase:
+                Type: AWS::Glue::Database
+                Properties:
+                    CatalogId: !Ref AWS::AccountId
+                    DatabaseInput:
+                        Name: {project_varname.lower()}_db
+        STARKAnalyticsGlueJobRole:
+            Type: AWS::IAM::Role
+            Properties:
+                AssumeRolePolicyDocument:
+                    Version: '2012-10-17'
+                    Statement: 
+                        - 
+                            Effect: Allow
+                            Principal:
+                                Service: 
+                                    - 'glue.amazonaws.com'
+                            Action: 'sts:AssumeRole'
+                ManagedPolicyArns:
+                    - 'arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole'
+                Policies:
+                    - 
+                        PolicyName: PolicyForSTARKAnalyticsGlueJobRole
+                        PolicyDocument:
+                            Version: '2012-10-17'
+                            Statement:
+                                - 
+                                    Sid: VisualEditor0
+                                    Effect: Allow
+                                    Action:
+                                        - 's3:PutObject'
+                                        - 's3:GetObject'
+                                    Resource: 
+                                        - !Join [ "",  [ "arn:aws:s3:::", "{s3_processed_bucket_name}", "/*"] ]
+                                        - !Join [ "",  [ "arn:aws:s3:::", "{s3_processed_bucket_name}"] ]
         STARKSystemBucketUser:
             Type: AWS::IAM::User
             Properties: 
@@ -706,7 +741,25 @@ def create(data, cli_mode=False):
                 MemorySize: 128
                 Timeout: 5
                 Layers:
-                    - !Ref Fpdf2Layer"""
+                    - !Ref Fpdf2Layer
+    STARKAnalyticsGlueJobFor{entity_logical_name}:
+            Type: AWS::Glue::Job
+            Properties: 
+                Command: 
+                    Name: glueetl
+                    PythonVersion: 3
+                    ScriptLocation: lambda/STARK_Analytics/ETL_Scripts/{entity_endpoint_name}.py
+                Description: Test template generated ETL Job
+                ExecutionClass: STANDARD
+                ExecutionProperty: 
+                    MaxConcurrentRuns: 1
+                GlueVersion: 3.0
+                MaxRetries: 0
+                Name: STARK_unique_job_name_only
+                NumberOfWorkers: 2
+                Role: !GetAtt STARKAnalyticsGlueJobRole.Arn
+                Timeout: 2880
+                WorkerType: G.1X"""
     
     cf_template += f"""
         STARKBackendApiForSTARKAnalytics:
