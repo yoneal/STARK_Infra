@@ -110,7 +110,7 @@ def create_handler(event, context):
         source_code            = cg_ddb.create(data)
         test_source_code       = cg_test.create(data)
         fixtures_source_code   = cg_fixtures.create(data)
-        etl_script_source_code = cg_etl_script(data)
+        etl_script_source_code = cg_etl_script.create(data)
 
         #Step 2: Add source code to our commit list to the project repo
         files_to_commit.append({
