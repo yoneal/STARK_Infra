@@ -28,8 +28,8 @@ cg_auth      = importlib.import_module(f"{prepend_dir}cgdynamic_authorizer")
 cg_sam       = importlib.import_module(f"{prepend_dir}cgdynamic_sam_template")
 cg_conf      = importlib.import_module(f"{prepend_dir}cgdynamic_template_conf")
 
-cg_analytics   = importlib.import_module(f"{prepend_dir}cgdynamic_analytics")
-cg_etl_scripts = importlib.import_module(f"{prepend_dir}cgdynamic_etl_scripts")
+cg_analytics  = importlib.import_module(f"{prepend_dir}cgdynamic_analytics")
+cg_etl_script = importlib.import_module(f"{prepend_dir}cgdynamic_etl_script")
 
 cg_conftest = importlib.import_module(f"{prepend_dir}cgdynamic_conftest")
 cg_test     = importlib.import_module(f"{prepend_dir}cgdynamic_test_cases")
@@ -110,7 +110,7 @@ def create_handler(event, context):
         source_code            = cg_ddb.create(data)
         test_source_code       = cg_test.create(data)
         fixtures_source_code   = cg_fixtures.create(data)
-        etl_script_source_code = cg_etl_scripts(data)
+        etl_script_source_code = cg_etl_script(data)
 
         #Step 2: Add source code to our commit list to the project repo
         files_to_commit.append({
