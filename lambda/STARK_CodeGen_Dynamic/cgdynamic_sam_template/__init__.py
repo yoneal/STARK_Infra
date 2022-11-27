@@ -271,6 +271,19 @@ def create(data, cli_mode=False):
                     CatalogId: !Ref AWS::AccountId
                     DatabaseInput:
                         Name: stark_{project_varname.lower()}_db
+        STARKAnalyticsAthenaWorkGroup:
+            Type: AWS::Athena::WorkGroup
+            Properties:
+            Name: STARK_{project_varname}_workgroup
+            Description: My WorkGroup Updated
+            State: ENABLED
+            WorkGroupConfigurationUpdates:
+                BytesScannedCutoffPerQuery: 200000000
+                EnforceWorkGroupConfiguration: false
+                PublishCloudWatchMetricsEnabled: false
+                RequesterPaysEnabled: true
+                ResultConfiguration:
+                    OutputLocation: s3://{s3_athena_bucket_name}/output/
         STARKAnalyticsGlueJobRole:
             Type: AWS::IAM::Role
             Properties:
@@ -699,7 +712,7 @@ def create(data, cli_mode=False):
                 ProvisionedThroughput:
                     ReadCapacityUnits: {ddb_rcu_provisioned}
                     WriteCapacityUnits: {ddb_wcu_provisioned}"""
-    etl_job_names = ""
+    etl_job_names = []
     for entity in entities:
         entity_logical_name = converter.convert_to_system_name(entity, "cf-resource")
         entity_endpoint_name = converter.convert_to_system_name(entity)
@@ -764,8 +777,7 @@ def create(data, cli_mode=False):
                     Role: !GetAtt STARKAnalyticsGlueJobRole.Arn
                     Timeout: 2880
                     WorkerType: G.1X"""
-        etl_job_names += f"""
-                -  STARK_{project_varname}_ETL_script_for_{entity_endpoint_name}"""
+        etl_job_names.append(f"STARK_{project_varname}_ETL_script_for_{entity_endpoint_name}") 
     cf_template += f"""
         STARKAnalyticsETLScheduledTrigger:
             Type: AWS::Glue::Trigger
@@ -773,9 +785,13 @@ def create(data, cli_mode=False):
             Type: SCHEDULED
             Description: DESCRIPTION_SCHEDULED
             Schedule: cron(30 0 * * ? *)
-            Actions: {etl_job_names}
-                Arguments:
-                    '--job-bookmark-option': job-bookmark-enable
+            Actions: """
+    for jobs in etl_job_names:
+        cf_template +=f"""
+                - JobName: !Ref {jobs}
+                  Arguments:
+                    '--job-bookmark-option': job-bookmark-enable"""
+    cf_template += f"""
             Name: STARK_{project_varname}_ETL_Scheduled_Trigger
         STARKBackendApiForSTARKAnalytics:
             Type: AWS::Serverless::Function
