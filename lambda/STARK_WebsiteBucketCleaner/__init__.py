@@ -45,7 +45,7 @@ def empty_bucket(event, _):
                 target_bucket = s3.Bucket(trimmed_project_name + suffix)
                 target_bucket.object_versions.all().delete()
             except Exception as error:
-                print(target_bucket + "does not exist or already deleted")
+                print(trimmed_project_name + suffix + "does not exist or already deleted")
 
 def lambda_handler(event, context):
     helper(event, context)
