@@ -277,7 +277,7 @@ def create(data, cli_mode=False):
                 Name: STARK_{project_varname}_workgroup
                 Description: My WorkGroup Updated
                 State: ENABLED
-                WorkGroupConfigurationUpdates:
+                WorkGroupConfiguration:
                     BytesScannedCutoffPerQuery: 200000000
                     EnforceWorkGroupConfiguration: false
                     PublishCloudWatchMetricsEnabled: false
