@@ -712,7 +712,6 @@ def create(data, cli_mode=False):
                 ProvisionedThroughput:
                     ReadCapacityUnits: {ddb_rcu_provisioned}
                     WriteCapacityUnits: {ddb_wcu_provisioned}"""
-    etl_job_names = []
     etl_resource_names = []
     for entity in entities:
         entity_logical_name = converter.convert_to_system_name(entity, "cf-resource")
@@ -778,7 +777,6 @@ def create(data, cli_mode=False):
                     Role: !GetAtt STARKAnalyticsGlueJobRole.Arn
                     Timeout: 2880
                     WorkerType: G.1X"""
-        etl_job_names.append(f"STARK_{project_varname}_ETL_script_for_{entity_endpoint_name}")
         etl_resource_names.append(f"STARKAnalyticsGlueJobFor{entity_logical_name}") 
     cf_template += f"""
         STARKAnalyticsETLScheduledTrigger:
@@ -788,10 +786,10 @@ def create(data, cli_mode=False):
                 Description: DESCRIPTION_SCHEDULED
                 Schedule: cron(30 0 * * ? *)
                 Actions: """
-    for jobs in etl_job_names:
+    for resource_name in etl_resource_names:
         cf_template +=f"""
                     - 
-                        JobName: !Ref {jobs}
+                        JobName: !Ref {resource_name}
                         Arguments:
                             "--job-bookmark-option": job-bookmark-enable"""
     cf_template += f"""
