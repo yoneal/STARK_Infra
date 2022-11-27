@@ -284,6 +284,8 @@ def create(data, cli_mode=False):
                     RequesterPaysEnabled: true
                     ResultConfiguration:
                         OutputLocation: s3://{s3_athena_bucket_name}/output/
+            DependsOn:
+                - STARKAnalyticsAthenaBucket
         STARKAnalyticsGlueJobRole:
             Type: AWS::IAM::Role
             Properties:
