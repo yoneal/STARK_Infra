@@ -788,9 +788,9 @@ def create(data, cli_mode=False):
                 Actions: """
     for jobs in etl_job_names:
         cf_template +=f"""
-                    - JobName: !Ref {jobs}
-                    Arguments:
-                        '--job-bookmark-option': job-bookmark-enable"""
+                        - JobName: !Ref {jobs}
+                        Arguments:
+                            '--job-bookmark-option': job-bookmark-enable"""
     cf_template += f"""
                 Name: STARK_{project_varname}_ETL_Scheduled_Trigger
         STARKBackendApiForSTARKAnalytics:
