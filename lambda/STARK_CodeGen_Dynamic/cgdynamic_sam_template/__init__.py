@@ -239,38 +239,38 @@ def create(data, cli_mode=False):
                     IndexDocument: {s3_index_document}"""
     cf_template +=f"""
         STARKAnalyticsRawBucket:
-                Type: AWS::S3::Bucket
-                Properties:
-                    BucketName: {s3_raw_bucket_name}
-                    PublicAccessBlockConfiguration:
-                        BlockPublicAcls: True
-                        BlockPublicPolicy: True
-                        IgnorePublicAcls: True
-                        RestrictPublicBuckets: True
+            Type: AWS::S3::Bucket
+            Properties:
+                BucketName: {s3_raw_bucket_name}
+                PublicAccessBlockConfiguration:
+                    BlockPublicAcls: True
+                    BlockPublicPolicy: True
+                    IgnorePublicAcls: True
+                    RestrictPublicBuckets: True
         STARKAnalyticsProcessedBucket:
-                Type: AWS::S3::Bucket
-                Properties:
-                    BucketName: {s3_processed_bucket_name}
-                    PublicAccessBlockConfiguration:
-                        BlockPublicAcls: True
-                        BlockPublicPolicy: True
-                        IgnorePublicAcls: True
-                        RestrictPublicBuckets: True
+            Type: AWS::S3::Bucket
+            Properties:
+                BucketName: {s3_processed_bucket_name}
+                PublicAccessBlockConfiguration:
+                    BlockPublicAcls: True
+                    BlockPublicPolicy: True
+                    IgnorePublicAcls: True
+                    RestrictPublicBuckets: True
         STARKAnalyticsAthenaBucket:
-                Type: AWS::S3::Bucket
-                Properties:
-                    BucketName: {s3_athena_bucket_name}
-                    PublicAccessBlockConfiguration:
-                        BlockPublicAcls: True
-                        BlockPublicPolicy: True
-                        IgnorePublicAcls: True
-                        RestrictPublicBuckets: True
+            Type: AWS::S3::Bucket
+            Properties:
+                BucketName: {s3_athena_bucket_name}
+                PublicAccessBlockConfiguration:
+                    BlockPublicAcls: True
+                    BlockPublicPolicy: True
+                    IgnorePublicAcls: True
+                    RestrictPublicBuckets: True
         STARKAnalyticsGlueDatabase:
-                Type: AWS::Glue::Database
-                Properties:
-                    CatalogId: !Ref AWS::AccountId
-                    DatabaseInput:
-                        Name: stark_{project_varname.lower()}_db
+            Type: AWS::Glue::Database
+            Properties:
+                CatalogId: !Ref AWS::AccountId
+                DatabaseInput:
+                    Name: stark_{project_varname.lower()}_db
         STARKAnalyticsAthenaWorkGroup:
             Type: AWS::Athena::WorkGroup
             Properties:
