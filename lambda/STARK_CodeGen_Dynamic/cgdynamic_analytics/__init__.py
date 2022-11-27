@@ -7,7 +7,7 @@ import textwrap
 import convert_friendly_to_system as converter
 
 def create(data):
-    entities = data["Entities"]
+    entities              = data["Entities"]
     entities_varname = []
     for entity in entities:
         entities_varname.append(converter.convert_to_system_name(entity))
@@ -20,6 +20,13 @@ def create(data):
 
     def lambda_handler(event, context):
         entities = {entities_varname}
+
+        #FIXME: Temporary solution to duplication of records due to multiple parquet files read in processed bucket
+        #       Delete every files inside the processed bucket        
+        client = boto3.client('s3')
+        resp = client.list_objects(Bucket=stark_core.analytics_processed_bucket_name)['Contents']
+        for val in resp:
+            client.delete_object(Bucket=stark_core.analytics_processed_bucket_name, Key=val["Key"])
 
         for entity in entities:
 
