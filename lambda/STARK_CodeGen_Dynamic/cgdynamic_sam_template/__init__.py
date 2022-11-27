@@ -782,17 +782,17 @@ def create(data, cli_mode=False):
         STARKAnalyticsETLScheduledTrigger:
             Type: AWS::Glue::Trigger
             Properties:
-            Type: SCHEDULED
-            Description: DESCRIPTION_SCHEDULED
-            Schedule: cron(30 0 * * ? *)
-            Actions: """
+                Type: SCHEDULED
+                Description: DESCRIPTION_SCHEDULED
+                Schedule: cron(30 0 * * ? *)
+                Actions: """
     for jobs in etl_job_names:
         cf_template +=f"""
-                - JobName: !Ref {jobs}
-                  Arguments:
-                    '--job-bookmark-option': job-bookmark-enable"""
+                    - JobName: !Ref {jobs}
+                    Arguments:
+                        '--job-bookmark-option': job-bookmark-enable"""
     cf_template += f"""
-            Name: STARK_{project_varname}_ETL_Scheduled_Trigger
+                Name: STARK_{project_varname}_ETL_Scheduled_Trigger
         STARKBackendApiForSTARKAnalytics:
             Type: AWS::Serverless::Function
             Properties:
