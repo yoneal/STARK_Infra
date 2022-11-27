@@ -713,6 +713,7 @@ def create(data, cli_mode=False):
                     ReadCapacityUnits: {ddb_rcu_provisioned}
                     WriteCapacityUnits: {ddb_wcu_provisioned}"""
     etl_job_names = []
+    etl_resource_names = []
     for entity in entities:
         entity_logical_name = converter.convert_to_system_name(entity, "cf-resource")
         entity_endpoint_name = converter.convert_to_system_name(entity)
@@ -777,7 +778,8 @@ def create(data, cli_mode=False):
                     Role: !GetAtt STARKAnalyticsGlueJobRole.Arn
                     Timeout: 2880
                     WorkerType: G.1X"""
-        etl_job_names.append(f"STARK_{project_varname}_ETL_script_for_{entity_endpoint_name}") 
+        etl_job_names.append(f"STARK_{project_varname}_ETL_script_for_{entity_endpoint_name}")
+        etl_resource_names.append(f"STARKAnalyticsGlueJobFor{entity_logical_name}") 
     cf_template += f"""
         STARKAnalyticsETLScheduledTrigger:
             Type: AWS::Glue::Trigger
@@ -794,6 +796,12 @@ def create(data, cli_mode=False):
                             "--job-bookmark-option": job-bookmark-enable"""
     cf_template += f"""
                 Name: STARK_{project_varname}_ETL_Scheduled_Trigger
+            DependsOn:"""
+    for resource_name in etl_resource_names:
+        cf_template +=f"""
+                - {resource_name}"""
+                
+    cf_template += f"""
         STARKBackendApiForSTARKAnalytics:
             Type: AWS::Serverless::Function
             Properties:
