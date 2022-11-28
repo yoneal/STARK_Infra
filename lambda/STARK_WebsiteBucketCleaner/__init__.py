@@ -32,8 +32,20 @@ def empty_bucket(event, _):
         #For versioned buckets, we have to delete ALL versions.
         #   This also works for non-versioned buckets, so this is the
         #   "I really want to empty the damn bucket no matter what!" command.
-        target_bucket.object_versions.all().delete()
-
+        try:
+            target_bucket.object_versions.all().delete()
+        except Exception as error:
+            print(target_bucket + "does not exist or already deleted")
+            
+        #FIXME: update when naming for raw and processed buckets are final
+        trimmed_project_name = target_bucket_name[0:-19]
+        analytics_bucket_suffix = ['-stark-analytics-raw', '-stark-analytics-processed', '-stark-analytics-athena']
+        for suffix in analytics_bucket_suffix:
+            try:
+                target_bucket = s3.Bucket(trimmed_project_name + suffix)
+                target_bucket.object_versions.all().delete()
+            except Exception as error:
+                print(trimmed_project_name + suffix + "does not exist or already deleted")
 
 def lambda_handler(event, context):
     helper(event, context)

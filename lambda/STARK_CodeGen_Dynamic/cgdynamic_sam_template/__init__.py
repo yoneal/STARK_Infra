@@ -67,9 +67,12 @@ def create(data, cli_mode=False):
     #Load and sanitize data here, for whatever IaC rules that govern them (e.g., S3 Bucket names must be lowercase)
 
     #S3-related data
-    s3_bucket_name    = cloud_resources["S3 webserve"]["Bucket Name"].lower()
-    s3_error_document = cloud_resources["S3 webserve"]["Error Document"]
-    s3_index_document = cloud_resources["S3 webserve"]["Index Document"]
+    s3_bucket_name           = cloud_resources["S3 webserve"]["Bucket Name"].lower()
+    s3_raw_bucket_name       = cloud_resources["S3 webserve"]["Analytics Buckets"]["raw"].lower()
+    s3_processed_bucket_name = cloud_resources["S3 webserve"]["Analytics Buckets"]["processed"].lower()
+    s3_athena_bucket_name    = cloud_resources["S3 webserve"]["Analytics Buckets"]["athena"].lower()
+    s3_error_document        = cloud_resources["S3 webserve"]["Error Document"]
+    s3_index_document        = cloud_resources["S3 webserve"]["Index Document"]
 
     #DynamoDB-related data
     ddb_table_name            = cloud_resources["DynamoDB"]['Table Name']
@@ -235,6 +238,85 @@ def create(data, cli_mode=False):
                     ErrorDocument: {s3_error_document}
                     IndexDocument: {s3_index_document}"""
     cf_template +=f"""
+        STARKAnalyticsRawBucket:
+            Type: AWS::S3::Bucket
+            Properties:
+                BucketName: {s3_raw_bucket_name}
+                PublicAccessBlockConfiguration:
+                    BlockPublicAcls: True
+                    BlockPublicPolicy: True
+                    IgnorePublicAcls: True
+                    RestrictPublicBuckets: True
+        STARKAnalyticsProcessedBucket:
+            Type: AWS::S3::Bucket
+            Properties:
+                BucketName: {s3_processed_bucket_name}
+                PublicAccessBlockConfiguration:
+                    BlockPublicAcls: True
+                    BlockPublicPolicy: True
+                    IgnorePublicAcls: True
+                    RestrictPublicBuckets: True
+        STARKAnalyticsAthenaBucket:
+            Type: AWS::S3::Bucket
+            Properties:
+                BucketName: {s3_athena_bucket_name}
+                PublicAccessBlockConfiguration:
+                    BlockPublicAcls: True
+                    BlockPublicPolicy: True
+                    IgnorePublicAcls: True
+                    RestrictPublicBuckets: True
+        STARKAnalyticsGlueDatabase:
+            Type: AWS::Glue::Database
+            Properties:
+                CatalogId: !Ref AWS::AccountId
+                DatabaseInput:
+                    Name: stark_{project_varname.lower()}_db
+        STARKAnalyticsAthenaWorkGroup:
+            Type: AWS::Athena::WorkGroup
+            Properties:
+                Name: STARK_{project_varname}_workgroup
+                Description: My WorkGroup Updated
+                State: ENABLED
+                WorkGroupConfiguration:
+                    BytesScannedCutoffPerQuery: 200000000
+                    EnforceWorkGroupConfiguration: false
+                    PublishCloudWatchMetricsEnabled: false
+                    RequesterPaysEnabled: true
+                    ResultConfiguration:
+                        OutputLocation: s3://{s3_athena_bucket_name}/output/
+            DependsOn:
+                - STARKAnalyticsAthenaBucket
+        STARKAnalyticsGlueJobRole:
+            Type: AWS::IAM::Role
+            Properties:
+                AssumeRolePolicyDocument:
+                    Version: '2012-10-17'
+                    Statement: 
+                        - 
+                            Effect: Allow
+                            Principal:
+                                Service: 
+                                    - 'glue.amazonaws.com'
+                            Action: 'sts:AssumeRole'
+                ManagedPolicyArns:
+                    - 'arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole'
+                Policies:
+                    - 
+                        PolicyName: PolicyForSTARKAnalyticsGlueJobRole
+                        PolicyDocument:
+                            Version: '2012-10-17'
+                            Statement:
+                                - 
+                                    Sid: VisualEditor0
+                                    Effect: Allow
+                                    Action:
+                                        - 's3:PutObject'
+                                        - 's3:GetObject'
+                                    Resource: 
+                                        - !Join [ "",  [ "arn:aws:s3:::", "{s3_processed_bucket_name}", "/*"] ]
+                                        - !Join [ "",  [ "arn:aws:s3:::", "{s3_processed_bucket_name}"] ]
+                                        - !Join [ "",  [ "arn:aws:s3:::", !Ref UserCICDPipelineBucketNameParameter, "/{project_varname}/*"] ]
+                                        - "*"
         STARKSystemBucketUser:
             Type: AWS::IAM::User
             Properties: 
@@ -309,6 +391,7 @@ def create(data, cli_mode=False):
                                         - !Join [ ":", [ "arn:aws:dynamodb", !Ref AWS::Region, !Ref AWS::AccountId, "table/{ddb_table_name}/index/STARK-ListView-Index", ] ]
                                         - !Join [ "",  [ "arn:aws:s3:::", "{s3_bucket_name}", "/tmp/*"] ]
                                         - !Join [ "",  [ "arn:aws:s3:::", "{s3_bucket_name}", "/uploaded_files/*"] ]
+                                        - !Join [ "",  [ "arn:aws:s3:::", "{s3_raw_bucket_name}", "/*"] ]
         STARKProjectDefaultAuthorizerInvokeRole:
             Type: AWS::IAM::Role
             Properties:
@@ -333,6 +416,45 @@ def create(data, cli_mode=False):
                                     Action:
                                         - 'lambda:InvokeFunction'
                                     Resource: !GetAtt STARKDefaultAuthorizerFunc.Arn
+        STARKProjectSchedulerInvokeRole:
+            Type: AWS::IAM::Role
+            Properties:
+                AssumeRolePolicyDocument:
+                    Version: '2012-10-17'
+                    Statement: 
+                        - 
+                            Effect: Allow
+                            Principal:
+                                Service: 
+                                    - 'scheduler.amazonaws.com'
+                            Action: 'sts:AssumeRole'
+                Policies:
+                    - 
+                        PolicyName: PolicyForSTARKProjectSchedulerInvokeRole
+                        PolicyDocument:
+                            Version: '2012-10-17'
+                            Statement:
+                                - 
+                                    Sid: VisualEditor0
+                                    Effect: Allow
+                                    Action:
+                                        - 'lambda:InvokeFunction'
+                                    Resource:
+                                        - !Join [ ":", [!GetAtt STARKBackendApiForSTARKAnalytics.Arn ] ]
+                                        - !Join [ ":", [!GetAtt STARKBackendApiForSTARKAnalytics.Arn, "*" ] ]
+        STARKProjectAnalyticsScheduler:
+            Type: AWS::Scheduler::Schedule
+            Properties: 
+                Description: Triggers dumping of data of each business entity in CSV formatted files 
+                FlexibleTimeWindow: 
+                    MaximumWindowInMinutes: 2
+                    Mode: FLEXIBLE
+                ScheduleExpression: cron(0 0 * * ? *)
+                ScheduleExpressionTimezone: Hongkong
+                State: ENABLED
+                Target:
+                    Arn: !GetAtt STARKBackendApiForSTARKAnalytics.Arn
+                    RoleArn: !GetAtt STARKProjectSchedulerInvokeRole.Arn
         CFCustomResourceHelperLayer:
             Type: AWS::Lambda::LayerVersion
             Properties:
@@ -590,7 +712,7 @@ def create(data, cli_mode=False):
                 ProvisionedThroughput:
                     ReadCapacityUnits: {ddb_rcu_provisioned}
                     WriteCapacityUnits: {ddb_wcu_provisioned}"""
-
+    etl_resource_names = []
     for entity in entities:
         entity_logical_name = converter.convert_to_system_name(entity, "cf-resource")
         entity_endpoint_name = converter.convert_to_system_name(entity)
@@ -636,9 +758,90 @@ def create(data, cli_mode=False):
                 MemorySize: 128
                 Timeout: 5
                 Layers:
-                    - !Ref Fpdf2Layer"""
-    
+                    - !Ref Fpdf2Layer
+        STARKAnalyticsGlueJobFor{entity_logical_name}:
+                Type: AWS::Glue::Job
+                Properties: 
+                    Command: 
+                        Name: glueetl
+                        PythonVersion: 3
+                        ScriptLocation: lambda/STARK_Analytics/ETL_Scripts/{entity_endpoint_name}.py
+                    Description: Test template generated ETL Job
+                    ExecutionClass: STANDARD
+                    ExecutionProperty: 
+                        MaxConcurrentRuns: 1
+                    GlueVersion: 3.0
+                    MaxRetries: 0
+                    Name: STARK_{project_varname}_ETL_script_for_{entity_endpoint_name}
+                    NumberOfWorkers: 2
+                    Role: !GetAtt STARKAnalyticsGlueJobRole.Arn
+                    Timeout: 2880
+                    WorkerType: G.1X"""
+        etl_resource_names.append(f"STARKAnalyticsGlueJobFor{entity_logical_name}") 
     cf_template += f"""
+        STARKAnalyticsETLScheduledTrigger:
+            Type: AWS::Glue::Trigger
+            Properties:
+                Type: SCHEDULED
+                Description: DESCRIPTION_SCHEDULED
+                Schedule: cron(30 0 * * ? *)
+                Actions: """
+    for resource_name in etl_resource_names:
+        cf_template +=f"""
+                    - 
+                        JobName: !Ref {resource_name}
+                        Arguments:
+                            "--job-bookmark-option": job-bookmark-enable"""
+    cf_template += f"""
+                Name: STARK_{project_varname}_ETL_Scheduled_Trigger
+            DependsOn:"""
+    for resource_name in etl_resource_names:
+        cf_template +=f"""
+                - {resource_name}"""
+                
+    cf_template += f"""
+        STARKBackendApiForSTARKAnalytics:
+            Type: AWS::Serverless::Function
+            Properties:
+                Events:
+                    STARKAnalyticsGetEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_Analytics
+                            Method: GET
+                            ApiId:
+                                Ref: STARKApiGateway
+                    STARKAnalyticsPostEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_Analytics
+                            Method: POST
+                            ApiId:
+                                Ref: STARKApiGateway
+                    STARKAnalyticsPutEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_Analytics
+                            Method: PUT
+                            ApiId:
+                                Ref: STARKApiGateway
+                    STARKAnalyticsDeleteEvent:
+                        Type: HttpApi
+                        Properties:
+                            Path: /STARK_Analytics
+                            Method: DELETE
+                            ApiId:
+                                Ref: STARKApiGateway
+                Runtime: python3.9
+                Handler: __init__.lambda_handler
+                CodeUri: lambda/STARK_Analytics
+                Role: !GetAtt STARKProjectDefaultLambdaServiceRole.Arn
+                Architectures:
+                    - arm64
+                MemorySize: 128
+                Timeout: 10
+                Layers:
+                    - !Ref Fpdf2Layer
         STARKBackendApiForSTARKUser:
             Type: AWS::Serverless::Function
             Properties:

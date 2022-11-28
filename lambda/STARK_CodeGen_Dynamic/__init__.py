@@ -19,14 +19,17 @@ prepend_dir = ""
 if 'libstark' in os.listdir():
     prepend_dir = "libstark.STARK_CodeGen_Dynamic."
 
-cg_login   = importlib.import_module(f"{prepend_dir}cgdynamic_login")
-cg_logout  = importlib.import_module(f"{prepend_dir}cgdynamic_logout")
-cg_builder = importlib.import_module(f"{prepend_dir}cgdynamic_builder")
-cg_ddb     = importlib.import_module(f"{prepend_dir}cgdynamic_dynamodb")
-cg_build   = importlib.import_module(f"{prepend_dir}cgdynamic_buildspec")
-cg_auth    = importlib.import_module(f"{prepend_dir}cgdynamic_authorizer")
-cg_sam     = importlib.import_module(f"{prepend_dir}cgdynamic_sam_template")
-cg_conf    = importlib.import_module(f"{prepend_dir}cgdynamic_template_conf")
+cg_login     = importlib.import_module(f"{prepend_dir}cgdynamic_login")
+cg_logout    = importlib.import_module(f"{prepend_dir}cgdynamic_logout")
+cg_builder   = importlib.import_module(f"{prepend_dir}cgdynamic_builder")
+cg_ddb       = importlib.import_module(f"{prepend_dir}cgdynamic_dynamodb")
+cg_build     = importlib.import_module(f"{prepend_dir}cgdynamic_buildspec")
+cg_auth      = importlib.import_module(f"{prepend_dir}cgdynamic_authorizer")
+cg_sam       = importlib.import_module(f"{prepend_dir}cgdynamic_sam_template")
+cg_conf      = importlib.import_module(f"{prepend_dir}cgdynamic_template_conf")
+
+cg_analytics  = importlib.import_module(f"{prepend_dir}cgdynamic_analytics")
+cg_etl_script = importlib.import_module(f"{prepend_dir}cgdynamic_etl_script")
 
 cg_conftest = importlib.import_module(f"{prepend_dir}cgdynamic_conftest")
 cg_test     = importlib.import_module(f"{prepend_dir}cgdynamic_test_cases")
@@ -52,6 +55,10 @@ def create_handler(event, context):
     cicd_bucket     = event.get('ResourceProperties', {}).get('CICDBucket','')
 
     project_varname = converter.convert_to_system_name(project_name)
+    
+    s3_analytics_raw_bucket_name = converter.convert_to_system_name(project_varname + '-stark-analytics-raw', 's3')
+    s3_analytics_processed_bucket_name = converter.convert_to_system_name(project_varname + '-stark-analytics-processed', 's3')
+    s3_analytics_athena_bucket_name = converter.convert_to_system_name(project_varname + '-stark-analytics-athena', 's3')
 
     #DynamoDB table name from our CF template
     ddb_table_name = event.get('ResourceProperties', {}).get('DDBTable','')
@@ -95,11 +102,15 @@ def create_handler(event, context):
                 "DynamoDB Name": ddb_table_name,
                 "Bucket Name": website_bucket,
                 "Relationships": relationships,
-                "Rel Model": rel_model
+                "Rel Model": rel_model,
+                "Raw Bucket Name": s3_analytics_raw_bucket_name,
+                "Processed Bucket Name": s3_analytics_processed_bucket_name,
+                "Project Name": project_varname
             }
-        source_code          = cg_ddb.create(data)
-        test_source_code     = cg_test.create(data)
-        fixtures_source_code = cg_fixtures.create(data)
+        source_code            = cg_ddb.create(data)
+        test_source_code       = cg_test.create(data)
+        fixtures_source_code   = cg_fixtures.create(data)
+        etl_script_source_code = cg_etl_script.create(data)
 
         #Step 2: Add source code to our commit list to the project repo
         files_to_commit.append({
@@ -117,6 +128,12 @@ def create_handler(event, context):
         files_to_commit.append({
             'filePath': f"lambda/test_cases/fixtures/{entity_varname}/__init__.py",
             'fileContent': fixtures_source_code.encode()
+        })
+
+        # etl scripts
+        files_to_commit.append({
+            'filePath': f"lambda/STARK_Analytics/ETL_Scripts/{entity_varname}.py",
+            'fileContent': etl_script_source_code.encode()
         })
 
     ###########################################################
@@ -184,12 +201,22 @@ def create_handler(event, context):
 
     #########################################
     #Create Lambdas of built-in STARK modules 
+    #    (Analytics)
+    analytics_source_code = cg_analytics.create({"Entities": entities})
+    files_to_commit.append({
+        'filePath': f"lambda/STARK_Analytics/__init__.py",
+        'fileContent': analytics_source_code.encode()
+    })
+
     #    (user management, permissions, etc)
     for root, subdirs, files in os.walk('source_files'):
         for source_file in files:
             with open(os.path.join(root, source_file)) as f:
                 source_code = f.read().replace("[[STARK_DDB_TABLE_NAME]]", ddb_table_name)
                 source_code = source_code.replace("[[STARK_WEB_BUCKET]]", website_bucket)
+                source_code = source_code.replace("[[STARK_RAW_BUCKET]]", s3_analytics_raw_bucket_name)
+                source_code = source_code.replace("[[STARK_PROCESSED_BUCKET]]", s3_analytics_processed_bucket_name)
+                source_code = source_code.replace("[[STARK_ATHENA_BUCKET]]", s3_analytics_athena_bucket_name)
                 #We use root[13:] because we want to strip out the "source_files/" part of the root path
                 files_to_commit.append({
                     'filePath': f"lambda/" + os.path.join(root[13:], source_file),

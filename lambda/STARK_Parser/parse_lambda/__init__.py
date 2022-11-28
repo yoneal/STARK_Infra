@@ -39,6 +39,12 @@ def parse(data):
             "Arch": "arm64",
             "Timeout": 5
         },
+        "STARK_Analytics": {
+            "Memory": 128,
+            "Arch": "arm64",
+            "Timeout": 5,
+            "Dependencies": entities
+        },
         "STARK_User": {
             "Memory": 128,
             "Arch": "arm64",
