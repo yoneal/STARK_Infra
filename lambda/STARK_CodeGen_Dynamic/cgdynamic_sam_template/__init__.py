@@ -312,8 +312,6 @@ def create(data, cli_mode=False):
                                     Action:
                                         - 's3:PutObject'
                                         - 's3:GetObject'
-                                        - 's3:PutObjectACL'
-                                        - 's3:GetObjectACL'
                                     Resource: 
                                         - !Join [ "",  [ "arn:aws:s3:::", "{s3_processed_bucket_name}", "/*"] ]
                                         - !Join [ "",  [ "arn:aws:s3:::", "{s3_processed_bucket_name}"] ]
