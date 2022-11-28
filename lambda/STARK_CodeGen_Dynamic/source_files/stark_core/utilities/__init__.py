@@ -69,7 +69,7 @@ def filter_report_list(report_list, diff_list):
 def create_csv(report_list, csv_header):
     
     file_buff = StringIO()
-    writer = csv.DictWriter(file_buff, fieldnames=csv_header)
+    writer = csv.DictWriter(file_buff, fieldnames=csv_header,quoting=csv.QUOTE_ALL)
     writer.writeheader()
     for rows in report_list:
         writer.writerow(rows)
@@ -77,9 +77,7 @@ def create_csv(report_list, csv_header):
     filename = f"{str(uuid.uuid4())}"
     csv_file = f"{filename}.csv"
     
-    save_object_to_bucket(file_buff.getvalue(), csv_file)
-
-    return csv_file
+    return csv_file, file_buff.getvalue()
 
 def prepare_pdf_data(data_to_tuple, master_fields, report_params, metadata, pk_field):
     #FIXME: PDF GENERATOR: can be outsourced to a layer, for refining 
@@ -117,9 +115,8 @@ def prepare_pdf_data(data_to_tuple, master_fields, report_params, metadata, pk_f
     pdf_file = f"{filename}.pdf"
 
     pdf = create_pdf(header_tuple, data_tuple, report_params, pk_field, metadata)
-    save_object_to_bucket(pdf.output(), pdf_file)
 
-    return pdf_file
+    return pdf_file, pdf.output()
 
 
 def create_pdf(header_tuple, data_tuple, report_params, pk_field, metadata):
@@ -237,15 +234,17 @@ def estimate_lines_needed(self, iter, col_width: float) -> int:
     max_cell_text_len_header = max([len(str(col)) for col in iter])  # how long is the longest string?
     return math.ceil(max_cell_text_len_header * font_width_in_mm / col_width)
 
-def save_object_to_bucket(body, filename, bucket_name = None):
+def save_object_to_bucket(body, filename, bucket_name = None, directory = "tmp"):
+    canned_ACL = 'private'
     if bucket_name == None:
-        bucket = stark_core.bucket_name
+        bucket_name = stark_core.bucket_name
+        canned_ACL = 'public-read'
 
     s3_action = s3.put_object(
-        ACL='public-read',
+        ACL= canned_ACL,
         Body= body,
-        Bucket=bucket,
-        Key='tmp/'+filename
+        Bucket=bucket_name,
+        Key=directory+'/'+filename
     )
 
 def copy_object_to_bucket(filename, destination_dir, bucket_name = None, source_dir='tmp'):
