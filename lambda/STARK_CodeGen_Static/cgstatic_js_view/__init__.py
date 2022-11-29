@@ -73,6 +73,27 @@ def create(data):
                         'max_length': '',
                         'data_type': '{data_type}'
                     }},""" 
+    
+    for rel_ent in rel_model:
+        rel_cols = rel_model[rel_ent]["data"]
+        rel_pk = rel_model[rel_ent]["pk"]
+        var_pk = rel_ent.replace(' ', '_') + '_' + rel_pk.replace(' ', '_')
+        source_code += f"""
+                    '{var_pk}': {{
+                        'value': '',
+                        'required': false,
+                        'max_length': '',
+                        'data_type': '',
+                    }},""" 
+        for rel_col, rel_col_type in rel_cols.items():
+            var_data = rel_ent.replace(' ', '_') + '_' + rel_col.replace(' ', '_')
+            source_code += f"""
+                    '{var_data}': {{
+                        'value': '',
+                        'required': false,
+                        'max_length': '',
+                        'data_type': '',
+                    }},"""
                     
     source_code += f"""
                     'STARK_Report_Type': {{
@@ -175,6 +196,17 @@ def create(data):
         col_type_id = set_type(col_type)
         source_code += f"""
                     '{col_varname}':  {{"operator": "", "value": "", "type":"{col_type_id}"}},""" 
+
+    for rel_ent in rel_model:
+        rel_cols = rel_model[rel_ent]["data"]
+        rel_pk = rel_model[rel_ent]["pk"]
+        var_pk = rel_ent.replace(' ', '_') + '_' + rel_pk.replace(' ', '_')
+        source_code += f"""
+                    '{var_pk}':  {{"operator": "", "value": "", "type":"S"}},"""
+        for rel_col, rel_col_type in rel_cols.items():
+            var_data = rel_ent.replace(' ', '_') + '_' + rel_col.replace(' ', '_')
+            source_code += f"""
+                    '{var_data}':  {{"operator": "", "value": "", "type":"S"}},"""
 
     source_code += f"""
                     'STARK_isReport':true,
@@ -304,6 +336,18 @@ def create(data):
             has_many_ux = col_type.get('has_many_ux', None)
             if has_many_ux == None:
                 field_strings += f"""'{col}',"""
+        else:
+            field_strings += f"""'{col}',"""
+
+    for rel_ent in rel_model:
+        rel_cols = rel_model[rel_ent]["data"]
+        rel_pk = rel_model[rel_ent]["pk"]
+        var_pk = rel_ent.replace(' ', '_') + '_' + rel_pk.replace(' ', '_')
+        field_strings += f"""'{var_pk.replace('_', ' ')}',"""
+        for rel_col, rel_col_type in rel_cols.items():
+            var_data = rel_ent.replace(' ', '_') + '_' + rel_col.replace(' ', '_')
+            field_strings += f"""'{var_data.replace('_', ' ')}',"""
+
     field_strings += f"""]"""
     source_code += f"""
                 temp_checked_fields: {field_strings},
@@ -444,8 +488,8 @@ def create(data):
                             {{
                                 for (var key in data) {{
                                     if (data.hasOwnProperty(key)) {{
-                                        root.metadata[key]['state'] = false
-                                        root.metadata[key]['feedback'] = data[key]
+                                        root.validation_properties[key]['state'] = false
+                                        root.validation_properties[key]['feedback'] = data[key]
                                     }}
                                 }}
                                 return false
@@ -540,8 +584,8 @@ def create(data):
                             {{
                                 for (var key in data) {{
                                     if (data.hasOwnProperty(key)) {{
-                                        root.metadata[key]['state'] = false
-                                        root.metadata[key]['feedback'] = data[key]
+                                        root.validation_properties[key]['state'] = false
+                                        root.validation_properties[key]['feedback'] = data[key]
                                     }}
                                 }}
                                 return false
@@ -580,13 +624,18 @@ def create(data):
                         console.log("VIEW: Getting!")
 
                         {entity_app}.get(data).then( function(data) {{
-                            root.{entity_varname} = data["item"]; 
+                            root.{entity_varname} = data["item"];"""
+    if with_upload or with_upload_on_many:
+        source_code += f"""
+                            root.object_url_prefix = data['object_url_prefix']"""
+    source_code += f"""
                             root.{entity_varname}.orig_{pk_varname} = root.{entity_varname}.{pk_varname};"""
     for col, col_type in cols.items():
         col_varname = converter.convert_to_system_name(col)
         if isinstance(col_type, dict) and col_type['type'] == 'file-upload':
             source_code += f"""
                             root.{entity_varname}.STARK_uploaded_s3_keys['{col_varname}'] = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.STARK_uploaded_s3_keys.{col_varname} : ""
+                            root.Transaction.orig_STARK_uploaded_s3_keys = structuredClone(Object.fromEntries(Object.entries(data["item"]['STARK_uploaded_s3_keys'])))
                             root.STARK_upload_elements['{col_varname}'].file = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.{col_varname} : ""
                             root.STARK_upload_elements['{col_varname}'].progress_bar_val = root.{entity_varname}.{col_varname} != "" ? 100 : 0
                             
@@ -633,9 +682,7 @@ def create(data):
                 rel_foreign_entity = converter.convert_to_system_name(col)
                 source_code += f"""
                             root.many_entity.{col_varname}.list_{rel_foreign_entity}()"""
-    if with_upload or with_upload_on_many:
-        source_code += f"""
-                            root.object_url_prefix = data['object_url_prefix']"""
+    
     source_code += f"""
                             console.log("VIEW: Retreived module data.")
                             root.show()
@@ -797,7 +844,13 @@ def create(data):
                                 root.listview_table = data[0];
                                 if(root.listview_table.length > 0) {{
                                     if(root.custom_report.STARK_Report_Type == 'Tabular') {{
-                                        root.STARK_report_fields = root.checked_fields 
+                                        if(root.custom_report.STARK_group_by_1 != '')
+                                        {{
+                                            root.STARK_report_fields = Object.keys(root.listview_table[0])
+                                        }}
+                                        else {{
+                                            root.STARK_report_fields = root.checked_fields 
+                                        }}
                                         root.temp_csv_link = data[1];
                                         root.temp_pdf_link = data[2];
                                     }} else {{
@@ -934,15 +987,8 @@ def create(data):
                     error_message = ""
 
                     if(file) {{
-                        if(typeof root.{entity_varname}.STARK_uploaded_s3_keys[file_upload_element] == 'undefined') {{
-                            uuid = STARK.create_UUID()
-                            ext = file.name.split('.').pop()
-                        }}
-                        else {{
-                            var s3_key = root.{entity_varname}.STARK_uploaded_s3_keys[file_upload_element]
-                            uuid = s3_key.split('.').shift()
-                            ext = file.name.split('.').pop()
-                        }}
+                        uuid = STARK.create_UUID()
+                        ext = file.name.split('.').pop()
 
                         valid_file = STARK.get_file_ext_whitelist(root.ext_whitelist[file_upload_element], root.ext_whitelist_table).split(", ").includes(ext)
                         allowed_file_size = STARK.get_allowed_upload_size(root.allowed_size[file_upload_element], root.allowed_size_table)

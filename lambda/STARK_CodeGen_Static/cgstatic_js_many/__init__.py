@@ -285,14 +285,9 @@ def create(data):
             error_message = ""
 
             if(file) {{
-                if( this.STARK_uploaded_s3_keys[file_upload_element][index] == '') {{
-                    uuid = STARK.create_UUID()
-                    ext = file.name.split('.').pop()
-                }}
-                else {{
-                    uuid = this.STARK_uploaded_s3_keys[file_upload_element][index].split('.').shift()
-                    ext = file.name.split('.').pop()
-                }}
+                uuid = STARK.create_UUID()
+                ext = file.name.split('.').pop()
+                
                 valid_file = STARK.get_file_ext_whitelist(this.ext_whitelist[file_upload_element], this.ext_whitelist_table).split(", ").includes(ext)
                 allowed_file_size = STARK.get_allowed_upload_size(this.allowed_size[file_upload_element], this.allowed_size_table)
                 if(!valid_file) {{
@@ -322,10 +317,7 @@ def create(data):
             return upload_processed
         }},
         
-        remove_field: function (index) {{
-            this.module_fields.splice(index, 1);       
-            this.validation_properties.splice(index, 1);       
-        }},  
+         
         """
 
     

@@ -247,7 +247,7 @@ var root = new Vue({
         add: function () {
             console.log("VIEW: Inserting!")
             response = STARK.validate_form(root.metadata, root.STARK_Module)
-            this.metadata = response['new_metadata']
+            this.metadata = response['validation_properties']
             if(response['is_valid_form']) {
                 loading_modal.show()
 
@@ -299,7 +299,7 @@ var root = new Vue({
         update: function () {
             console.log("VIEW: Updating!")
             response = STARK.validate_form(root.metadata, root.STARK_Module)
-            this.metadata = response['new_metadata']
+            this.metadata = response['validation_properties']
             if(response['is_valid_form']) {
                 loading_modal.show()
 
@@ -481,7 +481,7 @@ var root = new Vue({
                 root.metadata['STARK_Y_Data_Source'].required = true
             }
             response = STARK.validate_form(root.metadata, root.custom_report)
-            this.metadata = response['new_metadata']
+            this.metadata = response['validation_properties']
             // console.log(response['is_valid_form'])
             if(response['is_valid_form']) {
                 if(root.custom_report.STARK_Report_Type == 'Graph') {
@@ -496,12 +496,10 @@ var root = new Vue({
                     STARK_Module_app.report(report_payload).then( function(data) {
                         root.listview_table = data[0];
                         if(root.listview_table.length > 0) {
+                            root.STARK_report_fields = Object.keys(root.listview_table[0])
                             if(root.custom_report.STARK_Report_Type == 'Tabular') {
-                                root.STARK_report_fields = root.checked_fields 
                                 root.temp_csv_link = data[1];
                                 root.temp_pdf_link = data[2];
-                            } else {
-                                root.STARK_report_fields = Object.keys(root.listview_table[0])
                             }
                         }
                         console.log("DONE! Retrieved report.");
