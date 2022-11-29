@@ -57,7 +57,12 @@ def prepare_data(data, metadata, entity_varname):
         if key == pk_field:
             pass
         else:
-            transformed_data.update({key: {set_type(metadata[key]['data_type']): item}})
+            value = item
+            data_type = set_type(metadata[key]['data_type'])
+            if data_type == 'SS':
+                value = item.split(',')
+
+            transformed_data.update({key: {data_type: value}})
             if metadata[key]['data_type'] == 'file':
                 if item != "":
 
@@ -101,7 +106,7 @@ for entity, data in dummy_table_list.items():
         ddb_arguments['Item'] = transformed_data
         response = ddb.put_item(**ddb_arguments)
 
-        to_upload_keys = transformed_data['STARK_uploaded_s3_keys']['M']
+        to_upload_keys = transformed_data.get('STARK_uploaded_s3_keys',{}).get('M',{})
         for key, file_from_map in to_upload_keys.items():
             uuid_filename = file_from_map['S']
             filename = transformed_data[key]['S']
