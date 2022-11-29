@@ -386,12 +386,17 @@ def create(data, cli_mode=False):
                                         - 's3:PutObjectAcl'
                                         - 's3:GetObject'
                                         - 's3:GetObjectAcl'
+                                        - 's3:ListBucket'
+                                        - 's3:DeleteObject'
                                     Resource: 
                                         - !Join [ ":", [ "arn:aws:dynamodb", !Ref AWS::Region, !Ref AWS::AccountId, "table/{ddb_table_name}"] ]
                                         - !Join [ ":", [ "arn:aws:dynamodb", !Ref AWS::Region, !Ref AWS::AccountId, "table/{ddb_table_name}/index/STARK-ListView-Index", ] ]
                                         - !Join [ "",  [ "arn:aws:s3:::", "{s3_bucket_name}", "/tmp/*"] ]
                                         - !Join [ "",  [ "arn:aws:s3:::", "{s3_bucket_name}", "/uploaded_files/*"] ]
+                                        - !Join [ "",  [ "arn:aws:s3:::", "{s3_raw_bucket_name}"] ]
                                         - !Join [ "",  [ "arn:aws:s3:::", "{s3_raw_bucket_name}", "/*"] ]
+                                        - !Join [ "",  [ "arn:aws:s3:::", "{s3_processed_bucket_name}"] ]
+                                        - !Join [ "",  [ "arn:aws:s3:::", "{s3_processed_bucket_name}", "/*"] ]
         STARKProjectDefaultAuthorizerInvokeRole:
             Type: AWS::IAM::Role
             Properties:

@@ -14,6 +14,8 @@ def create(data):
 
     source_code = f"""\
     import importlib
+    import boto3
+    
     import stark_core
     from stark_core import data_abstraction
     from stark_core import utilities
@@ -24,7 +26,7 @@ def create(data):
         #FIXME: Temporary solution to duplication of records due to multiple parquet files read in processed bucket
         #       Delete every files inside the processed bucket        
         client = boto3.client('s3')
-        resp = client.list_objects(Bucket=stark_core.analytics_processed_bucket_name)['Contents']
+        resp = client.list_objects(Bucket=stark_core.analytics_processed_bucket_name).get('Contents',{{}})
         for val in resp:
             client.delete_object(Bucket=stark_core.analytics_processed_bucket_name, Key=val["Key"])
 
