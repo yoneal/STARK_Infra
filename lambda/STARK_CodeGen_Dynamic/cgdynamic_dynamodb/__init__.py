@@ -135,12 +135,7 @@ def create(data):
         col_varname = converter.convert_to_system_name(col)
         data_type = set_data_type(col_type)
         rel = ''
-        if isinstance(col_type, dict) and col_type["type"] == "relationship":
-            has_many_ux = col_type.get('has_many_ux', None)
-            if has_many_ux == 'repeater':
-                rel = '1-M'
-            else:
-                rel = ''
+        
         source_code += f"""
                 '{col_varname}': {{
                     'value': '',
@@ -152,6 +147,21 @@ def create(data):
                     'feedback': '',
                     'relationship': '{rel}'
                 }},""" 
+    if relationships.get('has_many', '') != '':
+        for relation in relationships.get('has_many'):
+            if relation.get('type') == 'repeater':
+                entity = converter.convert_to_system_name(relation.get('entity'))
+                source_code += f"""
+                '{entity}': {{
+                    'value': '',
+                    'key': '',
+                    'required': True,
+                    'max_length': '',
+                    'data_type': 'string',
+                    'state': None,
+                    'feedback': '',
+                    'relationship': '1-M'
+                }},"""
     # for rel_ent in rel_model:
     #     rel_cols = rel_model[rel_ent]["data"]
     #     rel_pk = rel_model[rel_ent]["pk"]
