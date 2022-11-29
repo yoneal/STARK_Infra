@@ -475,7 +475,7 @@ def create(data):
                         for (const key in root.many_entity) {{
                             if (Object.hasOwnProperty.call(root.many_entity, key)) {{
                                 var element = root.many_entity[key];
-                                this.Transaction.STARK_uploaded_s3_keys[`many_${{key}}`] = element.STARK_uploaded_s3_keys
+                                this.{entity_varname}.STARK_uploaded_s3_keys[`many_${{key}}`] = element.STARK_uploaded_s3_keys
                             }}
                         }}"""
                         
@@ -635,7 +635,7 @@ def create(data):
         if isinstance(col_type, dict) and col_type['type'] == 'file-upload':
             source_code += f"""
                             root.{entity_varname}.STARK_uploaded_s3_keys['{col_varname}'] = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.STARK_uploaded_s3_keys.{col_varname} : ""
-                            root.Transaction.orig_STARK_uploaded_s3_keys = structuredClone(Object.fromEntries(Object.entries(data["item"]['STARK_uploaded_s3_keys'])))
+                            root.{entity_varname}.orig_STARK_uploaded_s3_keys = structuredClone(Object.fromEntries(Object.entries(data["item"]['STARK_uploaded_s3_keys'])))
                             root.STARK_upload_elements['{col_varname}'].file = root.{entity_varname}.{col_varname} != "" ? root.{entity_varname}.{col_varname} : ""
                             root.STARK_upload_elements['{col_varname}'].progress_bar_val = root.{entity_varname}.{col_varname} != "" ? 100 : 0
                             

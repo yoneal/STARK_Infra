@@ -126,13 +126,21 @@ def create(data):
                     'max_length': '',
                     'data_type': 'string',
                     'state': None,
-                    'feedback': ''
+                    'feedback': '',
+                    'relationship': ''
                 }},"""
         
     
     for col, col_type in columns.items():
         col_varname = converter.convert_to_system_name(col)
         data_type = set_data_type(col_type)
+        rel = ''
+        if isinstance(col_type, dict) and col_type["type"] == "relationship":
+            has_many_ux = col_type.get('has_many_ux', None)
+            if has_many_ux == 'repeater':
+                rel = '1-M'
+            else:
+                rel = ''
         source_code += f"""
                 '{col_varname}': {{
                     'value': '',
@@ -141,47 +149,48 @@ def create(data):
                     'max_length': '',
                     'data_type': '{data_type}',
                     'state': None,
-                    'feedback': ''
+                    'feedback': '',
+                    'relationship': '{rel}'
                 }},""" 
-    for rel_ent in rel_model:
-        rel_cols = rel_model[rel_ent]["data"]
-        rel_pk = rel_model[rel_ent]["pk"]
-        var_pk = rel_ent.replace(' ', '_') + '_' + rel_pk.replace(' ', '_')
-        source_code += f"""
-                '{var_pk}': {{
-                    'value': '',
-                    'required': False,
-                    'max_length': '',
-                    'data_type': '',
-                    'state': None,
-                    'feedback': ''
-                }},""" 
-        for rel_col, rel_col_type in rel_cols.items():
-            var_data = rel_ent.replace(' ', '_') + '_' + rel_col.replace(' ', '_')
-            source_code += f"""
-                '{var_data}': {{
-                    'value': '',
-                    'required': False,
-                    'max_length': '',
-                    'data_type': '',
-                    'state': None,
-                    'feedback': ''
-                }},""" 
+    # for rel_ent in rel_model:
+    #     rel_cols = rel_model[rel_ent]["data"]
+    #     rel_pk = rel_model[rel_ent]["pk"]
+    #     var_pk = rel_ent.replace(' ', '_') + '_' + rel_pk.replace(' ', '_')
+    #     source_code += f"""
+    #             '{var_pk}': {{
+    #                 'value': '',
+    #                 'required': False,
+    #                 'max_length': '',
+    #                 'data_type': '',
+    #                 'state': None,
+    #                 'feedback': ''
+    #             }},""" 
+    #     for rel_col, rel_col_type in rel_cols.items():
+    #         var_data = rel_ent.replace(' ', '_') + '_' + rel_col.replace(' ', '_')
+    #         source_code += f"""
+    #             '{var_data}': {{
+    #                 'value': '',
+    #                 'required': False,
+    #                 'max_length': '',
+    #                 'data_type': '',
+    #                 'state': None,
+    #                 'feedback': ''
+    #             }},""" 
             
 
-    for col, col_type in columns.items():
-        col_varname = converter.convert_to_system_name(col)
-        # data_type = set_data_type(col_type)
-        if isinstance(col_type, dict) and col_type["type"] == "relationship":
-            has_many_ux = col_type.get('has_many_ux', None)
-            if has_many_ux == 'repeater':
-                source_code += f"""
-            '{col_varname}': {{
-                'value': '',
-                'required': true,
-                'max_length': '',
-                'data_type': ''
-            }},""" 
+    # for col, col_type in columns.items():
+    #     col_varname = converter.convert_to_system_name(col)
+    #     # data_type = set_data_type(col_type)
+    #     if isinstance(col_type, dict) and col_type["type"] == "relationship":
+    #         has_many_ux = col_type.get('has_many_ux', None)
+    #         if has_many_ux == 'repeater':
+    #             source_code += f"""
+    #         '{col_varname}': {{
+    #             'value': '',
+    #             'required': true,
+    #             'max_length': '',
+    #             'data_type': ''
+    #         }},""" 
                     
     source_code += f"""
     }}
