@@ -790,6 +790,7 @@ def create(data, cli_mode=False):
                 Type: SCHEDULED
                 Description: DESCRIPTION_SCHEDULED
                 Schedule: cron(30 0 * * ? *)
+                StartOnCreation: True
                 Actions: """
     for resource_name in etl_resource_names:
         cf_template +=f"""
