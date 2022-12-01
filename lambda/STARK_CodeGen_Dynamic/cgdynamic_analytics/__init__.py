@@ -15,6 +15,7 @@ def create(data):
     source_code = f"""\
     import importlib
     import boto3
+    import json
     
     import stark_core
     from stark_core import data_abstraction
