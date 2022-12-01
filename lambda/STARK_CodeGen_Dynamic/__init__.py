@@ -95,6 +95,13 @@ def create_handler(event, context):
                 for key in items:
                     for value in key:
                         key[value] = converter.convert_to_system_name(key[value])
+        
+        pk_field_of_parent_for_many = {}
+        for index in relationships.get('belongs_to',[]):
+            ##get pk field only
+            if index['rel_type'] == 'has_many':
+                pk_field_of_parent_for_many.update({entity: models.get(index['entity'],{}).get('pk')})
+                
         data = {
                 "Entity": entity, 
                 "Columns": models[entity]["data"], 
@@ -102,6 +109,7 @@ def create_handler(event, context):
                 "DynamoDB Name": ddb_table_name,
                 "Bucket Name": website_bucket,
                 "Relationships": relationships,
+                "PK Fields of Parent for Many": pk_field_of_parent_for_many,
                 "Rel Model": rel_model,
                 "Raw Bucket Name": s3_analytics_raw_bucket_name,
                 "Processed Bucket Name": s3_analytics_processed_bucket_name,
