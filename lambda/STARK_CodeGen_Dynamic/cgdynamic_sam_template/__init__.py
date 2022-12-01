@@ -789,7 +789,7 @@ def create(data, cli_mode=False):
             Properties:
                 Type: SCHEDULED
                 Description: DESCRIPTION_SCHEDULED
-                Schedule: cron(30 0 * * ? *)
+                Schedule: cron(30 16 * * ? *)
                 StartOnCreation: True
                 Actions: """
     for resource_name in etl_resource_names:
