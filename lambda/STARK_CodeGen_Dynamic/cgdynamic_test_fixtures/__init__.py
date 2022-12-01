@@ -85,11 +85,11 @@ def create(data):
         rel_pk = rel_model[rel_ent]["pk"]
         var_pk = rel_ent.replace(' ', '_') + '_' + rel_pk.replace(' ', '_')
         source_code += f"""
-        payload['{var_pk}'] = '',"""
+        payload['{var_pk}'] = ''"""
         for rel_col, rel_col_type in rel_cols.items():
             var_data = rel_ent.replace(' ', '_') + '_' + rel_col.replace(' ', '_')
             source_code += f"""
-        payload['{var_data}'] = '',"""
+        payload['{var_data}'] = ''"""
 
     source_code += f"""
         payload['STARK-ListView-sk'] = 'Test2'
