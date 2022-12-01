@@ -150,7 +150,7 @@ def create(data):
     if relationships.get('has_many', '') != '':
         for relation in relationships.get('has_many'):
             if relation.get('type') == 'repeater':
-                rel_entity = converter.convert_to_system_name(relation.get('rel_entity'))
+                rel_entity = converter.convert_to_system_name(relation.get('entity'))
                 source_code += f"""
                 '{rel_entity}': {{
                     'value': '',
