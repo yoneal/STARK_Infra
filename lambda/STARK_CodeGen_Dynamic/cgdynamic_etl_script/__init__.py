@@ -13,7 +13,7 @@ def create(data):
     project_varname       = data["Project Name"]
     columns               = data["Columns"]
     pk                    = data["PK"]
-    pk_fields_for_many    = data["PK Fields of Parent for Many"]
+    relationships         = data["Relationships"]
 
     pk_varname     = converter.convert_to_system_name(pk)
     entity_varname = converter.convert_to_system_name(entity)
@@ -37,17 +37,18 @@ def create(data):
                     'feedback': ''
                 }},"""
 
-    for entity, pk_field in pk_fields_for_many.items():
-        source_code += f"""
-                "{pk_field}": {{
-                    'value': '',
-                    'key': '',
-                    'required': True,
-                    'max_length': '',
-                    'data_type': 'string',
-                    'state': None,
-                    'feedback': ''
-                }},"""
+    for relation in relationships.get("belongs_to", []):
+        if relation['rel_type'] == 'has_many':
+            source_code += f"""
+                    "{converter.convert_to_system_name(relation['pk_field'])}": {{
+                        'value': '',
+                        'key': '',
+                        'required': True,
+                        'max_length': '',
+                        'data_type': 'string',
+                        'state': None,
+                        'feedback': ''
+                    }},"""
         
     
     for col, col_type in columns.items():

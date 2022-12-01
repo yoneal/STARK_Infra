@@ -83,7 +83,7 @@ def create_handler(event, context):
         entity_varname = converter.convert_to_system_name(entity) 
         #Step 1: generate source code.
         #Step 1.1: extract relationship
-        relationships = get_rel.get_relationship(models, entity)
+        relationships = get_rel.get_relationship(models, entity, entity)
         rel_model = {}
         for relationship in relationships.get('has_many', []):
             if relationship.get('type') == 'repeater':
@@ -94,14 +94,7 @@ def create_handler(event, context):
             if len(items) > 0:
                 for key in items:
                     for value in key:
-                        key[value] = converter.convert_to_system_name(key[value])
-        
-        pk_field_of_parent_for_many = {}
-        for index in relationships.get('belongs_to',[]):
-            ##get pk field only
-            if index['rel_type'] == 'has_many':
-                pk_field_of_parent_for_many.update({entity: models.get(index['entity'],{}).get('pk')})
-                
+                        key[value] = converter.convert_to_system_name(key[value]) 
         data = {
                 "Entity": entity, 
                 "Columns": models[entity]["data"], 
@@ -109,7 +102,6 @@ def create_handler(event, context):
                 "DynamoDB Name": ddb_table_name,
                 "Bucket Name": website_bucket,
                 "Relationships": relationships,
-                "PK Fields of Parent for Many": pk_field_of_parent_for_many,
                 "Rel Model": rel_model,
                 "Raw Bucket Name": s3_analytics_raw_bucket_name,
                 "Processed Bucket Name": s3_analytics_processed_bucket_name,
