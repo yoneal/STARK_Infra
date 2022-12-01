@@ -81,6 +81,7 @@ def create(data):
         payload['sk'] = '{entity_varname}|info'{payload_string}
         payload['STARK-ListView-sk'] = 'Test2'
         payload['STARK_uploaded_s3_keys'] = {{}}
+        payload['orig_STARK_uploaded_s3_keys'] = {{}}
         return payload
 
     def get_raw_payload():
@@ -96,7 +97,21 @@ def create(data):
     def get_raw_report_payload():
         raw_payload = {{
             "{entity_varname}": {{
-                '{pk_varname}': {{'operator': "=",'type': "S",'value': "Hello"}},{raw_rpt_payload_string}
+                '{pk_varname}': {{'operator': "=",'type': "S",'value': "Hello"}},{raw_rpt_payload_string}"""
+
+    for rel_ent in rel_model:
+        rel_cols = rel_model[rel_ent]["data"]
+        rel_pk = rel_model[rel_ent]["pk"]
+        var_pk = rel_ent.replace(' ', '_') + '_' + rel_pk.replace(' ', '_')
+        source_code += f"""
+                    '{var_pk}':  {{'operator': "",'type': "S",'value': ""}},"""
+        for rel_col, rel_col_type in rel_cols.items():
+            var_data = rel_ent.replace(' ', '_') + '_' + rel_col.replace(' ', '_')
+            source_code += f"""
+                    '{var_data}':  {{'operator': "",'type': "S",'value': ""}},"""
+
+    
+    source_code += f"""
                 'STARK_Chart_Type' : "",
                 'STARK_Report_Type' : "Tabular",
                 'STARK_X_Data_Source' : "",

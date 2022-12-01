@@ -498,9 +498,9 @@ def create(data):
                         # Get transaction number per report result
                         many_pk = each_item.get(pk_field)
                         for many_rel_entity, many_rel_field in many_entity_dict.items():
-                            many_sk = 'Transaction|' + many_rel_entity
+                            many_sk = '{entity_varname}|' + many_rel_entity
                             
-                            many_result = get_many_by_pk(many_pk, many_sk)
+                            many_result = data_abstraction.get_many_by_pk(many_pk, many_sk)
                             response = None
                             response = json.loads(many_result[0].get(many_sk, '').get('S'))
                             temp_list = []
@@ -709,7 +709,7 @@ def create(data):
         for rel in many_rel:
             entity = rel['entity']
             sk = '{entity_varname}|' + entity
-            many_result = get_many_by_pk(pk, sk)
+            many_result = data_abstraction.get_many_by_pk(pk, sk)
             for result in many_result:
                 response[entity] = result.get(sk, '').get('S')
         """
@@ -720,30 +720,6 @@ def create(data):
     source_code+= f"""
 
         return response"""
-
-    if len(rel_model) > 0:
-        source_code+= f"""
-    def get_many_by_pk(pk, sk, db_handler = None):
-        if db_handler == None:
-            db_handler = ddb
-
-        ddb_arguments = {{}}
-        ddb_arguments['TableName'] = ddb_table
-        ddb_arguments['Select'] = "ALL_ATTRIBUTES"
-        ddb_arguments['KeyConditionExpression'] = "#pk = :pk and #sk = :sk"
-        ddb_arguments['ExpressionAttributeNames'] = {{
-                                                    '#pk' : 'pk',
-                                                    '#sk' : 'sk'
-                                                }}
-        ddb_arguments['ExpressionAttributeValues'] = {{
-                                                    ':pk' : {{'S' : pk }},
-                                                    ':sk' : {{'S' : sk }}
-                                                }}
-        Document = db_handler.query(**ddb_arguments)
-        response = Document.get('Items')
-        return response
-        """
-
 
     source_code+= f"""
     def delete(data, db_handler = None):
