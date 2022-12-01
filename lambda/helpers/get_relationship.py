@@ -30,7 +30,9 @@ def get_relationship(model, parent_entity_name=""):
                                     has_many_list.append(rel)
                     if entity == parent_entity_name:
                         if types.get('has_one', '') != '':
-                            rel={'entity' : col}
+                            rel={'entity' : col, 'rel_type': 'has_one'}
+                        if types.get('has_many', '') != '':
+                            rel={'entity' : col, 'rel_type': 'has_many'}
                             belongs_to_list.append(rel)
 
     if len(has_one_list) > 0:
