@@ -81,7 +81,7 @@ def create(data):
 
     metadata_mappings = []
     for field, item in metadata.items():
-        metadata_mappings.append((field, item['data_type'], field, item['data_type']))
+        metadata_mappings.append((field, 'string', field, item['data_type']))
 
     # Script generated for node ApplyMapping
     ApplyMapping_node2 = ApplyMapping.apply(
@@ -118,19 +118,19 @@ def set_data_type(col_type):
     if isinstance(col_type, dict):
         #special/complex types
         if col_type["type"] in [ "int-spinner" ]:
-            data_type = 'integer'
+            data_type = 'int'
 
         if col_type["type"] in [ "decimal-spinner" ]:
             data_type = 'float'
         
         if col_type["type"] in [ "tags", "multiple choice" ]:
-            data_type = 'list'
+            data_type = 'string'
 
         if col_type["type"] == 'file-upload':
-            data_type = 'file'
+            data_type = 'string'
     
     elif col_type in [ "int", "number" ]:
-        data_type = 'integer'
+        data_type = 'int'
 
     elif col_type == 'date':
         data_type = 'date'
