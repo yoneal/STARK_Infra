@@ -83,7 +83,7 @@ def create_handler(event, context):
         entity_varname = converter.convert_to_system_name(entity) 
         #Step 1: generate source code.
         #Step 1.1: extract relationship
-        relationships = get_rel.get_relationship(models, entity)
+        relationships = get_rel.get_relationship(models, entity, entity)
         rel_model = {}
         for relationship in relationships.get('has_many', []):
             if relationship.get('type') == 'repeater':
@@ -94,7 +94,7 @@ def create_handler(event, context):
             if len(items) > 0:
                 for key in items:
                     for value in key:
-                        key[value] = converter.convert_to_system_name(key[value])
+                        key[value] = converter.convert_to_system_name(key[value]) 
         data = {
                 "Entity": entity, 
                 "Columns": models[entity]["data"], 
