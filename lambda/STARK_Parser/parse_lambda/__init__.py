@@ -95,10 +95,14 @@ def parse(data):
     }
     
     for entity in entities:
-        relationships = get_rel.get_relationship(data_model, entity)
+        relationships = get_rel.get_relationship(models, entity)
         dependencies = []
         if relationships.get('has_one', '') != '':
             for relation in relationships.get('has_one'):
+                    dependencies.append(relation['entity'])
+        elif relationships.get('has_many', '') != '':
+            for relation in relationships.get('has_many'):
+                if relation['type'] == 'repeater':
                     dependencies.append(relation['entity'])
 
         parsed[entity] = {
