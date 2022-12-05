@@ -1091,6 +1091,7 @@ def create(data):
         #loop through response and update each record
         for record in response:
             record[attribute] = params['pk']
+            record['orig_pk'] = params['pk']
             temp_import.edit(record)
 
         return "OK"
