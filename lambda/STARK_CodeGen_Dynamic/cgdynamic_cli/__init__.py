@@ -18,6 +18,9 @@ if 'libstark' in os.listdir():
 cg_ddb     = importlib.import_module(f"{prepend_dir}cgdynamic_dynamodb")
 cg_sam     = importlib.import_module(f"{prepend_dir}cgdynamic_sam_template")
 
+cg_analytics  = importlib.import_module(f"{prepend_dir}cgdynamic_analytics")
+cg_etl_script = importlib.import_module(f"{prepend_dir}cgdynamic_etl_script")
+
 import convert_friendly_to_system as converter
 import get_relationship as get_rel
 import suggest_graphic as set_graphic
@@ -25,6 +28,11 @@ import suggest_graphic as set_graphic
 def create(cloud_resources, project_basedir):
 
     models = cloud_resources["Data Model"]
+
+    s3_analytics_raw_bucket_name = converter.convert_to_system_name(project_varname + '-stark-analytics-raw', 's3')
+    s3_analytics_processed_bucket_name = converter.convert_to_system_name(project_varname + '-stark-analytics-processed', 's3')
+    s3_analytics_athena_bucket_name = converter.convert_to_system_name(project_varname + '-stark-analytics-athena', 's3')
+
     entities = []
     for entity in models:
         entities.append(entity)
@@ -53,14 +61,24 @@ def create(cloud_resources, project_basedir):
             "PK": models[entity]["pk"],
             "DynamoDB Name": ddb_table_name,
             "Bucket Name": web_bucket_name,
-            "Relationships": relationships
+            "Relationships": relationships,
+            "Raw Bucket Name": s3_analytics_raw_bucket_name,
+            "Processed Bucket Name": s3_analytics_processed_bucket_name,
+            "Project Name": project_varname
         }
         source_code = cg_ddb.create(data)
+        etl_script_source_code = cg_etl_script.create(data)
 
         #Step 2: Add source code to our commit list to the project repo
         files_to_commit.append({
             'filePath': f"lambda/{entity_varname}/main.py",
             'fileContent': source_code.encode()
+        })
+
+        # etl scripts
+        files_to_commit.append({
+            'filePath': f"lambda/STARK_Analytics/ETL_Scripts/{entity_varname}.py",
+            'fileContent': etl_script_source_code.encode()
         })
 
 
