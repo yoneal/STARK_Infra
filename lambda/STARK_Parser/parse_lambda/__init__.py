@@ -95,7 +95,7 @@ def parse(data):
     }
     
     for entity in entities:
-        relationships = get_rel.get_relationship(models, entity)
+        relationships = get_rel.get_relationship(data_model, entity)
         dependencies = []
         if relationships.get('has_one', '') != '':
             for relation in relationships.get('has_one'):
