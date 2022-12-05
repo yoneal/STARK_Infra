@@ -66,6 +66,26 @@ def get_many_by_pk(pk, sk, db_handler = None):
     response = db_handler.query(**ddb_arguments).get('Items')
     return response
     
+def get_many_by_pk(pk, sk, db_handler = None):
+    if db_handler == None:
+        db_handler = ddb
+
+    ddb_arguments = {}
+    ddb_arguments['TableName'] = stark_core.ddb_table
+    ddb_arguments['Select'] = "ALL_ATTRIBUTES"
+    ddb_arguments['KeyConditionExpression'] = "#pk = :pk and #sk = :sk"
+    ddb_arguments['ExpressionAttributeNames'] = {
+                                                '#pk' : 'pk',
+                                                '#sk' : 'sk'
+                                            }
+    ddb_arguments['ExpressionAttributeValues'] = {
+                                                ':pk' : {'S' : pk },
+                                                ':sk' : {'S' : sk }
+                                            }
+    Document = db_handler.query(**ddb_arguments)
+    response = Document.get('Items')
+    return response
+
 def get_report_data(report_payload, object_expression_value, string_filter, is_aggregate_report, map_results_func):
     ##FIXME: pass map_results function for now, it will be refactored soon and will just process meta data of an entity so that
     #        it can be dynamically used.
