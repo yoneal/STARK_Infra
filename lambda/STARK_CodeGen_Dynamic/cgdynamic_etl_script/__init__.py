@@ -13,6 +13,7 @@ def create(data):
     project_varname       = data["Project Name"]
     columns               = data["Columns"]
     pk                    = data["PK"]
+    relationships         = data["Relationships"]
 
     pk_varname     = converter.convert_to_system_name(pk)
     entity_varname = converter.convert_to_system_name(entity)
@@ -35,6 +36,19 @@ def create(data):
                     'state': None,
                     'feedback': ''
                 }},"""
+
+    for relation in relationships.get("belongs_to", []):
+        if relation['rel_type'] == 'has_many':
+            source_code += f"""
+                    "{converter.convert_to_system_name(relation['pk_field'])}": {{
+                        'value': '',
+                        'key': '',
+                        'required': True,
+                        'max_length': '',
+                        'data_type': 'string',
+                        'state': None,
+                        'feedback': ''
+                    }},"""
         
     
     for col, col_type in columns.items():
@@ -81,7 +95,7 @@ def create(data):
 
     metadata_mappings = []
     for field, item in metadata.items():
-        metadata_mappings.append((field, item['data_type'], field, item['data_type']))
+        metadata_mappings.append((field, 'string', field, item['data_type']))
 
     # Script generated for node ApplyMapping
     ApplyMapping_node2 = ApplyMapping.apply(
@@ -118,19 +132,19 @@ def set_data_type(col_type):
     if isinstance(col_type, dict):
         #special/complex types
         if col_type["type"] in [ "int-spinner" ]:
-            data_type = 'integer'
+            data_type = 'int'
 
         if col_type["type"] in [ "decimal-spinner" ]:
             data_type = 'float'
         
         if col_type["type"] in [ "tags", "multiple choice" ]:
-            data_type = 'list'
+            data_type = 'string'
 
         if col_type["type"] == 'file-upload':
-            data_type = 'file'
+            data_type = 'string'
     
     elif col_type in [ "int", "number" ]:
-        data_type = 'integer'
+        data_type = 'int'
 
     elif col_type == 'date':
         data_type = 'date'
