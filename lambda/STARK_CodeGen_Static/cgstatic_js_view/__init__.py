@@ -1377,7 +1377,7 @@ def create(data):
             if (col_type["type"] == "relationship") or isinstance(col_values, list):
                 has_many = col_type.get('has_many', '')
                 has_many_ux = col_type.get('has_many_ux', '')
-                if has_many != '' and has_many_ux != 'repeater':
+                if has_many_ux != 'repeater':
                     source_code += f"""
             {col_varname}_criteria() {{
                 return this.search['{col_varname}'].trim().toLowerCase()
