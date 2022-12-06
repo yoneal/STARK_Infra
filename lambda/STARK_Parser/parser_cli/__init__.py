@@ -51,7 +51,6 @@ def parse(construct_file):
         project_varname         = converter.convert_to_system_name(project_name)
         ddb_table_name          = current_cloud_resources["DynamoDB"]["Table Name"]
         web_bucket_name         = current_cloud_resources["S3 webserve"]["Bucket Name"]
-
     for key in data_model:
         if key == "__STARK_project_name__":
             project_name = data_model[key]
@@ -91,7 +90,11 @@ def parse(construct_file):
     cloud_resources["DynamoDB"] = dynamodb_parser.parse(data)
 
     #Lambdas ###
+    data.update({'raw_data_model': cloud_resources["Data Model"]})
+    #Retain old stark Analytics dependencies then merge it after parsing lambda
+    current_stark_analytics_dependencies = current_cloud_resources['Lambda']['STARK_Analytics']['Dependencies']
     cloud_resources["Lambda"] = lambda_parser.parse(data)
+    cloud_resources["Lambda"]['STARK_Analytics']['Dependencies'] = [ *current_stark_analytics_dependencies, *cloud_resources["Lambda"]['STARK_Analytics']['Dependencies']]
 
     #CloudFront ##################
     cloud_resources["CloudFront"] = cloudfront_parser.parse(data)

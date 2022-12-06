@@ -70,9 +70,6 @@ def create(data):
     #         if relation.get('type') != 'repeater':
     #             entity = relation.get('entity')
     #             print(entity)
-    print('columns')
-    print(columns)
-    print('test_def')
     repeater_fields = remove_repeater_col(relationships, columns)
 
     #This is for our DDB update call
