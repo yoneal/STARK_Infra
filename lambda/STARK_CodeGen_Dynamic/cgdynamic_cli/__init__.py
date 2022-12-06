@@ -18,6 +18,13 @@ if 'libstark' in os.listdir():
 cg_ddb     = importlib.import_module(f"{prepend_dir}cgdynamic_dynamodb")
 cg_sam     = importlib.import_module(f"{prepend_dir}cgdynamic_sam_template")
 
+cg_analytics  = importlib.import_module(f"{prepend_dir}cgdynamic_analytics")
+cg_etl_script = importlib.import_module(f"{prepend_dir}cgdynamic_etl_script")
+
+cg_conftest = importlib.import_module(f"{prepend_dir}cgdynamic_conftest")
+cg_test     = importlib.import_module(f"{prepend_dir}cgdynamic_test_cases")
+cg_fixtures = importlib.import_module(f"{prepend_dir}cgdynamic_test_fixtures")
+
 import convert_friendly_to_system as converter
 import get_relationship as get_rel
 import suggest_graphic as set_graphic
@@ -34,6 +41,18 @@ def create(cloud_resources, project_basedir):
     ddb_table_name  = cloud_resources["DynamoDB"]["Table Name"]
     web_bucket_name = cloud_resources["S3 webserve"]["Bucket Name"]
 
+    s3_analytics_raw_bucket_name = converter.convert_to_system_name(project_varname + '-stark-analytics-raw', 's3')
+    s3_analytics_processed_bucket_name = converter.convert_to_system_name(project_varname + '-stark-analytics-processed', 's3')
+    s3_analytics_athena_bucket_name = converter.convert_to_system_name(project_varname + '-stark-analytics-athena', 's3')
+
+    with open("../cloud_resources.yml", "r") as f:
+        current_cloud_resources = yaml.safe_load(f.read())
+        current_data_model =  current_cloud_resources['Data Model']
+
+    current_entities = []
+    for each_entity in current_data_model:
+        current_entities.append(each_entity)
+
     ##########################################
     #Create code for our entity Lambdas (API endpoint backing)
     files_to_commit = []
@@ -41,7 +60,13 @@ def create(cloud_resources, project_basedir):
         entity_varname = converter.convert_to_system_name(entity)
         #Step 1: generate source code.
         #Step 1.1: extract relationship
-        relationships = get_rel.get_relationship(models, entity)
+        relationships = get_rel.get_relationship(models, entity, entity)
+        rel_model = {}
+        for relationship in relationships.get('has_many', []):
+            if relationship.get('type') == 'repeater':
+                rel_col = models.get(relationship.get('entity'), '')
+                rel_model.update({(relationship.get('entity')) : rel_col})
+
         for index, items in relationships.items():
             if len(items) > 0:
                 for key in items:
@@ -53,16 +78,59 @@ def create(cloud_resources, project_basedir):
             "PK": models[entity]["pk"],
             "DynamoDB Name": ddb_table_name,
             "Bucket Name": web_bucket_name,
-            "Relationships": relationships
+            "Relationships": relationships,
+            "Rel Model": rel_model,
+            "Raw Bucket Name": s3_analytics_raw_bucket_name,
+            "Processed Bucket Name": s3_analytics_processed_bucket_name,
+            "Project Name": project_varname
         }
-        source_code = cg_ddb.create(data)
+        source_code            = cg_ddb.create(data)
+        test_source_code       = cg_test.create(data)
+        fixtures_source_code   = cg_fixtures.create(data)
+        etl_script_source_code = cg_etl_script.create(data)
 
         #Step 2: Add source code to our commit list to the project repo
         files_to_commit.append({
-            'filePath': f"lambda/{entity_varname}/main.py",
+            'filePath': f"lambda/{entity_varname}/__init__.py",
             'fileContent': source_code.encode()
         })
 
+        # test cases
+        files_to_commit.append({
+            'filePath': f"lambda/test_cases/business_modules/test_{entity_varname.lower()}.py",
+            'fileContent': test_source_code.encode()
+        })
+
+        # fixtures
+        files_to_commit.append({
+            'filePath': f"lambda/test_cases/fixtures/{entity_varname}/__init__.py",
+            'fileContent': fixtures_source_code.encode()
+        })
+
+        # etl scripts
+        files_to_commit.append({
+            'filePath': f"lambda/STARK_Analytics/ETL_Scripts/{entity_varname}.py",
+            'fileContent': etl_script_source_code.encode()
+        })
+    ########################################
+    #Update conftest of test_cases 
+    data = {
+        "Entities": [*current_entities, *entities]
+    }
+    conftest_code = cg_conftest.create(data)
+
+    files_to_commit.append({
+        'filePath': f"lambda/test_cases/conftest.py",
+        'fileContent': conftest_code.encode()
+    })
+
+    #########################################
+    #Update entities in STARK_Analytics 
+    analytics_source_code = cg_analytics.create(data)
+    files_to_commit.append({
+        'filePath': f"lambda/STARK_Analytics/__init__.py",
+        'fileContent': analytics_source_code.encode()
+    })
 
     ##################################################
     #Write files

@@ -23,7 +23,8 @@ cg_edit      = importlib.import_module(f"{prepend_dir}cgstatic_html_edit")
 cg_view      = importlib.import_module(f"{prepend_dir}cgstatic_html_view")  
 cg_delete    = importlib.import_module(f"{prepend_dir}cgstatic_html_delete")  
 cg_listview  = importlib.import_module(f"{prepend_dir}cgstatic_html_listview")
-cg_report    = importlib.import_module(f"{prepend_dir}cgstatic_html_report")   
+cg_report    = importlib.import_module(f"{prepend_dir}cgstatic_html_report")
+cg_js_many   = importlib.import_module(f"{prepend_dir}cgstatic_js_many")   
 
 ##unused imports
 # import cgstatic_html_homepage as cg_homepage
@@ -65,8 +66,20 @@ def create(cloud_resources, current_cloud_resources, project_basedir):
         pk   = models[entity]["pk"]
         cols = models[entity]["data"]
         relationships = get_rel.get_relationship(models, entity)
-        cgstatic_data = { "Entity": entity, "PK": pk, "Columns": cols, "Project Name": project_name, "Relationships" : relationships }
+        rel_model = {}
+        for relationship in relationships.get('has_many', []):
+            if relationship.get('type') == 'repeater':
+                rel_col = models.get(relationship.get('entity'), '')
+                rel_model.update({(relationship.get('entity')) : rel_col})
+
+        cgstatic_data = { "Entity": entity, "PK": pk, "Columns": cols, "Project Name": project_name, "Relationships" : relationships, "Rel Model": rel_model }
         entity_varname = converter.convert_to_system_name(entity)
+        for rel in rel_model:
+            pk   = rel_model[rel]["pk"]
+            cols = rel_model[rel]["data"]
+            many_entity_varname = converter.convert_to_system_name(rel)
+            cgstatic_many_data = { "Entity": rel, "PK": pk, "Columns": cols, "Project Name": project_name, "Relationships": relationships }
+            add_to_commit(source_code=cg_js_many.create(cgstatic_many_data), key=f"js/many_{many_entity_varname}.js", files_to_commit=files_to_commit, file_path='static')
 
         add_to_commit(source_code=cg_add.create(cgstatic_data), key=f"{entity_varname}_add.html", files_to_commit=files_to_commit, file_path='static')
         add_to_commit(source_code=cg_edit.create(cgstatic_data), key=f"{entity_varname}_edit.html", files_to_commit=files_to_commit, file_path='static')

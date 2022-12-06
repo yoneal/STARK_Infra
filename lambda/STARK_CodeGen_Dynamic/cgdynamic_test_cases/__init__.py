@@ -28,15 +28,28 @@ def create(data):
     with_upload    = False
 
     cascade_function_string = ""
-
-    if len(relationships) > 0:
-        cascade_function_string = f"""
-        {cascade_function_string}
+    for one_to_one_relation in relationships.get("has_one",[]):
+        cascade_function_string += f"""
+        def mock_cascade_pk_change_to_child(data, entity, attribute):
+                return 'OK'
+        monkeypatch.setattr({entity_to_lower}, "cascade_pk_change_to_child", mock_cascade_pk_change_to_child)
         """
 
     col_list = []
-    for keys in columns:
-        col_list.append(keys)
+    ## removes child of many field in the selection of valid columns
+    valid_columns = []
+    for key, attributes in columns.items():
+        valid_column = True
+        if isinstance(attributes,dict):
+            if attributes.get('has_many'):
+                valid_column = False
+
+        if valid_column:
+            valid_columns.append(key)
+
+    for key in valid_columns:
+        col_list.append(key)
+
     col_to_edit = col_list[randint(0,len(col_list) - 1)]
     col_type = set_type(columns[col_to_edit])
     test_data_for_edit = "'Testing Edit'"
@@ -81,7 +94,7 @@ def create(data):
     def test_get_by_pk(use_moto,set_{entity_to_lower}_payload, monkeypatch):
         use_moto()
         ddb = boto3.client('dynamodb', region_name=core.test_region)
-        {cascade_function_string}
+
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         response  = {entity_to_lower}.get_by_pk(set_{entity_to_lower}_payload['pk'], set_{entity_to_lower}_payload['sk'], ddb)
 
@@ -91,7 +104,7 @@ def create(data):
     def test_get_all(use_moto,set_{entity_to_lower}_payload, monkeypatch):
         use_moto()
         ddb = boto3.client('dynamodb', region_name=core.test_region)
-        {cascade_function_string}
+
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         set_{entity_to_lower}_payload['pk'] = 'Test3'
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
@@ -118,7 +131,7 @@ def create(data):
     def test_delete(use_moto,set_{entity_to_lower}_payload, monkeypatch):
         use_moto()
         ddb = boto3.client('dynamodb', region_name=core.test_region)
-        {cascade_function_string}
+
         {entity_to_lower}.add(set_{entity_to_lower}_payload, 'POST', ddb)
         {entity_to_lower}.delete(set_{entity_to_lower}_payload, ddb)
         response  = {entity_to_lower}.get_all('{default_sk}', None, ddb)
