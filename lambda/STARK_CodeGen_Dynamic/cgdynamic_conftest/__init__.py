@@ -11,9 +11,6 @@ import convert_friendly_to_system as converter
 def create(data):
   
     entities       = data["Entities"]
-    models         = data["Models"]
-    ddb_table_name = data["DynamoDB Name"]
-    bucket_name    = data['Bucket Name']
     
     #Convert human-friendly names to variable-friendly names
 
