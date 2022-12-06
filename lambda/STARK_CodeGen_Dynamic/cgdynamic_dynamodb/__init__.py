@@ -73,13 +73,16 @@ def create(data):
     print('columns')
     print(columns)
     print('test_def')
-    new_column = remove_repeater_col(relationships, columns)
+    repeater_fields = remove_repeater_col(relationships, columns)
 
     #This is for our DDB update call
     update_expression = ""
-    for col in new_column:
-        col_varname = converter.convert_to_system_name(col)
-        update_expression += f"""#{col_varname} = :{col_varname}, """
+    for col in columns:
+        if col in repeater_fields:
+            pass
+        else:
+            col_varname = converter.convert_to_system_name(col)
+            update_expression += f"""#{col_varname} = :{col_varname}, """
     update_expression += " #STARKListViewsk = :STARKListViewsk"
     if with_upload or with_upload_on_many:
         update_expression += ", #STARK_uploaded_s3_keys = :STARK_uploaded_s3_keys"
@@ -1161,11 +1164,7 @@ def remove_repeater_col(relationships, columns):
                 new_entity = (relation.get('entity')).replace('_', ' ')
                 repeater_fields.append(new_entity)
 
-    # model = models['Order']['data']
-    for fields in repeater_fields:
-        del columns[fields]
-    print(columns)
-    return columns
+    return repeater_fields
 
 def set_data_type(col_type):
 

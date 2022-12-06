@@ -1,6 +1,6 @@
 #This reads the model of the yaml and get all or the specified entity's relationship
 
-def get_relationship(model, parent_entity_name=""):
+def get_relationship(model, parent_entity_name="", child_entity_name=""):
     rel_list        = {}
     has_one_list    = []
     has_many_list   = []
@@ -30,8 +30,14 @@ def get_relationship(model, parent_entity_name=""):
                                     has_many_list.append(rel)
                     if entity == parent_entity_name:
                         if types.get('has_one', '') != '':
-                            rel={'entity' : col}
+                            rel={'entity' : col, 'rel_type': 'has_one'}
                             belongs_to_list.append(rel)
+
+                    if child_entity_name != "":
+                        if child_entity_name == col:
+                            if types.get('has_many', '') != '':
+                                rel={'entity' : entity, 'rel_type': 'has_many', 'pk_field': attributes['pk']}
+                                belongs_to_list.append(rel)
 
     if len(has_one_list) > 0:
         rel_list.update({'has_one' : has_one_list})
