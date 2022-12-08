@@ -627,6 +627,18 @@ def create(data):
             report_list = utilities.filter_report_list(report_list, diff_list)
             csv_file, file_buff_value = utilities.create_csv(report_list, report_header)
             utilities.save_object_to_bucket(file_buff_value, csv_file)
+
+            merge_metadata = {{}}
+            for relation in relationships.get('has_many', []):
+                if relation.get('type', '') == 'repeater':
+                    temp_import = importlib.import_module(relation.get('entity', ''))
+                    child_metadata = temp_import.metadata
+                    new_child_metadata = {{}}
+                    for child_entity, child_data in child_metadata.items():
+                        new_child_ent = relation['entity'] + '_' + child_entity
+                        new_child_metadata.update({{new_child_ent: child_data}})
+                    merge_metadata.update(new_child_metadata)
+            metadata.update(merge_metadata) 
             pdf_file, pdf_output = utilities.prepare_pdf_data(report_list, report_header, report_param_dict, metadata, pk_field)
             utilities.save_object_to_bucket(pdf_output, pdf_file)
 
