@@ -825,8 +825,11 @@ def create(data):
 
     for col in columns:
         col_varname = converter.convert_to_system_name(col)
-        source_code +=f"""
-            '#{col_varname}' : '{col_varname}',"""  
+        if col in repeater_fields:
+            pass
+        else:
+            source_code +=f"""
+            '#{col_varname}' : '{col_varname}',""" 
     
     if with_upload or with_upload_on_many:
         source_code += f"""
@@ -836,11 +839,14 @@ def create(data):
         }}
         ExpressionAttributeValuesDict = {{"""
 
-    for col, col_type in columns.items():
+
+    for col in columns:
         col_varname = converter.convert_to_system_name(col)
         col_type_id = set_type(col_type)
-
-        source_code +=f"""
+        if col in repeater_fields:
+            pass
+        else:    
+            source_code +=f"""
             ':{col_varname}' : {{'{col_type_id}' : {col_varname} }},"""  
 
     if with_upload or with_upload_on_many:
