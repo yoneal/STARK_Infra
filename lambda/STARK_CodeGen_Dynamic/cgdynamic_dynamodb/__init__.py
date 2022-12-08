@@ -440,7 +440,7 @@ def create(data):
         for key, index in data.items():
             if "STARK_" not in key:
                 if index['value'] != "":
-                    processed_operator_and_parameter_dict = utilities.compose_report_operators_and_parameters(key, index) 
+                    processed_operator_and_parameter_dict = utilities.compose_report_operators_and_parameters(key, index, metadata) 
                     temp_string_filter += processed_operator_and_parameter_dict['filter_string']
                     object_expression_value.update(processed_operator_and_parameter_dict['expression_values'])
                     report_param_dict.update(processed_operator_and_parameter_dict['report_params'])
