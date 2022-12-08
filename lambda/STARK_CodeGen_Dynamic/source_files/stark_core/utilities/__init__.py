@@ -12,7 +12,7 @@ s3_res = boto3.resource('s3')
 
 name = "STARK Utilities"
 
-def compose_report_operators_and_parameters(key, data):
+def compose_report_operators_and_parameters(key, data, metadata):
     composed_filter_dict = {"filter_string":"","expression_values": {}}
     if data['operator'] == "IN":
         string_split = data['value'].split(',')
@@ -38,7 +38,10 @@ def compose_report_operators_and_parameters(key, data):
         composed_filter_dict['expression_values'][f":to{key}"] = {data['type'] : from_to_split[1].strip()}
         composed_filter_dict['report_params'] = {key : f"Between {from_to_split[0].strip()} and {from_to_split[1].strip()}"}
     else:
-        composed_filter_dict['filter_string'] += f" {key} {data['operator']} :{key} AND"
+        if metadata[key]['data_type'] == 'list' and data['operator'] == '=':
+            composed_filter_dict['filter_string'] += f" contains({key}, :{key}) AND"
+        else:
+            composed_filter_dict['filter_string'] += f" {key} {data['operator']} :{key} AND"
         composed_filter_dict['expression_values'][f":{key}"] = {data['type'] : data['value'].strip()}
         operator_string_equivalent = ""
         if data['operator'] == '=':

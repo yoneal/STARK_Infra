@@ -326,7 +326,7 @@ def report(data, sk=default_sk):
         if key not in ["STARK_isReport", "STARK_report_fields", "STARK_uploaded_s3_keys", 
                         "STARK_sum_fields", 'STARK_count_fields', 'STARK_group_by_1']:																			  
             if index['value'] != "":
-                processed_operator_and_parameter_dict = utilities.compose_report_operators_and_parameters(key, index) 
+                processed_operator_and_parameter_dict = utilities.compose_report_operators_and_parameters(key, index, metadata) 
                 temp_string_filter += processed_operator_and_parameter_dict['filter_string']
                 object_expression_value.update(processed_operator_and_parameter_dict['expression_values'])
                 report_param_dict.update(processed_operator_and_parameter_dict['report_params'])
