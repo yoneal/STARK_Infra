@@ -840,7 +840,7 @@ def create(data):
         ExpressionAttributeValuesDict = {{"""
 
 
-    for col in columns:
+    for col, col_type in columns.items():
         col_varname = converter.convert_to_system_name(col)
         col_type_id = set_type(col_type)
         if col in repeater_fields:
