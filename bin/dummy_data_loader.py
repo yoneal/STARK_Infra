@@ -64,10 +64,13 @@ def prepare_data(data, metadata, entity_varname):
         if key == pk_field:
             pass
         else:
-            value = item
+            value = item.strip()
             data_type = set_type(metadata[key]['data_type'])
             if data_type == 'SS':
-                value = item.split(',')
+                split_value = []
+                for index in item.split(','):
+                    split_value.append(index.strip())
+                value = split_value
 
             if metadata[key]['data_type'] == 'file':
                 if item != "":
