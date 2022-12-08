@@ -112,7 +112,7 @@ def parse(data):
         parsed[entity] = {
             "Memory": 128,
             "Arch": "arm64",
-            "Timeout": 5
+            "Timeout": 30
         }
 
         if len(dependencies) > 0:

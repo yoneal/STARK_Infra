@@ -761,7 +761,7 @@ def create(data, cli_mode=False):
                 Architectures:
                     - arm64
                 MemorySize: 128
-                Timeout: 5
+                Timeout: 30
                 Layers:
                     - !Ref Fpdf2Layer
         STARKAnalyticsGlueJobFor{entity_logical_name}:
