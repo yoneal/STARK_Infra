@@ -455,7 +455,7 @@ var root = new Vue({
                     if(root.custom_report[element].operator == '')
                     {
                         isValid = false
-                        no_operator.push(element)
+                        no_operator.push(element.replace('_', ' '))
                     }
                 }
             }
