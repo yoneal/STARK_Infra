@@ -495,11 +495,19 @@ var root = new Vue({
                     loading_modal.show()
                     STARK_Module_app.report(report_payload).then( function(data) {
                         root.listview_table = data[0];
-                        if(root.listview_table.length > 0) {
-                            root.STARK_report_fields = Object.keys(root.listview_table[0])
+                        if(root.listview_table.length > 0) {															  
                             if(root.custom_report.STARK_Report_Type == 'Tabular') {
+                                if(root.custom_report.STARK_group_by_1 != '')
+                                {
+                                    root.STARK_report_fields = Object.keys(root.listview_table[0])
+                                }
+                                else {
+                                    root.STARK_report_fields = root.checked_fields 
+                                }
                                 root.temp_csv_link = data[1];
                                 root.temp_pdf_link = data[2];
+                            } else {
+                                root.STARK_report_fields = Object.keys(root.listview_table[0])
                             }
                         }
                         console.log("DONE! Retrieved report.");

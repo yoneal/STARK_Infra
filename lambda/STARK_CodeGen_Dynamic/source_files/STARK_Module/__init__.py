@@ -440,9 +440,10 @@ def report(data, sk=default_sk):
         
 
         report_list = utilities.filter_report_list(report_list, diff_list)
-        csv_file = utilities.create_csv(report_list, report_header)
-        pdf_file = utilities.prepare_pdf_data(report_list, report_header, report_param_dict, metadata, pk_field)
-												 
+        csv_file, file_buff_value = utilities.create_csv(report_list, report_header)
+        utilities.save_object_to_bucket(file_buff_value, csv_file)
+        pdf_file, pdf_output = utilities.prepare_pdf_data(report_list, report_header, report_param_dict, metadata, pk_field)
+        utilities.save_object_to_bucket(pdf_output, pdf_file)										 
 
     csv_bucket_key = bucket_tmp + csv_file
     pdf_bucket_key = bucket_tmp + pdf_file
