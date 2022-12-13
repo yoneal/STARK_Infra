@@ -91,7 +91,7 @@ def create(data):
                                                 <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{pk_varname}" id="Count_of_{pk_varname}" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_{pk_varname}')">
                                             </td>
                                             <td>
-                                                <input type="radio" class="checkbox-med" name="check_checkbox" value="{pk_varname}" id="{pk_varname}" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('{pk_varname}')">
+                                                <input type="radio" onclick="root.toggle_group_by(event)" class="checkbox-med"  name="check_checkbox" value="{pk_varname}" id="{pk_varname}" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('{pk_varname}')">
                                             </td>
                                         </tr>"""
     
@@ -141,7 +141,7 @@ def create(data):
                                                 <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="Count_of_{col_varname}" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_{col_varname}')">
                                             </td>
                                             <td>
-                                                <input type="radio" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="{col_varname}" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('{col_varname}')">
+                                                <input type="radio" onclick="root.toggle_group_by(event)" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="{col_varname}" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('{col_varname}')">
                                             </td>
                                         </tr>
                                     """                      
@@ -173,7 +173,7 @@ def create(data):
                                                 <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="Count_of_{col_varname}" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_{col_varname}')">
                                             </td>
                                             <td>
-                                                <input type="radio" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="{col_varname}" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('{col_varname}')">
+                                                <input type="radio" onclick="root.toggle_group_by(event)" class="checkbox-med" name="check_checkbox" value="{col_varname}" id="{col_varname}" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('{col_varname}')">
                                             </td>
                                         </tr>
                                     """
@@ -208,7 +208,7 @@ def create(data):
                                                 <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{var_pk}" id="Count_of_{var_pk}" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_{var_pk}')">
                                             </td>
                                             <td>
-                                                <input type="radio" class="checkbox-med" name="check_checkbox" value="{var_pk}" id="{var_pk}" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('{var_pk}')">
+                                                <input type="radio" onclick="root.toggle_group_by(event)" class="checkbox-med" name="check_checkbox" value="{var_pk}" id="{var_pk}" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('{var_pk}')">
                                             </td>
                                         </tr>
                             """
@@ -240,7 +240,7 @@ def create(data):
                                                 <input type="checkbox" class="checkbox-med" name="check_checkbox" value="{var_data}" id="Count_of_{var_data}" v-model="custom_report.STARK_count_fields" onchange="root.set_y_data_source('Count_of_{var_data}')">
                                             </td>
                                             <td>
-                                                <input type="radio" class="checkbox-med" name="check_checkbox" value="{var_data}" id="{var_data}" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('{var_data}')">
+                                                <input type="radio" onclick="root.toggle_group_by(event)" class="checkbox-med" name="check_checkbox" value="{var_data}" id="{var_data}" v-model="custom_report.STARK_group_by_1" onchange="root.set_x_data_source('{var_data}')">
                                             </td>
                                         </tr>
                             """
