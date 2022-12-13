@@ -947,9 +947,21 @@ def create(data):
                 }},
 
                 toggle_all(checked) {{
-                    root.checked_fields = checked ? root.temp_checked_fields.slice() : []
+                    temp_list = []
+                    if(root.custom_report['STARK_group_by_1'] != "") {{
+                        temp_list.push((root.custom_report['STARK_group_by_1']).replaceAll("_", " "))
+                    }}
+                    
+                    root.checked_fields = checked ? root.temp_checked_fields.slice() : temp_list
                     root.all_selected = checked
-                }},"""
+                }},
+
+                toggle_group_by(event) {{
+                    field = event.target.id
+                    root.checked_fields = [field.replaceAll("_", " ")]
+                    root.all_selected = false
+                }},
+        """
     if with_upload or with_upload_on_many:
         source_code += f"""
                 init_s3_access: function(){{
