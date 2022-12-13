@@ -533,15 +533,17 @@ def create(data):
                 for each_item in new_item:
 
                     if aggregate_report:
-                        aggregate_key = data['STARK_group_by_1']
+                        aggregate_key = data['STARK_group_by_1'].replace(" ","_")
                         aggregate_key_value = each_item.get(aggregate_key)
                         if aggregate_key_value in aggregated_results:
                             for field in data['STARK_count_fields']:
-                                count_index_name = f"Count of {{field}}"
+                                field_name = field.replace(" ","_")
+                                count_index_name = f"Count of {{field_name}}"
                                 aggregated_results[aggregate_key_value][count_index_name] += 1
 
                             for field in data['STARK_sum_fields']:
-                                sum_index_name = f"Sum of {{field}}"
+                                field_name = field.replace(" ","_")
+                                sum_index_name = f"Sum of {{field_name}}"
                                 if each_item.get(field) != '':
                                     sum_value = float(each_item.get(field))
                                 else:
@@ -550,21 +552,20 @@ def create(data):
 
                             for column in data['STARK_report_fields']:
                                 if column != aggregate_key:  
-                                    aggregated_results[aggregate_key_value][column] = each_item.get(column.replace(" ","_"))
+                                    aggregated_results[aggregate_key_value][column.replace(" ","_")] = each_item.get(column.replace(" ","_"))
 
                         else:
                             temp_dict = {{ aggregate_key : aggregate_key_value}}
                             for field in data['STARK_count_fields']:
-                                count_index_name = f"Count of {{field}}"
+                                field_name = field.replace(" ","_")
+                                count_index_name = f"Count of {{field_name}}"
                                 temp_dict.update({{
                                     count_index_name:  1
                                 }})
 
                             for field in data['STARK_sum_fields']:
-                                sum_index_name = f"Sum of {{field}}"
-                                print('here')
-                                print(type(each_item.get(field)))
-                                print(each_item.get(field))
+                                field_name = field.replace(" ","_")
+                                sum_index_name = f"Sum of {{field_name}}"
                                 if each_item.get(field) != None:
                                     sum_value = float(each_item.get(field))
                                 else:
@@ -576,7 +577,7 @@ def create(data):
                             for column in data['STARK_report_fields']:
                                 if column != aggregate_key:  
                                     temp_dict.update({{
-                                        column: each_item.get(column.replace(" ","_"))
+                                        column.replace(" ","_"): each_item.get(column.replace(" ","_"))
                                     }})
 
                             aggregated_results[aggregate_key_value] = temp_dict
