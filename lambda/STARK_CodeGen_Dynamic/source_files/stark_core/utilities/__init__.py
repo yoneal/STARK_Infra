@@ -38,11 +38,16 @@ def compose_report_operators_and_parameters(key, data, metadata):
         composed_filter_dict['expression_values'][f":to{key}"] = {data['type'] : from_to_split[1].strip()}
         composed_filter_dict['report_params'] = {key : f"Between {from_to_split[0].strip()} and {from_to_split[1].strip()}"}
     else:
-        if metadata[key]['data_type'] == 'list' and data['operator'] == '=':
-            composed_filter_dict['filter_string'] += f" contains({key}, :{key}) AND"
-        else:
+        if key is not 'pk':
+            if metadata[key]['data_type'] == 'list' and data['operator'] == '=':
+                composed_filter_dict['filter_string'] += f" contains({key}, :{key}) AND"
+            else:
+                composed_filter_dict['filter_string'] += f" {key} {data['operator']} :{key} AND"
+        else: 
             composed_filter_dict['filter_string'] += f" {key} {data['operator']} :{key} AND"
+        
         composed_filter_dict['expression_values'][f":{key}"] = {data['type'] : data['value'].strip()}
+        
         operator_string_equivalent = ""
         if data['operator'] == '=':
             operator_string_equivalent = 'Is equal to'
