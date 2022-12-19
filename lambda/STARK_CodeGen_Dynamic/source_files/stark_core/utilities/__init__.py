@@ -1,6 +1,7 @@
 import math
 import uuid
 import boto3
+from datetime import datetime
 
 from io import StringIO
 from fpdf import FPDF
@@ -39,8 +40,11 @@ def compose_report_operators_and_parameters(key, data, metadata):
         composed_filter_dict['report_params'] = {key : f"Between {from_to_split[0].strip()} and {from_to_split[1].strip()}"}
     else:
         if key != 'pk':
-            if metadata[key]['data_type'] == 'list' and data['operator'] == '=':
-                composed_filter_dict['filter_string'] += f" contains({key}, :{key}) AND"
+            if metadata[key]['data_type'] == 'list':
+                if data['operator'] == '=':
+                    composed_filter_dict['filter_string'] += f" contains({key}, :{key}) AND"
+                elif data['operator'] == '<>':
+                    composed_filter_dict['filter_string'] += f" not contains({key}, :{key}) AND"
             else:
                 composed_filter_dict['filter_string'] += f" {key} {data['operator']} :{key} AND"
         else: 
@@ -58,14 +62,73 @@ def compose_report_operators_and_parameters(key, data, metadata):
         elif data['operator'] == '<':
             operator_string_equivalent = 'Is less than'
         elif data['operator'] == '<=':
-            operator_string_equivalent = 'Is greater than or equal to'
-        elif data['operator'] == '<=':
+            operator_string_equivalent = 'Is less than or equal to'
+        elif data['operator'] == '<>':
             operator_string_equivalent = 'Is not equal to'
         else:
             operator_string_equivalent = 'Invalid operator'
         composed_filter_dict['report_params'] = {key : f" {operator_string_equivalent} {data['value'].strip()}" }
 
     return composed_filter_dict
+
+def filter_criteria_for_many_fields(str_value, criteria):
+
+    if criteria['operator'] not in ['IN', 'between']:
+        criteria_value = convert_value_data_type(criteria['value'], criteria['data_type'])
+        compare_value = convert_value_data_type(str_value, criteria['data_type'])
+
+    is_data_included = False
+
+    if str_value != "":
+        if criteria['operator'] == '=':
+            if compare_value == criteria_value:
+                is_data_included = True
+
+        elif criteria['operator'] == '<>':
+            if compare_value != criteria_value:
+                is_data_included = True
+
+        elif criteria['operator'] == '<':
+            if  compare_value < criteria_value:
+                is_data_included = True
+
+        elif criteria['operator'] == '<=':
+            if compare_value <= criteria_value:
+                is_data_included = True
+
+        elif criteria['operator'] == '>':
+            if compare_value > criteria_value:
+                is_data_included = True
+
+        elif criteria['operator'] == '>=':
+            if compare_value >= criteria_value:
+                is_data_included = True
+
+        elif criteria['operator'] == 'contains':
+            if  criteria_value in compare_value:
+                is_data_included = True
+
+        elif criteria['operator'] == 'IN':
+            if str(str_value) != "" and str(str_value) in criteria_value:
+                is_data_included = True
+
+        elif criteria['operator'] == 'begins_with':
+            if str(str_value).startswith(criteria['value']):
+                is_data_included = True
+
+        elif criteria['operator'] == 'between':
+            between_values = criteria['value'].split(',')
+            first_value = str(between_values[0]).strip()
+            second_value = str(between_values[1]).strip()
+            
+            converted_first_value   = convert_value_data_type(first_value, criteria['data_type'])
+            converted_second_value  = convert_value_data_type(second_value, criteria['data_type'])
+            converted_compare_value = convert_value_data_type(str_value, criteria['data_type'])
+            
+            if converted_first_value <= converted_compare_value <= converted_second_value:
+                is_data_included = True
+
+    return is_data_included
 
 def filter_report_list(report_list, diff_list):
     for rows in report_list:
@@ -269,3 +332,17 @@ def copy_object_to_bucket(filename, destination_dir, bucket_name = None, source_
         }
         s3_res.meta.client.copy(copy_source, bucket, destination_dir + filename, extra_args)
 
+def convert_value_data_type(value, data_type):
+    converted_value = ""
+    if value != "":
+        if data_type == 'date':
+            converted_value = datetime.strptime(value, '%Y-%m-%d').date()
+        elif data_type == 'float':
+            converted_value = float(value)
+        elif data_type == 'integer':
+            converted_value = int(value)
+        else:
+            #str default
+            converted_value = str(value)
+
+    return converted_value
