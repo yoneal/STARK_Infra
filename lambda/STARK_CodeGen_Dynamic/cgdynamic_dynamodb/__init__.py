@@ -257,26 +257,32 @@ def create(data):
         source_code +=f"""
                 data['{col_varname}'] = payload.get('{col_varname}','')"""
     
+    
+
+    source_code +=f"""
+
+                if payload.get('STARK_isReport', False) == False:"""
+                
+                #FIXME: should be refactored to use metadata of child entities
     if relationships.get('has_many', '') != '':
         for relation in relationships.get('has_many'):
             if relation.get('type') == 'repeater':
                 entity = converter.convert_to_system_name(relation.get('entity'))
                 source_code +=f"""
-                data['{entity}'] = payload.get('{entity}','')"""
+                    data['{entity}'] = payload.get('{entity}','')"""
     
     for rel_ent in rel_model:
         rel_cols = rel_model[rel_ent]["data"]
         rel_pk = rel_model[rel_ent]["pk"]
         var_pk = rel_ent.replace(' ', '_') + '_' + rel_pk.replace(' ', '_')
         source_code +=f"""
-                data['{var_pk}'] = payload.get('{var_pk}','')"""
+                    data['{var_pk}'] = payload.get('{var_pk}','')"""
         for rel_col, rel_col_type in rel_cols.items():
             var_data = rel_ent.replace(' ', '_') + '_' + rel_col.replace(' ', '_')
             source_code +=f"""
-                data['{var_data}'] = payload.get('{var_data}','')"""
+                    data['{var_data}'] = payload.get('{var_data}','')"""
 
     source_code +=f"""
-                if payload.get('STARK_isReport', False) == False:
                     data['orig_pk'] = payload.get('orig_{pk_varname}','')
                     data['sk'] = payload.get('sk', '')
                     if data['sk'] == "":
@@ -298,7 +304,30 @@ def create(data):
                     data['STARK_isReport'] = payload.get('STARK_isReport', False)
                     data['STARK_sum_fields'] = payload.get('STARK_sum_fields', [])
                     data['STARK_count_fields'] = payload.get('STARK_count_fields', [])
-                    data['STARK_group_by_1'] = payload.get('STARK_group_by_1', '')
+                    data['STARK_group_by_1'] = payload.get('STARK_group_by_1', '')"""
+    
+    for rel_ent in rel_model:
+        rel_ent_varname = converter.convert_to_system_name(rel_ent)
+        rel_cols = rel_model[rel_ent]["data"]
+        rel_pk = rel_model[rel_ent]["pk"]
+        rel_pk_varname = converter.convert_to_system_name(rel_pk)
+        var_pk = rel_ent + '_' + rel_pk
+        var_pk_varname = converter.convert_to_system_name(var_pk)
+        source_code +=f"""
+                    temp_{rel_ent_varname} = {{
+                        '{rel_pk_varname}': payload.get('{var_pk_varname}',''),"""
+        for rel_col, rel_col_type in rel_cols.items():
+            var_data = rel_ent + '_' + rel_col
+            rel_col_varname = converter.convert_to_system_name(rel_col)
+            data_varname = converter.convert_to_system_name(var_data)
+            source_code +=f"""
+                        '{rel_col_varname}': payload.get('{data_varname}',''),"""
+        source_code += f"""
+                    }}
+                    data['{rel_ent_varname}'] = temp_{rel_ent_varname}
+                    
+                    """
+    source_code +=f"""
 
                 data['STARK_uploaded_s3_keys'] = payload.get('STARK_uploaded_s3_keys',{{}})
                 data['orig_STARK_uploaded_s3_keys'] = payload.get('orig_STARK_uploaded_s3_keys',{{}})
@@ -438,13 +467,33 @@ def create(data):
         object_expression_value = {{':sk' : {{'S' : sk}}}}
         report_param_dict = {{}}
         for key, index in data.items():
-            if "STARK_" not in key:
+            #FIXME: : 1-M SEARCH CRITERIA: do not include fields with 1-M relationship in composing of operators and parameters for now
+            # Fetch all records for now then do necessary logic thru python for each operator in 1-M fields
+            if "STARK_" not in key and metadata.get(key,{{}}).get('relationship','') != "1-M":
                 if index['value'] != "":
                     processed_operator_and_parameter_dict = utilities.compose_report_operators_and_parameters(key, index, metadata) 
                     temp_string_filter += processed_operator_and_parameter_dict['filter_string']
                     object_expression_value.update(processed_operator_and_parameter_dict['expression_values'])
                     report_param_dict.update(processed_operator_and_parameter_dict['report_params'])
         string_filter = temp_string_filter[1:-3]
+
+
+        #FIXME: 1-M SEARCH CRITERIA: filter result of 1-M report operators here
+        composed_operator_for_one_to_many = {{}}
+
+        for key, attribute in metadata.items():
+            if attribute['relationship'] == '1-M':
+                temp_import = importlib.import_module(key)
+                for many_key, many_attribute in data[key].items():
+                    if many_attribute['value'] != "":
+                        temp_dict = {{
+                            f"{{key}}_{{many_key}}" : {{
+                                "operator": many_attribute.get("operator"), 
+                                "value": many_attribute.get('value'),
+                                "data_type": temp_import.metadata[many_key]['data_type']
+                                }}
+                            }}
+                        composed_operator_for_one_to_many.update(temp_dict)
 
         next_token = 'initial'
         items = []
@@ -510,14 +559,15 @@ def create(data):
                             temp_list = []
                             for res in response:  
                                 temp_item = {{}}
+                                is_included = True
                                 for item_key, item_val in each_item.items():
                                     temp_item.update({{item_key: item_val}})
                                 consolidated_items = {{}}
                                 for rel_field in many_rel_field:
-                                    
                                     rel_entity = many_rel_entity.replace(' ', '_')
                                     many_field = rel_field.replace(' ', '_')
                                     new_rel_field = rel_entity + '_' + many_field
+
                                     temp_item.update({{new_rel_field : res[rel_field]}})
                                     
                                 no_val_items = {{}}
@@ -525,8 +575,17 @@ def create(data):
                                     if dict.replace(' ', '_') not in temp_item:
                                         no_val_items.update({{dict.replace(' ', '_') : ''}})       
                                 consolidated_items = temp_item | no_val_items
+                            
+                                if len(composed_operator_for_one_to_many) > 0:
+                                    is_included = False
 
-                                new_item.append(consolidated_items)
+                                for field_name, field_criteria in composed_operator_for_one_to_many.items():
+                                    is_included = utilities.filter_criteria_for_many_fields(consolidated_items[field_name], field_criteria)
+                                    if is_included == False:
+                                        break
+                                
+                                if is_included:
+                                    new_item.append(consolidated_items)
                     else:
                         new_item = item
 
