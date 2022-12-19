@@ -44,7 +44,7 @@ def compose_report_operators_and_parameters(key, data, metadata):
                 if data['operator'] == '=':
                     composed_filter_dict['filter_string'] += f" contains({key}, :{key}) AND"
                 elif data['operator'] == '<>':
-                    composed_filter_dict['filter_string'] += f" not_contains({key}, :{key}) AND"
+                    composed_filter_dict['filter_string'] += f" not contains({key}, :{key}) AND"
             else:
                 composed_filter_dict['filter_string'] += f" {key} {data['operator']} :{key} AND"
         else: 
