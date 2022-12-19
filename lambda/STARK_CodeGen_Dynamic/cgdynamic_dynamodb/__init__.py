@@ -253,15 +253,10 @@ def create(data):
         source_code +=f"""
                 data['{col_varname}'] = payload.get('{col_varname}','')"""
     
-    if relationships.get('has_many', '') != '':
-        for relation in relationships.get('has_many'):
-            if relation.get('type') == 'repeater':
-                entity = converter.convert_to_system_name(relation.get('entity'))
-                source_code +=f"""
-                data['{entity}'] = payload.get('{entity}','')"""
     
 
     source_code +=f"""
+
                 if payload.get('STARK_isReport', False) == False:"""
                 
                 #FIXME: should be refactored to use metadata of child entities
@@ -316,15 +311,17 @@ def create(data):
         var_pk_varname = converter.convert_to_system_name(var_pk)
         source_code +=f"""
                     temp_{rel_ent_varname} = {{
-                        data['{rel_pk_varname}'] = payload.get('{var_pk_varname}','')"""
+                        '{rel_pk_varname}': payload.get('{var_pk_varname}',''),"""
         for rel_col, rel_col_type in rel_cols.items():
             var_data = rel_ent + '_' + rel_col
             rel_col_varname = converter.convert_to_system_name(rel_col)
             data_varname = converter.convert_to_system_name(var_data)
             source_code +=f"""
-                        data['{rel_col_varname}'] = payload.get('{data_varname}','')"""
+                        '{rel_col_varname}': payload.get('{data_varname}',''),"""
         source_code += f"""
                     }}
+                    data['{rel_ent_varname}'] = temp_{rel_ent_varname}
+                    
                     """
     source_code +=f"""
 
