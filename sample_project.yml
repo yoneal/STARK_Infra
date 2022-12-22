@@ -55,3 +55,37 @@ Document:
             type: file-upload
             allowed_ext: jpg, png, csv, pdf, txt, doc
             max_upload_size: 10 MB
+Transaction:
+    pk: Transaction Number
+    data:
+        - Date: date
+        - Remarks: multi-line-string
+        - Customer: 
+            type: relationship
+            has_one: Customer
+            value: Customer ID
+            display: Customer ID
+        - Transaction Details: 
+            type: relationship
+            has_many: Transaction Details
+            has_many_ux: repeater
+            value: Customer ID
+            display: Customer ID
+Transaction Details:
+    pk: Details ID
+    data:
+        - Item:
+            type: relationship
+            has_one: Item
+            value: Product Code
+            display: Product Code
+        - Amount:
+            type: int-spinner
+            min: 1
+            max: 50
+        - Quantity:
+            type: decimal-spinner
+        - Rating:
+            type: rating
+            max: 3
+        - Date: date
